@@ -1,0 +1,7 @@
+{
+    "name": "@votewise/lib",
+    "private": true,
+    "version": "0.0.0",
+    "sideEffects": false,
+    "scripts": {}
+}

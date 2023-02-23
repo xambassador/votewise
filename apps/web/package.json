@@ -1,5 +1,5 @@
 {
-  "name": "web",
+  "name": "@votewise/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@votewise/ui": "*",
     "@heroicons/react": "^2.0.16",
     "@hookform/error-message": "^2.0.1",
     "@hookform/resolvers": "^2.9.11",

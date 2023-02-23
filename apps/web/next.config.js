@@ -14,8 +14,7 @@ if (process.env.ANALYZE === "true" && process.env.NODE_ENV === "production") {
 const nextConfig = {
   reactStrictMode: true,
   // https://nextjs.org/blog/next-13-1#built-in-module-transpilation-stable
-  transpilePackages: [],
-  plugins,
+  transpilePackages: ["@votewise/ui"],
 };
 
 module.exports = nextConfig;

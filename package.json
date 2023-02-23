@@ -5,6 +5,15 @@
     "packages/*",
     "apps/*"
   ],
+  "scripts":{
+    "web:start": "lerna exec --scope @votewise/web -- yarn start",
+    "web:dev": "lerna exec --scope @votewise/web -- yarn dev",
+    "web:build": "lerna exec --scope @votewise/web -- yarn build",
+    "server:start": "lerna exec --scope @votewise/server -- yarn start",
+    "server:dev": "lerna exec --scope @votewise/server -- yarn dev",
+    "server:build": "lerna exec --scope @votewise/server -- yarn build",
+    "clean": "lerna clean --yes && rm -rf node_modules"
+  },
   "devDependencies": {
     "@types/jest": "^29.4.0",
     "jest": "^29.4.3",

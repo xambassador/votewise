@@ -3,15 +3,16 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/components/*": ["components/*"],
-      "@/assets/*": ["assets/*"],
-      "@/assets/images/*": ["assets/images/*"],
-      "@/assets/fonts/*": ["assets/fonts/*"],
-      "@/assets/icons/*": ["assets/icons/*"],
-      "@/styles/*": ["styles/*"],
-      "@/hooks/*": ["hooks/*"],
-      "@/routes/*": ["routes/*"],
-      "@/store/*": ["store/*"]
+      "@components/*": ["components/*"],
+      "@assets/*": ["assets/*"],
+      "@assets/images/*": ["assets/images/*"],
+      "@assets/fonts/*": ["assets/fonts/*"],
+      "@assets/icons/*": ["assets/icons/*"],
+      "@styles/*": ["styles/*"],
+      "@hooks/*": ["hooks/*"],
+      "@routes/*": ["routes/*"],
+      "@store/*": ["store/*"],
+      "@votewise/ui/*": ["@votewise/ui/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
