@@ -1,0 +1,19 @@
+{
+  "extends": "@votewise/tsconfig/nextjs.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/components/*": ["components/*"],
+      "@/assets/*": ["assets/*"],
+      "@/assets/images/*": ["assets/images/*"],
+      "@/assets/fonts/*": ["assets/fonts/*"],
+      "@/assets/icons/*": ["assets/icons/*"],
+      "@/styles/*": ["styles/*"],
+      "@/hooks/*": ["hooks/*"],
+      "@/routes/*": ["routes/*"],
+      "@/store/*": ["store/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}
