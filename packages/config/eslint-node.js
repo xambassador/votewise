@@ -26,6 +26,7 @@ module.exports = {
     "no-underscore-dangle": "off",
     "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
     "import/prefer-default-export": "off",
+    "import/no-extraneous-dependencies": ["off"],
   },
   settings: {
     "import/parsers": {

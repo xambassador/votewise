@@ -2,9 +2,7 @@
   "extends": "@votewise/tsconfig/node.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src",
-    "baseUrl": "src",
-    "paths": {}
+    "baseUrl": "./src"
   },
-  "include": ["**/*.ts"]
+  "include": ["src/**/*"]
 }
