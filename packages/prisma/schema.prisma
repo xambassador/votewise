@@ -9,3 +9,211 @@ datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
 }
+
+enum Gender {
+    MALE
+    FEMALE
+    OTHER
+}
+
+model User {
+    id              Int              @id @default(autoincrement())
+    username        String           @unique
+    password        String
+    name            String
+    email           String           @unique
+    about           String
+    twitter         String?
+    facebook        String?
+    instagram       String?
+    profile_image   String?
+    cover_image     String?
+    location        String?
+    gender          Gender
+    onboarded       Boolean          @default(false)
+    created_at      DateTime         @default(now())
+    updated_at      DateTime         @default(now())
+    posts           Post[] // User has many posts
+    upvotes         Upvote[] // User has many upvotes
+    comments        Comment[] // User has many comments
+    comment_upvotes CommentUpvote[] // User has many comment upvotes
+    followers       Follow[]         @relation("followers") // User has many followers
+    following       Follow[]         @relation("following") // User has many following
+    friend1         Friend[]         @relation("user")
+    friend2         Friend[]         @relation("friend")
+    GroupMember     GroupMember[] // User is a member of many groups
+    GropInvitation  GropInvitation[] // User has many invitations to join groups or User has made many invitations to join groups
+    Notification    Notification[]
+}
+
+enum PostType {
+    PUBLIC
+    GROUP_ONLY
+}
+
+enum PostStatus {
+    OPEN
+    CLOSED
+    ARCHIVED
+    INPROGRESS
+}
+
+model Post {
+    id                Int              @id @default(autoincrement())
+    User              User             @relation(fields: [user_id], references: [id])
+    user_id           Int
+    title             String           @db.VarChar(255)
+    content           String           @db.Text
+    slug              String           @db.VarChar(255)
+    type              PostType
+    status            PostStatus
+    created_at        DateTime         @default(now())
+    updated_at        DateTime         @default(now())
+    upvotes           Upvote[] // Post has many upvotes
+    comments          Comment[] // Post has many comments
+    content_hash_tags ContentHashTag[] // Post has many content hash tags
+}
+
+model Upvote {
+    id      Int  @id @default(autoincrement())
+    Post    Post @relation(fields: [post_id], references: [id])
+    post_id Int
+    User    User @relation(fields: [user_id], references: [id])
+    user_id Int
+}
+
+model Comment {
+    id        Int             @id @default(autoincrement())
+    text      String          @db.Text
+    Post      Post            @relation(fields: [post_id], references: [id])
+    post_id   Int
+    parent_id Int? // foreign key referencing the id of the comment that this comment is replying to. This can be NULL if the comment is not a reply to another comment.
+    User      User            @relation(fields: [user_id], references: [id])
+    user_id   Int
+    upvotes   CommentUpvote[] // Comment has many upvotes
+}
+
+model CommentUpvote {
+    id         Int     @id @default(autoincrement())
+    Comment    Comment @relation(fields: [comment_id], references: [id])
+    comment_id Int
+    User       User    @relation(fields: [user_id], references: [id])
+    user_id    Int
+}
+
+model HashTag {
+    id             Int              @id @default(autoincrement())
+    ContentHashTag ContentHashTag[]
+}
+
+model ContentHashTag {
+    id          Int     @id @default(autoincrement())
+    Post        Post    @relation(fields: [post_id], references: [id])
+    post_id     Int
+    HashTag     HashTag @relation(fields: [hash_tag_id], references: [id])
+    hash_tag_id Int
+}
+
+model Follow {
+    id           Int      @id @default(autoincrement())
+    followers    User     @relation("followers", fields: [follower_id], references: [id])
+    following    User     @relation("following", fields: [following_id], references: [id])
+    follower_id  Int // foreign key referencing the id of the user who is following
+    following_id Int // foreign key referencing the id of the user who is being followed
+    created_at   DateTime @default(now())
+}
+
+enum FriendType {
+    FRIENDS
+    PENDING_USER_TO_FRIEND_REQUEST
+    PENDING_FRIEND_TO_USER_REQUEST
+}
+
+model Friend {
+    id         Int        @id @default(autoincrement())
+    user       User       @relation("user", fields: [user_id], references: [id])
+    friend     User       @relation("friend", fields: [friend_id], references: [id])
+    user_id    Int
+    friend_id  Int
+    type       FriendType
+    created_at DateTime   @default(now())
+}
+
+enum GroupType {
+    PUBLIC
+    PRIVATE
+}
+
+enum GroupStatus {
+    OPEN
+    CLOSED
+    INACTIVE
+}
+
+model Group {
+    id                   Int              @id @default(autoincrement())
+    name                 String
+    abount               String
+    type                 GroupType
+    status               GroupStatus
+    join_through_request Boolean          @default(false)
+    GroupMember          GroupMember[]
+    GropInvitation       GropInvitation[] // One group can have many invitations to join
+}
+
+model GroupMember {
+    id         Int      @id @default(autoincrement())
+    User       User     @relation(fields: [user_id], references: [id])
+    user_id    Int
+    Group      Group    @relation(fields: [group_id], references: [id])
+    group_id   Int
+    joined_at  DateTime @default(now())
+    blocked    Boolean  @default(false)
+    is_removed Boolean  @default(false)
+}
+
+enum GroupInvitationType {
+    JOIN // User wants to join a group
+    INVITE // A user is invited to join a group
+}
+
+enum GroupInvitationStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
+}
+
+model GropInvitation {
+    id       Int                   @id @default(autoincrement())
+    Group    Group                 @relation(fields: [group_id], references: [id])
+    group_id Int
+    User     User                  @relation(fields: [user_id], references: [id])
+    user_id  Int
+    type     GroupInvitationType
+    status   GroupInvitationStatus
+    sent_at  DateTime              @default(now())
+}
+
+enum NotificationType {
+    PUBLIC_POST_UPVOTE
+    GROUP_POST_UPVOTE
+    PUBLIC_POST_COMMENT_UPVOTE
+    GROUP_POST_COMMENT_UPVOTE
+    PUBLIC_POST_COMMENT
+    GROUP_POST_COMMENT
+    START_FOLLOWING
+    FRIEND_REQUEST
+    FRIEND_REQUEST_ACCEPTED
+    GROUP_INVITATION
+    GROUP_INVITATION_ACCEPTED
+    JOIN_GROUP_REQUEST
+}
+
+model Notification {
+    id         Int              @id @default(autoincrement())
+    User       User             @relation(fields: [user_id], references: [id])
+    user_id    Int
+    event_type NotificationType
+    event_id   Int
+    is_read    Boolean          @default(false)
+}
