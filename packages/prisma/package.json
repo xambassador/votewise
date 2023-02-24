@@ -3,10 +3,13 @@
     "private": true,
     "version": "0.0.0",
     "sideEffects": false,
-    "main": "./src/index.ts",
-    "types": "index.d.ts",
+    "main": "index.ts",
     "files": ["client"],
-    "scripts": {},
+    "scripts": {
+        "db:generate": "prisma generate && prisma format",
+        "db:migrate": "yarn prisma migrate dev",
+        "db:studio": "yarn prisma studio"
+    },
     "devDependencies": {
         "@types/node": "^18.14.1",
         "@votewise/config": "*",

@@ -16,6 +16,7 @@ if (process.env.NODE_ENV === "development" && process.env.DEBUG) {
   prismaOptions.log = ["query", "error", "info", "warn"];
 }
 
+// https://www.prisma.io/docs/concepts/components/prisma-client/working-with-prismaclient/instantiate-prisma-client#the-number-of-prismaclient-instances-matters
 export const prisma = global.prisma || new PrismaClient(prismaOptions);
 
 export const customPrisma = (options: Prisma.PrismaClientOptions) =>
@@ -24,7 +25,8 @@ export const customPrisma = (options: Prisma.PrismaClientOptions) =>
     ...options,
   });
 
-if (process.env.NODE_ENV === "development") {
+//   https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#prismaclient-in-long-running-applications
+if (process.env.NODE_ENV !== "production") {
   globalThis.prisma = prisma;
 }
 
