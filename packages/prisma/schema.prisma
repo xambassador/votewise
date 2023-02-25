@@ -18,18 +18,18 @@ enum Gender {
 
 model User {
     id              Int              @id @default(autoincrement())
-    username        String           @unique
-    password        String
-    name            String
     email           String           @unique
-    about           String
+    password        String
+    username        String?          @unique // This is optional at prisma level, but required at application level
+    name            String? // This is optional at prisma level, but required at application level
+    about           String? // This is optional at prisma level, but required at application level
     twitter         String?
     facebook        String?
     instagram       String?
     profile_image   String?
     cover_image     String?
     location        String?
-    gender          Gender
+    gender          Gender? // This is optional at prisma level, but required at application level
     onboarded       Boolean          @default(false)
     created_at      DateTime         @default(now())
     updated_at      DateTime         @default(now())
@@ -44,6 +44,7 @@ model User {
     GroupMember     GroupMember[] // User is a member of many groups
     GropInvitation  GropInvitation[] // User has many invitations to join groups or User has made many invitations to join groups
     Notification    Notification[]
+    RefreshToken    RefreshToken[]
 }
 
 enum PostType {
@@ -216,4 +217,12 @@ model Notification {
     event_type NotificationType
     event_id   Int
     is_read    Boolean          @default(false)
+}
+
+model RefreshToken {
+    id         Int      @id @default(autoincrement())
+    User       User     @relation(fields: [user_id], references: [id])
+    user_id    Int
+    token      String   @db.VarChar(255)
+    created_at DateTime @default(now())
 }
