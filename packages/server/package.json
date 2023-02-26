@@ -7,7 +7,7 @@
         "start": "npm run build && node dist/index.js",
         "dev": "nodemon",
         "build": "rimraf ./dist && tsc",
-        "test": "NODE_ENV=test jest --detectOpenHandles",
+        "test": "NODE_ENV=test jest --detectOpenHandles --coverage --runInBand --silent",
         "test:watch": "jest --watch"
     },
     "dependencies": {
