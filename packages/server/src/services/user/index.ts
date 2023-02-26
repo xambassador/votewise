@@ -59,6 +59,19 @@ class UserService {
     const isPasswordValid = await bcrypt.compare(password, userPassword);
     return isPasswordValid;
   }
+
+  async updatePassword(password: string, userId: number) {
+    const hashPassword = await bcrypt.hash(password, 10);
+    const user = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        password: hashPassword,
+      },
+    });
+    return user;
+  }
 }
 
 export default new UserService();

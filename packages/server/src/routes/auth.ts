@@ -4,13 +4,21 @@
  */
 import { Router } from "express";
 
-import { REGISTER_USER_V1, LOGIN_USER_V1, REVOKE_ACCESS_TOKEN_V1 } from "../configs";
-import { register, login, refreshAccessToken } from "../controllers";
+import {
+  REGISTER_USER_V1,
+  LOGIN_USER_V1,
+  REVOKE_ACCESS_TOKEN_V1,
+  FORGOT_PASSWORD_V1,
+  RESET_PASSWORD_V1,
+} from "../configs";
+import { register, login, refreshAccessToken, forgotPassword, resetPassword } from "../controllers";
 
 const router = Router();
 
 router.post(REGISTER_USER_V1, register);
 router.post(LOGIN_USER_V1, login);
 router.post(REVOKE_ACCESS_TOKEN_V1, refreshAccessToken);
+router.post(FORGOT_PASSWORD_V1, forgotPassword);
+router.post(RESET_PASSWORD_V1, resetPassword);
 
 export default router;

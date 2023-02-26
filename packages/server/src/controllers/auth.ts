@@ -1,23 +1,34 @@
+import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import type { Request, Response } from "express";
 import httpStatusCodes from "http-status-codes";
-import pino from "pino";
 
 // -----------------------------------------------------------------------------------------
-import type { RegisterUserPayload, LoginPayload } from "@votewise/types";
+import type {
+  RegisterUserPayload,
+  LoginPayload,
+  RevokeAccessTokenPayload,
+  ForgotPasswordPayload,
+  ResetPasswordPayload,
+  ResetPasswordQuery,
+} from "@votewise/types";
 
 // -----------------------------------------------------------------------------------------
 import { JSONResponse } from "../lib";
+// -----------------------------------------------------------------------------------------
+import EmailService from "../services/email";
 import UserService from "../services/user";
 import JWTService from "../services/user/jwt";
+// -----------------------------------------------------------------------------------------
+import { logger } from "../utils";
+import { isEmail } from "../zodValidation/auth";
 
 dotenv.config();
 
-const ACCESS_TOKEN_SECRET = process.env.JWT_SALT_ACCESS_TOKEN_SECRET;
-const REFRESH_TOKEN_SECRET = process.env.JWT_SALT_REFRESH_TOKEN_SECRET;
+const { FRONTEND_URL } = process.env;
 
-if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET) {
-  pino().error("Missing JWT_SALT_ACCESS_TOKEN_SECRET or JWT_SALT_REFRESH_TOKEN_SECRET");
+if (!FRONTEND_URL) {
+  logger("FRONTEND_URL is not defined in .env file", "error");
   process.exit(1);
 }
 
@@ -51,7 +62,17 @@ export const register = async (req: Request, res: Response) => {
   const refreshToken = JWTService.generateRefreshToken({ userId: newUser.id });
   await JWTService.saveRefreshToken(newUser.id, refreshToken);
 
-  // TODO: Send an email for verifying the email address
+  const emailData = {
+    to: newUser.email,
+    subject: "Verify your email address",
+    html: `
+          <h1>Verify your email address</h1>
+          <p>Click on the link below to verify your email address</p>
+      `,
+  };
+
+  const transporter = new EmailService(emailData, "REGISTRATION_MAIL");
+  transporter.addToQueue();
 
   // Send the accessToken and refreshToken to the client
   return res.status(httpStatusCodes.CREATED).json(
@@ -113,7 +134,7 @@ export const login = async (req: Request, res: Response) => {
 // -----------------------------------------------------------------------------------------
 // Refresh the access token
 export const refreshAccessToken = async (req: Request, res: Response) => {
-  const refreshToken = req.body.refreshToken as string;
+  const { refreshToken } = req.body as RevokeAccessTokenPayload;
 
   // Validate the refreshToken
   if (!refreshToken) {
@@ -173,9 +194,154 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
 
 // -----------------------------------------------------------------------------------------
 // Forgot password
+export const forgotPassword = async (req: Request, res: Response) => {
+  const payload = req.body as ForgotPasswordPayload;
+
+  if (!payload.email) {
+    return res
+      .status(httpStatusCodes.BAD_REQUEST)
+      .json(new JSONResponse("Validation failed", null, { message: "Email is required" }, false));
+  }
+
+  const isValidEmail = isEmail(payload.email);
+
+  if (!isValidEmail) {
+    return res
+      .status(httpStatusCodes.BAD_REQUEST)
+      .json(new JSONResponse("Validation failed", null, { message: "Invalid email" }, false));
+  }
+
+  const user = await UserService.checkIfUserExists(payload.email);
+  if (!user) {
+    return res.status(httpStatusCodes.NOT_FOUND).json(
+      new JSONResponse(
+        "User not found",
+        null,
+        {
+          message: "User not found",
+        },
+        false
+      )
+    );
+  }
+
+  const { ip } = req;
+  const rid = await bcrypt.hash(`${user.id}${ip}`, 10);
+  const token = JWTService.generateAccessToken({ rid }, { expiresIn: 300 });
+  const url = `${process.env.FRONTEND_URL}/reset-password?token=${token}&email=${user.email}`;
+  const emailData = {
+    to: user.email,
+    html: `<p>Click the link below to reset your password</p><a href="${url}">${url}</a>`,
+    subject: "Reset password",
+  };
+  const transporter = new EmailService(emailData, "REGISTRATION_MAIL");
+  transporter.addToQueue();
+  return res.status(httpStatusCodes.OK).json(
+    new JSONResponse(
+      "Email sent successfully",
+      {
+        message: "Request is queued for process. Check your mail box..",
+      },
+      null,
+      true
+    )
+  );
+};
 
 // -----------------------------------------------------------------------------------------
 // Reset password
+export const resetPassword = async (req: Request, res: Response) => {
+  const { password } = req.body as ResetPasswordPayload;
+  const { token, email } = req.query as ResetPasswordQuery;
+
+  if (!token) {
+    return res
+      .status(httpStatusCodes.BAD_REQUEST)
+      .json(new JSONResponse("Validation failed", null, { message: "Token is required" }, false));
+  }
+
+  if (!email) {
+    return res
+      .status(httpStatusCodes.BAD_REQUEST)
+      .json(new JSONResponse("Validation failed", null, { message: "Email is required" }, false));
+  }
+
+  const isValidPayload = UserService.isValidRegisterPayload({
+    email,
+    password,
+  });
+
+  if (!isValidPayload.success) {
+    return res.status(httpStatusCodes.BAD_REQUEST).json(
+      new JSONResponse(
+        "Validation failed",
+        null,
+        {
+          message: isValidPayload.message,
+        },
+        false
+      )
+    );
+  }
+
+  const user = await UserService.checkIfUserExists(email);
+
+  if (!user) {
+    return res.status(httpStatusCodes.NOT_FOUND).json(
+      new JSONResponse(
+        "User not found",
+        null,
+        {
+          message: "User not found",
+        },
+        false
+      )
+    );
+  }
+
+  const { ip } = req;
+  const ridKey = `${user.id}${ip}`;
+  try {
+    const { rid } = JWTService.verifyAccessToken(token) as { rid: string };
+    const isValidRid = await bcrypt.compare(ridKey, rid);
+
+    if (!isValidRid) {
+      return res.status(httpStatusCodes.UNAUTHORIZED).json(
+        new JSONResponse(
+          "Unauthorized",
+          null,
+          {
+            message: "Unauthorized",
+          },
+          false
+        )
+      );
+    }
+
+    await UserService.updatePassword(password, user.id);
+    return res.status(httpStatusCodes.OK).json(
+      new JSONResponse(
+        "Password updated successfully",
+        {
+          message: "Password updated successfully",
+        },
+        null,
+        true
+      )
+    );
+  } catch (err) {
+    return res.status(httpStatusCodes.UNAUTHORIZED).json(
+      new JSONResponse(
+        "Unauthorized",
+        null,
+        {
+          message: "Unauthorized",
+        },
+        false
+      )
+    );
+  }
+};
 
 // -----------------------------------------------------------------------------------------
 // Email verification

@@ -14,4 +14,28 @@ type LoginPayload = {
   rememberMe: boolean;
 };
 
-export type { RegisterUserPayload, LoginPayload };
+type RevokeAccessTokenPayload = {
+  refreshToken: string;
+};
+
+type ForgotPasswordPayload = {
+  email: string;
+};
+
+type ResetPasswordPayload = {
+  password: string;
+};
+
+type ResetPasswordQuery = {
+  token: string;
+  email: string;
+};
+
+export type {
+  RegisterUserPayload,
+  LoginPayload,
+  RevokeAccessTokenPayload,
+  ForgotPasswordPayload,
+  ResetPasswordPayload,
+  ResetPasswordQuery,
+};
