@@ -75,6 +75,20 @@ class JWTService {
       },
     });
   }
+
+  async checkIfRefreshTokenExists(userId: number, token: string) {
+    const refreshToken = await prisma.refreshToken.findUnique({
+      where: {
+        user_id: userId,
+      },
+    });
+
+    if (!refreshToken) {
+      return false;
+    }
+
+    return refreshToken.token === token;
+  }
 }
 
 export default new JWTService();

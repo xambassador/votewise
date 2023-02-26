@@ -109,3 +109,76 @@ export const login = async (req: Request, res: Response) => {
     .status(httpStatusCodes.OK)
     .json(new JSONResponse("Login successful", { accessToken, refreshToken }, null, true));
 };
+
+// -----------------------------------------------------------------------------------------
+// Refresh the access token
+export const refreshAccessToken = async (req: Request, res: Response) => {
+  const refreshToken = req.body.refreshToken as string;
+
+  // Validate the refreshToken
+  if (!refreshToken) {
+    return res
+      .status(httpStatusCodes.BAD_REQUEST)
+      .json(new JSONResponse("Validation failed", null, { message: "Refresh token is required" }, false));
+  }
+
+  try {
+    // Verify the refreshToken
+    const decoded = JWTService.verifyRefreshToken(refreshToken) as { userId: string };
+
+    if (!decoded) {
+      return res
+        .status(httpStatusCodes.UNAUTHORIZED)
+        .json(new JSONResponse("Invalid refresh token", null, { message: "Invalid refresh token" }, false));
+    }
+
+    // Check if the refreshToken is in the database
+    const isRefreshTokenExists = await JWTService.checkIfRefreshTokenExists(
+      Number(decoded.userId),
+      refreshToken
+    );
+
+    if (!isRefreshTokenExists) {
+      return res
+        .status(httpStatusCodes.UNAUTHORIZED)
+        .json(
+          new JSONResponse("Invalid refresh token", null, { message: "Refresh token was expired." }, false)
+        );
+    }
+
+    // Create a new accessToken and refreshToken
+    const accessToken = JWTService.generateAccessToken({ userId: decoded.userId });
+    const newRefreshToken = JWTService.generateRefreshToken({ userId: decoded.userId });
+    await JWTService.saveRefreshToken(Number(decoded.userId), newRefreshToken, true);
+
+    // Send the accessToken and refreshToken to the client
+    return res
+      .status(httpStatusCodes.OK)
+      .json(
+        new JSONResponse(
+          "Access token revoked successfully",
+          { accessToken, refreshToken: newRefreshToken },
+          null,
+          true
+        )
+      );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
+    const msg = (err.message as string) || "Invalid refresh token";
+    return res
+      .status(httpStatusCodes.UNAUTHORIZED)
+      .json(new JSONResponse("Invalid refresh token", null, { message: msg }, false));
+  }
+};
+
+// -----------------------------------------------------------------------------------------
+// Forgot password
+
+// -----------------------------------------------------------------------------------------
+// Reset password
+
+// -----------------------------------------------------------------------------------------
+// Email verification
+
+// -----------------------------------------------------------------------------------------
+// Resend email verification

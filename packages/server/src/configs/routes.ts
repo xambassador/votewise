@@ -17,3 +17,4 @@ export const FORGOT_PASSWORD_V1 = "/forgot-password";
 export const RESET_PASSWORD_V1 = "/reset-password";
 export const VERIFY_EMAIL_V1 = "/verify-email";
 export const RESEND_EMAIL_VERIFICATION_V1 = "/resend-email-verification";
+export const REVOKE_ACCESS_TOKEN_V1 = "/revoke-access-token";

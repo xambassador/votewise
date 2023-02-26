@@ -8,7 +8,7 @@ import httpStatusCodes from "http-status-codes";
 import supertest from "supertest";
 
 import prismaMock from "../../../test/__mock__/prisma";
-import { AUTH_ROUTE_V1, REGISTER_USER_V1, LOGIN_USER_V1 } from "../../configs";
+import { AUTH_ROUTE_V1, REGISTER_USER_V1, LOGIN_USER_V1, REVOKE_ACCESS_TOKEN_V1 } from "../../configs";
 import app from "../../index";
 
 // Tell Jest to mock the prisma module
@@ -221,5 +221,43 @@ describe("POST /api/v1/auth/login", () => {
     expect(response.body.data).toHaveProperty("accessToken");
     expect(response.body.data).toHaveProperty("refreshToken");
     expect(response.body).toHaveProperty("error", null);
+  });
+});
+
+describe("POST /api/v1/auth/revoke-access-token", () => {
+  let server: http.Server;
+
+  beforeAll((done) => {
+    server = http.createServer(app);
+    server.listen(done);
+  });
+
+  afterAll((done) => {
+    server.close(done);
+  });
+
+  test("Should return BAD_REQUEST if the request body is invalid", async () => {
+    const request = supertest(server);
+    let response = await request.post(`${AUTH_ROUTE_V1}${REVOKE_ACCESS_TOKEN_V1}`).send();
+
+    expect(response.status).toBe(httpStatusCodes.BAD_REQUEST);
+    expect(response.status).not.toBe(httpStatusCodes.OK);
+    expect(response.body).toHaveProperty("success", false);
+    expect(response.body).toHaveProperty("message", "Validation failed");
+    expect(response.body).toHaveProperty("data", null);
+  });
+
+  test("Should return UNAUTHORIZED if token is invalid", async () => {
+    const request = supertest(server);
+    const token = faker.datatype.uuid();
+    const response = await request.post(`${AUTH_ROUTE_V1}${REVOKE_ACCESS_TOKEN_V1}`).send({
+      refreshToken: token,
+    });
+
+    expect(response.status).toBe(httpStatusCodes.UNAUTHORIZED);
+    expect(response.status).not.toBe(httpStatusCodes.OK);
+    expect(response.body).toHaveProperty("success", false);
+    expect(response.body).toHaveProperty("message", "Invalid refresh token");
+    expect(response.body).toHaveProperty("data", null);
   });
 });
