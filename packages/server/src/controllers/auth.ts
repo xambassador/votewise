@@ -1,17 +1,15 @@
-import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import type { Request, Response } from "express";
 import httpStatusCodes from "http-status-codes";
-import jsonwebtoken from "jsonwebtoken";
 import pino from "pino";
 
-import { prisma } from "@votewise/prisma";
 // -----------------------------------------------------------------------------------------
-import type { RegisterUserPayload } from "@votewise/types";
+import type { RegisterUserPayload, LoginPayload } from "@votewise/types";
 
 // -----------------------------------------------------------------------------------------
 import { JSONResponse } from "../lib";
-import { validateRegisterUserSchema } from "../zodValidation";
+import UserService from "../services/user";
+import JWTService from "../services/user/jwt";
 
 dotenv.config();
 
@@ -24,9 +22,10 @@ if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET) {
 }
 
 // -----------------------------------------------------------------------------------------
+// Register a new user
 export const register = async (req: Request, res: Response) => {
   const payload: RegisterUserPayload = req.body;
-  const isValid = validateRegisterUserSchema(payload);
+  const isValid = UserService.isValidRegisterPayload(payload);
 
   // Validate the request body
   if (!isValid.success) {
@@ -35,67 +34,78 @@ export const register = async (req: Request, res: Response) => {
       .json(new JSONResponse("Validation failed", null, { message: isValid.message }, false));
   }
 
-  // Check if the user already exists or not
-  const user = await prisma.user.findUnique({
-    where: {
-      email: payload.email,
-    },
-  });
+  // Check if the user already exists
+  const user = await UserService.checkIfUserExists(payload.email);
 
   if (user) {
-    return res.status(httpStatusCodes.CONFLICT).json(
-      new JSONResponse(
-        "User already exists",
-        null,
-        {
-          message: "User already exists",
-        },
-        false
-      )
-    );
+    return res
+      .status(httpStatusCodes.CONFLICT)
+      .json(new JSONResponse("User already exists", null, { message: "User already exists" }, false));
   }
 
-  // Create the user
-  const hashedPassword = await bcrypt.hash(payload.password, 10);
-  const newUser = await prisma.user.create({
-    data: {
-      email: payload.email,
-      password: hashedPassword,
-    },
-  });
+  // Create a new user
+  const newUser = await UserService.createUser(payload);
 
-  // Generate the JWT tokens, access token and refresh token
-  const accessToken = jsonwebtoken.sign(
-    {
-      userId: newUser.id,
-    },
-    ACCESS_TOKEN_SECRET,
-    {
-      expiresIn: "15m",
-    }
+  // Create a new accessToken and refreshToken
+  const accessToken = JWTService.generateAccessToken({ userId: newUser.id });
+  const refreshToken = JWTService.generateRefreshToken({ userId: newUser.id });
+  await JWTService.saveRefreshToken(newUser.id, refreshToken);
+
+  // TODO: Send an email for verifying the email address
+
+  // Send the accessToken and refreshToken to the client
+  return res.status(httpStatusCodes.CREATED).json(
+    new JSONResponse(
+      "User created successfully",
+      {
+        accessToken,
+        refreshToken,
+      },
+      null,
+      true
+    )
   );
-  const refreshToken = jsonwebtoken.sign(
-    {
-      userId: newUser.id,
-    },
-    REFRESH_TOKEN_SECRET,
-    {
-      expiresIn: "7d",
-    }
-  );
+};
 
-  // Save the refresh token in the database
-  const data = await prisma.refreshToken.create({
-    data: {
-      token: refreshToken,
-      user_id: newUser.id,
-    },
-  });
+// -----------------------------------------------------------------------------------------
+// Login a user
+export const login = async (req: Request, res: Response) => {
+  // Validate body payload
+  const payload = req.body as LoginPayload;
+  const isValid = UserService.isValidLoginPayload(payload);
 
-  pino().info(data);
+  if (!isValid.success) {
+    return res
+      .status(httpStatusCodes.BAD_REQUEST)
+      .json(new JSONResponse("Validation failed", null, { message: isValid.message }, false));
+  }
 
-  // Send the response
+  // Check if user is exists or not
+  const user = await UserService.checkIfUserExists(payload.username);
+
+  // If user is not exists
+  if (!user) {
+    return res
+      .status(httpStatusCodes.NOT_FOUND)
+      .json(new JSONResponse("User not found", null, { message: "User not found" }, false));
+  }
+
+  // Check if the password is correct or not
+  const isPasswordCorrect = await UserService.validatePassword(payload.password, user.password);
+
+  if (!isPasswordCorrect) {
+    return res
+      .status(httpStatusCodes.UNAUTHORIZED)
+      .json(new JSONResponse("Invalid credentials", null, { message: "Invalid credentials" }, false));
+  }
+
+  // Create a new accessToken and refreshToken
+  const accessToken = JWTService.generateAccessToken({ userId: user.id });
+  const refreshToken = JWTService.generateRefreshToken({ userId: user.id });
+  await JWTService.saveRefreshToken(user.id, refreshToken, true);
+
+  // Send the accessToken and refreshToken to the client
   return res
-    .status(httpStatusCodes.CREATED)
-    .json(new JSONResponse("User created successfully", { accessToken, refreshToken }, null, true));
+    .status(httpStatusCodes.OK)
+    .json(new JSONResponse("Login successful", { accessToken, refreshToken }, null, true));
 };

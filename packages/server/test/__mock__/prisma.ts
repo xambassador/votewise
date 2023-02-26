@@ -15,4 +15,9 @@ beforeEach(() => {
   mockReset(prismaMock);
 });
 
+afterAll(async () => {
+  await prismaMock.$disconnect();
+  await prisma.$disconnect();
+});
+
 export default prismaMock;

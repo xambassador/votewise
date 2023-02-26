@@ -222,7 +222,7 @@ model Notification {
 model RefreshToken {
     id         Int      @id @default(autoincrement())
     User       User     @relation(fields: [user_id], references: [id])
-    user_id    Int
+    user_id    Int      @unique
     token      String   @db.VarChar(255)
     created_at DateTime @default(now())
 }

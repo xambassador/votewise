@@ -12,3 +12,6 @@ beforeAll(async () => {
 afterAll(async () => {
     await prisma.$disconnect();
 });
+
+// eslint-disable-next-line
+console.log("test ====> jest.setup.ts");

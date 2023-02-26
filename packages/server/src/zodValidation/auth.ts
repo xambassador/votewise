@@ -4,21 +4,12 @@
  */
 import { z } from "zod";
 
-import type { RegisterUserPayload } from "@votewise/types";
+import type { RegisterUserPayload, LoginPayload } from "@votewise/types";
 
 import { generateErrorMessage } from "./generateErrorMessage";
 
 // -----------------------------------------------------------------------------------------
 const registerUserSchema = z.object({
-  //   username: z
-  //     .string({
-  //       required_error: "Username is required",
-  //       invalid_type_error: "Username must be a string",
-  //     })
-  //     .min(3, {
-  //       message: "Username must be at least 3 characters long",
-  //     })
-  //     .max(20),
   password: z
     .string({
       required_error: "Password is required",
@@ -28,15 +19,6 @@ const registerUserSchema = z.object({
       message: "Password must be at least 8 characters long",
     })
     .max(20),
-  //   about: z
-  //     .string({
-  //       required_error: "About is required",
-  //       invalid_type_error: "About must be a string",
-  //     })
-  //     .min(10, {
-  //       message: "About must be at least 10 characters long",
-  //     })
-  //     .max(100),
   email: z
     .string({
       required_error: "Email is required",
@@ -45,18 +27,29 @@ const registerUserSchema = z.object({
     .email({
       message: "Invalid email address",
     }),
-  //   gender: z.enum(["MALE", "FEMALE", "OTHER"], {
-  //     required_error: "Gender is required",
-  //   }),
-  //   name: z
-  //     .string({
-  //       required_error: "Name is required",
-  //       invalid_type_error: "Name must be a string",
-  //     })
-  //     .min(3, {
-  //       message: "Name must be at least 3 characters long",
-  //     })
-  //     .max(20),
+});
+
+const loginSchema = z.object({
+  username: z
+    .string({
+      required_error: "Username is required",
+      invalid_type_error: "Username must be a string",
+    })
+    .optional(),
+  email: z
+    .string()
+    .email({
+      message: "Invalid email",
+    })
+    .optional(),
+  password: z.string({
+    required_error: "Password is required",
+    invalid_type_error: "Password must be a string",
+  }),
+});
+
+const emailSchema = z.string().email({
+  message: "Invalid email address",
 });
 
 const validateRegisterUserSchema = (payload: RegisterUserPayload) => {
@@ -68,4 +61,35 @@ const validateRegisterUserSchema = (payload: RegisterUserPayload) => {
   return { success: true, message: null };
 };
 
-export { validateRegisterUserSchema };
+export const isEmail = (text: string) => {
+  const isValidEmail = emailSchema.safeParse(text);
+  return isValidEmail.success;
+};
+
+const validateLoginSchema = (payload: LoginPayload) => {
+  // check if the username is an email
+  const isValidEmail = isEmail(payload.username);
+  if (isValidEmail) {
+    const isValid = loginSchema.safeParse({
+      email: payload.username,
+      password: payload.password,
+    });
+    if (!isValid.success) {
+      const errorMessage = generateErrorMessage(isValid.error.issues);
+      return { success: false, message: errorMessage };
+    }
+    return { success: true, message: null };
+  }
+  // if it's not an email, then it's a username
+  const isValid = loginSchema.safeParse({
+    username: payload.username,
+    password: payload.password,
+  });
+  if (!isValid.success) {
+    const errorMessage = generateErrorMessage(isValid.error.issues);
+    return { success: false, message: errorMessage };
+  }
+  return { success: true, message: null };
+};
+
+export { validateRegisterUserSchema, validateLoginSchema };

@@ -27,6 +27,7 @@ module.exports = {
     "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
     "import/prefer-default-export": "off",
     "import/no-extraneous-dependencies": ["off"],
+    "class-methods-use-this": "off",
   },
   settings: {
     "import/parsers": {

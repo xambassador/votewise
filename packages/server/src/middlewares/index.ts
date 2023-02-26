@@ -25,6 +25,12 @@ const registerMiddlewares = (app: Application) => {
       limit: "50mb",
     })
   );
+  app.use((req, res, next) => {
+    if (req.body && typeof req.body === "object" && !Array.isArray(req.body)) {
+      Object.freeze(req.body);
+    }
+    next();
+  });
   logger("Middlewares registered....");
 };
 

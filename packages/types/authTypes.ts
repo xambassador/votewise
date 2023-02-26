@@ -8,4 +8,10 @@ type RegisterUserPayload = {
   password: string;
 };
 
-export type { RegisterUserPayload };
+type LoginPayload = {
+  username: string;
+  password: string;
+  rememberMe: boolean;
+};
+
+export type { RegisterUserPayload, LoginPayload };
