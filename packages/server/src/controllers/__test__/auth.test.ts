@@ -13,6 +13,23 @@ import app from "../../index";
 
 // Tell Jest to mock the prisma module
 jest.mock("@votewise/prisma", () => ({ prisma: prismaMock }));
+jest.mock("../../services/email/index", () => {
+  class EmailService {
+    public data: object;
+
+    private emailType: string;
+
+    constructor(data: object, type: string) {
+      this.data = data;
+      this.emailType = type;
+    }
+
+    addToQueue() {
+      return null;
+    }
+  }
+  return EmailService;
+});
 
 const getUser = (props: object) => ({
   id: 1,
@@ -49,7 +66,6 @@ describe("POST /api/v1/auth/register", () => {
   test("Should return BAD_REQUEST if the request body is empty", async () => {
     const request = supertest(server);
     const response = await request.post(`${AUTH_ROUTE_V1}${REGISTER_USER_V1}`).send();
-
     expect(response.status).toBe(httpStatusCodes.BAD_REQUEST);
     expect(response.status).not.toBe(httpStatusCodes.CREATED);
     expect(response.body).toHaveProperty("success", false);
@@ -62,7 +78,6 @@ describe("POST /api/v1/auth/register", () => {
     const response = await request.post(`${AUTH_ROUTE_V1}${REGISTER_USER_V1}`).send({
       email: faker.internet.email(),
     });
-
     expect(response.status).toBe(httpStatusCodes.BAD_REQUEST);
     expect(response.status).not.toBe(httpStatusCodes.CREATED);
     expect(response.body).toHaveProperty("success", false);
