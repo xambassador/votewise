@@ -21,7 +21,6 @@ import {
 import app from "../../index";
 import JWT from "../../services/user/jwt";
 
-// Tell Jest to mock the prisma module
 jest.mock("@votewise/prisma", () => ({ prisma: prismaMock }));
 jest.mock("../../services/email/index", () => {
   class EmailService {

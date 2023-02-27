@@ -6,11 +6,11 @@ import { Router } from "express";
 
 import { ONBOARDING_UPDATE_V1, ONBOARDING_STATUS_V1 } from "../configs";
 import { onboardingStatus, onboardUser } from "../controllers";
-import authMiddleware from "../middlewares/auth";
+import authorizationMiddleware from "../middlewares/auth";
 
 const router = Router();
 
-router.get(ONBOARDING_STATUS_V1, authMiddleware, onboardingStatus);
-router.put(ONBOARDING_UPDATE_V1, authMiddleware, onboardUser);
+router.get(ONBOARDING_STATUS_V1, authorizationMiddleware, onboardingStatus);
+router.put(ONBOARDING_UPDATE_V1, authorizationMiddleware, onboardUser);
 
 export default router;

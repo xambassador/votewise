@@ -13,6 +13,7 @@
     "server:dev": "lerna exec --scope @votewise/server -- yarn dev",
     "server:build": "lerna exec --scope @votewise/server -- yarn build",
     "server:test": "lerna exec --scope @votewise/server -- yarn test",
+    "server:test:watch": "lerna exec --scope @votewise/server -- yarn test:watch",
     "db:generate": "lerna exec --scope @votewise/prisma -- yarn run db:generate",
     "db:migrate": "lerna exec --scope @votewise/prisma -- yarn run db:migrate",
     "db:studio": "lerna exec --scope @votewise/prisma -- yarn run db:studio",

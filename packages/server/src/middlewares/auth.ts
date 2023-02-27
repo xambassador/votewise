@@ -9,10 +9,19 @@ import { JSONResponse } from "../lib";
 import UserService from "../services/user";
 import JWTService from "../services/user/jwt";
 
-export default async function authMiddleware(req: Request, res: Response, next: NextFunction) {
-  // Check if token is available in cookies or headers.
+const { UNAUTHORIZED } = httpStatusCodes;
+const error = {
+  message: "Unauthorized",
+};
+const unauthorizedResponse = new JSONResponse("Unauthorized", null, error, false);
+
+export default async function authorizationMiddleware(req: Request, res: Response, next: NextFunction) {
+  if (!req.headers) {
+    return res.status(UNAUTHORIZED).json(unauthorizedResponse);
+  }
+
   let token: undefined | null | string;
-  if (req.headers.authorization) {
+  if (req.headers.authorization && req.headers.authorization.split(" ")[0] === "Bearer") {
     // eslint-disable-next-line prefer-destructuring
     token = req.headers.authorization.split(" ")[1];
   } else if (req.cookies) {
@@ -20,45 +29,18 @@ export default async function authMiddleware(req: Request, res: Response, next: 
   }
 
   if (!token) {
-    return res.status(httpStatusCodes.UNAUTHORIZED).json(
-      new JSONResponse(
-        "Unauthorized",
-        null,
-        {
-          message: "Unauthorized",
-        },
-        false
-      )
-    );
+    return res.status(UNAUTHORIZED).json(unauthorizedResponse);
   }
 
   try {
     const { userId } = JWTService.verifyAccessToken(token) as { userId: number };
     const user = await UserService.checkIfUserExists(userId);
     if (!user) {
-      return res.status(httpStatusCodes.UNAUTHORIZED).json(
-        new JSONResponse(
-          "Unauthorized",
-          null,
-          {
-            message: "Unauthorized",
-          },
-          false
-        )
-      );
+      return res.status(UNAUTHORIZED).json(unauthorizedResponse);
     }
     req.session = { user };
     return next();
   } catch (err) {
-    return res.status(httpStatusCodes.UNAUTHORIZED).json(
-      new JSONResponse(
-        "Unauthorized",
-        null,
-        {
-          message: "Unauthorized",
-        },
-        false
-      )
-    );
+    return res.status(UNAUTHORIZED).json(unauthorizedResponse);
   }
 }

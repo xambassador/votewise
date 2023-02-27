@@ -8,7 +8,7 @@
         "dev": "nodemon",
         "build": "rimraf ./dist && tsc",
         "test": "NODE_ENV=test jest --runInBand --silent --forceExit",
-        "test:watch": "jest --watch"
+        "test:watch": "NODE_ENV=test jest --runInBand --silent --forceExit --watch"
     },
     "dependencies": {
         "@votewise/prisma": "*",
