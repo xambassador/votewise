@@ -34,6 +34,8 @@ if (!FRONTEND_URL) {
   process.exit(1);
 }
 
+const { BAD_REQUEST, CONFLICT, CREATED, NOT_FOUND, UNAUTHORIZED, OK } = httpStatusCodes;
+
 // -----------------------------------------------------------------------------------------
 // Register a new user
 export const register = async (req: Request, res: Response) => {
@@ -43,7 +45,7 @@ export const register = async (req: Request, res: Response) => {
   // Validate the request body
   if (!isValid.success) {
     return res
-      .status(httpStatusCodes.BAD_REQUEST)
+      .status(BAD_REQUEST)
       .json(new JSONResponse("Validation failed", null, { message: isValid.message }, false));
   }
 
@@ -52,7 +54,7 @@ export const register = async (req: Request, res: Response) => {
 
   if (user) {
     return res
-      .status(httpStatusCodes.CONFLICT)
+      .status(CONFLICT)
       .json(new JSONResponse("User already exists", null, { message: "User already exists" }, false));
   }
 
@@ -86,7 +88,7 @@ export const register = async (req: Request, res: Response) => {
   transporter.addToQueue();
 
   // Send the accessToken and refreshToken to the client
-  return res.status(httpStatusCodes.CREATED).json(
+  return res.status(CREATED).json(
     new JSONResponse(
       "User created successfully",
       {
@@ -108,7 +110,7 @@ export const login = async (req: Request, res: Response) => {
 
   if (!isValid.success) {
     return res
-      .status(httpStatusCodes.BAD_REQUEST)
+      .status(BAD_REQUEST)
       .json(new JSONResponse("Validation failed", null, { message: isValid.message }, false));
   }
 
@@ -118,7 +120,7 @@ export const login = async (req: Request, res: Response) => {
   // If user is not exists
   if (!user) {
     return res
-      .status(httpStatusCodes.NOT_FOUND)
+      .status(NOT_FOUND)
       .json(new JSONResponse("User not found", null, { message: "User not found" }, false));
   }
 
@@ -127,7 +129,7 @@ export const login = async (req: Request, res: Response) => {
 
   if (!isPasswordCorrect) {
     return res
-      .status(httpStatusCodes.UNAUTHORIZED)
+      .status(UNAUTHORIZED)
       .json(new JSONResponse("Invalid credentials", null, { message: "Invalid credentials" }, false));
   }
 
@@ -138,9 +140,7 @@ export const login = async (req: Request, res: Response) => {
   await UserService.updateLastLogin(user.id);
 
   // Send the accessToken and refreshToken to the client
-  return res
-    .status(httpStatusCodes.OK)
-    .json(new JSONResponse("Login successful", { accessToken, refreshToken }, null, true));
+  return res.status(OK).json(new JSONResponse("Login successful", { accessToken, refreshToken }, null, true));
 };
 
 // -----------------------------------------------------------------------------------------
@@ -151,7 +151,7 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
   // Validate the refreshToken
   if (!refreshToken) {
     return res
-      .status(httpStatusCodes.BAD_REQUEST)
+      .status(BAD_REQUEST)
       .json(new JSONResponse("Validation failed", null, { message: "Refresh token is required" }, false));
   }
 
@@ -161,7 +161,7 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
 
     if (!decoded) {
       return res
-        .status(httpStatusCodes.UNAUTHORIZED)
+        .status(UNAUTHORIZED)
         .json(new JSONResponse("Invalid refresh token", null, { message: "Invalid refresh token" }, false));
     }
 
@@ -173,7 +173,7 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
 
     if (!isRefreshTokenExists) {
       return res
-        .status(httpStatusCodes.UNAUTHORIZED)
+        .status(UNAUTHORIZED)
         .json(
           new JSONResponse("Invalid refresh token", null, { message: "Refresh token was expired." }, false)
         );
@@ -186,7 +186,7 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
 
     // Send the accessToken and refreshToken to the client
     return res
-      .status(httpStatusCodes.OK)
+      .status(OK)
       .json(
         new JSONResponse(
           "Access token revoked successfully",
@@ -199,7 +199,7 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
   } catch (err: any) {
     const msg = (err.message as string) || "Invalid refresh token";
     return res
-      .status(httpStatusCodes.UNAUTHORIZED)
+      .status(UNAUTHORIZED)
       .json(new JSONResponse("Invalid refresh token", null, { message: msg }, false));
   }
 };
@@ -211,7 +211,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
   if (!payload.email) {
     return res
-      .status(httpStatusCodes.BAD_REQUEST)
+      .status(BAD_REQUEST)
       .json(new JSONResponse("Validation failed", null, { message: "Email is required" }, false));
   }
 
@@ -219,13 +219,13 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
   if (!isValidEmail) {
     return res
-      .status(httpStatusCodes.BAD_REQUEST)
+      .status(BAD_REQUEST)
       .json(new JSONResponse("Validation failed", null, { message: "Invalid email" }, false));
   }
 
   const user = await UserService.checkIfUserExists(payload.email);
   if (!user) {
-    return res.status(httpStatusCodes.NOT_FOUND).json(
+    return res.status(NOT_FOUND).json(
       new JSONResponse(
         "User not found",
         null,
@@ -248,7 +248,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
   };
   const transporter = new EmailService(emailData, "REGISTRATION_MAIL");
   transporter.addToQueue();
-  return res.status(httpStatusCodes.OK).json(
+  return res.status(OK).json(
     new JSONResponse(
       "Email sent successfully",
       {
@@ -268,13 +268,13 @@ export const resetPassword = async (req: Request, res: Response) => {
 
   if (!token) {
     return res
-      .status(httpStatusCodes.BAD_REQUEST)
+      .status(BAD_REQUEST)
       .json(new JSONResponse("Validation failed", null, { message: "Token is required" }, false));
   }
 
   if (!email) {
     return res
-      .status(httpStatusCodes.BAD_REQUEST)
+      .status(BAD_REQUEST)
       .json(new JSONResponse("Validation failed", null, { message: "Email is required" }, false));
   }
 
@@ -284,7 +284,7 @@ export const resetPassword = async (req: Request, res: Response) => {
   });
 
   if (!isValidPayload.success) {
-    return res.status(httpStatusCodes.BAD_REQUEST).json(
+    return res.status(BAD_REQUEST).json(
       new JSONResponse(
         "Validation failed",
         null,
@@ -299,7 +299,7 @@ export const resetPassword = async (req: Request, res: Response) => {
   const user = await UserService.checkIfUserExists(email);
 
   if (!user) {
-    return res.status(httpStatusCodes.NOT_FOUND).json(
+    return res.status(NOT_FOUND).json(
       new JSONResponse(
         "User not found",
         null,
@@ -318,7 +318,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     const isValidRid = await bcrypt.compare(ridKey, rid);
 
     if (!isValidRid) {
-      return res.status(httpStatusCodes.UNAUTHORIZED).json(
+      return res.status(UNAUTHORIZED).json(
         new JSONResponse(
           "Unauthorized",
           null,
@@ -338,7 +338,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     };
     const transporter = new EmailService(emailData, "NOTIFICATION_MAIL");
     transporter.addToQueue();
-    return res.status(httpStatusCodes.OK).json(
+    return res.status(OK).json(
       new JSONResponse(
         "Password reset successfully",
         {
@@ -349,7 +349,7 @@ export const resetPassword = async (req: Request, res: Response) => {
       )
     );
   } catch (err) {
-    return res.status(httpStatusCodes.UNAUTHORIZED).json(
+    return res.status(UNAUTHORIZED).json(
       new JSONResponse(
         "Unauthorized",
         null,
