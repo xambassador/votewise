@@ -2,7 +2,7 @@ import Queue from "bull";
 import dotenv from "dotenv";
 
 import { logger } from "../../utils";
-import { EmailTransporter } from "../email";
+import { EmailTransporter } from "../email/EmailTransporter";
 
 dotenv.config();
 
@@ -27,7 +27,21 @@ const passwordResetEmailQueue = new Queue<EmailData>("passwordResetEmail", {
   redis,
 });
 
+const notificationMailQueue = new Queue<EmailData>("notificationMail", {
+  redis,
+});
+
+passwordResetEmailQueue.on("completed", (job) => {
+  logger(`${job.id} successfullt completed... Removing from Queue`);
+  job.remove();
+});
+
 registrationEmailQueue.on("completed", (job) => {
+  logger(`${job.id} is completed.... Removing from queue`);
+  job.remove();
+});
+
+notificationMailQueue.on("completed", (job) => {
   logger(`${job.id} is completed.... Removing from queue`);
   job.remove();
 });
@@ -53,9 +67,10 @@ passwordResetEmailQueue.process(async (job, done) => {
   done();
 });
 
-passwordResetEmailQueue.on("completed", (job) => {
-  logger(`${job.id} successfullt completed... Removing from Queue`);
-  job.remove();
+notificationMailQueue.process(async (job, done) => {
+  logger(`Processing notification email job ${job.id}...`);
+  await sendMail(job.data);
+  done();
 });
 
-export { registrationEmailQueue, passwordResetEmailQueue };
+export { registrationEmailQueue, passwordResetEmailQueue, notificationMailQueue };

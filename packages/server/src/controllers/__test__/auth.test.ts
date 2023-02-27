@@ -9,6 +9,7 @@ import jsonwebtoken from "jsonwebtoken";
 import supertest from "supertest";
 
 import prismaMock from "../../../test/__mock__/prisma";
+import { getUser } from "../../__mock__";
 import {
   AUTH_ROUTE_V1,
   REGISTER_USER_V1,
@@ -50,26 +51,6 @@ jest.mock("../../services/user/jwt", () => {
   };
 
   return JWTService;
-});
-
-const getUser = (props: object) => ({
-  id: 1,
-  name: faker.name.firstName(),
-  email: faker.internet.email(),
-  password: faker.internet.password(),
-  username: faker.internet.userName(),
-  about: faker.lorem.paragraph(),
-  twitter: "",
-  facebook: "",
-  instagram: "",
-  profile_image: "",
-  cover_image: "",
-  created_at: new Date(),
-  updated_at: new Date(),
-  location: "",
-  onboarded: false,
-  gender: null,
-  ...props,
 });
 
 describe("POST /api/v1/auth/register", () => {

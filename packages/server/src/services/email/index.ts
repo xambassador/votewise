@@ -1,5 +1,5 @@
 import { logger } from "../../utils";
-import { passwordResetEmailQueue, registrationEmailQueue } from "../queues";
+import { passwordResetEmailQueue, registrationEmailQueue, notificationMailQueue } from "../queues";
 
 type EmailOption = {
   to: string;
@@ -10,9 +10,9 @@ type EmailOption = {
 export default class EmailService {
   public data: EmailOption;
 
-  private emailType: "REGISTRATION_MAIL" | "FORGOT_MAIL";
+  private emailType: "REGISTRATION_MAIL" | "FORGOT_MAIL" | "NOTIFICATION_MAIL";
 
-  constructor(data: EmailOption, type: "REGISTRATION_MAIL" | "FORGOT_MAIL") {
+  constructor(data: EmailOption, type: "REGISTRATION_MAIL" | "FORGOT_MAIL" | "NOTIFICATION_MAIL") {
     this.data = data;
     this.emailType = type;
   }
@@ -35,10 +35,16 @@ export default class EmailService {
         }
         break;
 
+      case "NOTIFICATION_MAIL":
+        try {
+          await notificationMailQueue.add(this.data);
+        } catch (err) {
+          logger(err);
+        }
+        break;
+
       default:
         throw new Error(`Unknown type ${this.emailType}`);
     }
   }
 }
-
-export * from "./EmailTransporter";

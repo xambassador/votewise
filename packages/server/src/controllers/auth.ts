@@ -11,6 +11,8 @@ import type {
   ForgotPasswordPayload,
   ResetPasswordPayload,
   ResetPasswordQuery,
+  VerifyEmailQuery,
+  ResendEmailVerificationPayload,
 } from "@votewise/types";
 
 // -----------------------------------------------------------------------------------------
@@ -61,13 +63,22 @@ export const register = async (req: Request, res: Response) => {
   const accessToken = JWTService.generateAccessToken({ userId: newUser.id });
   const refreshToken = JWTService.generateRefreshToken({ userId: newUser.id });
   await JWTService.saveRefreshToken(newUser.id, refreshToken);
+  await UserService.updateLastLogin(newUser.id);
 
+  const verifyToken = JWTService.generateAccessToken(
+    { userId: newUser.id },
+    {
+      expiresIn: 300,
+    }
+  );
+  const url = `${FRONTEND_URL}/verify-email?token=${verifyToken}`;
   const emailData = {
     to: newUser.email,
     subject: "Verify your email address",
     html: `
           <h1>Verify your email address</h1>
           <p>Click on the link below to verify your email address</p>
+          <a href="${url}">${url}</a>
       `,
   };
 
@@ -124,6 +135,7 @@ export const login = async (req: Request, res: Response) => {
   const accessToken = JWTService.generateAccessToken({ userId: user.id });
   const refreshToken = JWTService.generateRefreshToken({ userId: user.id });
   await JWTService.saveRefreshToken(user.id, refreshToken, true);
+  await UserService.updateLastLogin(user.id);
 
   // Send the accessToken and refreshToken to the client
   return res
@@ -193,7 +205,7 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
 };
 
 // -----------------------------------------------------------------------------------------
-// Forgot password
+// Forgot password: Submit email to get a reset password link
 export const forgotPassword = async (req: Request, res: Response) => {
   const payload = req.body as ForgotPasswordPayload;
 
@@ -249,7 +261,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 };
 
 // -----------------------------------------------------------------------------------------
-// Reset password
+// Reset password: Submit new password with token and email from reset password link
 export const resetPassword = async (req: Request, res: Response) => {
   const { password } = req.body as ResetPasswordPayload;
   const { token, email } = req.query as ResetPasswordQuery;
@@ -319,6 +331,13 @@ export const resetPassword = async (req: Request, res: Response) => {
     }
 
     await UserService.updatePassword(password, user.id);
+    const emailData = {
+      to: user.email,
+      html: `<p>Your password has been reset successfully</p>`,
+      subject: "Password reset",
+    };
+    const transporter = new EmailService(emailData, "NOTIFICATION_MAIL");
+    transporter.addToQueue();
     return res.status(httpStatusCodes.OK).json(
       new JSONResponse(
         "Password reset successfully",
@@ -344,7 +363,113 @@ export const resetPassword = async (req: Request, res: Response) => {
 };
 
 // -----------------------------------------------------------------------------------------
-// Email verification
+// Email verification: Submit token from email verification link send to user when user registers
+export const verifyEmail = async (req: Request, res: Response) => {
+  const { token } = req.query as VerifyEmailQuery;
+
+  if (!token) {
+    return res
+      .status(httpStatusCodes.BAD_REQUEST)
+      .json(new JSONResponse("Validation failed", null, { message: "Token is required" }, false));
+  }
+
+  try {
+    const { userId } = JWTService.verifyAccessToken(token) as { userId: number };
+    await UserService.verifyEmail(userId);
+    return res.status(httpStatusCodes.OK).json(
+      new JSONResponse(
+        "Email verified successfully",
+        {
+          message: "Email verified successfully",
+        },
+        null,
+        true
+      )
+    );
+  } catch (err) {
+    return res.status(httpStatusCodes.UNAUTHORIZED).json(
+      new JSONResponse(
+        "Unauthorized",
+        null,
+        {
+          message: "Unauthorized",
+        },
+        false
+      )
+    );
+  }
+};
 
 // -----------------------------------------------------------------------------------------
-// Resend email verification
+// Resend email verification: Submit email to resend email verification link
+export const resendEmailVerification = async (req: Request, res: Response) => {
+  const { email } = req.body as ResendEmailVerificationPayload;
+
+  if (!email) {
+    return res
+      .status(httpStatusCodes.BAD_REQUEST)
+      .json(new JSONResponse("Validation failed", null, { message: "Email is required" }, false));
+  }
+
+  const isValidEmail = isEmail(email);
+
+  if (!isValidEmail) {
+    return res
+      .status(httpStatusCodes.BAD_REQUEST)
+      .json(new JSONResponse("Validation failed", null, { message: "Invalid email" }, false));
+  }
+
+  const user = await UserService.checkIfUserExists(email);
+
+  if (!user) {
+    return res.status(httpStatusCodes.NOT_FOUND).json(
+      new JSONResponse(
+        "User not found",
+        null,
+        {
+          message: "User not found",
+        },
+        false
+      )
+    );
+  }
+
+  if (user.is_email_verify) {
+    return res.status(httpStatusCodes.BAD_REQUEST).json(
+      new JSONResponse(
+        "Validation failed",
+        null,
+        {
+          message: "Email already verified",
+        },
+        false
+      )
+    );
+  }
+
+  const token = JWTService.generateAccessToken({ userId: user.id }, { expiresIn: 300 });
+  const url = `${process.env.FRONTEND_URL}/verify-email?token=${token}&email=${user.email}`;
+  const emailData = {
+    to: user.email,
+    subject: "Verify your email address",
+    html: `
+        <h1>Verify your email address</h1>
+        <p>Click on the link below to verify your email address</p>
+        <a href="${url}">${url}</a>
+    `,
+  };
+
+  const transporter = new EmailService(emailData, "REGISTRATION_MAIL");
+  transporter.addToQueue();
+
+  return res.status(httpStatusCodes.OK).json(
+    new JSONResponse(
+      "Email sent successfully",
+      {
+        message: "Request is queued for process. Check your mail box.",
+      },
+      null,
+      true
+    )
+  );
+};

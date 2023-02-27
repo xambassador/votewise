@@ -10,6 +10,7 @@ import os from "os";
 
 import { registerMiddlewares } from "./middlewares";
 import { registerRoutes } from "./routes";
+import "./types";
 import { logger } from "./utils";
 
 // -----------------------------------------------------------------------------------------

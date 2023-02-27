@@ -10,8 +10,18 @@ import {
   REVOKE_ACCESS_TOKEN_V1,
   FORGOT_PASSWORD_V1,
   RESET_PASSWORD_V1,
+  VERIFY_EMAIL_V1,
+  RESEND_EMAIL_VERIFICATION_V1,
 } from "../configs";
-import { register, login, refreshAccessToken, forgotPassword, resetPassword } from "../controllers";
+import {
+  register,
+  login,
+  refreshAccessToken,
+  forgotPassword,
+  resetPassword,
+  verifyEmail,
+  resendEmailVerification,
+} from "../controllers";
 
 const router = Router();
 
@@ -20,5 +30,7 @@ router.post(LOGIN_USER_V1, login);
 router.post(REVOKE_ACCESS_TOKEN_V1, refreshAccessToken);
 router.post(FORGOT_PASSWORD_V1, forgotPassword);
 router.post(RESET_PASSWORD_V1, resetPassword);
+router.post(VERIFY_EMAIL_V1, verifyEmail);
+router.post(RESEND_EMAIL_VERIFICATION_V1, resendEmailVerification);
 
 export default router;

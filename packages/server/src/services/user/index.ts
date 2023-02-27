@@ -17,18 +17,28 @@ class UserService {
   }
 
   // Check if given user already exists or not
-  async checkIfUserExists(email: string) {
-    const isValidEmail = isEmail(email);
-    if (isValidEmail) {
+  async checkIfUserExists(key: string | number) {
+    if (typeof key === "number") {
+      // Key is user id
       const user = await prisma.user.findUnique({
         where: {
-          email,
+          id: key,
         },
       });
       return user;
     }
-    // email is username
-    const user = await this.checkIfUsernameExists(email);
+    // Key can be a username or email
+    const username = key;
+    const isValidEmail = isEmail(username);
+    if (isValidEmail) {
+      const user = await prisma.user.findUnique({
+        where: {
+          email: username,
+        },
+      });
+      return user;
+    }
+    const user = await this.checkIfUsernameExists(username);
     return user;
   }
 
@@ -71,6 +81,28 @@ class UserService {
       },
     });
     return user;
+  }
+
+  async verifyEmail(userId: number) {
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        is_email_verify: true,
+      },
+    });
+  }
+
+  async updateLastLogin(userId: number) {
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        last_login: new Date(),
+      },
+    });
   }
 }
 
