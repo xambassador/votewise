@@ -31,6 +31,8 @@ model User {
     location        String?
     gender          Gender? // This is optional at prisma level, but required at application level
     onboarded       Boolean          @default(false)
+    is_email_verify Boolean          @default(false)
+    last_login      DateTime?
     created_at      DateTime         @default(now())
     updated_at      DateTime         @default(now())
     posts           Post[] // User has many posts

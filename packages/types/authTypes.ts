@@ -31,6 +31,14 @@ type ResetPasswordQuery = {
   email: string;
 };
 
+type VerifyEmailQuery = {
+  token: string;
+};
+
+type ResendEmailVerificationPayload = {
+  email: string;
+};
+
 export type {
   RegisterUserPayload,
   LoginPayload,
@@ -38,4 +46,6 @@ export type {
   ForgotPasswordPayload,
   ResetPasswordPayload,
   ResetPasswordQuery,
+  VerifyEmailQuery,
+  ResendEmailVerificationPayload,
 };
