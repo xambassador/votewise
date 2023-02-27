@@ -225,7 +225,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
     );
   }
 
-  const { ip } = req;
+  const ip = req.header("X-Forwarded-For") || req.ip;
   const rid = await bcrypt.hash(`${user.id}${ip}`, 10);
   const token = JWTService.generateAccessToken({ rid }, { expiresIn: 300 });
   const url = `${process.env.FRONTEND_URL}/reset-password?token=${token}&email=${user.email}`;
@@ -299,7 +299,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     );
   }
 
-  const { ip } = req;
+  const ip = req.header("X-Forwarded-For") || req.ip;
   const ridKey = `${user.id}${ip}`;
   try {
     const { rid } = JWTService.verifyAccessToken(token) as { rid: string };
@@ -321,9 +321,9 @@ export const resetPassword = async (req: Request, res: Response) => {
     await UserService.updatePassword(password, user.id);
     return res.status(httpStatusCodes.OK).json(
       new JSONResponse(
-        "Password updated successfully",
+        "Password reset successfully",
         {
-          message: "Password updated successfully",
+          message: "Password reset successfully",
         },
         null,
         true
