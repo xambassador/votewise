@@ -117,14 +117,14 @@ async function main() {
   const createdPosts = await prisma.post.findMany({
     select: {
       id: true,
-      user_id: true,
+      author_id: true,
     },
   });
 
   for (const post of createdPosts) {
-    const notCurrentUsersPosts = createdPosts.filter((p) => p.user_id !== post.user_id);
+    const notCurrentUsersPosts = createdPosts.filter((p) => p.author_id !== post.author_id);
     // current user commenting on other users posts
-    const currentUserId = post.user_id;
+    const currentUserId = post.author_id;
     for (const comment of createCommentOnPost()) {
       const randomPost = notCurrentUsersPosts[Math.floor(Math.random() * notCurrentUsersPosts.length)];
       await prisma.post.update({
