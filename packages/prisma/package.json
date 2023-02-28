@@ -8,7 +8,9 @@
     "scripts": {
         "db:generate": "prisma generate && prisma format",
         "db:migrate": "yarn prisma migrate dev",
-        "db:studio": "yarn prisma studio"
+        "db:studio": "yarn prisma studio",
+        "db:seed": "yarn prisma db seed",
+        "seed": "ts-node --transpile-only ./seed.ts"
     },
     "devDependencies": {
         "@types/node": "^18.14.1",
@@ -16,12 +18,15 @@
         "@votewise/tsconfig": "*",
         "prisma": "^4.10.1",
         "ts-node": "^10.9.1",
-        "typescript": "^4.9.5"
+        "typescript": "^4.9.5",
+        "slug": "^8.2.2",
+        "slugify": "^1.6.5"
     },
     "dependencies": {
         "@prisma/client": "^4.10.1",
         "zod": "^3.20.6",
-        "zod-prisma": "^0.5.4"
+        "zod-prisma": "^0.5.4",
+        "@faker-js/faker": "^7.6.0"
     },
     "prisma": {
         "seed": "ts-node --transpile-only ./seed.ts"

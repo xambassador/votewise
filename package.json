@@ -17,6 +17,7 @@
     "db:generate": "lerna exec --scope @votewise/prisma -- yarn run db:generate",
     "db:migrate": "lerna exec --scope @votewise/prisma -- yarn run db:migrate",
     "db:studio": "lerna exec --scope @votewise/prisma -- yarn run db:studio",
+    "db:seed": "lerna exec --scope @votewise/prisma -- yarn run db:seed",
     "clean": "lerna clean --yes && rm -rf node_modules"
   },
   "devDependencies": {
