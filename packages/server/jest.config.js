@@ -6,4 +6,8 @@ module.exports = {
   testMatch: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)", "**/test/**/*.test.ts"],
   clearMocks: true,
   setupFilesAfterEnv: ["<rootDir>/test/prisma.ts"],
+  moduleNameMapper: {
+    "^@/src/(.*)$": "<rootDir>/src/$1",
+    "^@/test/(.*)$": "<rootDir>/test/$1",
+  },
 };

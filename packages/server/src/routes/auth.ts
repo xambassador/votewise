@@ -5,23 +5,23 @@
 import { Router } from "express";
 
 import {
-  REGISTER_USER_V1,
-  LOGIN_USER_V1,
-  REVOKE_ACCESS_TOKEN_V1,
   FORGOT_PASSWORD_V1,
-  RESET_PASSWORD_V1,
-  VERIFY_EMAIL_V1,
+  LOGIN_USER_V1,
+  REGISTER_USER_V1,
   RESEND_EMAIL_VERIFICATION_V1,
-} from "../configs";
+  RESET_PASSWORD_V1,
+  REVOKE_ACCESS_TOKEN_V1,
+  VERIFY_EMAIL_V1,
+} from "@/src/configs";
 import {
-  register,
+  forgotPassword,
   login,
   refreshAccessToken,
-  forgotPassword,
+  register,
+  resendEmailVerification,
   resetPassword,
   verifyEmail,
-  resendEmailVerification,
-} from "../controllers";
+} from "@/src/controllers";
 
 const router = Router();
 

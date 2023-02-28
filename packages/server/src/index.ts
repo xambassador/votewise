@@ -2,16 +2,18 @@
  * @file: index.ts
  * @description: Entry point for the application
  */
+// -----------------------------------------------------------------------------------------
 import cluster from "cluster";
-import dotenv from "dotenv";
 import express from "express";
 import http from "http";
 import os from "os";
 
-import { registerMiddlewares } from "./middlewares";
-import { registerRoutes } from "./routes";
-import "./types";
-import { logger } from "./utils";
+import dotenv from "dotenv";
+
+import { registerMiddlewares } from "@/src/middlewares";
+import { registerRoutes } from "@/src/routes";
+import "@/src/types";
+import { logger } from "@/src/utils";
 
 // -----------------------------------------------------------------------------------------
 

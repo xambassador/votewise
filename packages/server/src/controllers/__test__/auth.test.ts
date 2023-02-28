@@ -12,11 +12,11 @@ import prismaMock from "../../../test/__mock__/prisma";
 import { getUser } from "../../__mock__";
 import {
   AUTH_ROUTE_V1,
-  REGISTER_USER_V1,
-  LOGIN_USER_V1,
-  REVOKE_ACCESS_TOKEN_V1,
   FORGOT_PASSWORD_V1,
+  LOGIN_USER_V1,
+  REGISTER_USER_V1,
   RESET_PASSWORD_V1,
+  REVOKE_ACCESS_TOKEN_V1,
 } from "../../configs";
 import app from "../../index";
 import JWT from "../../services/user/jwt";

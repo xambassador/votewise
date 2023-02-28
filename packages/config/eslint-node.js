@@ -14,7 +14,7 @@ module.exports = {
     "plugin:import/typescript",
     "plugin:prettier/recommended",
   ],
-  plugins: ["@typescript-eslint", "import"],
+  plugins: ["@typescript-eslint", "import", "prettier"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     tsconfigRootDir: __dirname,
@@ -28,6 +28,7 @@ module.exports = {
     "import/prefer-default-export": "off",
     "import/no-extraneous-dependencies": ["off"],
     "class-methods-use-this": "off",
+    "prettier/prettier": ["warn", { endOfLine: "auto" }],
   },
   settings: {
     "import/parsers": {
@@ -36,11 +37,12 @@ module.exports = {
     "import/resolver": {
       node: {
         extensions: [".js", ".ts"],
-        moduleDirectory: ["node_modules", "src/"],
+        moduleDirectory: ["node_modules", "src/", "test/"],
       },
       typescript: {
         alwaysTryTypes: true,
-        project: ".",
+        // tell where to find tsconfig.json to reolve module alias
+        project: "packages/server/tsconfig.json",
       },
     },
   },

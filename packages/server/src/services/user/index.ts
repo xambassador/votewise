@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
 
 import { prisma } from "@votewise/prisma";
-import type { RegisterUserPayload, LoginPayload } from "@votewise/types";
+import type { LoginPayload, RegisterUserPayload } from "@votewise/types";
 
-import { validateRegisterUserSchema, validateLoginSchema, isEmail } from "../../zodValidation";
+import { isEmail, validateLoginSchema, validateRegisterUserSchema } from "@/src/zodValidation";
 
 class UserService {
   // Validate the request body for registering new user

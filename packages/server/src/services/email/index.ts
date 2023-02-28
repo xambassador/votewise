@@ -1,5 +1,9 @@
-import { logger } from "../../utils";
-import { passwordResetEmailQueue, registrationEmailQueue, notificationMailQueue } from "../queues";
+import {
+  notificationMailQueue,
+  passwordResetEmailQueue,
+  registrationEmailQueue,
+} from "@/src/services/queues";
+import { logger } from "@/src/utils";
 
 type EmailOption = {
   to: string;

@@ -5,8 +5,8 @@
 import { prisma } from "@votewise/prisma";
 import type { OnboardingPayload } from "@votewise/types";
 
-import { validateOnboardingPayload } from "../../zodValidation";
-import UserService from "../user";
+import UserService from "@/src/services/user";
+import { validateOnboardingPayload } from "@/src/zodValidation";
 
 class OnboardingService {
   validateOnboardingPayload(payload: OnboardingPayload) {

@@ -4,12 +4,13 @@
  */
 import type { Application } from "express";
 
-import { HEALTH_ROUTE, AUTH_ROUTE_V1, ONBOARDING_ROUTE_V1 } from "../configs";
-import { logger } from "../utils";
-import authRouter from "./auth";
-import healthCheckRouter from "./healthCheck";
-import notFoundRouter from "./notFound";
-import onboardingRouter from "./onboarding";
+// -----------------------------------------------------------------------------------------
+import { AUTH_ROUTE_V1, HEALTH_ROUTE, ONBOARDING_ROUTE_V1 } from "@/src/configs";
+import authRouter from "@/src/routes/auth";
+import healthCheckRouter from "@/src/routes/healthCheck";
+import notFoundRouter from "@/src/routes/notFound";
+import onboardingRouter from "@/src/routes/onboarding";
+import { logger } from "@/src/utils";
 
 // Register routes
 const registerRoutes = (app: Application) => {

@@ -5,8 +5,8 @@
 import type { Request, Response } from "express";
 import { Router } from "express";
 
-import { HEALTH_CHECK, PING } from "../configs";
-import { JSONResponse } from "../lib";
+import { HEALTH_CHECK, PING } from "@/src/configs";
+import { JSONResponse } from "@/src/lib";
 
 // -----------------------------------------------------------------------------------------
 

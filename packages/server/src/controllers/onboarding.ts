@@ -7,9 +7,9 @@ import httpStatusCodes from "http-status-codes";
 
 import type { OnboardingPayload } from "@votewise/types";
 
-import { JSONResponse } from "../lib";
-import OnboardingService from "../services/onboarding";
-import { getErrorReason } from "../utils";
+import { JSONResponse } from "@/src/lib";
+import OnboardingService from "@/src/services/onboarding";
+import { getErrorReason } from "@/src/utils";
 
 export const onboardUser = async (req: Request, res: Response) => {
   const { params } = req;
@@ -92,7 +92,16 @@ export const onboardingStatus = async (req: Request, res: Response) => {
   const { params } = req;
   const { user } = req.session;
   if (user.id !== Number(params.userId)) {
-    return res.status(httpStatusCodes.UNAUTHORIZED).json(new JSONResponse("Unauthorized", null, null, false));
+    return res.status(httpStatusCodes.UNAUTHORIZED).json(
+      new JSONResponse(
+        "Unauthorized",
+        null,
+        {
+          message: "Unauthorized",
+        },
+        false
+      )
+    );
   }
   const { onboarded } = user;
   return res

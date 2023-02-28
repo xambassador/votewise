@@ -8,7 +8,7 @@ import type { Application } from "express";
 import express, { json } from "express";
 import helmet from "helmet";
 
-import { logger } from "../utils";
+import { logger } from "@/src/utils";
 
 const registerMiddlewares = (app: Application) => {
   logger("Registering middlewares....");

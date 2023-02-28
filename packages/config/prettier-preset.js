@@ -7,7 +7,33 @@ module.exports = {
   semi: true,
   printWidth: 110,
   arrowParens: "always",
-  importOrder: ["^@(votewise|ee)/(.*)$", "^@components/(.*)$", "^@lib/(.*)$", "^~/(.*)$", "^[./]"],
+  endOfLine: "auto",
+  importOrder: [
+    "<THIRD_PARTY_MODULES>",
+    "^@(votewise|ee)/(.*)$",
+    "^@components/(.*)$",
+    "^@lib/(.*)$",
+    // "^~/(.*)$",
+    "^[./]",
+  ],
   importOrderSeparation: true,
+  importOrderSortSpecifiers: true,
   plugins: [require("./merged-prettier-config")],
+  overrides: [
+    {
+      files: "**/server/**/*.{ts,json,js}",
+      options: {
+        plugins: ["@trivago/prettier-plugin-sort-imports"],
+        importOrder: [
+          "^dotenv$",
+          "^dotenv/config$",
+          "^@(votewise|ee)/(.*)$",
+          "@/src/(.*)$",
+          "@/test/(.*)$",
+          "^~/(.*)$",
+          "^[./]",
+        ],
+      },
+    },
+  ],
 };

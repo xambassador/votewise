@@ -2,7 +2,13 @@
   "extends": "@votewise/tsconfig/node.json",
   "compilerOptions": {
     "outDir": "dist",
-    "baseUrl": "./src"
+    "baseUrl": ".",
+    "isolatedModules": true,
+    "paths": {
+      "@/src/*": ["src/*"],
+      "@/test/*": ["test/*"]
+    }
   },
-  "include": ["src/**/*", "test/**/*"]
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules", "dist", "**/node_modules/*"]
 }

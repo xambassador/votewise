@@ -1,5 +1,6 @@
-import dotenv from "dotenv";
 import pino from "pino";
+
+import dotenv from "dotenv";
 
 dotenv.config();
 

@@ -1,6 +1,7 @@
-import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
+
+import dotenv from "dotenv";
 
 dotenv.config();
 

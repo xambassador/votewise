@@ -1,29 +1,33 @@
+/**
+ * @file: auth.ts
+ * @description: Auth controller
+ */
+// -----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------
 import bcrypt from "bcrypt";
-import dotenv from "dotenv";
 import type { Request, Response } from "express";
 import httpStatusCodes from "http-status-codes";
 
-// -----------------------------------------------------------------------------------------
-import type {
-  RegisterUserPayload,
-  LoginPayload,
-  RevokeAccessTokenPayload,
-  ForgotPasswordPayload,
-  ResetPasswordPayload,
-  ResetPasswordQuery,
-  VerifyEmailQuery,
-  ResendEmailVerificationPayload,
-} from "@votewise/types";
+import dotenv from "dotenv";
 
 // -----------------------------------------------------------------------------------------
-import { JSONResponse } from "../lib";
-// -----------------------------------------------------------------------------------------
-import EmailService from "../services/email";
-import UserService from "../services/user";
-import JWTService from "../services/user/jwt";
-// -----------------------------------------------------------------------------------------
-import { logger } from "../utils";
-import { isEmail } from "../zodValidation/auth";
+import type {
+  ForgotPasswordPayload,
+  LoginPayload,
+  RegisterUserPayload,
+  ResendEmailVerificationPayload,
+  ResetPasswordPayload,
+  ResetPasswordQuery,
+  RevokeAccessTokenPayload,
+  VerifyEmailQuery,
+} from "@votewise/types";
+
+import { JSONResponse } from "@/src/lib";
+import EmailService from "@/src/services/email";
+import UserService from "@/src/services/user";
+import JWTService from "@/src/services/user/jwt";
+import { logger } from "@/src/utils";
+import { isEmail } from "@/src/zodValidation/auth";
 
 dotenv.config();
 

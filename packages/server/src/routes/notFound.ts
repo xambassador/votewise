@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { Router } from "express";
 import httpStatusCodes from "http-status-codes";
 
-import { JSONResponse } from "../lib";
+import { JSONResponse } from "@/src/lib";
 
 const router = Router();
 

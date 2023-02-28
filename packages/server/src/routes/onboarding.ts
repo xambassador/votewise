@@ -4,9 +4,9 @@
  */
 import { Router } from "express";
 
-import { ONBOARDING_UPDATE_V1, ONBOARDING_STATUS_V1 } from "../configs";
-import { onboardingStatus, onboardUser } from "../controllers";
-import authorizationMiddleware from "../middlewares/auth";
+import { ONBOARDING_STATUS_V1, ONBOARDING_UPDATE_V1 } from "@/src/configs";
+import { onboardUser, onboardingStatus } from "@/src/controllers";
+import authorizationMiddleware from "@/src/middlewares/auth";
 
 const router = Router();
 

@@ -1,8 +1,9 @@
 import Queue from "bull";
+
 import dotenv from "dotenv";
 
-import { logger } from "../../utils";
-import { EmailTransporter } from "../email/EmailTransporter";
+import { EmailTransporter } from "@/src/services/email/EmailTransporter";
+import { logger } from "@/src/utils";
 
 dotenv.config();
 

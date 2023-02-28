@@ -1,9 +1,10 @@
-import dotenv from "dotenv";
 import jsonwebtoken from "jsonwebtoken";
+
+import dotenv from "dotenv";
 
 import { prisma } from "@votewise/prisma";
 
-import { logger } from "../../utils";
+import { logger } from "@/src/utils";
 
 dotenv.config();
 
