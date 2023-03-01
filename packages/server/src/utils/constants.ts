@@ -17,6 +17,11 @@ export const EMAIL_ALREADY_VERIFIED_MSG = "Email already verified";
 export const LOGIN_SUCCESS_MSG = "Login successful";
 export const EMAIL_REQUIRED_MSG = "Email is required";
 export const TOKEN_REQUIRED_MSG = "Token is required";
+export const INVALID_POST_ID_MSG = "Invalid post id";
+export const POSTID_REQUIRED_MSG = "Post id is required";
+export const POSTS_FETCHED_SUCCESSFULLY_MSG = "Posts fetched successfully";
+export const POST_DETAILS_FETCHED_SUCCESSFULLY_MSG = "Post details fetched successfully";
+export const SOMETHING_WENT_WRONG_MSG = "Something went wrong";
 
 export const USER_ALREADY_EXISTS_RESPONSE = {
   message: USER_ALREADY_EXISTS_MSG,
@@ -122,6 +127,15 @@ export const EMAIL_ALREADY_VERIFIED_RESPONSE = {
   data: null,
   error: {
     message: EMAIL_ALREADY_VERIFIED_MSG,
+  },
+  success: false,
+};
+
+export const INVALID_POST_ID_RESPONSE = {
+  message: VALIDATION_FAILED_MSG,
+  data: null,
+  error: {
+    message: INVALID_POST_ID_MSG,
   },
   success: false,
 };

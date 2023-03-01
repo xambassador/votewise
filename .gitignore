@@ -94,3 +94,5 @@ apps/auth
 # Lerna
 lerna-debug.log
 lerna-debug.log.*
+
+todo.txt

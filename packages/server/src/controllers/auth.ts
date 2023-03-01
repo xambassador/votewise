@@ -45,6 +45,7 @@ import {
   USER_CREATED_SUCCESSFULLY_MSG,
   USER_NOT_FOUND_RESPONSE,
   VALIDATION_FAILED_MSG,
+  getErrorReason,
   logger,
 } from "@/src/utils";
 import { isEmail } from "@/src/zodValidation/auth";
@@ -58,7 +59,8 @@ if (!FRONTEND_URL) {
   process.exit(1);
 }
 
-const { BAD_REQUEST, CONFLICT, CREATED, NOT_FOUND, UNAUTHORIZED, OK } = httpStatusCodes;
+const { BAD_REQUEST, CONFLICT, CREATED, NOT_FOUND, UNAUTHORIZED, OK, INTERNAL_SERVER_ERROR } =
+  httpStatusCodes;
 
 // -----------------------------------------------------------------------------------------
 // Register a new user
@@ -73,54 +75,68 @@ export const register = async (req: Request, res: Response) => {
       .json(new JSONResponse(VALIDATION_FAILED_MSG, null, { message: isValid.message }, false));
   }
 
-  // Check if the user already exists
-  const user = await UserService.checkIfUserExists(payload.email);
+  try {
+    // Check if the user already exists
+    const user = await UserService.checkIfUserExists(payload.email);
 
-  if (user) {
-    return res.status(CONFLICT).json(USER_ALREADY_EXISTS_RESPONSE);
-  }
-
-  // Create a new user
-  const newUser = await UserService.createUser(payload);
-
-  // Create a new accessToken and refreshToken
-  const accessToken = JWTService.generateAccessToken({ userId: newUser.id });
-  const refreshToken = JWTService.generateRefreshToken({ userId: newUser.id });
-  await JWTService.saveRefreshToken(newUser.id, refreshToken);
-  await UserService.updateLastLogin(newUser.id);
-
-  const verifyToken = JWTService.generateAccessToken(
-    { userId: newUser.id },
-    {
-      expiresIn: 300,
+    if (user) {
+      return res.status(CONFLICT).json(USER_ALREADY_EXISTS_RESPONSE);
     }
-  );
-  const url = `${FRONTEND_URL}/verify-email?token=${verifyToken}`;
-  const emailData = {
-    to: newUser.email,
-    subject: "Verify your email address",
-    html: `
+
+    // Create a new user
+    const newUser = await UserService.createUser(payload);
+
+    // Create a new accessToken and refreshToken
+    const accessToken = JWTService.generateAccessToken({ userId: newUser.id });
+    const refreshToken = JWTService.generateRefreshToken({ userId: newUser.id });
+    await JWTService.saveRefreshToken(newUser.id, refreshToken);
+    await UserService.updateLastLogin(newUser.id);
+
+    const verifyToken = JWTService.generateAccessToken(
+      { userId: newUser.id },
+      {
+        expiresIn: 300,
+      }
+    );
+    const url = `${FRONTEND_URL}/verify-email?token=${verifyToken}`;
+    const emailData = {
+      to: newUser.email,
+      subject: "Verify your email address",
+      html: `
           <h1>Verify your email address</h1>
           <p>Click on the link below to verify your email address</p>
           <a href="${url}">${url}</a>
       `,
-  };
+    };
 
-  const transporter = new EmailService(emailData, "REGISTRATION_MAIL");
-  transporter.addToQueue();
+    const transporter = new EmailService(emailData, "REGISTRATION_MAIL");
+    transporter.addToQueue();
 
-  // Send the accessToken and refreshToken to the client
-  return res.status(CREATED).json(
-    new JSONResponse(
-      USER_CREATED_SUCCESSFULLY_MSG,
-      {
-        accessToken,
-        refreshToken,
-      },
-      null,
-      true
-    )
-  );
+    // Send the accessToken and refreshToken to the client
+    return res.status(CREATED).json(
+      new JSONResponse(
+        USER_CREATED_SUCCESSFULLY_MSG,
+        {
+          accessToken,
+          refreshToken,
+        },
+        null,
+        true
+      )
+    );
+  } catch (err) {
+    const msg = getErrorReason(err) || "Something went wrong";
+    return res.status(INTERNAL_SERVER_ERROR).json(
+      new JSONResponse(
+        "Something went wrong",
+        null,
+        {
+          message: msg,
+        },
+        false
+      )
+    );
+  }
 };
 
 // -----------------------------------------------------------------------------------------
@@ -136,29 +152,38 @@ export const login = async (req: Request, res: Response) => {
       .json(new JSONResponse(VALIDATION_FAILED_MSG, null, { message: isValid.message }, false));
   }
 
-  // Check if user is exists or not
-  const user = await UserService.checkIfUserExists(payload.username);
+  try {
+    // Check if user is exists or not
+    const user = await UserService.checkIfUserExists(payload.username);
 
-  // If user is not exists
-  if (!user) {
-    return res.status(NOT_FOUND).json(USER_NOT_FOUND_RESPONSE);
+    // If user is not exists
+    if (!user) {
+      return res.status(NOT_FOUND).json(USER_NOT_FOUND_RESPONSE);
+    }
+
+    // Check if the password is correct or not
+    const isPasswordCorrect = await UserService.validatePassword(payload.password, user.password);
+
+    if (!isPasswordCorrect) {
+      return res.status(UNAUTHORIZED).json(INVALID_CREDENTIALS_RESPONSE);
+    }
+
+    // Create a new accessToken and refreshToken
+    const accessToken = JWTService.generateAccessToken({ userId: user.id });
+    const refreshToken = JWTService.generateRefreshToken({ userId: user.id });
+    await JWTService.saveRefreshToken(user.id, refreshToken, true);
+    await UserService.updateLastLogin(user.id);
+
+    // Send the accessToken and refreshToken to the client
+    return res
+      .status(OK)
+      .json(new JSONResponse(LOGIN_SUCCESS_MSG, { accessToken, refreshToken }, null, true));
+  } catch (err) {
+    const msg = getErrorReason(err) || "Something went wrong";
+    return res
+      .status(INTERNAL_SERVER_ERROR)
+      .json(new JSONResponse("Something went wrong", null, { message: msg }, false));
   }
-
-  // Check if the password is correct or not
-  const isPasswordCorrect = await UserService.validatePassword(payload.password, user.password);
-
-  if (!isPasswordCorrect) {
-    return res.status(UNAUTHORIZED).json(INVALID_CREDENTIALS_RESPONSE);
-  }
-
-  // Create a new accessToken and refreshToken
-  const accessToken = JWTService.generateAccessToken({ userId: user.id });
-  const refreshToken = JWTService.generateRefreshToken({ userId: user.id });
-  await JWTService.saveRefreshToken(user.id, refreshToken, true);
-  await UserService.updateLastLogin(user.id);
-
-  // Send the accessToken and refreshToken to the client
-  return res.status(OK).json(new JSONResponse(LOGIN_SUCCESS_MSG, { accessToken, refreshToken }, null, true));
 };
 
 // -----------------------------------------------------------------------------------------
@@ -225,23 +250,30 @@ export const forgotPassword = async (req: Request, res: Response) => {
     return res.status(BAD_REQUEST).json(INVALID_EMAIL_RESPONSE);
   }
 
-  const user = await UserService.checkIfUserExists(payload.email);
-  if (!user) {
-    return res.status(NOT_FOUND).json(USER_NOT_FOUND_RESPONSE);
-  }
+  try {
+    const user = await UserService.checkIfUserExists(payload.email);
+    if (!user) {
+      return res.status(NOT_FOUND).json(USER_NOT_FOUND_RESPONSE);
+    }
 
-  const ip = req.header("X-Forwarded-For") || req.ip;
-  const rid = await bcrypt.hash(`${user.id}${ip}`, 10);
-  const token = JWTService.generateAccessToken({ rid }, { expiresIn: 300 });
-  const url = `${process.env.FRONTEND_URL}/reset-password?token=${token}&email=${user.email}`;
-  const emailData = {
-    to: user.email,
-    html: `<p>Click the link below to reset your password</p><a href="${url}">${url}</a>`,
-    subject: "Reset password",
-  };
-  const transporter = new EmailService(emailData, "REGISTRATION_MAIL");
-  transporter.addToQueue();
-  return res.status(OK).json(EMAIL_SENT_RESPONSE);
+    const ip = req.header("X-Forwarded-For") || req.ip;
+    const rid = await bcrypt.hash(`${user.id}${ip}`, 10);
+    const token = JWTService.generateAccessToken({ rid }, { expiresIn: 300 });
+    const url = `${process.env.FRONTEND_URL}/reset-password?token=${token}&email=${user.email}`;
+    const emailData = {
+      to: user.email,
+      html: `<p>Click the link below to reset your password</p><a href="${url}">${url}</a>`,
+      subject: "Reset password",
+    };
+    const transporter = new EmailService(emailData, "REGISTRATION_MAIL");
+    transporter.addToQueue();
+    return res.status(OK).json(EMAIL_SENT_RESPONSE);
+  } catch (err) {
+    const msg = getErrorReason(err) || "Something went wrong";
+    return res
+      .status(INTERNAL_SERVER_ERROR)
+      .json(new JSONResponse("Something went wrong", null, { message: msg }, false));
+  }
 };
 
 // -----------------------------------------------------------------------------------------
@@ -276,15 +308,14 @@ export const resetPassword = async (req: Request, res: Response) => {
     );
   }
 
-  const user = await UserService.checkIfUserExists(email);
-
-  if (!user) {
-    return res.status(NOT_FOUND).json(USER_NOT_FOUND_RESPONSE);
-  }
-
-  const ip = req.header("X-Forwarded-For") || req.ip;
-  const ridKey = `${user.id}${ip}`;
   try {
+    const user = await UserService.checkIfUserExists(email);
+    if (!user) {
+      return res.status(NOT_FOUND).json(USER_NOT_FOUND_RESPONSE);
+    }
+
+    const ip = req.header("X-Forwarded-For") || req.ip;
+    const ridKey = `${user.id}${ip}`;
     const { rid } = JWTService.verifyAccessToken(token) as { rid: string };
     const isValidRid = await bcrypt.compare(ridKey, rid);
 
@@ -302,6 +333,10 @@ export const resetPassword = async (req: Request, res: Response) => {
     transporter.addToQueue();
     return res.status(OK).json(PASSWORD_RESET_RESPONSE);
   } catch (err) {
+    const msg = getErrorReason(err);
+    if (msg === "Error while fetching user") {
+      return res.status(NOT_FOUND).json(USER_NOT_FOUND_RESPONSE);
+    }
     return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
   }
 };

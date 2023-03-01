@@ -22,26 +22,39 @@ export const REVOKE_ACCESS_TOKEN_V1 = "/revoke-access-token";
 // Onboarding routes.
 export const ONBOARDING_ROUTE_V1 = "/api/v1/onboarding";
 
-// PUT /api/v1/onboarding/:userId
+// PATCH /api/v1/onboarding/:userId
 export const ONBOARDING_UPDATE_V1 = "/:userId";
 // GET /api/v1/onboarding/:userId/status
 export const ONBOARDING_STATUS_V1 = "/:userId/status";
-
-// User routes.
-export const USER_ROUTE_V1 = "/api/v1/user";
-// GET /api/v1/user/usernames?username=example
-export const CHECK_USERNAME_AVAILABILITY_V1 = "/usernames";
 
 export const POST_ROUTE_V1 = "/api/v1/posts";
 // GET /api/v1/posts?limit=10&offset=0 => Get all posts (public, public groups, friends posts)
 export const GET_POSTS_V1 = "";
 // GET /api/v1/posts/:postId => Get post by id
 export const GET_POST_V1 = "/:postId";
-// GET /api/v1/posts/:postId/comments => Get post comments
+// GET /api/v1/posts/:postId/comments?limit=10&offset=0 => Get post comments
 export const GET_POST_COMMENTS_V1 = "/:postId/comments";
-// GET /api/v1/posts/:postId/likes => Get post likes
-export const GET_POST_LIKES_V1 = "/:postId/likes";
+// PATCH /api/v1/posts/:postId/like => Like post
+export const LIKE_POST_V1 = "/:postId/like";
+// PATCH /api/v1/posts/:postId/unlike => Unlike post
+export const UNLIKE_POST_V1 = "/:postId/unlike";
+// POST /api/v1/posts/:postId/comment => Comment on post
+export const COMMENT_ON_POST_V1 = "/:postId/comment";
+// PATCH /api/v1/posts/:postId/comment => Update comment on post
+export const UPDATE_COMMENT_ON_POST_V1 = "/:postId/comment";
+// DELETE /api/v1/posts/:postId/comment/:commentId => Delete comment on post
+export const DELETE_COMMENT_ON_POST_V1 = "/:postId/comment/:commentId";
+// PATCH /api/v1/posts/:postId/comment/:commentId/like => Like comment on post
+export const LIKE_COMMENT_ON_POST_V1 = "/:postId/comment/:commentId/like";
+// PATCH /api/v1/posts/:postId/comment/:commentId/unlike => Unlike comment on post
+export const UNLIKE_COMMENT_ON_POST_V1 = "/:postId/comment/:commentId/unlike";
 
+// User routes.
+export const USER_ROUTE_V1 = "/api/v1/user";
+// GET /api/v1/user/me
+export const GET_ME_V1 = "/me";
+// GET /api/v1/user/usernames?username=example
+export const CHECK_USERNAME_AVAILABILITY_V1 = "/usernames";
 // POST /api/v1/user/posts
 export const USER_CREATE_POST_V1 = "/posts";
 // GET /api/v1/user/posts

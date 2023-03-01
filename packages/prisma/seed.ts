@@ -81,6 +81,7 @@ async function main() {
   await prisma.upvote.deleteMany();
   await prisma.comment.deleteMany();
   await prisma.post.deleteMany();
+  await prisma.refreshToken.deleteMany();
   await prisma.user.deleteMany();
 
   const users = Array(NUM_USERS)

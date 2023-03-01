@@ -11,6 +11,6 @@ import authorizationMiddleware from "@/src/middlewares/auth";
 const router = Router();
 
 router.get(ONBOARDING_STATUS_V1, authorizationMiddleware, onboardingStatus);
-router.put(ONBOARDING_UPDATE_V1, authorizationMiddleware, onboardUser);
+router.patch(ONBOARDING_UPDATE_V1, authorizationMiddleware, onboardUser);
 
 export default router;

@@ -20,23 +20,31 @@ class UserService {
   async checkIfUserExists(key: string | number) {
     if (typeof key === "number") {
       // Key is user id
-      const user = await prisma.user.findUnique({
-        where: {
-          id: key,
-        },
-      });
-      return user;
+      try {
+        const user = await prisma.user.findUnique({
+          where: {
+            id: key,
+          },
+        });
+        return user;
+      } catch (err) {
+        throw new Error("Error while fetching user");
+      }
     }
     // Key can be a username or email
     const username = key;
     const isValidEmail = isEmail(username);
     if (isValidEmail) {
-      const user = await prisma.user.findUnique({
-        where: {
-          email: username,
-        },
-      });
-      return user;
+      try {
+        const user = await prisma.user.findUnique({
+          where: {
+            email: username,
+          },
+        });
+        return user;
+      } catch (err) {
+        throw new Error("Error while fetching user");
+      }
     }
     const user = await this.checkIfUsernameExists(username);
     return user;
@@ -56,12 +64,16 @@ class UserService {
 
   // Check if given username is already taken or not
   async checkIfUsernameExists(username: string) {
-    const user = await prisma.user.findUnique({
-      where: {
-        username,
-      },
-    });
-    return user;
+    try {
+      const user = await prisma.user.findUnique({
+        where: {
+          username,
+        },
+      });
+      return user;
+    } catch (err) {
+      throw new Error("Error while fetching user");
+    }
   }
 
   // Check if password is correct or not
@@ -103,6 +115,22 @@ class UserService {
         last_login: new Date(),
       },
     });
+  }
+
+  async getMyDetails(userId: number) {
+    try {
+      const data = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          password: false,
+        },
+      });
+      return data;
+    } catch (err) {
+      throw new Error("Error while fetching user");
+    }
   }
 }
 
