@@ -1,52 +1,48 @@
-import http from "http";
 import httpStatusCodes from "http-status-codes";
-import supertest from "supertest";
 
 import prismaMock from "../../../test/__mock__/prisma";
-import { getUser } from "../../__mock__";
-import { CHECK_USERNAME_AVAILABILITY_V1, USER_ROUTE_V1 } from "../../configs";
-import app from "../../index";
+import { createRequest, createResponse, getUser } from "../../__mock__";
+import { checkUsernameAvailability } from "../user";
 
 jest.mock("@votewise/prisma", () => ({ prisma: prismaMock }));
 
 const { BAD_REQUEST, OK } = httpStatusCodes;
 
 describe("User controller", () => {
-  let server: http.Server;
-
-  beforeAll((done) => {
-    server = http.createServer(app);
-    server.listen(done);
-  });
-
-  afterAll((done) => {
-    server.close(done);
-  });
-
   test("Should return BAD_REQUEST if username is not provided", async () => {
-    const request = supertest(server);
-    const user = getUser({ username: "test" });
-    prismaMock.user.findUnique.mockResolvedValue(user);
-    const response = await request.get(`${USER_ROUTE_V1}${CHECK_USERNAME_AVAILABILITY_V1}`);
+    const mockRequest = createRequest({
+      query: {
+        username: "",
+      },
+    });
+    const mockResponse = createResponse();
+    await checkUsernameAvailability(mockRequest, mockResponse);
     expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
-    expect(response.status).toBe(BAD_REQUEST);
-    expect(response.body).toEqual({
-      message: "Validation failed",
+    expect(mockResponse.status).toBeCalledWith(BAD_REQUEST);
+    expect(mockResponse.status).not.toBeCalledWith(OK);
+    expect(mockResponse.status).toHaveBeenCalledTimes(1);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      success: false,
       data: null,
+      message: "Validation failed",
       error: {
         message: "Username is required",
       },
-      success: false,
     });
   });
 
   test("Should return BAD_REQUEST if username is already taken", async () => {
-    const request = supertest(server);
     const user = getUser({
       username: "test",
     });
+    const mockRequest = createRequest({
+      query: {
+        username: "test",
+      },
+    });
+    const mockResponse = createResponse();
     prismaMock.user.findUnique.mockResolvedValue(user);
-    const response = await request.get(`${USER_ROUTE_V1}${CHECK_USERNAME_AVAILABILITY_V1}?username=test`);
+    await checkUsernameAvailability(mockRequest, mockResponse);
     expect(prismaMock.user.findUnique).toHaveBeenCalled();
     expect(prismaMock.user.findUnique).toBeCalledTimes(1);
     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
@@ -54,22 +50,29 @@ describe("User controller", () => {
         username: "test",
       },
     });
-    expect(response.status).toBe(BAD_REQUEST);
-    expect(response.status).not.toBe(OK);
-    expect(response.body).toEqual({
-      message: "Username is already taken",
+    expect(mockResponse.status).toHaveBeenCalledWith(BAD_REQUEST);
+    expect(mockResponse.status).not.toHaveBeenCalledWith(OK);
+    expect(mockResponse.status).toHaveBeenCalledTimes(1);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      success: false,
       data: null,
+      message: "Username is already taken",
       error: {
         message: "Username is already taken",
       },
-      success: false,
     });
+    expect(mockResponse.json).toHaveBeenCalledTimes(1);
   });
 
   test("Should return OK if username is available", async () => {
-    const request = supertest(server);
+    const mockRequest = createRequest({
+      query: {
+        username: "test",
+      },
+    });
+    const mockResponse = createResponse();
     prismaMock.user.findUnique.mockResolvedValue(null);
-    const response = await request.get(`${USER_ROUTE_V1}${CHECK_USERNAME_AVAILABILITY_V1}?username=test`);
+    await checkUsernameAvailability(mockRequest, mockResponse);
     expect(prismaMock.user.findUnique).toHaveBeenCalled();
     expect(prismaMock.user.findUnique).toBeCalledTimes(1);
     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
@@ -77,16 +80,18 @@ describe("User controller", () => {
         username: "test",
       },
     });
-    expect(response.status).toBe(OK);
-    expect(response.status).not.toBe(BAD_REQUEST);
-    expect(response.body).toEqual({
-      message: "Username is available",
+    expect(mockResponse.status).toHaveBeenCalledWith(OK);
+    expect(mockResponse.status).not.toHaveBeenCalledWith(BAD_REQUEST);
+    expect(mockResponse.status).toHaveBeenCalledTimes(1);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      success: true,
       data: {
         username: "test",
-        message: "Username test is available",
+        message: `Username test is available`,
       },
+      message: "Username is available",
       error: null,
-      success: true,
     });
+    expect(mockResponse.json).toHaveBeenCalledTimes(1);
   });
 });

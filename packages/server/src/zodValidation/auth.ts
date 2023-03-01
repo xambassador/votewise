@@ -67,6 +67,10 @@ export const isEmail = (text: string) => {
 };
 
 const validateLoginSchema = (payload: LoginPayload) => {
+  // Edge case: if username is missing
+  if (!payload.username) {
+    return { success: false, message: "Username is required" };
+  }
   // check if the username is an email
   const isValidEmail = isEmail(payload.username);
   if (isValidEmail) {

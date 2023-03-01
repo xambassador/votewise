@@ -23,3 +23,4 @@ const getUser = (props: object) => ({
 });
 
 export { getUser };
+export * from "./generator";

@@ -201,7 +201,7 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
       );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
-    const msg = (err.message as string) || "Invalid refresh token";
+    const msg = "Invalid refresh token";
     return res
       .status(UNAUTHORIZED)
       .json(new JSONResponse("Invalid refresh token", null, { message: msg }, false));
