@@ -7,6 +7,12 @@ declare global {
       session: {
         user: User;
       };
+      query: {
+        limit?: number;
+        offset?: number;
+        token?: string;
+        email?: string;
+      };
     }
   }
 }

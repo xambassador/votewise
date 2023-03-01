@@ -5,11 +5,19 @@
 import type { Application } from "express";
 
 // -----------------------------------------------------------------------------------------
-import { AUTH_ROUTE_V1, HEALTH_ROUTE, ONBOARDING_ROUTE_V1 } from "@/src/configs";
+import {
+  AUTH_ROUTE_V1,
+  HEALTH_ROUTE,
+  ONBOARDING_ROUTE_V1,
+  POST_ROUTE_V1,
+  USER_ROUTE_V1,
+} from "@/src/configs";
 import authRouter from "@/src/routes/auth";
 import healthCheckRouter from "@/src/routes/healthCheck";
 import notFoundRouter from "@/src/routes/notFound";
 import onboardingRouter from "@/src/routes/onboarding";
+import postRouter from "@/src/routes/post";
+import userRouter from "@/src/routes/user";
 import { logger } from "@/src/utils";
 
 // Register routes
@@ -19,6 +27,8 @@ const registerRoutes = (app: Application) => {
   app.use(HEALTH_ROUTE, healthCheckRouter);
   app.use(AUTH_ROUTE_V1, authRouter);
   app.use(ONBOARDING_ROUTE_V1, onboardingRouter);
+  app.use(USER_ROUTE_V1, userRouter);
+  app.use(POST_ROUTE_V1, postRouter);
   app.use("*", notFoundRouter);
 
   logger("Routes registered...");
