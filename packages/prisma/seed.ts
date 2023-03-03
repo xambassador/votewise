@@ -6,6 +6,8 @@
 import { faker } from "@faker-js/faker";
 import type { Comment, Post, User } from "@prisma/client";
 import { PrismaClient } from "@prisma/client";
+import chalk from "chalk";
+import ora from "ora";
 import slugify from "slugify";
 
 const prisma = new PrismaClient();
@@ -15,6 +17,8 @@ const POSTS_PER_USER = 5;
 const COMMENTS_PER_POST = 5;
 const FOLLOWING_PER_USER = 5;
 const FRIENDS_PER_USER = 5;
+
+const spinner = ora();
 
 function createUser() {
   const email = faker.internet.email();
@@ -76,6 +80,8 @@ function createCommentOnPost() {
 }
 
 async function main() {
+  console.log(chalk.blue("🤠 Seeding database..."));
+  spinner.start(chalk.blue("🧟‍♀️ Deleting all data..."));
   await prisma.friend.deleteMany();
   await prisma.follow.deleteMany();
   await prisma.upvote.deleteMany();
@@ -83,15 +89,18 @@ async function main() {
   await prisma.post.deleteMany();
   await prisma.refreshToken.deleteMany();
   await prisma.user.deleteMany();
+  spinner.succeed(chalk.blue("✨✨ Deleted all data... ✨✨"));
 
+  spinner.start(chalk.blue("👦👩 Creating users..."));
   const users = Array(NUM_USERS)
     .fill({} as User)
     .map(() => createUser());
-
   await prisma.user.createMany({
     data: users as User[],
   });
+  spinner.succeed(chalk.blue("👯‍♀️ Users created users..."));
 
+  spinner.start(chalk.blue("📝 Creating posts..."));
   const createdUsersId = await prisma.user.findMany({
     select: {
       id: true,
@@ -114,7 +123,9 @@ async function main() {
       },
     });
   }
+  spinner.succeed(chalk.blue("📝 Posts created..."));
 
+  spinner.start(chalk.blue("🐶 Creating comments..."));
   const createdPosts = await prisma.post.findMany({
     select: {
       id: true,
@@ -148,7 +159,9 @@ async function main() {
       });
     }
   }
+  spinner.succeed(chalk.blue("🐶 Comments created..."));
 
+  spinner.start(chalk.blue("👯‍♀️ Creating followers and following..."));
   for (const user of createdUsersId) {
     const otherUsers = createdUsersId.filter((u) => u.id !== user.id);
     const suffledUsers = otherUsers.sort(() => Math.random() - 0.5);
@@ -163,7 +176,9 @@ async function main() {
       });
     }
   }
+  spinner.succeed(chalk.blue("👯‍♀️ Followers and following created..."));
 
+  spinner.start(chalk.blue("👯‍♀️ Creating friends..."));
   for (const user of createdUsersId) {
     const otherUsers = createdUsersId.filter((u) => u.id !== user.id);
     const currentUserId = user.id;
@@ -179,6 +194,7 @@ async function main() {
       });
     }
   }
+  spinner.succeed(chalk.blue("👯‍♀️ Friends created..."));
 }
 
 main()
@@ -189,6 +205,8 @@ main()
   })
   .catch((e) => {
     console.error(e);
+    spinner.fail();
+    spinner.stop();
     prisma.$disconnect();
     process.exit(1);
   });
