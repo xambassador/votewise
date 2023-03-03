@@ -5,23 +5,46 @@
 import type { Request, Response } from "express";
 import httpStatusCodes from "http-status-codes";
 
-import { CommentOnPostPayload } from "@votewise/types";
+import type {
+  CommentOnPostPayload,
+  ReplyToCommentOnPostPayload,
+  UpdateCommentOnPostPayload,
+} from "@votewise/types";
 
 // -----------------------------------------------------------------------------------------
 import { JSONResponse } from "@/src/lib";
 import PostService from "@/src/services/posts";
 import {
+  ALREADY_LIKED_COMMENT_MSG,
+  ALREADY_LIKED_COMMENT_RESPONSE,
+  COMMENT_ADDED_SUCCESSFULLY_MSG,
+  COMMENT_DELETED_SUCCESSFULLY_MSG,
+  COMMENT_LIKE_SUCCESSFULLY_MSG,
+  COMMENT_NOT_EMPTY_RESPONSE,
+  COMMENT_NOT_FOUND_MSG,
+  COMMENT_NOT_FOUND_RESPONSE,
+  COMMENT_NOT_LIKED_MSG,
+  COMMENT_NOT_LIKED_RESPONSE,
+  COMMENT_UNLIKE_SUCCESSFULLY_MSG,
+  COMMENT_UPDATED_SUCCESSFULLY_MSG,
+  GETTING_REPLIES_FROM_COMMENT_MSG,
+  INVALID_COMMENT_ID_RESPONSE,
   INVALID_POST_ID_RESPONSE,
   POSTS_FETCHED_SUCCESSFULLY_MSG,
+  POST_ALREADY_LIKED_MSG,
   POST_DETAILS_FETCHED_SUCCESSFULLY_MSG,
+  POST_NOT_LIKED_MSG,
+  POST_UNLIKED_SUCCESSFULLY_MSG,
+  REPLAY_ADDED_SUCCESSFULLY_MSG,
   SOMETHING_WENT_WRONG_MSG,
-  VALIDATION_FAILED_MSG,
+  UNAUTHORIZED_MSG,
+  UNAUTHORIZED_RESPONSE,
   getErrorReason,
   getLimitAndOffset,
 } from "@/src/utils";
 
 // -----------------------------------------------------------------------------------------
-const { OK, BAD_REQUEST, INTERNAL_SERVER_ERROR } = httpStatusCodes;
+const { OK, BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, UNAUTHORIZED } = httpStatusCodes;
 
 // -----------------------------------------------------------------------------------------
 export const getPosts = async (req: Request, res: Response) => {
@@ -112,10 +135,10 @@ export const getCommentsForPost = async (req: Request, res: Response) => {
       )
     );
   } catch (err) {
-    const msg = getErrorReason(err) || "Something went wrong";
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
     return res.status(INTERNAL_SERVER_ERROR).json(
       new JSONResponse(
-        "Something went wrong",
+        SOMETHING_WENT_WRONG_MSG,
         null,
         {
           message: msg,
@@ -149,11 +172,11 @@ export const likePost = async (req: Request, res: Response) => {
       )
     );
   } catch (err) {
-    const msg = getErrorReason(err) || "Something went wrong";
-    if (msg === "Post already liked") {
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    if (msg === POST_ALREADY_LIKED_MSG) {
       return res.status(BAD_REQUEST).json(
         new JSONResponse(
-          "Post already liked",
+          POST_ALREADY_LIKED_MSG,
           null,
           {
             message: msg,
@@ -164,7 +187,7 @@ export const likePost = async (req: Request, res: Response) => {
     }
     return res.status(INTERNAL_SERVER_ERROR).json(
       new JSONResponse(
-        "Something went wrong",
+        SOMETHING_WENT_WRONG_MSG,
         null,
         {
           message: msg,
@@ -188,9 +211,9 @@ export const unlikePost = async (req: Request, res: Response) => {
     const data = await PostService.unlikePost(Number(postId), user.id);
     return res.status(OK).json(
       new JSONResponse(
-        "Post unliked successfully",
+        POST_UNLIKED_SUCCESSFULLY_MSG,
         {
-          message: "Post unliked successfully",
+          message: POST_UNLIKED_SUCCESSFULLY_MSG,
           post_total_upvotes: data,
         },
         null,
@@ -198,11 +221,11 @@ export const unlikePost = async (req: Request, res: Response) => {
       )
     );
   } catch (err) {
-    const msg = getErrorReason(err) || "Something went wrong";
-    if (msg === "Post not liked") {
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    if (msg === POST_NOT_LIKED_MSG) {
       return res.status(BAD_REQUEST).json(
         new JSONResponse(
-          "Post not liked",
+          POST_NOT_LIKED_MSG,
           null,
           {
             message: msg,
@@ -213,7 +236,7 @@ export const unlikePost = async (req: Request, res: Response) => {
     }
     return res.status(INTERNAL_SERVER_ERROR).json(
       new JSONResponse(
-        "Something went wrong",
+        SOMETHING_WENT_WRONG_MSG,
         null,
         {
           message: msg,
@@ -234,16 +257,7 @@ export const commentOnPost = async (req: Request, res: Response) => {
   }
 
   if (!text) {
-    return res.status(BAD_REQUEST).json(
-      new JSONResponse(
-        VALIDATION_FAILED_MSG,
-        null,
-        {
-          message: "Comment should not be empty",
-        },
-        false
-      )
-    );
+    return res.status(BAD_REQUEST).json(COMMENT_NOT_EMPTY_RESPONSE);
   }
 
   const { user } = req.session;
@@ -252,9 +266,9 @@ export const commentOnPost = async (req: Request, res: Response) => {
     const data = await PostService.addComment(Number(postId), user.id, text);
     return res.status(OK).json(
       new JSONResponse(
-        "Comment added successfully",
+        COMMENT_ADDED_SUCCESSFULLY_MSG,
         {
-          message: "Comment added successfully",
+          message: COMMENT_ADDED_SUCCESSFULLY_MSG,
           comment: data,
         },
         null,
@@ -262,10 +276,303 @@ export const commentOnPost = async (req: Request, res: Response) => {
       )
     );
   } catch (err) {
-    const msg = getErrorReason(err) || "Something went wrong";
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
     return res.status(INTERNAL_SERVER_ERROR).json(
       new JSONResponse(
-        "Something went wrong",
+        SOMETHING_WENT_WRONG_MSG,
+        null,
+        {
+          message: msg,
+        },
+        false
+      )
+    );
+  }
+};
+
+// -----------------------------------------------------------------------------------------
+export const deleteCommentOnPost = async (req: Request, res: Response) => {
+  const { postId, commentId } = req.params;
+  const { user } = req.session;
+
+  if (!postId) {
+    return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
+  }
+
+  if (!commentId) {
+    return res.status(BAD_REQUEST).json(INVALID_COMMENT_ID_RESPONSE);
+  }
+
+  try {
+    await PostService.deleteComment(Number(postId), Number(commentId), user.id);
+    return res.status(OK).json(
+      new JSONResponse(
+        COMMENT_DELETED_SUCCESSFULLY_MSG,
+        {
+          message: COMMENT_DELETED_SUCCESSFULLY_MSG,
+        },
+        null,
+        true
+      )
+    );
+  } catch (err) {
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    if (msg === COMMENT_NOT_FOUND_MSG) {
+      return res.status(NOT_FOUND).json(COMMENT_NOT_FOUND_RESPONSE);
+    }
+
+    if (msg === UNAUTHORIZED_MSG) {
+      return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
+    }
+
+    return res.status(INTERNAL_SERVER_ERROR).json(
+      new JSONResponse(
+        SOMETHING_WENT_WRONG_MSG,
+        null,
+        {
+          message: msg,
+        },
+        false
+      )
+    );
+  }
+};
+
+// -----------------------------------------------------------------------------------------
+export const updateCommentOnPost = async (req: Request, res: Response) => {
+  const { commentId, postId } = req.params;
+  const { text } = req.body as UpdateCommentOnPostPayload;
+
+  if (!postId) {
+    return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
+  }
+
+  if (!commentId) {
+    return res.status(BAD_REQUEST).json(INVALID_COMMENT_ID_RESPONSE);
+  }
+
+  if (!text) {
+    return res.status(BAD_REQUEST).json(COMMENT_NOT_EMPTY_RESPONSE);
+  }
+
+  const { user } = req.session;
+
+  try {
+    const data = await PostService.updateComment(Number(postId), Number(commentId), user.id, text);
+    return res.status(OK).json(
+      new JSONResponse(
+        COMMENT_UPDATED_SUCCESSFULLY_MSG,
+        {
+          message: COMMENT_UPDATED_SUCCESSFULLY_MSG,
+          comment: data,
+        },
+        null,
+        true
+      )
+    );
+  } catch (err) {
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    if (msg === COMMENT_NOT_FOUND_MSG) {
+      return res.status(NOT_FOUND).json(COMMENT_NOT_FOUND_RESPONSE);
+    }
+    if (msg === UNAUTHORIZED_MSG) {
+      return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
+    }
+    return res.status(INTERNAL_SERVER_ERROR).json(
+      new JSONResponse(
+        SOMETHING_WENT_WRONG_MSG,
+        null,
+        {
+          message: msg,
+        },
+        false
+      )
+    );
+  }
+};
+
+// -----------------------------------------------------------------------------------------
+export const replyToCommentOnPost = async (req: Request, res: Response) => {
+  const { text } = req.body as ReplyToCommentOnPostPayload;
+  const { postId, commentId } = req.params;
+
+  if (!postId) {
+    return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
+  }
+
+  if (!commentId) {
+    return res.status(BAD_REQUEST).json(INVALID_COMMENT_ID_RESPONSE);
+  }
+
+  if (!text) {
+    return res.status(BAD_REQUEST).json(COMMENT_NOT_EMPTY_RESPONSE);
+  }
+
+  const { user } = req.session;
+
+  try {
+    const data = await PostService.addReplyToComment(Number(postId), Number(commentId), user.id, text);
+    return res.status(OK).json(
+      new JSONResponse(
+        REPLAY_ADDED_SUCCESSFULLY_MSG,
+        {
+          message: REPLAY_ADDED_SUCCESSFULLY_MSG,
+          comment: data,
+        },
+        null,
+        true
+      )
+    );
+  } catch (err) {
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    if (msg === COMMENT_NOT_FOUND_MSG) {
+      return res.status(NOT_FOUND).json(COMMENT_NOT_FOUND_RESPONSE);
+    }
+    return res.status(INTERNAL_SERVER_ERROR).json(
+      new JSONResponse(
+        SOMETHING_WENT_WRONG_MSG,
+        null,
+        {
+          message: msg,
+        },
+        false
+      )
+    );
+  }
+};
+
+// -----------------------------------------------------------------------------------------
+export const getRepliesToCommentOnPost = async (req: Request, res: Response) => {
+  const { postId, commentId } = req.params;
+
+  if (!postId) {
+    return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
+  }
+
+  if (!commentId) {
+    return res.status(BAD_REQUEST).json(INVALID_COMMENT_ID_RESPONSE);
+  }
+
+  const { limit, offset } = getLimitAndOffset(req);
+
+  try {
+    const data = await PostService.getRepliesToComment(Number(postId), Number(commentId), limit, offset);
+    return res.status(OK).json(
+      new JSONResponse(
+        GETTING_REPLIES_FROM_COMMENT_MSG,
+        {
+          message: GETTING_REPLIES_FROM_COMMENT_MSG,
+          replies: data.comments,
+          meta: data.meta,
+        },
+        null,
+        true
+      )
+    );
+  } catch (err) {
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    if (msg === COMMENT_NOT_FOUND_MSG) {
+      return res.status(NOT_FOUND).json(COMMENT_NOT_FOUND_RESPONSE);
+    }
+    return res.status(INTERNAL_SERVER_ERROR).json(
+      new JSONResponse(
+        SOMETHING_WENT_WRONG_MSG,
+        null,
+        {
+          message: msg,
+        },
+        false
+      )
+    );
+  }
+};
+
+// -----------------------------------------------------------------------------------------
+export const likeComment = async (req: Request, res: Response) => {
+  const { commentId, postId } = req.params;
+
+  if (!postId) {
+    return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
+  }
+
+  if (!commentId) {
+    return res.status(BAD_REQUEST).json(INVALID_COMMENT_ID_RESPONSE);
+  }
+
+  const { user } = req.session;
+
+  try {
+    const data = await PostService.likeComment(Number(postId), Number(commentId), user.id);
+    return res.status(OK).json(
+      new JSONResponse(
+        COMMENT_LIKE_SUCCESSFULLY_MSG,
+        {
+          message: COMMENT_LIKE_SUCCESSFULLY_MSG,
+          comment: data,
+        },
+        null,
+        true
+      )
+    );
+  } catch (err) {
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    if (msg === COMMENT_NOT_FOUND_MSG) {
+      return res.status(NOT_FOUND).json(COMMENT_NOT_FOUND_RESPONSE);
+    }
+    if (msg === ALREADY_LIKED_COMMENT_MSG) {
+      return res.status(BAD_REQUEST).json(ALREADY_LIKED_COMMENT_RESPONSE);
+    }
+    return res.status(INTERNAL_SERVER_ERROR).json(
+      new JSONResponse(
+        SOMETHING_WENT_WRONG_MSG,
+        null,
+        {
+          message: msg,
+        },
+        false
+      )
+    );
+  }
+};
+
+// -----------------------------------------------------------------------------------------
+export const unlikeComment = async (req: Request, res: Response) => {
+  const { commentId, postId } = req.params;
+
+  if (!postId) {
+    return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
+  }
+
+  if (!commentId) {
+    return res.status(BAD_REQUEST).json(INVALID_COMMENT_ID_RESPONSE);
+  }
+
+  const { user } = req.session;
+
+  try {
+    const data = await PostService.unlikeComment(Number(postId), Number(commentId), user.id);
+    return res.status(OK).json(
+      new JSONResponse(
+        COMMENT_UNLIKE_SUCCESSFULLY_MSG,
+        {
+          message: COMMENT_UNLIKE_SUCCESSFULLY_MSG,
+          comment: data,
+        },
+        null,
+        true
+      )
+    );
+  } catch (err) {
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    if (msg === COMMENT_NOT_FOUND_MSG) {
+      return res.status(NOT_FOUND).json(COMMENT_NOT_FOUND_RESPONSE);
+    }
+    if (msg === COMMENT_NOT_LIKED_MSG) {
+      return res.status(BAD_REQUEST).json(COMMENT_NOT_LIKED_RESPONSE);
+    }
+    return res.status(INTERNAL_SERVER_ERROR).json(
+      new JSONResponse(
+        SOMETHING_WENT_WRONG_MSG,
         null,
         {
           message: msg,

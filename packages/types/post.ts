@@ -2,4 +2,12 @@ type CommentOnPostPayload = {
   text: string;
 };
 
-export type { CommentOnPostPayload };
+type UpdateCommentOnPostPayload = {
+  text: string;
+};
+
+type ReplyToCommentOnPostPayload = {
+  text: string;
+};
+
+export type { CommentOnPostPayload, UpdateCommentOnPostPayload, ReplyToCommentOnPostPayload };

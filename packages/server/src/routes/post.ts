@@ -10,18 +10,27 @@ import {
   GET_POSTS_V1,
   GET_POST_COMMENTS_V1,
   GET_POST_V1,
+  GET_REPLIES_TO_COMMENT_ON_POST_V1,
   LIKE_COMMENT_ON_POST_V1,
   LIKE_POST_V1,
+  REPLY_TO_COMMENT_ON_POST_V1,
   UNLIKE_COMMENT_ON_POST_V1,
   UNLIKE_POST_V1,
+  UPDATE_COMMENT_ON_POST_V1,
 } from "@/src/configs";
 import {
   commentOnPost,
+  deleteCommentOnPost,
   getCommentsForPost,
   getPost,
   getPosts,
+  getRepliesToCommentOnPost,
+  likeComment,
   likePost,
+  replyToCommentOnPost,
+  unlikeComment,
   unlikePost,
+  updateCommentOnPost,
 } from "@/src/controllers/post";
 import authorizationMiddleware from "@/src/middlewares/auth";
 import onboardedMiddleware from "@/src/middlewares/onboarded";
@@ -36,15 +45,18 @@ router.patch(LIKE_POST_V1, authorizationMiddleware, onboardedMiddleware, likePos
 router.delete(UNLIKE_POST_V1, authorizationMiddleware, onboardedMiddleware, unlikePost);
 
 router.post(COMMENT_ON_POST_V1, authorizationMiddleware, onboardedMiddleware, commentOnPost);
-router.delete(DELETE_COMMENT_ON_POST_V1, authorizationMiddleware, onboardedMiddleware, (req, res) => {
-  return res.status(200).json({ message: "Delete comment on post" });
-});
+router.patch(UPDATE_COMMENT_ON_POST_V1, authorizationMiddleware, onboardedMiddleware, updateCommentOnPost);
+router.delete(DELETE_COMMENT_ON_POST_V1, authorizationMiddleware, onboardedMiddleware, deleteCommentOnPost);
 
-router.put(LIKE_COMMENT_ON_POST_V1, authorizationMiddleware, onboardedMiddleware, (req, res) => {
-  return res.status(200).json({ message: "Like comment on post" });
-});
-router.put(UNLIKE_COMMENT_ON_POST_V1, authorizationMiddleware, onboardedMiddleware, (req, res) => {
-  return res.status(200).json({ message: "UnLike comment on post" });
-});
+router.get(
+  GET_REPLIES_TO_COMMENT_ON_POST_V1,
+  authorizationMiddleware,
+  onboardedMiddleware,
+  getRepliesToCommentOnPost
+);
+router.post(REPLY_TO_COMMENT_ON_POST_V1, authorizationMiddleware, onboardedMiddleware, replyToCommentOnPost);
+
+router.patch(LIKE_COMMENT_ON_POST_V1, authorizationMiddleware, onboardedMiddleware, likeComment);
+router.delete(UNLIKE_COMMENT_ON_POST_V1, authorizationMiddleware, onboardedMiddleware, unlikeComment);
 
 export default router;

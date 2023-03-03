@@ -36,12 +36,16 @@ export const GET_POST_V1 = "/:postId";
 export const GET_POST_COMMENTS_V1 = "/:postId/comments";
 // PATCH /api/v1/posts/:postId/like => Like post
 export const LIKE_POST_V1 = "/:postId/like";
-// PATCH /api/v1/posts/:postId/unlike => Unlike post
+// DELETE /api/v1/posts/:postId/unlike => Unlike post
 export const UNLIKE_POST_V1 = "/:postId/unlike";
 // POST /api/v1/posts/:postId/comment => Comment on post
 export const COMMENT_ON_POST_V1 = "/:postId/comment";
-// PATCH /api/v1/posts/:postId/comment => Update comment on post
-export const UPDATE_COMMENT_ON_POST_V1 = "/:postId/comment";
+// PATCH /api/v1/posts/:postId/comment/:commentId => Update comment on post
+export const UPDATE_COMMENT_ON_POST_V1 = "/:postId/comment/:commentId";
+// POST /api/v1/posts/:postId/comment/:commentId => Reply to comment on post
+export const REPLY_TO_COMMENT_ON_POST_V1 = "/:postId/comment/:commentId";
+// GET /api/v1/posts/:postId/comment/:commentId/replies?limit=10&offset=0 => Get replies to comment on post
+export const GET_REPLIES_TO_COMMENT_ON_POST_V1 = "/:postId/comment/:commentId/replies";
 // DELETE /api/v1/posts/:postId/comment/:commentId => Delete comment on post
 export const DELETE_COMMENT_ON_POST_V1 = "/:postId/comment/:commentId";
 // PATCH /api/v1/posts/:postId/comment/:commentId/like => Like comment on post
@@ -55,20 +59,11 @@ export const USER_ROUTE_V1 = "/api/v1/user";
 export const GET_ME_V1 = "/me";
 // GET /api/v1/user/usernames?username=example
 export const CHECK_USERNAME_AVAILABILITY_V1 = "/usernames";
-// POST /api/v1/user/posts
+// POST /api/v1/user/posts => Create new post
 export const USER_CREATE_POST_V1 = "/posts";
-// GET /api/v1/user/posts
+// GET /api/v1/user/posts => Get all posts of current user
 export const USER_GET_POSTS_V1 = "/posts";
-// GET /api/v1/user/posts/:postId
-export const USER_GET_POST_V1 = "/posts/:postId";
-// PUT /api/v1/user/posts/:postId (update post)
+// PATCH /api/v1/user/posts/:postId (update post)
 export const USER_UPDATE_POST_V1 = "/posts/:postId";
-// PUT /api/v1/user/posts/:postId/like (like post)
-export const USER_LIKE_POST_V1 = "/posts/:postId/like";
-// PUT /api/v1/user/posts/:postId/unlike (unlike post)
-export const USER_UNLIKE_POST_V1 = "/posts/:postId/unlike";
-// PUT /api/v1/user/posts/:postId/comment (comment on post)
-export const USER_COMMENT_ON_POST_V1 = "/posts/:postId/comment";
-
 // DELETE /api/v1/user/posts/:postId
 export const DELETE_POST_V1 = "/posts/:postId";
