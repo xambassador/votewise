@@ -35,7 +35,7 @@ router.get(GET_POST_COMMENTS_V1, authorizationMiddleware, onboardedMiddleware, g
 router.patch(LIKE_POST_V1, authorizationMiddleware, onboardedMiddleware, likePost);
 router.delete(UNLIKE_POST_V1, authorizationMiddleware, onboardedMiddleware, unlikePost);
 
-router.patch(COMMENT_ON_POST_V1, authorizationMiddleware, onboardedMiddleware, commentOnPost);
+router.post(COMMENT_ON_POST_V1, authorizationMiddleware, onboardedMiddleware, commentOnPost);
 router.delete(DELETE_COMMENT_ON_POST_V1, authorizationMiddleware, onboardedMiddleware, (req, res) => {
   return res.status(200).json({ message: "Delete comment on post" });
 });
