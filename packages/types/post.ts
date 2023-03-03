@@ -10,4 +10,17 @@ type ReplyToCommentOnPostPayload = {
   text: string;
 };
 
-export type { CommentOnPostPayload, UpdateCommentOnPostPayload, ReplyToCommentOnPostPayload };
+type CreatePostPayload = {
+  title: string;
+  content: string;
+  type?: "PUBLIC" | "GROUP_ONLY";
+  status: "OPEN" | "CLOSED" | "ARCHIVED" | "INPROGRESS";
+  groupId?: number;
+};
+
+export type {
+  CommentOnPostPayload,
+  UpdateCommentOnPostPayload,
+  ReplyToCommentOnPostPayload,
+  CreatePostPayload,
+};

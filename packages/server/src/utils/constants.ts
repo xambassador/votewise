@@ -35,6 +35,8 @@ export const ERROR_UNLIKING_POST_MSG = "Error while unliking post";
 export const ERROR_LIKING_POST_MSG = "Error while liking post";
 export const ERROR_FETCHING_POSTS_MSG = "Error while fetching posts";
 export const ERROR_FETCHING_POST_MSG = "Error while fetching post";
+export const ERROR_CREATING_POST_MSG = "Error while creating post";
+export const ERROR_CHECKING_SLUG_MSG = "Error while checking slug";
 
 export const COMMENT_ADDED_SUCCESSFULLY_MSG = "Comment added successfully";
 export const COMMENT_DELETED_SUCCESSFULLY_MSG = "Comment deleted successfully";
