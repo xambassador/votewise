@@ -46,8 +46,7 @@ export const validateCreatePostPayload = (payload: CreatePostPayload) => {
     };
   }
 
-  // TODO:
-  // Remove me once group routes are implemented
+  // TODO: Remove me once group routes are implemented
   if (payload.type === "GROUP_ONLY" && payload.groupId) {
     return {
       success: false,

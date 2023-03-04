@@ -2,29 +2,41 @@
  * @file: index.ts
  * @description: Contains all posts related services
  */
-import { prisma } from "@votewise/prisma";
+import { nanoid } from "nanoid";
+import slugify from "slugify";
 
+import { prisma } from "@votewise/prisma";
+import type { CreatePostPayload, UpdatePostPayload } from "@votewise/types";
+
+import HashTagService from "@/src/services/hashtag";
 import {
   ALREADY_LIKED_COMMENT_MSG,
   COMMENT_NOT_FOUND_MSG,
   COMMENT_NOT_LIKED_MSG,
   ERROR_ADDING_COMMENT_MSG,
+  ERROR_CREATING_POST_MSG,
   ERROR_DELETING_COMMENT_MSG,
+  ERROR_DELETING_POST_MSG,
   ERROR_FETCHING_COMMENTS_FOR_POST_MSG,
   ERROR_FETCHING_POST_MSG,
   ERROR_GETTING_REPLIES_FROM_COMMENT_MSG,
+  ERROR_GETTING_USER_POSTS,
   ERROR_LIKING_COMMENT_MSG,
   ERROR_LIKING_POST_MSG,
   ERROR_REPLAYING_COMMENT_MSG,
   ERROR_UNLIKING_COMMENT_MSG,
   ERROR_UNLIKING_POST_MSG,
   ERROR_UPDATING_COMMENT_MSG,
+  ERROR_UPDATING_POST_MSG,
   POST_ALREADY_LIKED_MSG,
+  POST_NOT_FOUND_MSG,
   POST_NOT_LIKED_MSG,
   UNAUTHORIZED_MSG,
   getErrorReason,
 } from "@/src/utils";
+import { validateCreatePostPayload } from "@/src/zodValidation";
 
+// TODO: Move me from here to somewhere else
 function getPagination(total: number, limit: number, offset: number) {
   return {
     total,
@@ -34,6 +46,7 @@ function getPagination(total: number, limit: number, offset: number) {
   };
 }
 
+// FIXME: Remove comments logic to its own service
 class PostService {
   async getPosts(userId: number, limit = 10, offset = 0) {
     const posts = await prisma.post.findMany({
@@ -230,7 +243,7 @@ class PostService {
         },
       });
 
-      if (isAlreadyLiked?.upvotes) {
+      if (isAlreadyLiked && isAlreadyLiked.upvotes.length > 0) {
         throw new Error(POST_ALREADY_LIKED_MSG);
       }
 
@@ -281,7 +294,11 @@ class PostService {
         },
       });
 
-      if (!isAlreadyLiked?.upvotes) {
+      if (!isAlreadyLiked) {
+        throw new Error(POST_NOT_LIKED_MSG);
+      }
+
+      if (isAlreadyLiked && isAlreadyLiked.upvotes.length === 0) {
         throw new Error(POST_NOT_LIKED_MSG);
       }
 
@@ -639,6 +656,196 @@ class PostService {
         throw new Error(ERROR_UNLIKING_COMMENT_MSG);
       }
     }
+  }
+
+  // ---------------------------------
+  // TODO: Add images and videos to post case
+  async createPost({ content, title, status, type = "PUBLIC", groupId }: CreatePostPayload, userId: number) {
+    const slug = slugify(`${title}-${nanoid(5)}`, { lower: true });
+    try {
+      const post = await prisma.post.create({
+        data: {
+          slug,
+          content,
+          title,
+          status,
+          type,
+          group_id: groupId,
+          author_id: userId,
+        },
+      });
+      await HashTagService.addHashtags(post.id, content);
+      return post;
+    } catch (err) {
+      throw new Error(ERROR_CREATING_POST_MSG);
+    }
+  }
+
+  // ---------------------------------
+  async getPostsByUserId(userId: number, limit = 5, offset = 0) {
+    try {
+      const totalPosts = await prisma.post.count({
+        where: {
+          author_id: userId,
+        },
+      });
+      const posts = await prisma.post.findMany({
+        where: {
+          author_id: userId,
+        },
+        orderBy: {
+          updated_at: "desc",
+        },
+        include: {
+          _count: {
+            select: {
+              upvotes: true,
+              comments: true,
+            },
+          },
+        },
+        take: limit,
+        skip: offset,
+      });
+      return {
+        posts: posts.map((p) => ({
+          ...p,
+          upvotes: p._count.upvotes,
+          comments: p._count.comments,
+          _count: undefined,
+        })),
+        meta: {
+          pagination: {
+            ...getPagination(totalPosts, limit, offset),
+          },
+        },
+      };
+    } catch (err) {
+      throw new Error(ERROR_GETTING_USER_POSTS);
+    }
+  }
+
+  // ---------------------------------
+  async updatePost(postId: number, userId: number, payload: UpdatePostPayload) {
+    const slug = slugify(`${payload.title}-${nanoid(5)}`, { lower: true });
+    try {
+      const post = await prisma.post.findUnique({
+        where: {
+          id: postId,
+        },
+      });
+
+      if (!post) {
+        throw new Error(POST_NOT_FOUND_MSG);
+      }
+
+      const data = await prisma.post.update({
+        where: {
+          id: postId,
+        },
+        data: {
+          content: payload.content,
+          title: payload.title,
+          slug,
+          type: payload.type,
+          status: payload.status,
+          group_id: payload.groupId,
+        },
+      });
+      await HashTagService.addHashtags(postId, payload.content);
+      return data;
+    } catch (err) {
+      const msg = getErrorReason(err);
+      if (msg === POST_NOT_FOUND_MSG) {
+        throw new Error(msg);
+      }
+      throw new Error(ERROR_UPDATING_POST_MSG);
+    }
+  }
+
+  // ---------------------------------
+  async deleteMyPost(postId: number, userId: number) {
+    try {
+      const post = await prisma.post.findUnique({
+        where: {
+          id: postId,
+        },
+        select: {
+          author_id: true,
+          post_hash_tags: {
+            where: {
+              post_id: postId,
+            },
+          },
+        },
+      });
+
+      // eslint-disable-next-line no-console
+      console.log(post);
+
+      if (!post) {
+        throw new Error(POST_NOT_FOUND_MSG);
+      }
+
+      await prisma.postHashTag.deleteMany({
+        where: {
+          post_id: postId,
+        },
+      });
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const hashtagId of post.post_hash_tags) {
+        // eslint-disable-next-line no-await-in-loop
+        await prisma.hashTag.update({
+          where: {
+            id: hashtagId.hash_tag_id,
+          },
+          data: {
+            count: {
+              decrement: 1,
+            },
+          },
+        });
+      }
+
+      await prisma.comment.deleteMany({
+        where: {
+          post_id: postId,
+          upvotes: {
+            every: {
+              post_id: postId,
+            },
+          },
+        },
+      });
+
+      await prisma.upvote.deleteMany({
+        where: {
+          post_id: postId,
+        },
+      });
+
+      await prisma.post.delete({
+        where: {
+          id: postId,
+        },
+      });
+
+      return true;
+    } catch (err) {
+      const msg = getErrorReason(err);
+      if (msg === POST_NOT_FOUND_MSG) {
+        throw new Error(msg);
+      }
+      // eslint-disable-next-line no-console
+      console.log(err);
+      throw new Error(ERROR_DELETING_POST_MSG);
+    }
+  }
+
+  // ---------------------------------
+  validatePostPayload(data: CreatePostPayload) {
+    return validateCreatePostPayload(data);
   }
 }
 
