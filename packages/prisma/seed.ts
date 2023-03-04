@@ -82,6 +82,8 @@ function createCommentOnPost() {
 async function main() {
   console.log(chalk.blue("🤠 Seeding database..."));
   spinner.start(chalk.blue("🧟‍♀️ Deleting all data..."));
+  await prisma.postHashTag.deleteMany();
+  await prisma.hashTag.deleteMany();
   await prisma.friend.deleteMany();
   await prisma.follow.deleteMany();
   await prisma.upvote.deleteMany();
