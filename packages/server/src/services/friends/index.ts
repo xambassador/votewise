@@ -238,11 +238,13 @@ class FriendsService {
         throw new Error(FRIEND_REQUEST_NOT_FOUND_MSG);
       }
 
-      if (request.user_id !== userId) {
+      // I am rejecting the friend request, so I am the friend of the user who sent the request
+      // So, I should be the friend_id and the user who sent the request should be the user_id
+      if (request.friend_id !== userId) {
         throw new Error(UNAUTHORIZED_MSG);
       }
 
-      if (request.friend_id !== friendId) {
+      if (request.user_id !== friendId) {
         throw new Error(FRIEND_REQUEST_NOT_FOUND_MSG);
       }
 

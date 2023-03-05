@@ -14,6 +14,7 @@ import type {
 } from "@votewise/types";
 
 import { JSONResponse } from "@/src/lib";
+import FollowerService from "@/src/services/follower";
 import FriendService from "@/src/services/friends";
 import PostService from "@/src/services/posts";
 import UserService from "@/src/services/user";
@@ -636,6 +637,192 @@ export const getMyFriendRequests = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    return res.status(INTERNAL_SERVER_ERROR).json(
+      new JSONResponse(
+        INTERNAL_SERVER_ERROR_MSG,
+        null,
+        {
+          message: msg,
+        },
+        false
+      )
+    );
+  }
+};
+
+// -----------------------------------------------------------------------------------------
+export const getMyFollowers = async (req: Request, res: Response) => {
+  const { limit, offset } = getLimitAndOffset(req);
+  const { user } = req.session;
+
+  try {
+    const data = await FollowerService.getFollowersByUserId(user.id, limit, offset);
+    return res.status(OK).json(
+      new JSONResponse(
+        "Followers fetched successfully",
+        {
+          message: "Followers fetched successfully",
+          followers: data.followers,
+          meta: data.meta,
+        },
+        null,
+        true
+      )
+    );
+  } catch (err) {
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    return res.status(INTERNAL_SERVER_ERROR).json(
+      new JSONResponse(
+        INTERNAL_SERVER_ERROR_MSG,
+        null,
+        {
+          message: msg,
+        },
+        false
+      )
+    );
+  }
+};
+
+// -----------------------------------------------------------------------------------------
+export const getMyFollowings = async (req: Request, res: Response) => {
+  const { limit, offset } = getLimitAndOffset(req);
+  const { user } = req.session;
+
+  try {
+    const data = await FollowerService.getFollowingByUserId(user.id, limit, offset);
+    return res.status(OK).json(
+      new JSONResponse(
+        "Followings fetched successfully",
+        {
+          message: "Followings fetched successfully",
+          followers: data.following,
+          meta: data.meta,
+        },
+        null,
+        true
+      )
+    );
+  } catch (err) {
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    return res.status(INTERNAL_SERVER_ERROR).json(
+      new JSONResponse(
+        INTERNAL_SERVER_ERROR_MSG,
+        null,
+        {
+          message: msg,
+        },
+        false
+      )
+    );
+  }
+};
+
+// -----------------------------------------------------------------------------------------
+export const startFollowing = async (req: Request, res: Response) => {
+  const { followingId } = req.params;
+  const { user } = req.session;
+
+  if (!followingId) {
+    return res.status(BAD_REQUEST).json(
+      new JSONResponse(
+        VALIDATION_FAILED_MSG,
+        null,
+        {
+          message: "Invalid following id",
+        },
+        false
+      )
+    );
+  }
+
+  try {
+    const data = await FollowerService.startFollowing(user.id, Number(followingId));
+    return res.status(OK).json(
+      new JSONResponse(
+        "Started following successfully",
+        {
+          message: "Started following successfully",
+          follower: data,
+        },
+        null,
+        true
+      )
+    );
+  } catch (err) {
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    if (msg === "Already following") {
+      return res.status(BAD_REQUEST).json(
+        new JSONResponse(
+          "Already following",
+          null,
+          {
+            message: msg,
+          },
+          false
+        )
+      );
+    }
+
+    return res.status(INTERNAL_SERVER_ERROR).json(
+      new JSONResponse(
+        INTERNAL_SERVER_ERROR_MSG,
+        null,
+        {
+          message: msg,
+        },
+        false
+      )
+    );
+  }
+};
+
+// -----------------------------------------------------------------------------------------
+export const stopFollowing = async (req: Request, res: Response) => {
+  const { followingId } = req.params;
+  const { user } = req.session;
+
+  if (!followingId) {
+    return res.status(BAD_REQUEST).json(
+      new JSONResponse(
+        VALIDATION_FAILED_MSG,
+        null,
+        {
+          message: "Invalid following id",
+        },
+        false
+      )
+    );
+  }
+
+  try {
+    const data = await FollowerService.stopFollowing(user.id, Number(followingId));
+    return res.status(OK).json(
+      new JSONResponse(
+        "Unfollowed successfully",
+        {
+          message: "Unfollowed successfully",
+          follower: data,
+        },
+        null,
+        true
+      )
+    );
+  } catch (err) {
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    if (msg === "Not following") {
+      return res.status(BAD_REQUEST).json(
+        new JSONResponse(
+          "Not following",
+          null,
+          {
+            message: msg,
+          },
+          false
+        )
+      );
+    }
+
     return res.status(INTERNAL_SERVER_ERROR).json(
       new JSONResponse(
         INTERNAL_SERVER_ERROR_MSG,

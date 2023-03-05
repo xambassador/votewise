@@ -11,11 +11,15 @@ import {
   UPDATE_POST_STATUS_V1,
   USER_ACCEPT_REJECT_FRIEND_REQUEST_V1,
   USER_CREATE_POST_V1,
+  USER_FOLLOW_USER_V1,
   USER_GET_COMMENTS_V1,
+  USER_GET_FOLLOWERS_V1,
+  USER_GET_FOLLOWING_V1,
   USER_GET_FRIENDS_V1,
   USER_GET_FRIEND_REQUESTS_V1,
   USER_GET_POSTS_V1,
   USER_SEND_FRIEND_REQUEST_V1,
+  USER_UNFOLLOW_USER_V1,
   USER_UPDATE_POST_V1,
 } from "@/src/configs";
 import {
@@ -26,9 +30,13 @@ import {
   deleteMyPost,
   getMyComments,
   getMyDetails,
+  getMyFollowers,
+  getMyFollowings,
   getMyFriendRequests,
   getMyFriends,
   getMyPosts,
+  startFollowing,
+  stopFollowing,
   updateMyPost,
   updateStatus,
 } from "@/src/controllers/user";
@@ -44,9 +52,12 @@ router.get(GET_ME_V1, authorizationMiddleware, onboardedMiddleware, getMyDetails
 router.get(USER_GET_COMMENTS_V1, authorizationMiddleware, onboardedMiddleware, getMyComments);
 router.get(USER_GET_FRIENDS_V1, authorizationMiddleware, onboardedMiddleware, getMyFriends);
 router.get(USER_GET_FRIEND_REQUESTS_V1, authorizationMiddleware, onboardedMiddleware, getMyFriendRequests);
+router.get(USER_GET_FOLLOWERS_V1, authorizationMiddleware, onboardedMiddleware, getMyFollowers);
+router.get(USER_GET_FOLLOWING_V1, authorizationMiddleware, onboardedMiddleware, getMyFollowings);
 
 router.post(USER_CREATE_POST_V1, authorizationMiddleware, onboardedMiddleware, createPost);
 router.post(USER_SEND_FRIEND_REQUEST_V1, authorizationMiddleware, onboardedMiddleware, addFriend);
+router.post(USER_FOLLOW_USER_V1, authorizationMiddleware, onboardedMiddleware, startFollowing);
 
 router.patch(USER_UPDATE_POST_V1, authorizationMiddleware, onboardedMiddleware, updateMyPost);
 router.patch(UPDATE_POST_STATUS_V1, authorizationMiddleware, onboardedMiddleware, updateStatus);
@@ -58,5 +69,6 @@ router.patch(
 );
 
 router.delete(DELETE_POST_V1, authorizationMiddleware, onboardedMiddleware, deleteMyPost);
+router.delete(USER_UNFOLLOW_USER_V1, authorizationMiddleware, onboardedMiddleware, stopFollowing);
 
 export default router;

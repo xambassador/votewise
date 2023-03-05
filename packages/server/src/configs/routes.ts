@@ -81,16 +81,15 @@ export const USER_ACCEPT_REJECT_FRIEND_REQUEST_V1 = "/friends/:friendId";
 // GET /api/v1/user/friends/requests?limit=5&offset=0 => Get all friend requests of current user
 export const USER_GET_FRIEND_REQUESTS_V1 = "/friends/requests";
 
-// IMPLEMENTME: Implement this route
 // GET /api/v1/user/followers?limit=5&offset=0 => Get all followers of current user
 export const USER_GET_FOLLOWERS_V1 = "/followers";
-// IMPLEMENTME: Implement this route
-// PATCH /api/v1/user/followers/:userId => Follow user
-export const USER_FOLLOW_USER_V1 = "/followers/:userId";
+// POST /api/v1/user/followers/:userId => Follow user
+export const USER_FOLLOW_USER_V1 = "/followers/:followingId";
 
-// IMPLEMENTME: Implement this route
 // GET /api/v1/user/following?limit=5&offset=0 => Get all users current user is following
 export const USER_GET_FOLLOWING_V1 = "/following";
+// DELETE /api/v1/user/following/:folloingId => Unfollow user
+export const USER_UNFOLLOW_USER_V1 = "/following/:followingId";
 
 // IMPLEMENTME: Implement this route
 // GET /api/v1/user/groups?limit=5&offset=0 => Get all groups of current user
