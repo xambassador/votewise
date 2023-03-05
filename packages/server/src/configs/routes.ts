@@ -72,16 +72,12 @@ export const UPDATE_POST_STATUS_V1 = "/posts/:postId/status";
 // GET /api/v1/user/comments?limit=5&offset=0 => Get all comments of current user
 export const USER_GET_COMMENTS_V1 = "/comments";
 
-// IMPLEMENTME: Implement this route
 // GET /api/v1/user/friends?limit=5&offset=0 => Get all friends of current user
 export const USER_GET_FRIENDS_V1 = "/friends";
-// IMPLEMENTME: Implement this route
 // POST /api/v1/user/friends/:friendId => Send friend request to user
 export const USER_SEND_FRIEND_REQUEST_V1 = "/friends/:friendId";
-// IMPLEMENTME: Implement this route
 // PATCH /api/v1/user/friends/:friendId => Accept or Reject friend request from user
 export const USER_ACCEPT_REJECT_FRIEND_REQUEST_V1 = "/friends/:friendId";
-// IMPLEMENTME: Implement this route
 // GET /api/v1/user/friends/requests?limit=5&offset=0 => Get all friend requests of current user
 export const USER_GET_FRIEND_REQUESTS_V1 = "/friends/requests";
 

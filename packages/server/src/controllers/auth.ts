@@ -198,6 +198,8 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
       .json(new JSONResponse(VALIDATION_FAILED_MSG, null, { message: REFRESHTOKEN_REQUIRED_MSG }, false));
   }
 
+  // TODO: need to add validation based on ip address
+
   try {
     // Verify the refreshToken
     const decoded = JWTService.verifyRefreshToken(refreshToken) as { userId: string };

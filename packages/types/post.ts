@@ -14,6 +14,7 @@ type CreatePostPayload = {
   title: string;
   content: string;
   type?: "PUBLIC" | "GROUP_ONLY";
+  // TODO: Add a status type
   status: "OPEN" | "CLOSED" | "ARCHIVED" | "INPROGRESS";
   groupId?: number;
 };
@@ -22,8 +23,14 @@ type UpdatePostPayload = {
   title: string;
   content: string;
   type?: "PUBLIC" | "GROUP_ONLY";
+  // TODO: Add a status type
   status: "OPEN" | "CLOSED" | "ARCHIVED" | "INPROGRESS";
   groupId?: number;
+};
+
+type ChangeStatusPayload = {
+  // TODO: Add a status type
+  status: "OPEN" | "CLOSED" | "ARCHIVED" | "INPROGRESS";
 };
 
 export type {
@@ -32,4 +39,5 @@ export type {
   ReplyToCommentOnPostPayload,
   CreatePostPayload,
   UpdatePostPayload,
+  ChangeStatusPayload,
 };

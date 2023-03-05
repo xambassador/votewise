@@ -6,15 +6,26 @@ import type { PostStatus } from "@prisma/client";
 import type { Request, Response } from "express";
 import httpStatusCodes from "http-status-codes";
 
-import type { ChangeStatusPayload, CreatePostPayload, UpdatePostPayload } from "@votewise/types";
+import type {
+  AcceptOrRejectFriendRequestPayload,
+  ChangeStatusPayload,
+  CreatePostPayload,
+  UpdatePostPayload,
+} from "@votewise/types";
 
 import { JSONResponse } from "@/src/lib";
 import FriendService from "@/src/services/friends";
 import PostService from "@/src/services/posts";
 import UserService from "@/src/services/user";
 import {
+  ALREADY_FRIENDS_MSG,
   COMMENT_FETCHED_SUCCESSFULLY_MSG,
+  FRIEDN_REQUESTS_FETCHED_SUCCESSFULLY_MSG,
   FRIENDS_FETCHED_SUCCESSFULLY_MSG,
+  FRIEND_REQUEST_ACCEPTED_SUCCESSFULLY_MSG,
+  FRIEND_REQUEST_NOT_FOUND_MSG,
+  FRIEND_REQUEST_REJECTED_SUCCESSFULLY_MSG,
+  FRIEND_REQUEST_SENT_SUCCESSFULLY_MSG,
   INTERNAL_SERVER_ERROR_MSG,
   INVALID_POST_ID_RESPONSE,
   POSTS_FETCHED_SUCCESSFULLY_MSG,
@@ -403,13 +414,14 @@ export const getMyFriends = async (req: Request, res: Response) => {
   const { user } = req.session;
 
   try {
-    const data = await FriendService.getFriends(user.id);
+    const data = await FriendService.getFriends(user.id, limit, offset);
     return res.status(OK).json(
       new JSONResponse(
         FRIENDS_FETCHED_SUCCESSFULLY_MSG,
         {
           message: FRIENDS_FETCHED_SUCCESSFULLY_MSG,
-          friends: data,
+          friends: data.friends,
+          meta: data.meta,
         },
         null,
         true
@@ -434,6 +446,7 @@ export const getMyFriends = async (req: Request, res: Response) => {
 export const addFriend = async (req: Request, res: Response) => {
   const { friendId } = req.params;
 
+  // TODO: Create Invalid friend id response
   if (!friendId) {
     return res.status(BAD_REQUEST).json(
       new JSONResponse(
@@ -451,12 +464,171 @@ export const addFriend = async (req: Request, res: Response) => {
 
   try {
     const data = await FriendService.addFriend(user.id, Number(friendId));
+    // TODO: send notification to the user and send email
     return res.status(OK).json(
       new JSONResponse(
-        "FRIEND_ADDED_SUCCESSFULLY_MSG",
+        FRIEND_REQUEST_SENT_SUCCESSFULLY_MSG,
         {
-          message: "FRIEND_ADDED_SUCCESSFULLY_MSG",
+          message: FRIEND_REQUEST_SENT_SUCCESSFULLY_MSG,
           friend: data,
+        },
+        null,
+        true
+      )
+    );
+  } catch (err) {
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    if (msg === ALREADY_FRIENDS_MSG) {
+      return res.status(BAD_REQUEST).json(
+        new JSONResponse(
+          ALREADY_FRIENDS_MSG,
+          null,
+          {
+            message: msg,
+          },
+          false
+        )
+      );
+    }
+    if (msg === "Friend request already sent") {
+      return res.status(BAD_REQUEST).json(
+        new JSONResponse(
+          "Friend request already sent",
+          null,
+          {
+            message: msg,
+          },
+          false
+        )
+      );
+    }
+    return res.status(INTERNAL_SERVER_ERROR).json(
+      new JSONResponse(
+        INTERNAL_SERVER_ERROR_MSG,
+        null,
+        {
+          message: msg,
+        },
+        false
+      )
+    );
+  }
+};
+
+// -----------------------------------------------------------------------------------------
+export const acceptOrRejectFriendRequest = async (req: Request, res: Response) => {
+  const { friendId } = req.params;
+  const payload = req.body as AcceptOrRejectFriendRequestPayload;
+  const { user } = req.session;
+
+  const isValid = FriendService.validateAcceptOrRejectFriendRequestPayload(payload);
+
+  if (!isValid.success) {
+    return res.status(BAD_REQUEST).json(
+      new JSONResponse(
+        VALIDATION_FAILED_MSG,
+        null,
+        {
+          message: isValid.message,
+        },
+        false
+      )
+    );
+  }
+
+  // TODO: Create Invalid friend id response
+  if (!friendId) {
+    return res.status(BAD_REQUEST).json(
+      new JSONResponse(
+        VALIDATION_FAILED_MSG,
+        null,
+        {
+          message: "Invalid friend id",
+        },
+        false
+      )
+    );
+  }
+
+  try {
+    const data = await FriendService.acceptOrRejectFriendRequest(
+      user.id,
+      Number(friendId),
+      payload.requestId,
+      payload.type
+    );
+    // TODO: send notification to the user who sent the request
+
+    const msg =
+      payload.type === "ACCEPT"
+        ? FRIEND_REQUEST_ACCEPTED_SUCCESSFULLY_MSG
+        : FRIEND_REQUEST_REJECTED_SUCCESSFULLY_MSG;
+    return res.status(OK).json(
+      new JSONResponse(
+        msg,
+        {
+          message: msg,
+          friend: data,
+        },
+        null,
+        true
+      )
+    );
+  } catch (err) {
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    if (msg === FRIEND_REQUEST_NOT_FOUND_MSG) {
+      return res.status(NOT_FOUND).json(
+        new JSONResponse(
+          FRIEND_REQUEST_NOT_FOUND_MSG,
+          null,
+          {
+            message: msg,
+          },
+          false
+        )
+      );
+    }
+
+    if (msg === UNAUTHORIZED_MSG) {
+      return res.status(UNAUTHORIZED).json(
+        new JSONResponse(
+          UNAUTHORIZED_MSG,
+          null,
+          {
+            message: msg,
+          },
+          false
+        )
+      );
+    }
+
+    return res.status(INTERNAL_SERVER_ERROR).json(
+      new JSONResponse(
+        INTERNAL_SERVER_ERROR_MSG,
+        null,
+        {
+          message: msg,
+        },
+        false
+      )
+    );
+  }
+};
+
+// -----------------------------------------------------------------------------------------
+export const getMyFriendRequests = async (req: Request, res: Response) => {
+  const { limit, offset } = getLimitAndOffset(req);
+  const { user } = req.session;
+
+  try {
+    const data = await FriendService.getFriendRequests(user.id, limit, offset);
+    return res.status(OK).json(
+      new JSONResponse(
+        FRIEDN_REQUESTS_FETCHED_SUCCESSFULLY_MSG,
+        {
+          message: FRIEDN_REQUESTS_FETCHED_SUCCESSFULLY_MSG,
+          requests: data.requests,
+          meta: data.meta,
         },
         null,
         true

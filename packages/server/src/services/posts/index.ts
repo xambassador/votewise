@@ -2,11 +2,12 @@
  * @file: index.ts
  * @description: Contains all posts related services
  */
+import type { PostStatus } from "@prisma/client";
 import { nanoid } from "nanoid";
 import slugify from "slugify";
 
 import { prisma } from "@votewise/prisma";
-import type { CreatePostPayload, UpdatePostPayload } from "@votewise/types";
+import type { ChangeStatusPayload, CreatePostPayload, UpdatePostPayload } from "@votewise/types";
 
 import HashTagService from "@/src/services/hashtag";
 import {
@@ -14,6 +15,7 @@ import {
   COMMENT_NOT_FOUND_MSG,
   COMMENT_NOT_LIKED_MSG,
   ERROR_ADDING_COMMENT_MSG,
+  ERROR_COMMENT_FETCHED_MSG,
   ERROR_CREATING_POST_MSG,
   ERROR_DELETING_COMMENT_MSG,
   ERROR_DELETING_POST_MSG,
@@ -28,27 +30,50 @@ import {
   ERROR_UNLIKING_POST_MSG,
   ERROR_UPDATING_COMMENT_MSG,
   ERROR_UPDATING_POST_MSG,
+  ERROR_UPDATING_POST_STATUS_MSG,
   POST_ALREADY_LIKED_MSG,
   POST_NOT_FOUND_MSG,
   POST_NOT_LIKED_MSG,
   UNAUTHORIZED_MSG,
   getErrorReason,
+  getPagination,
 } from "@/src/utils";
 import { validateCreatePostPayload } from "@/src/zodValidation";
 
-// TODO: Move me from here to somewhere else
-function getPagination(total: number, limit: number, offset: number) {
-  return {
-    total,
-    limit,
-    next: offset + limit,
-    isLastPage: total <= offset + limit,
-  };
-}
-
 // FIXME: Remove comments logic to its own service
 class PostService {
-  async getPosts(userId: number, limit = 10, offset = 0) {
+  async getPosts(
+    userId: number,
+    limit = 10,
+    offset = 0,
+    sortby: "upvote" | "comment" | "date" = "date",
+    sortorder: "asc" | "desc" = "desc"
+  ) {
+    let orderBy;
+
+    switch (sortby) {
+      case "upvote":
+        orderBy = {
+          upvotes: {
+            _count: sortorder,
+          },
+        };
+        break;
+
+      case "comment":
+        orderBy = {
+          comments: {
+            _count: sortorder,
+          },
+        };
+        break;
+
+      default:
+        orderBy = {
+          created_at: sortorder,
+        };
+    }
+
     const posts = await prisma.post.findMany({
       where: {
         OR: [
@@ -82,9 +107,7 @@ class PostService {
       },
       take: limit,
       skip: offset,
-      orderBy: {
-        created_at: "desc",
-      },
+      orderBy,
     });
     const totalPosts = await prisma.post.count();
     // https://github.com/prisma/prisma/issues/4433
@@ -682,11 +705,12 @@ class PostService {
   }
 
   // ---------------------------------
-  async getPostsByUserId(userId: number, limit = 5, offset = 0) {
+  async getPostsByUserId(userId: number, limit = 5, offset = 0, status = "OPEN" as PostStatus) {
     try {
       const totalPosts = await prisma.post.count({
         where: {
           author_id: userId,
+          status,
         },
       });
       const posts = await prisma.post.findMany({
@@ -739,6 +763,10 @@ class PostService {
         throw new Error(POST_NOT_FOUND_MSG);
       }
 
+      if (post.author_id !== userId) {
+        throw new Error(UNAUTHORIZED_MSG);
+      }
+
       const data = await prisma.post.update({
         where: {
           id: postId,
@@ -756,7 +784,7 @@ class PostService {
       return data;
     } catch (err) {
       const msg = getErrorReason(err);
-      if (msg === POST_NOT_FOUND_MSG) {
+      if (msg === POST_NOT_FOUND_MSG || msg === UNAUTHORIZED_MSG) {
         throw new Error(msg);
       }
       throw new Error(ERROR_UPDATING_POST_MSG);
@@ -780,11 +808,12 @@ class PostService {
         },
       });
 
-      // eslint-disable-next-line no-console
-      console.log(post);
-
       if (!post) {
         throw new Error(POST_NOT_FOUND_MSG);
+      }
+
+      if (post.author_id !== userId) {
+        throw new Error(UNAUTHORIZED_MSG);
       }
 
       await prisma.postHashTag.deleteMany({
@@ -834,12 +863,96 @@ class PostService {
       return true;
     } catch (err) {
       const msg = getErrorReason(err);
-      if (msg === POST_NOT_FOUND_MSG) {
+      if (msg === POST_NOT_FOUND_MSG || msg === UNAUTHORIZED_MSG) {
         throw new Error(msg);
       }
       // eslint-disable-next-line no-console
       console.log(err);
       throw new Error(ERROR_DELETING_POST_MSG);
+    }
+  }
+
+  // ---------------------------------
+  async changeStatus(postId: number, payload: ChangeStatusPayload, userId: number) {
+    try {
+      const post = await prisma.post.findUnique({
+        where: {
+          id: postId,
+        },
+      });
+
+      if (!post) {
+        throw new Error(POST_NOT_FOUND_MSG);
+      }
+
+      if (post.id !== userId) {
+        throw new Error(UNAUTHORIZED_MSG);
+      }
+
+      const data = await prisma.post.update({
+        where: {
+          id: postId,
+        },
+        data: {
+          status: payload.status,
+        },
+      });
+
+      return data;
+    } catch (err) {
+      const msg = getErrorReason(err);
+      if (msg === POST_NOT_FOUND_MSG || msg === UNAUTHORIZED_MSG) {
+        throw new Error(msg);
+      }
+      throw new Error(ERROR_UPDATING_POST_STATUS_MSG);
+    }
+  }
+
+  // ---------------------------------
+  async getCommentsByUserId(userId: number, limit = 5, offset = 0) {
+    try {
+      const totalComments = await prisma.comment.count({
+        where: {
+          user_id: userId,
+        },
+      });
+      const comments = await prisma.comment.findMany({
+        where: {
+          user_id: userId,
+        },
+        include: {
+          post: {
+            select: {
+              title: true,
+              id: true,
+              updated_at: true,
+              status: true,
+              author: {
+                select: {
+                  name: true,
+                  profile_image: true,
+                  id: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          updated_at: "desc",
+        },
+        take: limit,
+        skip: offset,
+      });
+      return {
+        comments,
+        meta: {
+          pagination: {
+            ...getPagination(totalComments, limit, offset),
+          },
+        },
+      };
+    } catch (err) {
+      throw new Error(ERROR_COMMENT_FETCHED_MSG);
     }
   }
 
