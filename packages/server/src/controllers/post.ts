@@ -39,6 +39,7 @@ import {
   SOMETHING_WENT_WRONG_MSG,
   UNAUTHORIZED_MSG,
   UNAUTHORIZED_RESPONSE,
+  VALIDATION_FAILED_MSG,
   getErrorReason,
   getLimitAndOffset,
 } from "@/src/utils";
@@ -50,7 +51,40 @@ const { OK, BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, UNAUTHORIZED } = http
 export const getPosts = async (req: Request, res: Response) => {
   const { user } = req.session;
   const { limit, offset } = getLimitAndOffset(req);
-  const data = await PostService.getPosts(user.id, limit, offset);
+  const { sortBy, order } = req.query;
+  type SortBy = "upvote" | "comment" | "date";
+  type OrderType = "desc" | "asc";
+
+  if (sortBy && !["upvote", "comment", "date"].includes(sortBy as SortBy)) {
+    return res.status(BAD_REQUEST).json(
+      new JSONResponse(
+        VALIDATION_FAILED_MSG,
+        null,
+        {
+          message: "Invalid sort by value",
+        },
+        false
+      )
+    );
+  }
+
+  if (order && !["desc", "asc"].includes(order as OrderType)) {
+    return res.status(BAD_REQUEST).json(
+      new JSONResponse(
+        VALIDATION_FAILED_MSG,
+        null,
+        {
+          message: "Invalid order value",
+        },
+        false
+      )
+    );
+  }
+
+  const sortby: SortBy = (sortBy as SortBy) || "date";
+  const sortorder: OrderType = (order as OrderType) || "desc";
+
+  const data = await PostService.getPosts(user.id, limit, offset, sortby, sortorder);
 
   return res.status(OK).json(
     new JSONResponse(

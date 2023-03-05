@@ -28,7 +28,7 @@ export const ONBOARDING_UPDATE_V1 = "/:userId";
 export const ONBOARDING_STATUS_V1 = "/:userId/status";
 
 export const POST_ROUTE_V1 = "/api/v1/posts";
-// GET /api/v1/posts?limit=10&offset=0 => Get all posts (public, public groups, friends posts)
+// GET /api/v1/posts?limit=10&offset=0&sortBy=upvotes&order=desc|asc => Get all posts (public, public groups, friends posts)
 export const GET_POSTS_V1 = "";
 // GET /api/v1/posts/:postId => Get post by id
 export const GET_POST_V1 = "/:postId";
@@ -61,13 +61,41 @@ export const GET_ME_V1 = "/me";
 export const CHECK_USERNAME_AVAILABILITY_V1 = "/usernames";
 // POST /api/v1/user/posts => Create new post
 export const USER_CREATE_POST_V1 = "/posts";
-// GET /api/v1/user/posts?limit=5&offset=0 => Get all posts of current user
+// GET /api/v1/user/posts?limit=5&offset=0&status=open => Get all posts of current user
 export const USER_GET_POSTS_V1 = "/posts";
 // PATCH /api/v1/user/posts/:postId (update post)
 export const USER_UPDATE_POST_V1 = "/posts/:postId";
 // DELETE /api/v1/user/posts/:postId
 export const DELETE_POST_V1 = "/posts/:postId";
-
-// IMPLEMENTME: Need to implement this route
 // PATCH /api/v1/user/posts/:postId/status => Update post status
 export const UPDATE_POST_STATUS_V1 = "/posts/:postId/status";
+// GET /api/v1/user/comments?limit=5&offset=0 => Get all comments of current user
+export const USER_GET_COMMENTS_V1 = "/comments";
+
+// IMPLEMENTME: Implement this route
+// GET /api/v1/user/friends?limit=5&offset=0 => Get all friends of current user
+export const USER_GET_FRIENDS_V1 = "/friends";
+// IMPLEMENTME: Implement this route
+// POST /api/v1/user/friends/:friendId => Send friend request to user
+export const USER_SEND_FRIEND_REQUEST_V1 = "/friends/:friendId";
+// IMPLEMENTME: Implement this route
+// PATCH /api/v1/user/friends/:friendId => Accept or Reject friend request from user
+export const USER_ACCEPT_REJECT_FRIEND_REQUEST_V1 = "/friends/:friendId";
+// IMPLEMENTME: Implement this route
+// GET /api/v1/user/friends/requests?limit=5&offset=0 => Get all friend requests of current user
+export const USER_GET_FRIEND_REQUESTS_V1 = "/friends/requests";
+
+// IMPLEMENTME: Implement this route
+// GET /api/v1/user/followers?limit=5&offset=0 => Get all followers of current user
+export const USER_GET_FOLLOWERS_V1 = "/followers";
+// IMPLEMENTME: Implement this route
+// PATCH /api/v1/user/followers/:userId => Follow user
+export const USER_FOLLOW_USER_V1 = "/followers/:userId";
+
+// IMPLEMENTME: Implement this route
+// GET /api/v1/user/following?limit=5&offset=0 => Get all users current user is following
+export const USER_GET_FOLLOWING_V1 = "/following";
+
+// IMPLEMENTME: Implement this route
+// GET /api/v1/user/groups?limit=5&offset=0 => Get all groups of current user
+export const USER_GET_GROUPS_V1 = "/groups";
