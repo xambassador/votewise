@@ -17,6 +17,8 @@ import {
   USER_GET_FOLLOWING_V1,
   USER_GET_FRIENDS_V1,
   USER_GET_FRIEND_REQUESTS_V1,
+  USER_GET_GROUPS_REQUESTED_V1,
+  USER_GET_GROUPS_V1,
   USER_GET_POSTS_V1,
   USER_SEND_FRIEND_REQUEST_V1,
   USER_UNFOLLOW_USER_V1,
@@ -28,6 +30,7 @@ import {
   checkUsernameAvailability,
   createPost,
   deleteMyPost,
+  getAllMyGroups,
   getMyComments,
   getMyDetails,
   getMyFollowers,
@@ -35,6 +38,7 @@ import {
   getMyFriendRequests,
   getMyFriends,
   getMyPosts,
+  getRequestedGroups,
   startFollowing,
   stopFollowing,
   updateMyPost,
@@ -54,6 +58,8 @@ router.get(USER_GET_FRIENDS_V1, authorizationMiddleware, onboardedMiddleware, ge
 router.get(USER_GET_FRIEND_REQUESTS_V1, authorizationMiddleware, onboardedMiddleware, getMyFriendRequests);
 router.get(USER_GET_FOLLOWERS_V1, authorizationMiddleware, onboardedMiddleware, getMyFollowers);
 router.get(USER_GET_FOLLOWING_V1, authorizationMiddleware, onboardedMiddleware, getMyFollowings);
+router.get(USER_GET_GROUPS_V1, authorizationMiddleware, onboardedMiddleware, getAllMyGroups);
+router.get(USER_GET_GROUPS_REQUESTED_V1, authorizationMiddleware, onboardedMiddleware, getRequestedGroups);
 
 router.post(USER_CREATE_POST_V1, authorizationMiddleware, onboardedMiddleware, createPost);
 router.post(USER_SEND_FRIEND_REQUEST_V1, authorizationMiddleware, onboardedMiddleware, addFriend);

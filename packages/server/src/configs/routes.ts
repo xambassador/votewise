@@ -91,6 +91,33 @@ export const USER_GET_FOLLOWING_V1 = "/following";
 // DELETE /api/v1/user/following/:folloingId => Unfollow user
 export const USER_UNFOLLOW_USER_V1 = "/following/:followingId";
 
-// IMPLEMENTME: Implement this route
-// GET /api/v1/user/groups?limit=5&offset=0 => Get all groups of current user
+export const GROUPS_ROUTE_V1 = "/api/v1/groups";
+// GET /api/v1/groups?limit=5&offset=0 => Get all groups
+export const GET_GROUPS_V1 = "";
+
+// POST /api/v1/groups => Create new group
+export const CREATE_GROUP_V1 = "";
+
+// POST /api/v1/groups/:groupId/join => Join group
+export const JOIN_GROUP_V1 = "/:groupId/join";
+// GET /api/v1/groups/requestes?limit=5&offset=0?groupId=1 => Get all group join request of group author by current user
+export const GET_GROUP_REQUESTS_V1 = "/requests";
+// PATCH /api/v1/groups/:groupId/requests/:userId => Accept or reject request to join group
+export const ACCEPT_REJECT_GROUP_REQUEST_V1 = "/:groupId/requests/:userId";
+
+// GET /api/v1/user/groups?limit=5&offset=0?created=true/false&joined=true/false => Get all groups of current user
 export const USER_GET_GROUPS_V1 = "/groups";
+// GET /api/v1/user/groups/requested?limit=5&offset=0&pending=true/false&rejected=true/false => Get all groups of current user has requested to join
+export const USER_GET_GROUPS_REQUESTED_V1 = "/groups/requested";
+
+// PATCH /api/v1/groups/:groupId/requets/me => Accept or reject request to join group
+export const ACCEPT_REJECT_GROUP_REQUEST_ME_V1 = "/:groupId/requests/me";
+
+// DELETE /api/v1/groups/:groupId/leave => Leave group
+export const LEAVE_GROUP_V1 = "/:groupId/leave";
+
+// PATCH /api/v1/groups/:groupId/members/:userId => Remove member from group
+export const REMOVE_MEMBER_FROM_GROUP_V1 = "/:groupId/members/:userId";
+
+// GET /api/v1/groups/:groupId/members?limit=5&offset=0 => Get all members of group
+export const GET_GROUP_MEMBERS_V1 = "/:groupId/members";

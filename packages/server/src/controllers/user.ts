@@ -16,6 +16,7 @@ import type {
 import { JSONResponse } from "@/src/lib";
 import FollowerService from "@/src/services/follower";
 import FriendService from "@/src/services/friends";
+import GroupService from "@/src/services/group";
 import PostService from "@/src/services/posts";
 import UserService from "@/src/services/user";
 import {
@@ -823,6 +824,110 @@ export const stopFollowing = async (req: Request, res: Response) => {
       );
     }
 
+    return res.status(INTERNAL_SERVER_ERROR).json(
+      new JSONResponse(
+        INTERNAL_SERVER_ERROR_MSG,
+        null,
+        {
+          message: msg,
+        },
+        false
+      )
+    );
+  }
+};
+
+// -----------------------------------------------------------------------------------------
+export const getAllMyGroups = async (req: Request, res: Response) => {
+  const { limit, offset } = getLimitAndOffset(req);
+  const { created, joined } = req.query;
+  const { user } = req.session;
+
+  if (created && joined && typeof created !== "boolean" && typeof joined !== "boolean") {
+    return res.status(BAD_REQUEST).json(
+      new JSONResponse(
+        VALIDATION_FAILED_MSG,
+        null,
+        {
+          message: "Invalid query params",
+        },
+        false
+      )
+    );
+  }
+
+  const isCreated = created === "true";
+  const isJoined = joined === "true";
+
+  try {
+    const data = await GroupService.getAllGroupsByUserId(user.id, limit, offset, isCreated, isJoined);
+    // TODO: Move messages to constants
+    return res.status(OK).json(
+      new JSONResponse(
+        "Groups fetched successfully",
+        {
+          message: "Groups fetched successfully",
+          groups: data.groups,
+          meta: data.meta,
+        },
+        null,
+        true
+      )
+    );
+  } catch (err) {
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    return res.status(INTERNAL_SERVER_ERROR).json(
+      new JSONResponse(
+        INTERNAL_SERVER_ERROR_MSG,
+        null,
+        {
+          message: msg,
+        },
+        false
+      )
+    );
+  }
+};
+
+// -----------------------------------------------------------------------------------------
+export const getRequestedGroups = async (req: Request, res: Response) => {
+  const { limit, offset } = getLimitAndOffset(req);
+  const { user } = req.session;
+  const { pending, rejected } = req.query;
+
+  if (pending && rejected && typeof pending !== "boolean" && typeof rejected !== "boolean") {
+    return res.status(BAD_REQUEST).json(
+      new JSONResponse(
+        VALIDATION_FAILED_MSG,
+        null,
+        {
+          message: "Invalid query params",
+        },
+        false
+      )
+    );
+  }
+
+  const isPending = pending === "true";
+  const isRejected = rejected === "true";
+
+  try {
+    const data = await GroupService.getRequestedGroupsByUserId(user.id, limit, offset, isPending, isRejected);
+    return res.status(OK).json(
+      new JSONResponse(
+        "Requested groups fetched successfully",
+        {
+          message: "Requested groups fetched successfully",
+          groups: data.groups,
+          meta: data.meta,
+        },
+        null,
+        true
+      )
+    );
+  } catch (err) {
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    // REFACTOR: Create a function to handle errors
     return res.status(INTERNAL_SERVER_ERROR).json(
       new JSONResponse(
         INTERNAL_SERVER_ERROR_MSG,
