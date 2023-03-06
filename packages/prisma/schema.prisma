@@ -2,269 +2,276 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum Gender {
-    MALE
-    FEMALE
-    OTHER
+  MALE
+  FEMALE
+  OTHER
 }
 
 model User {
-    id                Int              @id @default(autoincrement())
-    email             String           @unique
-    password          String
-    username          String?          @unique
-    name              String?
-    about             String?
-    twitter           String?
-    facebook          String?
-    instagram         String?
-    profile_image     String?
-    cover_image       String?
-    location          String?
-    gender            Gender?
-    onboarded         Boolean          @default(false)
-    is_email_verify   Boolean          @default(false)
-    last_login        DateTime?
-    created_at        DateTime         @default(now())
-    updated_at        DateTime         @default(now())
-    posts             Post[]
-    upvotes           Upvote[]
-    comments          Comment[]
-    comment_upvotes   CommentUpvote[]
-    followers         Follow[]         @relation("followers")
-    following         Follow[]         @relation("following")
-    friend1           Friend[]         @relation("user")
-    friend2           Friend[]         @relation("friend")
-    group_member      GroupMember[]
-    group_invitations GropInvitation[]
-    notification      Notification[]
-    refresh_token     RefreshToken[]
+  id                Int              @id @default(autoincrement())
+  email             String           @unique
+  password          String
+  username          String?          @unique
+  name              String?
+  about             String?
+  twitter           String?
+  facebook          String?
+  instagram         String?
+  profile_image     String?
+  cover_image       String?
+  location          String?
+  gender            Gender?
+  onboarded         Boolean          @default(false)
+  is_email_verify   Boolean          @default(false)
+  last_login        DateTime?
+  created_at        DateTime         @default(now())
+  updated_at        DateTime         @default(now())
+  posts             Post[]
+  upvotes           Upvote[]
+  comments          Comment[]
+  comment_upvotes   CommentUpvote[]
+  followers         Follow[]         @relation("followers")
+  following         Follow[]         @relation("following")
+  friend1           Friend[]         @relation("user")
+  friend2           Friend[]         @relation("friend")
+  group_member      GroupMember[]
+  group_invitations GropInvitation[]
+  notification      Notification[]
+  refresh_token     RefreshToken[]
 }
 
 enum PostType {
-    PUBLIC
-    GROUP_ONLY
+  PUBLIC
+  GROUP_ONLY
 }
 
 enum PostStatus {
-    OPEN
-    CLOSED
-    ARCHIVED
-    INPROGRESS
+  OPEN
+  CLOSED
+  ARCHIVED
+  INPROGRESS
 }
 
 model Post {
-    id              Int             @id @default(autoincrement())
-    author          User            @relation(fields: [author_id], references: [id])
-    author_id       Int
-    title           String          @db.VarChar(255)
-    content         String          @db.Text
-    slug            String          @unique @db.VarChar(255)
-    type            PostType
-    status          PostStatus
-    group           Group?          @relation(fields: [group_id], references: [id])
-    group_id        Int?
-    created_at      DateTime        @default(now())
-    updated_at      DateTime        @default(now())
-    upvotes         Upvote[]
-    comments        Comment[]
-    post_hash_tags  PostHashTag[]
-    post_assets     PostAsset[]
-    comment_upvotes CommentUpvote[]
+  id              Int             @id @default(autoincrement())
+  author          User            @relation(fields: [author_id], references: [id])
+  author_id       Int
+  title           String          @db.VarChar(255)
+  content         String          @db.Text
+  slug            String          @unique @db.VarChar(255)
+  type            PostType
+  status          PostStatus
+  group           Group?          @relation(fields: [group_id], references: [id])
+  group_id        Int?
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @default(now())
+  upvotes         Upvote[]
+  comments        Comment[]
+  post_hash_tags  PostHashTag[]
+  post_assets     PostAsset[]
+  comment_upvotes CommentUpvote[]
 }
 
 model PostAsset {
-    id         Int      @id @default(autoincrement())
-    post       Post     @relation(fields: [post_id], references: [id])
-    post_id    Int
-    type       String
-    url        String
-    created_at DateTime @default(now())
-    updated_at DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  post       Post     @relation(fields: [post_id], references: [id])
+  post_id    Int
+  type       String
+  url        String
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
 }
 
 model Upvote {
-    id         Int      @id @default(autoincrement())
-    post       Post     @relation(fields: [post_id], references: [id])
-    post_id    Int
-    user       User     @relation(fields: [user_id], references: [id])
-    user_id    Int
-    created_at DateTime @default(now())
-    updated_at DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  post       Post     @relation(fields: [post_id], references: [id])
+  post_id    Int
+  user       User     @relation(fields: [user_id], references: [id])
+  user_id    Int
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
 }
 
 model Comment {
-    id         Int             @id @default(autoincrement())
-    text       String          @db.Text
-    post       Post            @relation(fields: [post_id], references: [id])
-    post_id    Int
-    parent_id  Int? // foreign key referencing the id of the comment that this comment is replying to. This can be NULL if the comment is not a reply to another comment.
-    user       User            @relation(fields: [user_id], references: [id])
-    user_id    Int
-    upvotes    CommentUpvote[]
-    created_at DateTime        @default(now())
-    updated_at DateTime        @default(now())
+  id         Int             @id @default(autoincrement())
+  text       String          @db.Text
+  post       Post            @relation(fields: [post_id], references: [id])
+  post_id    Int
+  parent_id  Int? // foreign key referencing the id of the comment that this comment is replying to. This can be NULL if the comment is not a reply to another comment.
+  user       User            @relation(fields: [user_id], references: [id])
+  user_id    Int
+  upvotes    CommentUpvote[]
+  created_at DateTime        @default(now())
+  updated_at DateTime        @default(now())
 }
 
 model CommentUpvote {
-    id         Int      @id @default(autoincrement())
-    comment    Comment  @relation(fields: [comment_id], references: [id])
-    comment_id Int
-    post       Post     @relation(fields: [post_id], references: [id])
-    post_id    Int
-    user       User     @relation(fields: [user_id], references: [id])
-    user_id    Int
-    created_at DateTime @default(now())
-    updated_at DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  comment    Comment  @relation(fields: [comment_id], references: [id])
+  comment_id Int
+  post       Post     @relation(fields: [post_id], references: [id])
+  post_id    Int
+  user       User     @relation(fields: [user_id], references: [id])
+  user_id    Int
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
 }
 
 model HashTag {
-    id             Int           @id @default(autoincrement())
-    count          Int           @default(0)
-    name           String        @unique
-    post_hash_tags PostHashTag[]
-    created_at     DateTime      @default(now())
-    updated_at     DateTime      @default(now())
+  id             Int           @id @default(autoincrement())
+  count          Int           @default(0)
+  name           String        @unique
+  post_hash_tags PostHashTag[]
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @default(now())
 }
 
 model PostHashTag {
-    id          Int      @id @default(autoincrement())
-    post        Post     @relation(fields: [post_id], references: [id])
-    post_id     Int
-    hash_tag    HashTag  @relation(fields: [hash_tag_id], references: [id])
-    hash_tag_id Int
-    created_at  DateTime @default(now())
-    updated_at  DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  post        Post     @relation(fields: [post_id], references: [id])
+  post_id     Int
+  hash_tag    HashTag  @relation(fields: [hash_tag_id], references: [id])
+  hash_tag_id Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
 }
 
 model Follow {
-    id           Int      @id @default(autoincrement())
-    followers    User     @relation("followers", fields: [follower_id], references: [id])
-    following    User     @relation("following", fields: [following_id], references: [id])
-    follower_id  Int // foreign key referencing the id of the user who is following
-    following_id Int // foreign key referencing the id of the user who is being followed
-    created_at   DateTime @default(now())
-    updated_at   DateTime @default(now())
+  id           Int      @id @default(autoincrement())
+  followers    User     @relation("followers", fields: [follower_id], references: [id])
+  following    User     @relation("following", fields: [following_id], references: [id])
+  follower_id  Int // foreign key referencing the id of the user who is following
+  following_id Int // foreign key referencing the id of the user who is being followed
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now())
 }
 
 enum FriendType {
-    FRIENDS
-    PENDING_USER_TO_FRIEND_REQUEST
-    PENDING_FRIEND_TO_USER_REQUEST
+  FRIENDS
+  PENDING_USER_TO_FRIEND_REQUEST
+  PENDING_FRIEND_TO_USER_REQUEST
 }
 
 model Friend {
-    id         Int        @id @default(autoincrement())
-    user       User       @relation("user", fields: [user_id], references: [id])
-    friend     User       @relation("friend", fields: [friend_id], references: [id])
-    user_id    Int
-    friend_id  Int
-    type       FriendType
-    created_at DateTime   @default(now())
-    updated_at DateTime   @default(now())
+  id         Int        @id @default(autoincrement())
+  user       User       @relation("user", fields: [user_id], references: [id])
+  friend     User       @relation("friend", fields: [friend_id], references: [id])
+  user_id    Int
+  friend_id  Int
+  type       FriendType
+  created_at DateTime   @default(now())
+  updated_at DateTime   @default(now())
 }
 
 enum GroupType {
-    PUBLIC
-    PRIVATE
+  PUBLIC
+  PRIVATE
 }
 
 enum GroupStatus {
-    OPEN
-    CLOSED
-    INACTIVE
+  OPEN
+  CLOSED
+  INACTIVE
 }
 
 model Group {
-    id                   Int              @id @default(autoincrement())
-    name                 String
-    abount               String
-    type                 GroupType
-    status               GroupStatus
-    join_through_request Boolean          @default(false)
-    group_members        GroupMember[]
-    group_invitations    GropInvitation[] // One group can have many invitations to join
-    created_at           DateTime         @default(now())
-    updated_at           DateTime         @default(now())
-    posts                Post[]
+  id                   Int              @id @default(autoincrement())
+  name                 String
+  abount               String
+  type                 GroupType
+  status               GroupStatus
+  join_through_request Boolean          @default(false)
+  group_members        GroupMember[]
+  group_invitations    GropInvitation[] // One group can have many invitations to join
+  created_at           DateTime         @default(now())
+  updated_at           DateTime         @default(now())
+  posts                Post[]
+}
+
+enum GroupMemberRole {
+  ADMIN
+  MODERATOR
+  MEMBER
 }
 
 model GroupMember {
-    id         Int      @id @default(autoincrement())
-    user       User     @relation(fields: [user_id], references: [id])
-    user_id    Int
-    group      Group    @relation(fields: [group_id], references: [id])
-    group_id   Int
-    joined_at  DateTime @default(now())
-    blocked    Boolean  @default(false)
-    is_removed Boolean  @default(false)
-    created_at DateTime @default(now())
-    updated_at DateTime @default(now())
+  id         Int             @id @default(autoincrement())
+  user       User            @relation(fields: [user_id], references: [id])
+  user_id    Int
+  group      Group           @relation(fields: [group_id], references: [id])
+  group_id   Int
+  role       GroupMemberRole @default(MEMBER)
+  joined_at  DateTime        @default(now())
+  blocked    Boolean         @default(false)
+  is_removed Boolean         @default(false)
+  created_at DateTime        @default(now())
+  updated_at DateTime        @default(now())
 }
 
 enum GroupInvitationType {
-    JOIN // User wants to join a group
-    INVITE // A user is invited to join a group
+  JOIN // User wants to join a group
+  INVITE // A user is invited to join a group
 }
 
 enum GroupInvitationStatus {
-    PENDING
-    ACCEPTED
-    REJECTED
+  PENDING
+  ACCEPTED
+  REJECTED
 }
 
 model GropInvitation {
-    id         Int                   @id @default(autoincrement())
-    group      Group                 @relation(fields: [group_id], references: [id])
-    group_id   Int
-    user       User                  @relation(fields: [user_id], references: [id])
-    user_id    Int
-    type       GroupInvitationType
-    status     GroupInvitationStatus
-    sent_at    DateTime              @default(now())
-    created_at DateTime              @default(now())
-    updated_at DateTime              @default(now())
+  id         Int                   @id @default(autoincrement())
+  group      Group                 @relation(fields: [group_id], references: [id])
+  group_id   Int
+  user       User                  @relation(fields: [user_id], references: [id])
+  user_id    Int
+  type       GroupInvitationType
+  status     GroupInvitationStatus
+  sent_at    DateTime              @default(now())
+  created_at DateTime              @default(now())
+  updated_at DateTime              @default(now())
 }
 
 enum NotificationType {
-    PUBLIC_POST_UPVOTE
-    GROUP_POST_UPVOTE
-    PUBLIC_POST_COMMENT_UPVOTE
-    GROUP_POST_COMMENT_UPVOTE
-    PUBLIC_POST_COMMENT
-    GROUP_POST_COMMENT
-    START_FOLLOWING
-    FRIEND_REQUEST
-    FRIEND_REQUEST_ACCEPTED
-    GROUP_INVITATION
-    GROUP_INVITATION_ACCEPTED
-    JOIN_GROUP_REQUEST
+  PUBLIC_POST_UPVOTE
+  GROUP_POST_UPVOTE
+  PUBLIC_POST_COMMENT_UPVOTE
+  GROUP_POST_COMMENT_UPVOTE
+  PUBLIC_POST_COMMENT
+  GROUP_POST_COMMENT
+  START_FOLLOWING
+  FRIEND_REQUEST
+  FRIEND_REQUEST_ACCEPTED
+  GROUP_INVITATION
+  GROUP_INVITATION_ACCEPTED
+  JOIN_GROUP_REQUEST
 }
 
 model Notification {
-    id         Int              @id @default(autoincrement())
-    user       User             @relation(fields: [user_id], references: [id])
-    user_id    Int
-    event_type NotificationType
-    event_id   Int
-    is_read    Boolean          @default(false)
-    created_at DateTime         @default(now())
-    updated_at DateTime         @default(now())
+  id         Int              @id @default(autoincrement())
+  user       User             @relation(fields: [user_id], references: [id])
+  user_id    Int
+  event_type NotificationType
+  event_id   Int
+  is_read    Boolean          @default(false)
+  created_at DateTime         @default(now())
+  updated_at DateTime         @default(now())
 }
 
 model RefreshToken {
-    id         Int      @id @default(autoincrement())
-    user       User     @relation(fields: [user_id], references: [id])
-    user_id    Int      @unique
-    token      String   @db.VarChar(255)
-    created_at DateTime @default(now())
-    updated_at DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [user_id], references: [id])
+  user_id    Int      @unique
+  token      String   @db.VarChar(255)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
 }
