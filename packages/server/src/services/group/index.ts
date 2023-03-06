@@ -1,10 +1,12 @@
 import { prisma } from "@votewise/prisma";
-import type { CreateGroupPayload } from "@votewise/types";
+import type { CreateGroupPayload, UpdateGroupDetailsPayload } from "@votewise/types";
 
 import { getErrorReason, getPagination } from "@/src/utils";
 import { validateCreateGroupPayload } from "@/src/zodValidation/group";
 
-class GroupService {
+import BaseGroup from "./Base";
+
+class GroupService extends BaseGroup {
   validateCreateGroupPayload(payload: CreateGroupPayload) {
     return validateCreateGroupPayload(payload);
   }
@@ -14,7 +16,7 @@ class GroupService {
       const group = await prisma.group.create({
         data: {
           name: payload.name,
-          abount: payload.description,
+          about: payload.description,
           status: payload.status,
           type: payload.type,
           join_through_request: payload.joinThroghInvite,
@@ -37,93 +39,69 @@ class GroupService {
     }
   }
 
-  async joinGroup(userId: number, groupId: number) {
+  async updateGroupDetails(userId: number, groupId: number, payload: UpdateGroupDetailsPayload) {
     try {
-      const isGroupExist = await prisma.group.findUnique({
-        where: {
-          id: groupId,
-        },
-      });
-
+      const isGroupExist = await this.isGroupExists(groupId);
       if (!isGroupExist) {
         throw new Error("Group not found");
       }
 
-      const isUserAlreadyAMember = await prisma.groupMember.findFirst({
+      const isAdmin = await this.isUserAdmin(userId, groupId);
+      if (!isAdmin) {
+        throw new Error("You are not an admin of this group");
+      }
+
+      const group = await prisma.group.update({
         where: {
-          user_id: userId,
-          group_id: groupId,
+          id: groupId,
+        },
+        data: {
+          about: payload.description,
+          name: payload.name,
+          join_through_request: payload.joinThroghInvite,
+          status: payload.status,
+          type: payload.type,
         },
       });
 
-      if (isUserAlreadyAMember) {
+      return group;
+    } catch (err) {
+      const msg = getErrorReason(err) || "Error while updating group details";
+      throw new Error(msg);
+    }
+  }
+
+  async joinGroup(userId: number, groupId: number) {
+    try {
+      const group = await this.isGroupExists(groupId);
+      if (!group) {
+        throw new Error("Group not found");
+      }
+
+      const isUserMember = await this.isUserAlreadyMember(userId, groupId);
+      if (isUserMember) {
         throw new Error("You are already a member of this group");
       }
 
       // Check if user is retrying to join the group if it's request is pending
-      const isRequestSentBefore = await prisma.gropInvitation.findFirst({
-        where: {
-          user_id: userId,
-          group_id: groupId,
-          type: "JOIN",
-          status: "PENDING",
-        },
-      });
+      const request = await this.isGroupInvitaionExists(userId, groupId, "JOIN", "PENDING");
 
-      if (isRequestSentBefore) {
+      if (request) {
         throw new Error("You have already sent a request to join this group");
       }
 
-      let status = "ACCEPTED";
-      if (
-        isGroupExist.type === "PRIVATE" ||
-        (isGroupExist.type === "PUBLIC" && isGroupExist.join_through_request)
-      ) {
-        status = "PENDING";
-      }
-
+      const status = this.getInviteStatus(group) as "ACCEPTED" | "PENDING" | "REJECTED";
       const promises = [];
 
-      if (
-        isGroupExist.type === "PRIVATE" ||
-        (isGroupExist.type === "PUBLIC" && isGroupExist.join_through_request)
-      ) {
+      if (group.type === "PRIVATE" || (group.type === "PUBLIC" && group.join_through_request)) {
         // Creating only invitation. User will be added to group when admin accepts the request
-        promises.push(
-          prisma.gropInvitation.create({
-            data: {
-              status: status as "ACCEPTED" | "PENDING" | "REJECTED",
-              type: "JOIN",
-              group_id: groupId,
-              user_id: userId,
-              sent_at: new Date(),
-            },
-          })
-        );
+        promises.push(this.createGroupInvitationPromise(groupId, userId, status, "JOIN"));
       } else {
         // In case of public group with open join, user will be added to group directly
         // Adding entry to invitation table. The reason is if admin change the group type to private or join through request to true,
         // then we can have a record of all the users who joined the group before the change
-        promises.push(
-          prisma.groupMember.create({
-            data: {
-              user_id: userId,
-              group_id: groupId,
-              joined_at: new Date(),
-            },
-          })
-        );
-        promises.push(
-          prisma.gropInvitation.create({
-            data: {
-              status: status as "ACCEPTED" | "PENDING" | "REJECTED",
-              type: "JOIN",
-              group_id: groupId,
-              user_id: userId,
-              sent_at: new Date(),
-            },
-          })
-        );
+        promises.push(this.createGroupMemberPromise(groupId, userId));
+        promises.push(this.createGroupInvitationPromise(groupId, userId, status, "JOIN"));
       }
 
       // TODO: Send notification to group admin
@@ -166,39 +144,25 @@ class GroupService {
       });
 
       if (!myGroups.length) {
-        throw new Error("You are not a member of any group");
+        throw new Error("You have no groups");
       }
 
       let groupIds;
       if (groupId) {
-        const isGroupExist = await prisma.group.findUnique({
-          where: {
-            id: groupId,
-          },
-        });
-
-        if (!isGroupExist) {
+        const isGroupExists = await this.isGroupExists(groupId);
+        if (!isGroupExists) {
           throw new Error("Group not found");
         }
-
-        const isUserAdmin = await prisma.groupMember.findFirst({
-          where: {
-            user_id: userId,
-            group_id: groupId,
-            role: "ADMIN",
-          },
-        });
-
+        const isUserAdmin = await this.isUserAdmin(userId, groupId);
         if (!isUserAdmin) {
           throw new Error("You are not an admin of this group");
         }
-
         groupIds = [groupId];
       } else {
         groupIds = myGroups.map((group) => group.group_id);
       }
 
-      const total = await prisma.gropInvitation.count({
+      const total = await prisma.groupInvitation.count({
         where: {
           group_id: {
             in: groupIds,
@@ -206,7 +170,7 @@ class GroupService {
           status: "PENDING",
         },
       });
-      const data = await prisma.gropInvitation.findMany({
+      const data = await prisma.groupInvitation.findMany({
         where: {
           group_id: {
             in: groupIds,
@@ -224,6 +188,14 @@ class GroupService {
               name: true,
               profile_image: true,
               id: true,
+            },
+          },
+          group: {
+            select: {
+              id: true,
+              name: true,
+              status: true,
+              about: true,
             },
           },
         },
@@ -253,83 +225,35 @@ class GroupService {
     // TODO: Send notification to user on request accept
 
     try {
-      const isGroupExist = await prisma.group.findUnique({
-        where: {
-          id: groupId,
-        },
-      });
-
+      const isGroupExist = await this.isGroupExists(groupId);
       if (!isGroupExist) {
         throw new Error("Group not found");
       }
-
-      const isUserAdmin = await prisma.groupMember.findFirst({
-        where: {
-          user_id: userId,
-          group_id: groupId,
-          role: "ADMIN",
-        },
-      });
-
-      if (!isUserAdmin) {
+      const isAdmin = await this.isUserAdmin(userId, groupId);
+      if (!isAdmin) {
         throw new Error("You are not an admin of this group");
       }
 
-      const isRequestExist = await prisma.gropInvitation.findFirst({
-        where: {
-          user_id: requestedUserId,
-          group_id: groupId,
-          status: "PENDING",
-        },
-      });
-
+      const isRequestExist = await this.isGroupInvitaionExists(requestedUserId, groupId, "JOIN", "PENDING");
       if (!isRequestExist) {
         throw new Error("Request not found");
       }
-
       const groupType = isGroupExist.type;
       const isJoinThroughRequest = isGroupExist.join_through_request;
+
       if (action === "ACCEPT") {
         if (groupType === "PRIVATE" || isJoinThroughRequest) {
           const promises = [
-            prisma.gropInvitation.update({
-              where: {
-                id: isRequestExist.id,
-              },
-              data: {
-                status: "ACCEPTED",
-              },
-            }),
-            prisma.groupMember.create({
-              data: {
-                group_id: groupId,
-                user_id: requestedUserId,
-                joined_at: new Date(),
-              },
-            }),
+            this.createGroupInvitationUpdatePromise(isRequestExist.id, { status: "ACCEPTED" }),
+            this.createGroupMemberPromise(groupId, requestedUserId),
           ];
           await prisma.$transaction(promises);
         } else {
-          await prisma.gropInvitation.update({
-            where: {
-              id: isRequestExist.id,
-            },
-            data: {
-              status: "ACCEPTED",
-            },
-          });
+          await this.createGroupInvitationUpdatePromise(isRequestExist.id, { status: "ACCEPTED" });
         }
       } else {
-        await prisma.gropInvitation.update({
-          where: {
-            id: isRequestExist.id,
-          },
-          data: {
-            status: "REJECTED",
-          },
-        });
+        await this.createGroupInvitationUpdatePromise(isRequestExist.id, { status: "REJECTED" });
       }
-
       Promise.resolve();
     } catch (err) {
       const msg = getErrorReason(err) || "Error while accepting request";
@@ -376,7 +300,7 @@ class GroupService {
             select: {
               name: true,
               id: true,
-              abount: true,
+              about: true,
               type: true,
               status: true,
               join_through_request: true,
@@ -416,7 +340,7 @@ class GroupService {
         status.push("PENDING", "REJECTED");
       }
 
-      const groups = await prisma.gropInvitation.findMany({
+      const groups = await prisma.groupInvitation.findMany({
         where: {
           user_id: userId,
           status: {
@@ -433,7 +357,7 @@ class GroupService {
             select: {
               name: true,
               id: true,
-              abount: true,
+              about: true,
               type: true,
               status: true,
             },
@@ -445,7 +369,7 @@ class GroupService {
           updated_at: "desc",
         },
       });
-      const total = await prisma.gropInvitation.count({
+      const total = await prisma.groupInvitation.count({
         where: {
           user_id: userId,
           status: {
@@ -471,58 +395,23 @@ class GroupService {
 
   async acceptOrRejectGroupInvitation(groupId: number, userId: number, action: "ACCEPT" | "REJECT") {
     try {
-      const isGroupExist = await prisma.group.findUnique({
-        where: {
-          id: groupId,
-        },
-      });
-
-      if (!isGroupExist) {
+      const isGroupExists = await this.isGroupExists(groupId);
+      if (!isGroupExists) {
         throw new Error("Group not found");
       }
-
-      const isRequestExist = await prisma.gropInvitation.findFirst({
-        where: {
-          user_id: userId,
-          group_id: groupId,
-          type: "INVITE",
-        },
-      });
-
+      const isRequestExist = await this.isGroupInvitaionExists(userId, groupId, "INVITE");
       if (!isRequestExist) {
         throw new Error("Request not found");
       }
-
       if (action === "ACCEPT") {
         const promises = [
-          prisma.gropInvitation.update({
-            where: {
-              id: isRequestExist.id,
-            },
-            data: {
-              status: "ACCEPTED",
-            },
-          }),
-          prisma.groupMember.create({
-            data: {
-              group_id: groupId,
-              user_id: userId,
-              joined_at: new Date(),
-            },
-          }),
+          this.createGroupInvitationUpdatePromise(isRequestExist.id, { status: "ACCEPTED" }),
+          this.createGroupMemberPromise(groupId, userId),
         ];
         await prisma.$transaction(promises);
       } else {
-        await prisma.gropInvitation.update({
-          where: {
-            id: isRequestExist.id,
-          },
-          data: {
-            status: "REJECTED",
-          },
-        });
+        await this.createGroupInvitationUpdatePromise(isRequestExist.id, { status: "REJECTED" });
       }
-
       Promise.resolve();
     } catch (err) {
       const msg = getErrorReason(err) || "Error while accepting request";
@@ -532,34 +421,19 @@ class GroupService {
 
   async leaveGroup(userId: number, groupId: number) {
     try {
-      const isGroupExist = await prisma.group.findUnique({
-        where: {
-          id: groupId,
-        },
-      });
-
-      if (!isGroupExist) {
+      const isGroupExists = await this.isGroupExists(groupId);
+      if (!isGroupExists) {
         throw new Error("Group not found");
       }
-
-      const isMemberExist = await prisma.groupMember.findFirst({
-        where: {
-          user_id: userId,
-          group_id: groupId,
-          role: "MEMBER",
-        },
-      });
-
+      const isMemberExist = await this.isMemberExists(userId, groupId);
       if (!isMemberExist) {
         throw new Error("User is not a member of this group");
       }
-
       await prisma.groupMember.delete({
         where: {
           id: isMemberExist.id,
         },
       });
-
       Promise.resolve();
     } catch (err) {
       const msg = getErrorReason(err) || "Error while leaving group";
@@ -569,40 +443,18 @@ class GroupService {
 
   async removeMemberFromGroup(userId: number, groupId: number, removingUserId: number) {
     try {
-      const isGroupExist = await prisma.group.findUnique({
-        where: {
-          id: groupId,
-        },
-      });
-
-      if (!isGroupExist) {
+      const isGroupExists = await this.isGroupExists(groupId);
+      if (!isGroupExists) {
         throw new Error("Group not found");
       }
-
-      const isMemberExist = await prisma.groupMember.findFirst({
-        where: {
-          user_id: removingUserId,
-        },
-      });
-
+      const isMemberExist = await this.isMemberExists(removingUserId, groupId);
       if (!isMemberExist) {
         throw new Error("User is not a member of this group");
       }
-
-      const isCurrentUserAdmin = await prisma.groupMember.findFirst({
-        where: {
-          user_id: userId,
-        },
-      });
-
-      if (!isCurrentUserAdmin) {
-        throw new Error("You are not admin of this group");
+      const isUserAdmin = await this.isUserAdmin(userId, groupId);
+      if (!isUserAdmin) {
+        throw new Error("You are not an admin of this group");
       }
-
-      if (isCurrentUserAdmin.role !== "ADMIN") {
-        throw new Error("You are not admin of this group");
-      }
-
       await prisma.groupMember.update({
         where: {
           id: isMemberExist.id,
@@ -611,7 +463,6 @@ class GroupService {
           is_removed: true,
         },
       });
-
       Promise.resolve();
     } catch (err) {
       const msg = getErrorReason(err) || "Error while removing member from group";
@@ -621,27 +472,14 @@ class GroupService {
 
   async getGroupMembers(userId: number, groupId: number, limit = 5, offset = 0) {
     try {
-      // TODO: Common function for checking group exist. Move it to different method
-      const isGroupExist = await prisma.group.findUnique({
-        where: {
-          id: groupId,
-        },
-      });
-
-      if (!isGroupExist) {
+      const isGroupExists = await this.isGroupExists(groupId);
+      if (!isGroupExists) {
         throw new Error("Group not found");
       }
 
-      // TODO: Common function for checking group exist. Move it to different method
-      const isMemberExist = await prisma.groupMember.findFirst({
-        where: {
-          user_id: userId,
-          group_id: groupId,
-        },
-      });
-
-      if (!isMemberExist) {
-        throw new Error("You are not member of this group");
+      const isMemberExists = await this.isMemberExists(userId, groupId);
+      if (!isMemberExists) {
+        throw new Error("User is not a member of this group");
       }
 
       const total = await prisma.groupMember.count({

@@ -5,6 +5,7 @@ import type {
   AcceptRejectGroupInvitationPayload,
   AcceptRejectGroupRequestPayload,
   CreateGroupPayload,
+  UpdateGroupDetailsPayload,
 } from "@votewise/types";
 
 import { JSONResponse } from "@/src/lib";
@@ -204,7 +205,7 @@ export const getRequests = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    if (msg === "You are not a member of any group") {
+    if (msg === "You have no groups") {
       return res.status(BAD_REQUEST).json(
         new JSONResponse(
           msg,
@@ -507,7 +508,7 @@ export const removeMemberFromGroup = async (req: Request, res: Response) => {
       return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
     }
 
-    if (msg === "You are not admin of this group") {
+    if (msg === "You are not an admin of this group") {
       return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
     }
 
@@ -574,6 +575,71 @@ export const getGropMembers = async (req: Request, res: Response) => {
     }
 
     if (msg === "You are not member of this group") {
+      return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
+    }
+
+    return res.status(INTERNAL_SERVER_ERROR).json(
+      new JSONResponse(
+        SOMETHING_WENT_WRONG_MSG,
+        null,
+        {
+          message: msg,
+        },
+        false
+      )
+    );
+  }
+};
+
+// -----------------------------------------------------------------------------------------
+export const updateGroupDetails = async (req: Request, res: Response) => {
+  const payload = req.body as UpdateGroupDetailsPayload;
+  const isValid = GroupService.validateCreateGroupPayload(payload);
+  if (!isValid.success) {
+    return res.status(BAD_REQUEST).json(
+      new JSONResponse(
+        VALIDATION_FAILED_MSG,
+        null,
+        {
+          message: isValid.message,
+        },
+        false
+      )
+    );
+  }
+
+  const { groupId } = req.params;
+  const { user } = req.session;
+
+  try {
+    const data = await GroupService.updateGroupDetails(user.id, Number(groupId), payload);
+    return res.status(OK).json(
+      new JSONResponse(
+        "Group details updated successfully",
+        {
+          message: "Group details updated successfully",
+          group: data,
+        },
+        null,
+        true
+      )
+    );
+  } catch (err) {
+    const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    if (msg === "Group not found") {
+      return res.status(NOT_FOUND).json(
+        new JSONResponse(
+          msg,
+          null,
+          {
+            message: msg,
+          },
+          false
+        )
+      );
+    }
+
+    if (msg === "You are not an admin of this group") {
       return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
     }
 

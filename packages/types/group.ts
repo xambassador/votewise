@@ -14,4 +14,17 @@ type AcceptRejectGroupInvitationPayload = {
   action: "ACCEPT" | "REJECT";
 };
 
-export type { CreateGroupPayload, AcceptRejectGroupRequestPayload, AcceptRejectGroupInvitationPayload };
+type UpdateGroupDetailsPayload = {
+  name: string;
+  description: string;
+  type: "PUBLIC" | "PRIVATE";
+  status: "OPEN" | "CLOSED" | "INACTIVE";
+  joinThroghInvite: boolean;
+};
+
+export type {
+  CreateGroupPayload,
+  AcceptRejectGroupRequestPayload,
+  AcceptRejectGroupInvitationPayload,
+  UpdateGroupDetailsPayload,
+};

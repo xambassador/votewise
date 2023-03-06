@@ -91,12 +91,17 @@ export const USER_GET_FOLLOWING_V1 = "/following";
 // DELETE /api/v1/user/following/:folloingId => Unfollow user
 export const USER_UNFOLLOW_USER_V1 = "/following/:followingId";
 
+// ==========================================================================================================
 export const GROUPS_ROUTE_V1 = "/api/v1/groups";
+
 // GET /api/v1/groups?limit=5&offset=0 => Get all groups
 export const GET_GROUPS_V1 = "";
 
 // POST /api/v1/groups => Create new group
 export const CREATE_GROUP_V1 = "";
+
+// PATCH /api/v1/groups/:groupId => Update group
+export const UPDATE_GROUP_V1 = "/:groupId";
 
 // POST /api/v1/groups/:groupId/join => Join group
 export const JOIN_GROUP_V1 = "/:groupId/join";

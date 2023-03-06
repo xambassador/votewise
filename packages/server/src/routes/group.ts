@@ -10,6 +10,7 @@ import {
   JOIN_GROUP_V1,
   LEAVE_GROUP_V1,
   REMOVE_MEMBER_FROM_GROUP_V1,
+  UPDATE_GROUP_V1,
 } from "@/src/configs";
 import {
   acceptOrRejectGroupInvitation,
@@ -21,6 +22,7 @@ import {
   joinGroup,
   leaveGroup,
   removeMemberFromGroup,
+  updateGroupDetails,
 } from "@/src/controllers";
 import authorizationMiddleware from "@/src/middlewares/auth";
 import onboardedMiddleware from "@/src/middlewares/onboarded";
@@ -52,6 +54,7 @@ router.patch(
   onboardedMiddleware,
   removeMemberFromGroup
 );
+router.patch(UPDATE_GROUP_V1, authorizationMiddleware, onboardedMiddleware, updateGroupDetails);
 
 router.delete(LEAVE_GROUP_V1, authorizationMiddleware, onboardedMiddleware, leaveGroup);
 
