@@ -17,10 +17,10 @@ enum Gender {
 }
 
 model User {
-  id                Int              @id @default(autoincrement())
-  email             String           @unique
+  id                Int               @id @default(autoincrement())
+  email             String            @unique
   password          String
-  username          String?          @unique
+  username          String?           @unique
   name              String?
   about             String?
   twitter           String?
@@ -30,21 +30,21 @@ model User {
   cover_image       String?
   location          String?
   gender            Gender?
-  onboarded         Boolean          @default(false)
-  is_email_verify   Boolean          @default(false)
+  onboarded         Boolean           @default(false)
+  is_email_verify   Boolean           @default(false)
   last_login        DateTime?
-  created_at        DateTime         @default(now())
-  updated_at        DateTime         @default(now())
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @default(now())
   posts             Post[]
   upvotes           Upvote[]
   comments          Comment[]
   comment_upvotes   CommentUpvote[]
-  followers         Follow[]         @relation("followers")
-  following         Follow[]         @relation("following")
-  friend1           Friend[]         @relation("user")
-  friend2           Friend[]         @relation("friend")
+  followers         Follow[]          @relation("followers")
+  following         Follow[]          @relation("following")
+  friend1           Friend[]          @relation("user")
+  friend2           Friend[]          @relation("friend")
   group_member      GroupMember[]
-  group_invitations GropInvitation[]
+  group_invitations GroupInvitation[]
   notification      Notification[]
   refresh_token     RefreshToken[]
 }
@@ -184,16 +184,16 @@ enum GroupStatus {
 }
 
 model Group {
-  id                   Int              @id @default(autoincrement())
+  id                   Int               @id @default(autoincrement())
   name                 String
-  abount               String
+  about                String
   type                 GroupType
   status               GroupStatus
-  join_through_request Boolean          @default(false)
+  join_through_request Boolean           @default(false)
   group_members        GroupMember[]
-  group_invitations    GropInvitation[] // One group can have many invitations to join
-  created_at           DateTime         @default(now())
-  updated_at           DateTime         @default(now())
+  group_invitations    GroupInvitation[] // One group can have many invitations to join
+  created_at           DateTime          @default(now())
+  updated_at           DateTime          @default(now())
   posts                Post[]
 }
 
@@ -228,7 +228,7 @@ enum GroupInvitationStatus {
   REJECTED
 }
 
-model GropInvitation {
+model GroupInvitation {
   id         Int                   @id @default(autoincrement())
   group      Group                 @relation(fields: [group_id], references: [id])
   group_id   Int
