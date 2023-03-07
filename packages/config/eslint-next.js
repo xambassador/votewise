@@ -40,6 +40,8 @@ module.exports = {
     "react/jsx-curly-brace-presence": ["error", { props: "never", children: "never" }],
     "react/self-closing-comp": ["error", { component: true, html: true }],
     "react/jsx-props-no-spreading": "off",
+    "react/require-default-props": "off",
+    "react/prop-types": "off",
     "@typescript-eslint/no-unused-vars": "error",
     "unused-imports/no-unused-imports": "error",
     "unused-imports/no-unused-vars": [
@@ -47,6 +49,16 @@ module.exports = {
       { vars: "all", varsIgnorePattern: "^_", args: "after-used", argsIgnorePattern: "^_" },
     ],
     "import/prefer-default-export": "off",
+    "jsx-a11y/label-has-associated-control": [
+      "error",
+      {
+        labelComponents: ["CustomLabel"],
+        labelAttributes: ["label"],
+        controlComponents: ["CustomInput"],
+        assert: "either",
+        depth: 3,
+      },
+    ],
   },
   ignorePatterns: ["**/*.js", "**/*.json", "node_modules", "public", "styles", ".next", "coverage", "dist"],
 };

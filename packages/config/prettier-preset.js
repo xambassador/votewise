@@ -1,6 +1,6 @@
 module.exports = {
   bracketSpacing: true,
-  bracketSameLine: true,
+  bracketSameLine: false,
   singleQuote: false,
   jsxSingleQuote: false,
   trailingComma: "es5",
@@ -10,9 +10,11 @@ module.exports = {
   endOfLine: "auto",
   importOrder: [
     "<THIRD_PARTY_MODULES>",
+    "^next$",
+    "react",
     "^@(votewise|ee)/(.*)$",
-    "^@components/(.*)$",
-    "^@lib/(.*)$",
+    "^components/(.*)$",
+    "^lib/(.*)$",
     // "^~/(.*)$",
     "^[./]",
   ],
