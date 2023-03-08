@@ -13,9 +13,11 @@ export function Layout({ children }: Props) {
     <div className="min-h-screen min-w-full">
       <Navbar />
       <main className="mt-14">
-        <div className="container mx-auto flex">
+        <div className="container mx-auto flex justify-between">
           <LeftPanel />
           {children}
+          {/* TODO: Replace it with RightPanel */}
+          <LeftPanel />
         </div>
       </main>
     </div>

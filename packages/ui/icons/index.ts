@@ -8,3 +8,8 @@ export * from "./Tranding";
 export * from "./Group";
 export * from "./Search";
 export * from "./Bell";
+export * from "./MapPin";
+export * from "./Upvote";
+export * from "./Clock";
+export * from "./Message";
+export * from "./Send";
