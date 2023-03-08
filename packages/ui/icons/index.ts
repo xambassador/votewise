@@ -3,3 +3,8 @@ export * from "./Eye";
 export * from "./Google";
 export * from "./Facebook";
 export * from "./Twitter";
+export * from "./Home";
+export * from "./Tranding";
+export * from "./Group";
+export * from "./Search";
+export * from "./Bell";

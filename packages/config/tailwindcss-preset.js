@@ -98,6 +98,9 @@ module.exports = {
         "outline-orange": "0 0 0 3px rgba(255, 146, 43, 0.5)",
         "auth-form": "0px 2px 6px -1px rgba(0, 0, 0, 0.08)",
       },
+      width: {
+        15: "3.75rem",
+      },
     },
     fontSize: {
       ...require("tailwindcss/defaultTheme").fontSize,

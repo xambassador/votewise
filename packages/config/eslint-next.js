@@ -59,6 +59,7 @@ module.exports = {
         depth: 3,
       },
     ],
+    "react/function-component-definition": ["off"],
   },
   ignorePatterns: ["**/*.js", "**/*.json", "node_modules", "public", "styles", ".next", "coverage", "dist"],
 };

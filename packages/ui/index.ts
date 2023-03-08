@@ -4,3 +4,6 @@ export * from "./components/forms";
 export * from "./icons";
 export * from "./components/Divider";
 export * from "./components/Uploader";
+export * from "./components/Image";
+export * from "./components/Avatar";
+export * from "./components/Tabs";

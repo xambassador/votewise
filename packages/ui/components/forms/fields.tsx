@@ -4,6 +4,8 @@ import { useFormContext } from "react-hook-form";
 
 import { classNames } from "@votewise/lib";
 
+import { Search as SearchIcon } from "../../icons";
+
 type InputProps = Omit<JSX.IntrinsicElements["input"], "name"> & {
   name: string;
   primary?: boolean;
@@ -161,6 +163,36 @@ export const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>
         // TODO: Replace with error component
         <p className="mt-1">{methods.formState.errors[props.name]?.message as string}</p>
       )}
+    </div>
+  );
+});
+
+type SearchFieldProps = React.ComponentProps<typeof Input> & {
+  buttonProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
+};
+
+export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>((props, ref) => {
+  const { className, buttonProps, ...passThrough } = props;
+  return (
+    <div
+      className={classNames(
+        "flex items-center rounded-lg border border-gray-200 bg-gray-50 px-[calc((10/16)*1rem)]",
+        className
+      )}
+    >
+      <button {...buttonProps} type="button">
+        <SearchIcon />
+      </button>
+      <Input
+        ref={ref}
+        type="search"
+        autoCapitalize="none"
+        autoComplete="off"
+        autoCorrect="off"
+        inputMode="search"
+        className="placeholder:text-black-900 h-10 rounded-none border-none bg-transparent py-4 placeholder:font-medium focus:border-none focus:ring-0"
+        {...passThrough}
+      />
     </div>
   );
 });
