@@ -4,3 +4,4 @@ export * from "./random";
 export * from "./slugify";
 export * from "./text";
 export * from "./webstorage";
+export * from "./routes";

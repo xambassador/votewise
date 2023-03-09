@@ -91,7 +91,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>((props, ref) =>
       </div>
       {hint}
       {methods?.formState?.errors[props.name]?.message && (
-        <p className="mt-1">{methods.formState.errors[props.name]?.message as string}</p>
+        <p className="mt-1 text-red-600">{methods.formState.errors[props.name]?.message as string}</p>
       )}
     </div>
   );

@@ -14,6 +14,7 @@ const Page: NextPageWithLayout = () => (
 
         <div className="mt-7 w-full text-gray-800">
           <AuthForm
+            type="login"
             title="Hey, Welcome back 👋"
             subtitle={
               <>
