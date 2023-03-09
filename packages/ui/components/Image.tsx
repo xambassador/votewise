@@ -10,6 +10,8 @@ interface ImageProps {
   alt?: string;
   effect?: "blur" | "opacity" | "black-and-white";
   className?: string;
+  resetWidthAndHeight?: boolean;
+  wrapperClassName?: string;
 }
 
 export function Image({
@@ -19,10 +21,24 @@ export function Image({
   alt = "",
   effect = "blur",
   className = "",
+  resetWidthAndHeight = false,
+  wrapperClassName = "",
 }: ImageProps) {
+  if (resetWidthAndHeight) {
+    return (
+      <LazyLoadImage
+        className={className}
+        wrapperClassName={wrapperClassName}
+        src={src}
+        alt={alt}
+        effect={effect}
+      />
+    );
+  }
   return (
     <LazyLoadImage
       className={className}
+      wrapperClassName={wrapperClassName}
       src={src}
       alt={alt}
       height={height}

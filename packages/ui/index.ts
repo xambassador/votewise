@@ -7,3 +7,4 @@ export * from "./components/Uploader";
 export * from "./components/Image";
 export * from "./components/Avatar";
 export * from "./components/Tabs";
+export * from "./components/Badge";

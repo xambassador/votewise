@@ -13,3 +13,7 @@ export * from "./Upvote";
 export * from "./Clock";
 export * from "./Message";
 export * from "./Send";
+export * from "./Edit";
+export * from "./UserPlus";
+export * from "./Heart";
+export * from "./X";

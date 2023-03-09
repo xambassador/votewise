@@ -25,15 +25,17 @@ export function Avatar(props: ImageProps) {
   const avatarClassName = classNames(
     "w-15 h-15 flex items-center overflow-hidden",
     rounded ? "rounded-full" : "rounded-lg",
-    withStroke ? "p-1" : "p-0",
+    withStroke ? "p-1 bg-white" : "p-0",
     width ? `w-[calc((${width}/16)*1rem)]` : "",
     height ? `h-[calc((${width}/16)*1rem)]` : "",
     className
   );
 
+  const imageClassName = classNames(rounded ? "rounded-full" : "rounded-lg");
+
   return (
     <div className={avatarClassName}>
-      <Image src={src} alt={alt} width={width} height={height} {...imageProps} />
+      <Image src={src} alt={alt} width={width} height={height} className={imageClassName} {...imageProps} />
     </div>
   );
 }

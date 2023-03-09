@@ -6,7 +6,7 @@ import { UserPill } from "../UserPill";
 
 export function LeftPanel() {
   return (
-    <aside className="max-w-[calc((342/16)*1rem)] rounded-lg border border-gray-200 bg-white py-5 px-10">
+    <aside className="h-fit max-h-[calc((700/16)*1rem)] max-w-[calc((342/16)*1rem)] overflow-hidden rounded-lg border border-gray-200 bg-white py-5 px-10">
       <div>
         <SearchField name="search" placeholder="Search people or group" />
       </div>
@@ -16,9 +16,10 @@ export function LeftPanel() {
           {Array(5)
             .fill(0)
             .map(() => (
+              // TODO: Replace key with proper id
               <div key={`item-${new Date()}`}>
                 <UserPill
-                  src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
+                  src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80"
                   username="Selma knight"
                 />
               </div>
@@ -34,7 +35,7 @@ export function LeftPanel() {
             .map(() => (
               <div key={`item-${new Date()}`}>
                 <UserPill
-                  src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
+                  src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80"
                   username="Selma knight"
                 />
               </div>

@@ -1,0 +1,36 @@
+import React from "react";
+
+export function Edit({ className = "", width = 20, height = 20, fill = "#f9fafb" }) {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 20 20"
+      className={className}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g clipPath="url(#clip0_42_1185)">
+        <path
+          d="M9.16675 3.33337H3.33341C2.89139 3.33337 2.46746 3.50897 2.1549 3.82153C1.84234 4.13409 1.66675 4.55801 1.66675 5.00004V16.6667C1.66675 17.1087 1.84234 17.5327 2.1549 17.8452C2.46746 18.1578 2.89139 18.3334 3.33341 18.3334H15.0001C15.4421 18.3334 15.866 18.1578 16.1786 17.8452C16.4912 17.5327 16.6667 17.1087 16.6667 16.6667V10.8334"
+          stroke={fill}
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M15.4167 2.08332C15.7483 1.7518 16.1979 1.56555 16.6667 1.56555C17.1356 1.56555 17.5852 1.7518 17.9167 2.08332C18.2483 2.41484 18.4345 2.86448 18.4345 3.33332C18.4345 3.80216 18.2483 4.2518 17.9167 4.58332L10.0001 12.5L6.66675 13.3333L7.50008 9.99999L15.4167 2.08332Z"
+          stroke={fill}
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_42_1185">
+          <rect width="20" height="20" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+}
