@@ -1,104 +1,123 @@
-import Link from "next/link";
-
 import type { ReactNode } from "react";
 import React from "react";
 
-import { Avatar, Clock, MapPin, Message, Sent, Upvote } from "@votewise/ui";
+import { classNames } from "@votewise/lib";
+import { Avatar, Clock, Image, MapPin } from "@votewise/ui";
 
-function Location({
+export function PostMapPinIcon({ className = "" }) {
+  return <MapPin className={className} />;
+}
+
+export function Location({ className, children }: { className?: string; children?: ReactNode }) {
+  return <div className={classNames("flex items-center gap-1", className)}>{children}</div>;
+}
+
+export function PostTimeAgoClockIcon({ className = "" }) {
+  return <Clock className={className} />;
+}
+
+export function TimeAgo({ className, children }: { className?: string; children: ReactNode }) {
+  return <div className={classNames("flex items-center gap-1", className)}>{children}</div>;
+}
+
+export function PostTitle({ className, children }: { className?: string; children?: ReactNode }) {
+  return <h1 className={classNames("text-2xl font-semibold text-gray-600", className)}>{children}</h1>;
+}
+
+export function PostText({ className, children }: { className?: string; children?: ReactNode }) {
+  return <p className={classNames("text-black-900 leading-6", className)}>{children}</p>;
+}
+
+export function PostHashTags({ className, children }: { className?: string; children?: ReactNode }) {
+  return <p className={classNames("text-blue-700", className)}>{children}</p>;
+}
+
+export function ButtonGroup({ className, children }: { className?: string; children: ReactNode }) {
+  return <div className={classNames("flex items-center gap-2", className)}>{children}</div>;
+}
+
+export function PostHeader({ className, children }: { className?: string; children?: ReactNode }) {
+  return <div className={classNames("flex", className)}>{children}</div>;
+}
+
+export function PostUserName({ className, children }: { className?: string; children?: ReactNode }) {
+  return <h3 className={classNames("text-black-900 text-xl font-semibold", className)}>{children}</h3>;
+}
+
+export function PostUserPill({
+  avatar,
+  userName,
   location,
-  className = "flex items-center gap-1",
+  timeAgo,
 }: {
+  avatar: string;
+  userName: string;
   location: string;
-  className?: string;
+  timeAgo: string;
 }) {
   return (
-    <div className={className}>
-      <span>
-        <MapPin />
-      </span>
-      <span>{location}</span>
-    </div>
-  );
-}
-
-function TimeAgo({ time, className = "flex items-center gap-1" }: { time: string; className?: string }) {
-  return (
-    <div className={className}>
-      <span>
-        <Clock />
-      </span>
-      <span>{time}</span>
-    </div>
-  );
-}
-
-function PostTitle({ className = "text-2xl font-semibold text-gray-600" }) {
-  return (
-    <h1 className={className}>
-      <Link href="/">This is Naoimi’s Cool Idea to save environment</Link>
-    </h1>
-  );
-}
-
-function PostText({ className = "text-black-900 leading-6" }) {
-  return (
-    <p className={className}>
-      The chair sat in the corner where it had been for over 25 years. The only difference was there was
-      someone actually sitting in it. How long had it been since someone had done that? Ten years or more he
-      imagined. Yet there was no denying the presence in the chair now.{" "}
-    </p>
-  );
-}
-
-function HashTags({ className = "text-blue-700" }) {
-  return <p className={className}>#cool #coolidea #uiux #frontend</p>;
-}
-
-function ButtonGroup({ className = "flex gap-2", children }: { className?: string; children: ReactNode }) {
-  return <div className={className}>{children}</div>;
-}
-
-export function Post() {
-  return (
-    <div className="flex max-w-[calc((774/16)*1rem)] flex-col gap-5 rounded-lg border border-gray-200 bg-white p-5">
-      <div className="flex">
-        <Avatar src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80" />
-        <div className="ml-4 flex flex-col">
-          <h3 className="text-black-900 text-xl font-semibold">Naomi Yoshida</h3>
-          <div className="mt-2 flex gap-2 text-gray-600">
-            <Location location="Japan" />
-            <TimeAgo time="2 hours ago" />
-          </div>
+    <PostHeader>
+      <Avatar src={avatar} />
+      <div className="ml-4 flex flex-col">
+        <PostUserName>{userName}</PostUserName>
+        <div className="mt-2 flex gap-2 text-gray-600">
+          <Location>
+            <span>
+              <PostMapPinIcon />
+            </span>
+            <span>{location}</span>
+          </Location>
+          <TimeAgo>
+            <span>
+              <PostTimeAgoClockIcon />
+            </span>
+            <span>{timeAgo}</span>
+          </TimeAgo>
         </div>
       </div>
+    </PostHeader>
+  );
+}
 
-      <PostTitle />
-      <PostText />
-      <HashTags />
+export function PostFooter({ className, children }: { className?: string; children?: ReactNode }) {
+  return <div className={classNames("flex items-center gap-7", className)}>{children}</div>;
+}
 
-      <div className="flex items-center gap-7">
-        <ButtonGroup>
-          <button type="button">
-            <Upvote />
-          </button>
-          <span className="text-sm text-gray-600">840</span>
-        </ButtonGroup>
+export function Post({ className, children }: { className?: string; children?: ReactNode }) {
+  return (
+    <div
+      className={classNames(
+        "flex max-w-[calc((774/16)*1rem)] flex-col gap-5 rounded-lg border border-gray-200 bg-white p-5",
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
+}
 
-        <ButtonGroup>
-          <button type="button">
-            <Message />
-          </button>
-          <span className="text-sm text-gray-600">Comments</span>
-        </ButtonGroup>
+function Figure({ children }: { children: ReactNode }) {
+  return (
+    <figure className="h-[calc((250/16)*1rem)] max-h-[calc((250/16)*1rem)] w-[calc((350/16)*1rem)]">
+      {children}
+    </figure>
+  );
+}
 
-        <ButtonGroup>
-          <button type="button">
-            <Sent />
-          </button>
-          <span className="text-sm text-gray-600">Share</span>
-        </ButtonGroup>
-      </div>
+export function PostGallary({ images }: { images: { src: string }[] }) {
+  return (
+    <div className="grid grid-cols-2 gap-6">
+      {images.map((img) => (
+        <Figure key={img.src}>
+          <Image
+            src={img.src}
+            alt="Post"
+            resetWidthAndHeight
+            className="h-full w-full rounded-lg object-cover"
+            wrapperClassName="max-h-[calc((250/16)*1rem)] w-full h-full"
+          />
+        </Figure>
+      ))}
     </div>
   );
 }
