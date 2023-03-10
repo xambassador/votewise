@@ -18,7 +18,8 @@
     "db:migrate": "lerna exec --scope @votewise/prisma -- yarn run db:migrate",
     "db:studio": "lerna exec --scope @votewise/prisma -- yarn run db:studio",
     "db:seed": "lerna exec --scope @votewise/prisma -- yarn run db:seed",
-    "clean": "lerna clean --yes && rm -rf node_modules"
+    "clean": "lerna clean --yes && rm -rf node_modules",
+    "dev": "lerna run dev --parallel --stream --no-bail --scope @votewise/web --scope @votewise/server"
   },
   "devDependencies": {
     "@types/jest": "^29.4.0",
