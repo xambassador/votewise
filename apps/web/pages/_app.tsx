@@ -9,6 +9,7 @@ import "react-lazy-load-image-component/src/effects/black-and-white.css";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import "react-lazy-load-image-component/src/effects/opacity.css";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   return getLayout(
     <QueryClientProvider client={queryClient}>
       <Component {...pageProps} />
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }
