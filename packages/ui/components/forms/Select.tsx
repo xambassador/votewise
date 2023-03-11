@@ -1,4 +1,5 @@
 import React, { useId } from "react";
+import { useFormContext } from "react-hook-form";
 import type { GroupBase, InputProps, Props } from "react-select";
 import ReactSelect, { components } from "react-select";
 
@@ -101,6 +102,7 @@ export function SelectField<
   Group extends GroupBase<Option> = GroupBase<Option>
 >({ className, ...props }: SelectFieldProps<Option, IsMulti, Group>) {
   const id = useId();
+  const methods = useFormContext();
   const { label, labelProps, ...passThrogh } = props;
 
   return (
@@ -111,6 +113,9 @@ export function SelectField<
         </Label>
       )}
       <Select id={id} className={classNames("w-full", className)} {...passThrogh} />
+      {methods?.formState?.errors[props.name]?.message && (
+        <p className="mt-1 text-red-600">{methods.formState.errors[props.name]?.message as string}</p>
+      )}
     </div>
   );
 }

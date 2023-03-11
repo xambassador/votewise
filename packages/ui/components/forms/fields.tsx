@@ -159,9 +159,9 @@ export const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>
         </Label>
       )}
       <TextArea ref={ref} id={id} placeholder={placeholder} {...passThrough} />
+      {/* TODO: Replace with error component or alert component */}
       {methods?.formState?.errors[props.name]?.message && (
-        // TODO: Replace with error component
-        <p className="mt-1">{methods.formState.errors[props.name]?.message as string}</p>
+        <p className="mt-1 text-red-600">{methods.formState.errors[props.name]?.message as string}</p>
       )}
     </div>
   );

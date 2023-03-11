@@ -9,6 +9,7 @@
       "@/hooks/*": ["hooks/*"],
       "@/routes/*": ["routes/*"],
       "@/store/*": ["store/*"],
+      "@/services/*": ["services/*"],
       "@votewise/ui/*": ["@votewise/ui/*"]
     }
   },

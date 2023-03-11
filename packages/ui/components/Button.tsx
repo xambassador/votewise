@@ -4,16 +4,22 @@ import type { ReactNode } from "react";
 // -----------------------------------------------------------------------------------------
 import { classNames } from "@votewise/lib";
 
+import { Loader } from "./Loader";
+
 // -----------------------------------------------------------------------------------------
 type ButtonProps = {
   children?: ReactNode;
   primary?: boolean;
   secondary?: boolean;
   tritertiary?: boolean;
-} & React.ButtonHTMLAttributes<HTMLButtonElement>;
+  isLoading?: boolean;
+} & React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    loaderProps?: React.ComponentProps<typeof Loader>;
+  };
 
 function getThemeClasses(theme: "primary" | "secondary" | "tritertiary") {
-  let classnames = "rounded-lg py-4 flex w-full items-center justify-center font-semibold";
+  let classnames =
+    "rounded-lg py-4 flex w-full items-center justify-center font-semibold disabled:cursor-not-allowed disabled:bg-blue-300";
   if (theme === "primary") {
     classnames += " bg-blue-500 text-blue-50 px-0";
   }
@@ -30,7 +36,7 @@ function getThemeClasses(theme: "primary" | "secondary" | "tritertiary") {
 }
 
 export function Button(props: ButtonProps) {
-  const { className, children, primary = true, secondary, ...rest } = props;
+  const { className, children, primary = true, secondary, isLoading, loaderProps, ...rest } = props;
   // eslint-disable-next-line no-nested-ternary
   const classnames = primary
     ? getThemeClasses("primary")
@@ -39,8 +45,9 @@ export function Button(props: ButtonProps) {
     : getThemeClasses("tritertiary");
   return (
     // eslint-disable-next-line react/button-has-type
-    <button className={classNames(classnames, className)} {...rest}>
-      {children}
+    <button className={classNames(classnames, className)} disabled={isLoading} {...rest}>
+      {isLoading && <Loader {...loaderProps} />}
+      {!isLoading && children}
     </button>
   );
 }
