@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { AxiosResponse } from "axios";
 import cookie from "cookie";
+import { getProxyHeaders } from "lib";
 
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -14,32 +15,23 @@ type BodyPayload = RegisterUserPayload & {
   rememberMe: boolean;
 };
 
+type Response = AxiosResponse<{
+  message: string;
+  error: null;
+  data: { accessToken: string; refreshToken: string };
+  success: boolean;
+}>;
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { headers, body } = req;
+  const { body } = req;
   const { rememberMe, ...payload } = body as unknown as BodyPayload;
+  const headers = getProxyHeaders(req);
 
   try {
-    const response = await axios.post<
-      RegisterUserPayload,
-      AxiosResponse<{
-        message: string;
-        error: null;
-        data: { accessToken: string; resfreshToken: string };
-        success: boolean;
-      }>
-    >(apiEndpoint, payload, {
-      headers: {
-        ...headers,
-        "X-Forwarded-For":
-          req.headers["x-forwarded-for"] || req.headers["x-real-ip"] || req.socket.remoteAddress,
-      },
+    const response = await axios.post<RegisterUserPayload, Response>(apiEndpoint, payload, {
+      headers,
     });
-    let maxAge = 0;
-    if (rememberMe) {
-      maxAge = 60 * 60 * 24 * 7; // 7 days
-    } else {
-      maxAge = 60 * 60 * 24; // 1 day
-    }
+    const maxAge = rememberMe ? 60 * 60 * 24 * 7 : 60 * 60 * 24;
     res.setHeader("Set-Cookie", [
       cookie.serialize("votewise-utoken", response.data.data.accessToken, {
         httpOnly: true,
@@ -48,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         maxAge,
         path: "/",
       }),
-      cookie.serialize("votewise-rtoken", response.data.data.resfreshToken, {
+      cookie.serialize("votewise-rtoken", response.data.data.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
@@ -62,6 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const [key, value] = keyArr;
       res.setHeader(key, value);
     });
+
     return res.status(status).json(data);
   } catch (err: any) {
     const status = err.response.status || 500;

@@ -11,7 +11,6 @@ const Page: NextPageWithLayout = () => (
     <div className="flex h-full flex-1 flex-col items-center justify-center">
       <div className="flex w-[calc((530/16)*1rem)] flex-col items-center">
         <Logo />
-
         <div className="mt-7 w-full text-gray-800">
           <AuthForm
             type="login"

@@ -4,7 +4,7 @@ import React from "react";
 
 export function IllustrationSection() {
   return (
-    <div className="relative flex h-full flex-1 flex-col bg-blue-800 pt-11">
+    <div className="relative flex h-full flex-1 flex-col overflow-hidden bg-blue-800 pt-11">
       <figure className="mx-auto h-fit w-fit">
         <Image src="/space.svg" alt="Space" width={420} height={386} />
       </figure>

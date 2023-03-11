@@ -1,5 +1,6 @@
 import { axioInstance } from "lib";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 import React from "react";
 import type { ReactNode } from "react";
@@ -8,6 +9,7 @@ import type { SubmitHandler } from "react-hook-form";
 
 import {
   Button,
+  X as CloseIcon,
   Divider,
   Email,
   EmailField,
@@ -26,7 +28,7 @@ type AuthFormProps = {
   submitButtonLabel?: string;
 };
 
-type SignUpFormValues = {
+type FormValues = {
   email: string;
   password: string;
   rememberMe: boolean;
@@ -42,18 +44,24 @@ export function AuthForm(props: AuthFormProps) {
     type = "signup",
   } = props;
 
-  const methods = useForm<SignUpFormValues>();
+  const router = useRouter();
+  const methods = useForm<FormValues>();
   const {
     register,
-    formState: { errors },
+    formState: { errors, isSubmitting },
+    clearErrors,
   } = methods;
 
-  const signUp: SubmitHandler<SignUpFormValues> = async (data) => {
+  const resetErrors = () => {
+    clearErrors("apiError");
+  };
+
+  const authenticate: SubmitHandler<FormValues> = async (data) => {
+    const url = type === "signup" ? "/signup" : "/login";
     try {
-      await axioInstance.post("/signup", data);
-    } catch (err) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      await axioInstance.post(url, data);
+      router.push("/onboarding");
+    } catch (err: any) {
       const msg = err.response.data.message || "Something went wrong";
       methods.setError("apiError", { message: msg });
     }
@@ -63,9 +71,16 @@ export function AuthForm(props: AuthFormProps) {
     <FormProvider {...methods}>
       <form
         className="shadow-auth-form flex flex-col gap-7 rounded-lg bg-white p-10"
-        onSubmit={methods.handleSubmit(signUp)}
+        onSubmit={methods.handleSubmit(authenticate)}
       >
-        {errors.apiError && <p className="py-2 text-red-600">{errors.apiError.message}</p>}
+        {errors.apiError && (
+          <div className="flex items-center justify-between text-red-600">
+            <p>{errors.apiError.message}</p>
+            <button type="button" onClick={resetErrors}>
+              <CloseIcon />
+            </button>
+          </div>
+        )}
         <div className="flex flex-col gap-5">
           <div>
             <h1 className="text-3xl font-bold text-gray-800">{title}</h1>
@@ -120,7 +135,9 @@ export function AuthForm(props: AuthFormProps) {
             </div>
           </div>
 
-          <Button primary>{submitButtonLabel}</Button>
+          <Button primary isLoading={isSubmitting} disabled={errors.apiError && true}>
+            {submitButtonLabel}
+          </Button>
         </div>
 
         <Divider>Or</Divider>
