@@ -12,7 +12,9 @@ import {
   ONBOARDING_ROUTE_V1,
   POST_ROUTE_V1,
   USER_ROUTE_V1,
-} from "@/src/configs";
+} from "@votewise/lib";
+import { logger } from "@votewise/lib/logger";
+
 import authRouter from "@/src/routes/auth";
 import groupRouter from "@/src/routes/group";
 import healthCheckRouter from "@/src/routes/healthCheck";
@@ -20,7 +22,6 @@ import notFoundRouter from "@/src/routes/notFound";
 import onboardingRouter from "@/src/routes/onboarding";
 import postRouter from "@/src/routes/post";
 import userRouter from "@/src/routes/user";
-import { logger } from "@/src/utils";
 
 // Register routes
 const registerRoutes = (app: Application) => {

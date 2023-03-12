@@ -5,9 +5,9 @@
 import type { NextFunction, Request, Response } from "express";
 import httpStatusCodes from "http-status-codes";
 
-import { JSONResponse } from "../lib";
-import UserService from "../services/user";
-import JWTService from "../services/user/jwt";
+import { JSONResponse } from "@/src/lib";
+import UserService from "@/src/services/user";
+import JWTService from "@/src/services/user/jwt";
 
 const { UNAUTHORIZED } = httpStatusCodes;
 const error = {

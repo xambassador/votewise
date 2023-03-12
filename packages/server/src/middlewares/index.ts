@@ -8,7 +8,7 @@ import type { Application } from "express";
 import express, { json } from "express";
 import helmet from "helmet";
 
-import { logger } from "@/src/utils";
+import { logger } from "@votewise/lib/logger";
 
 const registerMiddlewares = (app: Application) => {
   logger("Registering middlewares....");

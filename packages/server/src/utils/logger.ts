@@ -1,3 +1,7 @@
+/**
+ * @file: logger.ts
+ * @description: Logger utility for the application.
+ */
 import pino from "pino";
 
 import dotenv from "dotenv";
@@ -23,6 +27,9 @@ const pinoInit = pino({
   },
 });
 
+/**
+ * @deprecated: This function is deprecated and will be removed in the future. Use logger from @votewise/lib.
+ */
 const logger = (text: unknown, level = "info") => {
   const isTestEnv = process.env.NODE_ENV === "test";
   if (isTestEnv) {

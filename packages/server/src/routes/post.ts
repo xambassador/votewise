@@ -17,7 +17,8 @@ import {
   UNLIKE_COMMENT_ON_POST_V1,
   UNLIKE_POST_V1,
   UPDATE_COMMENT_ON_POST_V1,
-} from "@/src/configs";
+} from "@votewise/lib";
+
 import {
   commentOnPost,
   deleteCommentOnPost,

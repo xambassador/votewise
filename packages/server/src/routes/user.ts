@@ -23,7 +23,8 @@ import {
   USER_SEND_FRIEND_REQUEST_V1,
   USER_UNFOLLOW_USER_V1,
   USER_UPDATE_POST_V1,
-} from "@/src/configs";
+} from "@votewise/lib";
+
 import {
   acceptOrRejectFriendRequest,
   addFriend,
@@ -44,9 +45,8 @@ import {
   updateMyPost,
   updateStatus,
 } from "@/src/controllers/user";
-
-import authorizationMiddleware from "../middlewares/auth";
-import onboardedMiddleware from "../middlewares/onboarded";
+import authorizationMiddleware from "@/src/middlewares/auth";
+import onboardedMiddleware from "@/src/middlewares/onboarded";
 
 const router = Router();
 

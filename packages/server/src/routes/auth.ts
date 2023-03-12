@@ -12,7 +12,8 @@ import {
   RESET_PASSWORD_V1,
   REVOKE_ACCESS_TOKEN_V1,
   VERIFY_EMAIL_V1,
-} from "@/src/configs";
+} from "@votewise/lib";
+
 import {
   forgotPassword,
   login,

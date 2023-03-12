@@ -11,7 +11,8 @@ import {
   LEAVE_GROUP_V1,
   REMOVE_MEMBER_FROM_GROUP_V1,
   UPDATE_GROUP_V1,
-} from "@/src/configs";
+} from "@votewise/lib";
+
 import {
   acceptOrRejectGroupInvitation,
   acceptOrRejectGroupRequest,

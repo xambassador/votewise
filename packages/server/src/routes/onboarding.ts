@@ -4,7 +4,8 @@
  */
 import { Router } from "express";
 
-import { ONBOARDING_STATUS_V1, ONBOARDING_UPDATE_V1 } from "@/src/configs";
+import { ONBOARDING_STATUS_V1, ONBOARDING_UPDATE_V1 } from "@votewise/lib";
+
 import { onboardUser, onboardingStatus } from "@/src/controllers";
 import authorizationMiddleware from "@/src/middlewares/auth";
 
