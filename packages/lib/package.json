@@ -5,7 +5,10 @@
     "sideEffects": false,
     "scripts": {},
     "dependencies": {
-      "tailwind-merge": "^1.10.0"
+      "tailwind-merge": "^1.10.0",
+      "pino": "^8.11.0",
+      "pino-pretty": "^9.4.0",
+      "dotenv": "^16.0.3"
     },
     "devDependencies": {}
 }
