@@ -1,7 +1,8 @@
 import React from "react";
 import type { ReactNode } from "react";
 
-import { Avatar, Button, Edit, Image, UserPlus } from "@votewise/ui";
+import { Avatar, Button, Image } from "@votewise/ui";
+import { FiEdit as Edit, FiUserPlus as UserPlus } from "@votewise/ui/icons";
 
 import { UserPill } from "../UserPill";
 

@@ -1,6 +1,10 @@
-import { AuthForm, AuthScreenLayout, IllustrationSection, Logo } from "components";
+import type { GetServerSidePropsContext } from "next";
 
 import React from "react";
+
+import { AuthForm, AuthScreenLayout, IllustrationSection, Logo } from "components";
+
+import { getServerSession } from "server/lib/getServerSession";
 
 import type { NextPageWithLayout } from "./_app";
 
@@ -21,3 +25,19 @@ const Page: NextPageWithLayout = () => (
 Page.getLayout = (page) => <AuthScreenLayout>{page}</AuthScreenLayout>;
 
 export default Page;
+
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+  const { req, res } = context;
+  const session = getServerSession({ req, res });
+  if (session) {
+    return {
+      redirect: {
+        destination: "/",
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
+};

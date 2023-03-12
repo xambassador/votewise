@@ -1,4 +1,3 @@
-import { axioInstance } from "lib";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -9,16 +8,16 @@ import type { SubmitHandler } from "react-hook-form";
 
 import {
   Button,
-  X as CloseIcon,
   Divider,
-  Email,
   EmailField,
-  EyeOff,
   FacebookAuthButton,
   GoogleAuthButton,
   PasswordField,
   TwitterAuthButton,
 } from "@votewise/ui";
+import { FiX as CloseIcon, FiMail as Email, FiEyeOff as EyeOff } from "@votewise/ui/icons";
+
+import { axioInstance } from "lib/axios";
 
 type AuthFormProps = {
   title: string;
@@ -57,7 +56,7 @@ export function AuthForm(props: AuthFormProps) {
   };
 
   const authenticate: SubmitHandler<FormValues> = async (data) => {
-    const url = type === "signup" ? "/signup" : "/login";
+    const url = type === "signup" ? "/signup" : "/signin";
     try {
       await axioInstance.post(url, data);
       router.push("/onboarding");
@@ -77,7 +76,7 @@ export function AuthForm(props: AuthFormProps) {
           <div className="flex items-center justify-between text-red-600">
             <p>{errors.apiError.message}</p>
             <button type="button" onClick={resetErrors}>
-              <CloseIcon />
+              <CloseIcon className="text-gray-500" />
             </button>
           </div>
         )}
@@ -96,7 +95,7 @@ export function AuthForm(props: AuthFormProps) {
               placeholder="johndoe@gmail.com"
               required
             >
-              <Email className="absolute right-4 top-1/2 -translate-y-1/2" />
+              <Email className="absolute right-4 top-1/2 h-6 w-6 -translate-y-1/2 text-gray-500" />
             </EmailField>
             <PasswordField
               label="Password"
@@ -112,7 +111,7 @@ export function AuthForm(props: AuthFormProps) {
                 },
               })}
             >
-              <EyeOff className="absolute right-4 top-1/2 -translate-y-1/2" />
+              <EyeOff className="absolute right-4 top-1/2 h-6 w-6 -translate-y-1/2 text-gray-500" />
             </PasswordField>
 
             <div className="flex w-full items-center justify-between">

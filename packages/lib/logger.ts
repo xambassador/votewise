@@ -22,7 +22,9 @@ const pinoInit = pino({
   },
 });
 
-const logger = (text: unknown, level = "info") => {
+type LoggerLevel = "info" | "error" | "warn" | "debug";
+
+const logger = (text: unknown, level: LoggerLevel = "info") => {
   const isTestEnv = process.env.NODE_ENV === "test";
   if (isTestEnv) {
     return;

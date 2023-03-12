@@ -1,15 +1,18 @@
-import type { AppProps } from "next/app";
-import "styles/globals.css";
-
-import type { NextPage } from "next";
-
-import type { ReactElement, ReactNode } from "react";
-import React from "react";
+import "nprogress/nprogress.css";
 import "react-lazy-load-image-component/src/effects/black-and-white.css";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import "react-lazy-load-image-component/src/effects/opacity.css";
+import "styles/globals.css";
+
+import type { NextPage } from "next";
+import type { AppProps } from "next/app";
+
+import type { ReactElement, ReactNode } from "react";
+import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
+
+import { ProgressBar } from "components";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +24,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
   return getLayout(
     <QueryClientProvider client={queryClient}>
+      <ProgressBar />
       <Component {...pageProps} />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

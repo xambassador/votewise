@@ -1,15 +1,22 @@
 import axios from "axios";
 import type { AxiosResponse } from "axios";
 import cookie from "cookie";
-import { getProxyHeaders } from "lib";
 
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { AUTH_ROUTE_V1, REGISTER_USER_V1 } from "@votewise/lib";
+import { logger } from "@votewise/lib/logger";
 import type { RegisterUserPayload } from "@votewise/types";
+
+import { getProxyHeaders } from "server/lib/getProxyHeaders";
 
 const baseUrl = `${process.env.BACKEND_URL}`;
 const apiEndpoint = `${baseUrl}${AUTH_ROUTE_V1}${REGISTER_USER_V1}`;
+const { COOKIE_ACCESS_TOKEN_KEY, COOKIE_REFRESH_TOKEN_KEY } = process.env;
+
+if (!COOKIE_ACCESS_TOKEN_KEY || !COOKIE_REFRESH_TOKEN_KEY) {
+  throw new Error("Missing COOKIE_ACCESS_TOKEN_KEY or COOKIE_REFRESH_TOKEN_KEY");
+}
 
 type BodyPayload = RegisterUserPayload & {
   rememberMe: boolean;
@@ -33,14 +40,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
     const maxAge = rememberMe ? 60 * 60 * 24 * 7 : 60 * 60 * 24;
     res.setHeader("Set-Cookie", [
-      cookie.serialize("votewise-utoken", response.data.data.accessToken, {
+      cookie.serialize(COOKIE_ACCESS_TOKEN_KEY as string, response.data.data.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
         maxAge,
         path: "/",
       }),
-      cookie.serialize("votewise-rtoken", response.data.data.refreshToken, {
+      cookie.serialize(COOKIE_REFRESH_TOKEN_KEY as string, response.data.data.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
@@ -57,6 +64,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(status).json(data);
   } catch (err: any) {
+    logger(err.response.data, "error");
     const status = err.response.status || 500;
     const data = err.response.data || { message: "Something went wrong" };
     return res.status(status).json(data);

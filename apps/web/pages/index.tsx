@@ -1,3 +1,9 @@
+import Link from "next/link";
+
+import React from "react";
+
+import { FiMessageCircle as Message, FiSend as Sent, FiThumbsUp as Upvote } from "@votewise/ui/icons";
+
 import {
   ButtonGroup,
   Layout,
@@ -9,11 +15,6 @@ import {
   PostTitle,
   PostUserPill,
 } from "components";
-import Link from "next/link";
-
-import React from "react";
-
-import { Message, Sent, Upvote } from "@votewise/ui";
 
 const imgs = [
   { src: "https://images.unsplash.com/photo-1677869274156-d3da0d0addb5" },

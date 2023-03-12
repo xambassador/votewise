@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 import React from "react";
 
 import { classNames } from "@votewise/lib";
-import { Avatar, Clock, Image, MapPin } from "@votewise/ui";
+import { Avatar, Image } from "@votewise/ui";
+import { FiClock as Clock, FiMapPin as MapPin } from "@votewise/ui/icons";
 
 export function PostMapPinIcon({ className = "" }) {
   return <MapPin className={className} />;

@@ -2,7 +2,13 @@ import Link from "next/link";
 
 import React from "react";
 
-import { Bell, Group, Home, SearchField, Trending } from "@votewise/ui";
+import { SearchField } from "@votewise/ui";
+import {
+  FiBell as Bell,
+  FiUsers as Group,
+  FiHome as Home,
+  FiTrendingUp as Trending,
+} from "@votewise/ui/icons";
 
 import { Logo } from "./Logo";
 import { UserPill } from "./UserPill";

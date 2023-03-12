@@ -7,3 +7,4 @@ export * from "./Navbar";
 export * from "./Logo";
 export * from "./UserPill";
 export * from "./post";
+export * from "./Progressbar";

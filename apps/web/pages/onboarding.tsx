@@ -1,13 +1,15 @@
-import { AuthScreenLayout, IllustrationSection, StepOne, StepTwo } from "components";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { onboardUser } from "services";
 
 import React, { useCallback, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 
 import { AvatarUploader, Button, CoverUploader } from "@votewise/ui";
+
+import { AuthScreenLayout, IllustrationSection, StepOne, StepTwo } from "components";
+
+import { onboardUser } from "services/user";
 
 import type { NextPageWithLayout } from "./_app";
 

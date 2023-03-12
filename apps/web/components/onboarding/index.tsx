@@ -1,11 +1,12 @@
-import { useDebounce } from "lib";
-import { checkUsernameAvailability } from "services";
-
 import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { useQuery } from "react-query";
 
 import { Loader, SelectField, TextAreaField, TextField } from "@votewise/ui";
+
+import { useDebounce } from "lib/hooks/useDebounce";
+
+import { checkUsernameAvailability } from "services/user";
 
 const options = [
   { value: "MALE", label: "Male" },

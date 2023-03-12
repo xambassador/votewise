@@ -1,4 +1,4 @@
-import { axioInstance } from "lib";
+import { axioInstance } from "lib/axios";
 
 export const checkUsernameAvailability = async (username: string) => {
   const { data } = await axioInstance.get(`usernameAvailable?username=${username}`);

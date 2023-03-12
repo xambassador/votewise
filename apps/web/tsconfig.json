@@ -10,6 +10,7 @@
       "@/routes/*": ["routes/*"],
       "@/store/*": ["store/*"],
       "@/services/*": ["services/*"],
+      "@/server/*": ["server/*"],
       "@votewise/ui/*": ["@votewise/ui/*"]
     }
   },

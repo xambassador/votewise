@@ -1,9 +1,10 @@
 import axios from "axios";
-import { getProxyHeaders } from "lib";
 
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { CHECK_USERNAME_AVAILABILITY_V1, USER_ROUTE_V1 } from "@votewise/lib";
+
+import { getProxyHeaders } from "server/lib/getProxyHeaders";
 
 const baseUrl = `${process.env.BACKEND_URL}`;
 const apiEndpoint = `${baseUrl}${USER_ROUTE_V1}${CHECK_USERNAME_AVAILABILITY_V1}`;

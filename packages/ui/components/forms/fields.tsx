@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form";
 
 import { classNames } from "@votewise/lib";
 
-import { Search as SearchIcon } from "../../icons";
+import { FiSearch as SearchIcon } from "../../icons";
 
 type InputProps = Omit<JSX.IntrinsicElements["input"], "name"> & {
   name: string;
