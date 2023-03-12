@@ -3,7 +3,9 @@ import type { ReactNode } from "react";
 
 import { classNames } from "@votewise/lib";
 
-import { Facebook, Google, Twitter } from "../../icons";
+import { Facebook } from "../../icons/Facebook";
+import { Google } from "../../icons/Google";
+import { Twitter } from "../../icons/Twitter";
 
 type AuthButtonProps = {
   children?: ReactNode;

@@ -4,7 +4,8 @@
     "sideEffects": false,
     "main": "./index.ts",
     "exports": {
-        ".": "./index.ts"
+        ".": "./index.ts",
+        "./icons": "./icons/index.ts"
     },
     "types": "./index.tsx",
     "scripts": {
@@ -30,6 +31,7 @@
         "react-feather": "^2.0.10",
         "react-hook-form": "^7.43.2",
         "react-hot-toast": "^2.4.0",
+        "react-icons": "^4.8.0",
         "react-lazy-load-image-component": "^1.5.6",
         "react-select": "^5.7.0",
         "react-tooltip": "^5.9.0",
