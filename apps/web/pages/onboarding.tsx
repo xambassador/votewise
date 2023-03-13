@@ -1,3 +1,4 @@
+import { GetServerSidePropsContext } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
@@ -8,6 +9,8 @@ import type { SubmitHandler } from "react-hook-form";
 import { AvatarUploader, Button, CoverUploader } from "@votewise/ui";
 
 import { AuthScreenLayout, IllustrationSection, StepOne, StepTwo } from "components";
+
+import { getServerSession } from "server/lib/getServerSession";
 
 import { onboardUser } from "services/user";
 
@@ -119,3 +122,12 @@ const Page: NextPageWithLayout = () => {
 Page.getLayout = (page) => <AuthScreenLayout>{page}</AuthScreenLayout>;
 
 export default Page;
+
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+  const { req, res } = context;
+  const session = getServerSession({ req, res });
+
+  return {
+    props: {},
+  };
+};
