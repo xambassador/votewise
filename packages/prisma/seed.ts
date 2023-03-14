@@ -100,7 +100,7 @@ async function main() {
   await prisma.user.createMany({
     data: users as User[],
   });
-  spinner.succeed(chalk.blue("👯‍♀️ Users created users..."));
+  spinner.succeed(chalk.blue("👯‍♀️ Users created..."));
 
   spinner.start(chalk.blue("📝 Creating posts..."));
   const createdUsersId = await prisma.user.findMany({

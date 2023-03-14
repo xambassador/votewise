@@ -71,7 +71,8 @@ export const getServerSession = async (
         userId: decodeToken(response.data.accessToken).userId as number,
         accessToken: response.data.accessToken,
       };
-    } catch (err) {
+    } catch (err: any) {
+      logger("====> Error refreshing token", err.response.data);
       clearCookies(res);
       return null;
     }
