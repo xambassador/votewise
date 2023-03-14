@@ -1,34 +1,82 @@
-import jsonwebtoken from "jsonwebtoken";
 import type { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from "next";
+import { revokeAccessToken } from "server/services/revokeToken";
 
-const secret = process.env.JWT_SALT_ACCESS_TOKEN_SECRET;
-const tokenKey = process.env.COOKIE_ACCESS_TOKEN_KEY;
-const refreshTokenKey = process.env.COOKIE_REFRESH_TOKEN_KEY;
+import { logger } from "@votewise/lib/logger";
 
-if (!secret || !tokenKey || !refreshTokenKey) {
-  throw new Error("ENV variables not set");
-}
+import { clearCookies } from "./clearCookies";
+import { decodeJwt } from "./decodeJwt";
+import { getCookie } from "./getCookie";
+import { setAuthCookies } from "./setAuthCookies";
 
-// This should be run on the server side only. It will not work on the client side as env variable is not available on client.
-export const getServerSession = (options: {
+type Options = {
   req: NextApiRequest | GetServerSidePropsContext["req"];
   res: NextApiResponse | GetServerSidePropsContext["res"];
-}): { userId: number } | null => {
-  const { req } = options;
-  const { cookies } = req;
-  // TODO: replace cookie key with env variable
-  if (cookies && cookies[tokenKey as string]) {
-    const token = cookies[tokenKey as string] as string;
+};
+
+const decodeToken = (token: string) => {
+  try {
+    const decoded = decodeJwt(token) as { userId: number };
+    return {
+      userId: decoded.userId,
+      accessToken: token,
+      error: null,
+    };
+  } catch (err: any) {
+    return {
+      userId: null,
+      accessToken: null,
+      error: err,
+    };
+  }
+};
+
+export const getServerSession = async (
+  options: Options
+): Promise<{
+  userId: number;
+  accessToken: string;
+} | null> => {
+  const { req, res } = options;
+  const token = getCookie(req, "ACCESS_TOKEN");
+
+  if (!token) {
+    return null;
+  }
+
+  const decoded = decodeToken(token);
+
+  if (!decoded.error) {
+    return {
+      userId: decoded.userId as number,
+      accessToken: token,
+    };
+  }
+
+  if (decoded.error.message === "jwt expired") {
+    const refreshToken = getCookie(req, "REFRESH_TOKEN");
+    if (!refreshToken) {
+      clearCookies(res);
+      return null;
+    }
+
     try {
-      const decoded = jsonwebtoken.verify(token, secret as string);
-      return decoded as { userId: number };
-    } catch (err: any) {
-      const msg = err.message;
-      if (msg === "jwt expired") {
-        // TODO: Refresh token
-      }
+      logger("====> Trying to refresh token");
+      const response = await revokeAccessToken(refreshToken);
+      setAuthCookies(res, {
+        accessToken: response.data.accessToken,
+        refreshToken: response.data.refreshToken,
+      });
+
+      return {
+        userId: decodeToken(response.data.accessToken).userId as number,
+        accessToken: response.data.accessToken,
+      };
+    } catch (err) {
+      clearCookies(res);
       return null;
     }
   }
+
+  clearCookies(res);
   return null;
 };

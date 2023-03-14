@@ -1,19 +1,17 @@
-import axios from "axios";
-
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { CHECK_USERNAME_AVAILABILITY_V1, USER_ROUTE_V1 } from "@votewise/lib";
 
+import { axiosServerInstance } from "server/lib/axios";
 import { getProxyHeaders } from "server/lib/getProxyHeaders";
 
-const baseUrl = `${process.env.BACKEND_URL}`;
-const apiEndpoint = `${baseUrl}${USER_ROUTE_V1}${CHECK_USERNAME_AVAILABILITY_V1}`;
+const apiEndpoint = `${USER_ROUTE_V1}${CHECK_USERNAME_AVAILABILITY_V1}`;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const headers = getProxyHeaders(req);
 
   try {
-    const response = await axios.get(`${apiEndpoint}?username=${req.query.username}`, {
+    const response = await axiosServerInstance.get(`${apiEndpoint}?username=${req.query.username}`, {
       headers,
     });
 

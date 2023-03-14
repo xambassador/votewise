@@ -42,7 +42,7 @@ export default Page;
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const { req, res } = context;
-  const session = getServerSession({ req, res });
+  const session = await getServerSession({ req, res });
   if (session) {
     return {
       redirect: {

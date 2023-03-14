@@ -1,4 +1,6 @@
-import { GetServerSidePropsContext } from "next";
+import cookie from "cookie";
+
+import type { GetServerSidePropsContext } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
@@ -7,11 +9,14 @@ import { FormProvider, useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 
 import { AvatarUploader, Button, CoverUploader } from "@votewise/ui";
+import { FiX as CloseIcon } from "@votewise/ui/icons";
 
 import { AuthScreenLayout, IllustrationSection, StepOne, StepTwo } from "components";
 
+import { getCookie } from "server/lib/getCookie";
 import { getServerSession } from "server/lib/getServerSession";
 
+import { getOnboardingStatus } from "server/services/onboarding";
 import { onboardUser } from "services/user";
 
 import type { NextPageWithLayout } from "./_app";
@@ -37,6 +42,10 @@ const Page: NextPageWithLayout = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const methods = useForm<FormValues>();
+  const {
+    formState: { errors },
+    clearErrors,
+  } = methods;
 
   const handleOnNextClick: SubmitHandler<FormValues> = (data) => {
     const { trigger } = methods;
@@ -49,7 +58,7 @@ const Page: NextPageWithLayout = () => {
             })
             .catch((err: any) => {
               methods.setError("apiError", {
-                message: err.message,
+                message: err.response.data.message,
               });
             });
           return;
@@ -67,6 +76,10 @@ const Page: NextPageWithLayout = () => {
     setIsLoading(loading);
   }, []);
 
+  const resetErrors = () => {
+    clearErrors("apiError");
+  };
+
   return (
     <>
       <div className="flex flex-1 flex-col items-center justify-center">
@@ -82,6 +95,14 @@ const Page: NextPageWithLayout = () => {
               >
                 <div className="flex flex-col gap-5">
                   <div>
+                    {errors.apiError && (
+                      <div className="mb-2 flex items-center justify-center text-red-600">
+                        <p>{errors.apiError.message}</p>
+                        <button type="button" onClick={resetErrors} className="ml-2">
+                          <CloseIcon className="text-gray-500" />
+                        </button>
+                      </div>
+                    )}
                     <h2 className="mb-5 text-center text-3xl font-bold text-gray-800">
                       Tell us more about you
                     </h2>
@@ -125,7 +146,44 @@ export default Page;
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const { req, res } = context;
-  const session = getServerSession({ req, res });
+  const session = await getServerSession({ req, res });
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/signin",
+      },
+    };
+  }
+
+  const { COOKIE_IS_ONBOARDED_KEY } = process.env;
+  const isOnboarded = getCookie(req, "IS_ONBOARDED");
+  if (isOnboarded === "true") {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  const onboarded = await getOnboardingStatus(session.userId, session.accessToken);
+  if (onboarded) {
+    res.setHeader("Set-Cookie", [
+      cookie.serialize(COOKIE_IS_ONBOARDED_KEY as string, "true", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+      }),
+    ]);
+
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
 
   return {
     props: {},

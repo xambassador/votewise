@@ -1,7 +1,7 @@
 import { axioInstance } from "lib/axios";
 
 export const checkUsernameAvailability = async (username: string) => {
-  const { data } = await axioInstance.get(`usernameAvailable?username=${username}`);
+  const { data } = await axioInstance.get(`/usernameAvailable?username=${username}`);
   return data;
 };
 
@@ -15,6 +15,6 @@ export const onboardUser = async (data: {
   instagram: string;
   facebook: string;
 }) => {
-  const { data: responseData } = await axioInstance.post("onboarding", data);
+  const { data: responseData } = await axioInstance.post("/onboarding", data);
   return responseData;
 };

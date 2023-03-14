@@ -1,3 +1,4 @@
+import type { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 
 import React from "react";
@@ -15,6 +16,8 @@ import {
   PostTitle,
   PostUserPill,
 } from "components";
+
+import { getServerSession } from "server/lib/getServerSession";
 
 const imgs = [
   { src: "https://images.unsplash.com/photo-1677869274156-d3da0d0addb5" },
@@ -107,3 +110,22 @@ export default function Home() {
     </Layout>
   );
 }
+
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+  const { req, res } = context;
+
+  const session = await getServerSession({ req, res });
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/signin",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
+};

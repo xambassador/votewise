@@ -1,4 +1,3 @@
-import axios from "axios";
 import type { AxiosResponse } from "axios";
 import cookie from "cookie";
 
@@ -8,15 +7,11 @@ import { AUTH_ROUTE_V1, REGISTER_USER_V1 } from "@votewise/lib";
 import { logger } from "@votewise/lib/logger";
 import type { RegisterUserPayload } from "@votewise/types";
 
+import { axiosServerInstance } from "server/lib/axios";
 import { getProxyHeaders } from "server/lib/getProxyHeaders";
 
-const baseUrl = `${process.env.BACKEND_URL}`;
-const apiEndpoint = `${baseUrl}${AUTH_ROUTE_V1}${REGISTER_USER_V1}`;
+const apiEndpoint = `${AUTH_ROUTE_V1}${REGISTER_USER_V1}`;
 const { COOKIE_ACCESS_TOKEN_KEY, COOKIE_REFRESH_TOKEN_KEY, COOKIE_IS_ONBOARDED_KEY } = process.env;
-
-if (!COOKIE_ACCESS_TOKEN_KEY || !COOKIE_REFRESH_TOKEN_KEY || !COOKIE_IS_ONBOARDED_KEY) {
-  throw new Error("ENV variables not set.");
-}
 
 type BodyPayload = RegisterUserPayload & {
   rememberMe: boolean;
@@ -35,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const headers = getProxyHeaders(req);
 
   try {
-    const response = await axios.post<RegisterUserPayload, Response>(apiEndpoint, payload, {
+    const response = await axiosServerInstance.post<RegisterUserPayload, Response>(apiEndpoint, payload, {
       headers,
     });
     const maxAge = rememberMe ? 60 * 60 * 24 * 7 : 60 * 60 * 24;
@@ -58,7 +53,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge,
         path: "/",
       }),
     ]);
