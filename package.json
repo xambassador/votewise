@@ -19,7 +19,8 @@
     "db:studio": "lerna exec --scope @votewise/prisma -- yarn run db:studio",
     "db:seed": "lerna exec --scope @votewise/prisma -- yarn run db:seed",
     "clean": "lerna clean --yes && rm -rf node_modules",
-    "dev": "lerna run dev --parallel --stream --no-bail --scope @votewise/web --scope @votewise/server",
+    "dev": "lerna run dev --parallel --stream --no-bail --scope @votewise/web --scope @votewise/server --scope @votewise/static-server & npm run static-server & wait",
+    "static-server": "node ./scripts/run-static-server.js",
     "predev": "dotenv-checker --schema .env.example --env .env"
   },
   "devDependencies": {
