@@ -14,7 +14,6 @@ child.stdout.on("data", (data) => {
 
 child.stderr.on("data", (data) => {
   console.log(`stderr: ${data}`);
-  // log to lerna log
 });
 
 child.on("close", (code) => {
