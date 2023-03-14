@@ -25,7 +25,7 @@ export function Navbar() {
             <li>
               <Link href="/" className="bg-black-900 flex items-center gap-2 rounded-full p-3 text-gray-50">
                 <span>
-                  <Home stroke="#F3F4F6" />
+                  <Home className="h-6 w-6 text-gray-50" />
                 </span>
                 <span className="font-medium text-gray-50">Home</span>
               </Link>
@@ -33,14 +33,14 @@ export function Navbar() {
             <li>
               <Link href="/" className="inline-block rounded-full p-3 transition-all hover:bg-gray-50">
                 <span>
-                  <Trending />
+                  <Trending className="h-6 w-6 text-gray-800" />
                 </span>
               </Link>
             </li>
             <li>
               <Link href="/" className="inline-block rounded-full p-3 transition-all hover:bg-gray-50">
                 <span>
-                  <Group />
+                  <Group className="h-6 w-6 text-gray-800" />
                 </span>
               </Link>
             </li>
@@ -55,7 +55,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-4">
           <button type="button">
-            <Bell />
+            <Bell className="h-6 w-6 text-gray-800" />
           </button>
           <UserPill
             username="Selma knight"

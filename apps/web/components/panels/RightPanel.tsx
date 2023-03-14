@@ -63,7 +63,7 @@ export function UserInfo() {
         </ul>
 
         <Button className="mt-2 gap-2 py-3">
-          <Edit />
+          <Edit className="h-5 w-5" />
           <span>Create Post</span>
         </Button>
       </div>
@@ -87,7 +87,7 @@ export function UserRecommendations() {
               }}
             />
             <button type="button">
-              <UserPlus />
+              <UserPlus className="h-6 w-6 text-gray-500" />
             </button>
           </li>
         </ul>
