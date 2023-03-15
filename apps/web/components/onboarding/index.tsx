@@ -16,7 +16,7 @@ const options = [
 
 export function StepOne({ onFetchingUsername }: { onFetchingUsername: (isLoading: boolean) => void }) {
   const { register, control, watch } = useFormContext();
-  const debouncedUsername = useDebounce(watch("username"), 1000);
+  const debouncedUsername = useDebounce(watch("username"), 500);
   const { data, isLoading, isSuccess } = useQuery<{
     // TODO: Move response type to service
     message: string;

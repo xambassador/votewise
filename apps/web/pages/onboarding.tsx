@@ -8,10 +8,14 @@ import React, { useCallback, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 
-import { AvatarUploader, Button, CoverUploader } from "@votewise/ui";
+import { Button } from "@votewise/ui";
 import { FiX as CloseIcon } from "@votewise/ui/icons";
 
-import { AuthScreenLayout, IllustrationSection, StepOne, StepTwo } from "components";
+import { AuthScreenLayout } from "components/AuthScreenLayout";
+import { IllustrationSection } from "components/IllustrationSection";
+import { StepOne, StepTwo } from "components/onboarding";
+import { AvatarPicker } from "components/onboarding/AvatarPicker";
+import { CoverPicker } from "components/onboarding/CoverPicker";
 
 import { getCookie } from "server/lib/getCookie";
 import { getServerSession } from "server/lib/getServerSession";
@@ -35,16 +39,20 @@ type FormValues = {
   instagram: string;
   facebook: string;
   apiError: string;
+  profile_image: string;
+  cover_image: string;
 };
 
 const Page: NextPageWithLayout = () => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+
   const methods = useForm<FormValues>();
   const {
     formState: { errors },
     clearErrors,
+    setValue,
   } = methods;
 
   const handleOnNextClick: SubmitHandler<FormValues> = (data) => {
@@ -80,6 +88,13 @@ const Page: NextPageWithLayout = () => {
     clearErrors("apiError");
   };
 
+  const handleOnUploadSuccess = (url: string, type: "profile" | "cover") => {
+    if (type === "profile") {
+      setValue("profile_image", url);
+    }
+    setValue("cover_image", url);
+  };
+
   return (
     <>
       <div className="flex flex-1 flex-col items-center justify-center">
@@ -107,9 +122,12 @@ const Page: NextPageWithLayout = () => {
                       Tell us more about you
                     </h2>
 
-                    {/* TODO: Move Avatar picker and Cover picker to UI package */}
-                    {currentStep === 1 && <AvatarUploader />}
-                    {currentStep === 2 && <CoverUploader />}
+                    {currentStep === 1 && (
+                      <AvatarPicker onSuccess={(url) => handleOnUploadSuccess(url, "profile")} />
+                    )}
+                    {currentStep === 2 && (
+                      <CoverPicker onSuccess={(url) => handleOnUploadSuccess(url, "cover")} />
+                    )}
                   </div>
 
                   <div className="flex flex-col gap-5">
