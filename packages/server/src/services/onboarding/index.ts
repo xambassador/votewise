@@ -27,6 +27,9 @@ class OnboardingService {
           ...payload,
           onboarded: true,
         },
+        select: {
+          password: false,
+        },
       });
       return user;
     } catch (err) {

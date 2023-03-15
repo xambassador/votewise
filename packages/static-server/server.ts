@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 import express from "express";
 import fs from "fs";
 import { promisify } from "util";
-import uuid from "uuid";
+import { v4 } from "uuid";
 
 import { logger } from "@votewise/lib/logger";
 
@@ -17,6 +17,7 @@ const getFileInfo = promisify(fs.stat);
 
 // ----------
 const port = process.env.STATIC_UPLOAD_SERVER_PORT || 8001;
+const staticServerPort = process.env.STATIC_WEB_SERVER_PORT || 8787;
 
 // ----------
 const app = express();
@@ -48,7 +49,7 @@ app.post("/handshake", (req, res) => {
 
   const fileName = req.body.fileName;
   // ----- Token
-  const fileToken = uuid.v4();
+  const fileToken = v4();
   // ----- Creating empty file
   fs.createWriteStream(getFilePath(fileName, fileToken), {
     flags: "w",
@@ -65,6 +66,7 @@ app.post("/handshake", (req, res) => {
 /**
  * @route POST /upload
  * Upload file to server.
+ * Need to pass x-file-token and content-range headers. Token can be obtained from /handshake route.
  */
 app.post("/upload", async (req, res) => {
   const contentRange = req.headers["content-range"];
@@ -115,19 +117,11 @@ app.post("/upload", async (req, res) => {
     return res.sendStatus(500);
   });
 
-  bb.on("finish", () => {
-    return res.status(200).json({
-      message: "File uploaded successfully",
-      success: true,
-      data: {
-        url: `${req.protocol}://${req.hostname}:${port}/upload-${token}-${req.query.filename}`,
-      },
-      error: null,
-    });
-  });
+  let fileName: string;
 
   bb.on("file", async (_, file, info) => {
     const { filename } = info;
+    fileName = filename;
     const filepath = getFilePath(filename, token as string);
     try {
       const stats = await getFileInfo(filepath);
@@ -149,6 +143,17 @@ app.post("/upload", async (req, res) => {
         success: false,
       });
     }
+  });
+
+  bb.on("finish", () => {
+    return res.status(200).json({
+      message: "File uploaded successfully",
+      success: true,
+      data: {
+        // We delegate the serving of the file to the client to rust static-web-server, which is running on port 8787
+        url: `${req.protocol}://${req.hostname}:${staticServerPort}/upload-${token}-${fileName}`,
+      },
+    });
   });
 
   req.pipe(bb);
@@ -188,10 +193,10 @@ app.get("/upload-status", (req, res) => {
 
 // ----------
 /**
- * @route DELETE /delete-upload
+ * @route DELETE /upload
  * Perform cleanup of the file from disk.
  */
-app.delete("/delete-upload", (req, res) => {
+app.delete("/upload", (req, res) => {
   if (!req.query || !req.query.token || !req.query.filename) {
     return res.status(400).json({
       message: "Missing token or fileName in query params",
