@@ -31,7 +31,7 @@ type FormValues = {
   username: string;
   name: string;
   gender: {
-    value: string;
+    value: "MALE" | "FEMALE" | "OTHER";
   };
   about: string;
   location: string;
@@ -47,6 +47,7 @@ const Page: NextPageWithLayout = () => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState<"idle" | "pending" | "resolved" | "rejected">("idle");
 
   const methods = useForm<FormValues>();
   const {
@@ -60,14 +61,17 @@ const Page: NextPageWithLayout = () => {
     trigger().then((isValid) => {
       if (isValid) {
         if (currentStep === TOTAL_STEPS) {
+          setStatus("pending");
           onboardUser({ ...data, gender: data.gender.value })
             .then(() => {
               router.push("/");
+              setStatus("resolved");
             })
             .catch((err: any) => {
               methods.setError("apiError", {
                 message: err.response.data.message,
               });
+              setStatus("rejected");
             });
           return;
         }
@@ -137,8 +141,12 @@ const Page: NextPageWithLayout = () => {
                 </div>
 
                 <div>
-                  <Button type="submit" disabled={isLoading}>
-                    Next
+                  <Button
+                    type="submit"
+                    isLoading={status === "pending"}
+                    disabled={isLoading || status === "pending"}
+                  >
+                    {currentStep === TOTAL_STEPS ? "Finish" : "Next"}
                   </Button>
                   {currentStep !== 1 && (
                     <Button className="bg-transparent text-gray-600" onClick={handleOnPrevious}>

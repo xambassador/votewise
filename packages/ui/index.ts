@@ -8,3 +8,5 @@ export * from "./components/Avatar";
 export * from "./components/Tabs";
 export * from "./components/Badge";
 export * from "./components/Loader";
+
+export * from "./components/skeleton"

@@ -1,20 +1,40 @@
+import type { AxiosResponse } from "axios";
+
+import type {
+  MyDetailsResponse,
+  OnboardingPayload,
+  OnboardingResponse,
+  UsernameAvailableResponse,
+} from "@votewise/types";
+
 import { axioInstance } from "lib/axios";
 
+/**
+ *
+ * @description Check if a username is available
+ * @param username Username to check availability for
+ * @returns
+ */
 export const checkUsernameAvailability = async (username: string) => {
-  const { data } = await axioInstance.get(`/usernameAvailable?username=${username}`);
-  return data;
+  const response: AxiosResponse<UsernameAvailableResponse> = await axioInstance.get(
+    `/usernameAvailable?username=${username}`
+  );
+  return response.data;
 };
 
-export const onboardUser = async (data: {
-  username: string;
-  name: string;
-  gender: string;
-  about: string;
-  location: string;
-  twitter: string;
-  instagram: string;
-  facebook: string;
-}) => {
-  const { data: responseData } = await axioInstance.post("/onboarding", data);
-  return responseData;
+/**
+ *
+ * @description Onboard a user
+ */
+export const onboardUser = async (data: OnboardingPayload) => {
+  const response: AxiosResponse<OnboardingResponse> = await axioInstance.post("/onboarding", data);
+  return response.data;
+};
+
+/**
+ * @description Get user information
+ */
+export const getMyDetails = async () => {
+  const response: AxiosResponse<MyDetailsResponse> = await axioInstance.get("/me");
+  return response.data;
 };

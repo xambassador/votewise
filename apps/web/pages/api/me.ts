@@ -1,18 +1,14 @@
-import cookie from "cookie";
 import httpStatusCodes from "http-status-codes";
 
 import type { NextApiRequest, NextApiResponse } from "next";
-
-import { logger } from "@votewise/lib/logger";
-import type { OnboardingPayload } from "@votewise/types";
 
 import { getProxyHeaders } from "server/lib/getProxyHeaders";
 import { getServerSession } from "server/lib/getServerSession";
 import { UNAUTHORIZED_RESPONSE } from "server/lib/response";
 
-import { onboardUser } from "server/services/onboarding";
+import { getMyDetails } from "server/services/user";
 
-const { COOKIE_IS_ONBOARDED_KEY } = process.env;
+const { UNAUTHORIZED } = httpStatusCodes;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const headers = getProxyHeaders(req);
@@ -20,30 +16,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const session = await getServerSession({ req, res });
     if (!session) {
-      return res.status(httpStatusCodes.UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
+      return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
     }
-    const { userId, accessToken } = session;
-    const response = await onboardUser(userId, {
-      token: accessToken,
-      payload: req.body as OnboardingPayload,
-      headers,
-    });
+
+    const response = await getMyDetails(session.accessToken, { headers });
+
     const { headers: responseHeaders, data, status } = response;
     Object.entries(responseHeaders).forEach((keyArr) => {
       const [key, value] = keyArr;
       res.setHeader(key, value);
     });
-    res.setHeader("Set-Cookie", [
-      cookie.serialize(COOKIE_IS_ONBOARDED_KEY as string, "true", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        path: "/",
-      }),
-    ]);
+
     return res.status(status).json(data);
   } catch (err: any) {
-    logger(err.response, "error");
     const status = err.response.status || 500;
     const data = err.response.data || { message: "Something went wrong" };
     return res.status(status).json(data);

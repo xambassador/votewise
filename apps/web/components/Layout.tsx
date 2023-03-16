@@ -2,8 +2,9 @@ import React from "react";
 import type { ReactNode } from "react";
 
 import { Navbar } from "./Navbar";
+import { UserInfo } from "./UserInfo";
 import { LeftPanel } from "./panels/LeftPanel";
-import { RightPanel, UserInfo, UserRecommendations } from "./panels/RightPanel";
+import { RightPanel, UserRecommendations } from "./panels/RightPanel";
 
 type Props = {
   children: ReactNode;

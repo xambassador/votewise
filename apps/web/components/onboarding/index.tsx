@@ -1,7 +1,10 @@
+import type { AxiosError } from "axios";
+
 import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { useQuery } from "react-query";
 
+import type { ErrorResponse } from "@votewise/types";
 import { Loader, SelectField, TextAreaField, TextField } from "@votewise/ui";
 
 import { useDebounce } from "lib/hooks/useDebounce";
@@ -17,18 +20,13 @@ const options = [
 export function StepOne({ onFetchingUsername }: { onFetchingUsername: (isLoading: boolean) => void }) {
   const { register, control, watch } = useFormContext();
   const debouncedUsername = useDebounce(watch("username"), 500);
-  const { data, isLoading, isSuccess } = useQuery<{
-    // TODO: Move response type to service
-    message: string;
-    success: boolean;
-    data: {
-      message: string;
-      username: string;
-    };
-    error: null;
-  }>(["checkUsernameAvailability", debouncedUsername], () => checkUsernameAvailability(debouncedUsername), {
+  const { data, isLoading, isSuccess, isError, error } = useQuery<
+    Awaited<ReturnType<typeof checkUsernameAvailability>>,
+    AxiosError<ErrorResponse>
+  >(["checkUsernameAvailability", debouncedUsername], () => checkUsernameAvailability(debouncedUsername), {
     refetchOnWindowFocus: false,
     enabled: !!debouncedUsername,
+    retry: false,
   });
 
   useEffect(() => {
@@ -54,6 +52,9 @@ export function StepOne({ onFetchingUsername }: { onFetchingUsername: (isLoading
           </div>
         )}
         {isSuccess && <span className="text-sm text-green-600">{data.data.message}</span>}
+        {isError && error && (
+          <span className="text-sm text-red-600">{error.response?.data.error.message}</span>
+        )}
       </TextField>
 
       <TextField

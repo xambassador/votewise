@@ -2,16 +2,11 @@
  * @file: authTypes.ts
  * @description: This file contains types that are shared between the server and client
  */
+import type { BaseResponse } from "./base";
 
 type RegisterUserPayload = {
   email: string;
   password: string;
-};
-
-type BaseResponse = {
-  success: boolean;
-  message: string;
-  error: null;
 };
 
 type RegisterUserResponse = {

@@ -21,7 +21,8 @@ export const axiosServerInstance = axios.create({
 });
 
 /**
- *
+ * @description: Axios instance for NextJS API routes and server side code. This must be used in server side only.
+ * This is used to make API calls to the backend server. Don't make API calls to NextJS API routes using this instance.
  * @param token JWT token
  * @returns Axios instance with Authorization header set
  */
@@ -31,6 +32,7 @@ export const getAxiosServerWithAuth = (token: string) => {
 };
 
 axiosServerInstance.interceptors.request.use((config) => {
+  logger("========== Axios Server Instance ==========");
   logger(`====> Request: ${config.method} ${config.url} Body payload:====> ${JSON.stringify(config.data)}`);
   return config;
 });
