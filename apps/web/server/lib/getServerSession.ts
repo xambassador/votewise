@@ -13,6 +13,11 @@ type Options = {
   res: NextApiResponse | GetServerSidePropsContext["res"];
 };
 
+/**
+ * @description Decode access token
+ * @param token Access token
+ * @returns
+ */
 const decodeToken = (token: string) => {
   try {
     const decoded = decodeJwt(token) as { userId: number };
@@ -30,6 +35,12 @@ const decodeToken = (token: string) => {
   }
 };
 
+/**
+ * @description Check if user is authenticated or not. It will also refresh the token if it is expired
+ * @param options
+ * @returns User id and access token if user is authenticated. Otherwise, null is user is not authenticated or token is expired and cannot be refreshed
+ * It will also set the cookies if token is refreshed successfully. Otherwise, it will clear the cookies
+ */
 export const getServerSession = async (
   options: Options
 ): Promise<{

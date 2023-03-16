@@ -4,6 +4,10 @@ import type { GetServerSidePropsContext, NextApiResponse } from "next";
 const tokenKey = process.env.COOKIE_ACCESS_TOKEN_KEY;
 const refreshTokenKey = process.env.COOKIE_REFRESH_TOKEN_KEY;
 
+/**
+ * @description Set auth cookies to response
+ * @param res NextApiResponse
+ */
 export function setAuthCookies(
   res: GetServerSidePropsContext["res"] | NextApiResponse,
   {
