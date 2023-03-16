@@ -1,12 +1,15 @@
 import type { AxiosError } from "axios";
+import { useStore } from "zustand";
 
-import React from "react";
+import React, { useEffect } from "react";
 import type { ReactNode } from "react";
 import { useQuery } from "react-query";
 
 import type { ErrorResponse } from "@votewise/types";
 import { Avatar, Button, Image } from "@votewise/ui";
 import { FiEdit as Edit } from "@votewise/ui/icons";
+
+import store from "lib/store";
 
 import { getMyDetails } from "services/user";
 
@@ -46,15 +49,22 @@ const fetcher = () => getMyDetails();
 type Response = Awaited<ReturnType<typeof fetcher>>;
 
 export function UserInfo() {
-  const { isLoading, isError, data, error } = useQuery<Response, AxiosError<ErrorResponse>>(
-    "user-info",
-    fetcher
-  );
+  const { data, error, status } = useQuery<Response, AxiosError<ErrorResponse>>("user-info", fetcher);
+
+  const setUser = useStore(store, (state) => state.setUser);
+  const setStatus = useStore(store, (state) => state.setStatus);
+
+  useEffect(() => {
+    setStatus(status);
+    if (data) {
+      setUser(data.data.user);
+    }
+  }, [data, setStatus, setUser, status]);
 
   return (
     <Wrapper>
-      {isLoading && <UserInfoSkeleton />}
-      {!isLoading && !isError && (
+      {status === "loading" && <UserInfoSkeleton />}
+      {status === "success" && (
         <div className="flex w-full flex-col">
           <UserAvatarWithBanner avatar={data?.data.user.profile_image} banner={data?.data.user.cover_image} />
           <div className="mt-8 text-center">
@@ -85,7 +95,7 @@ export function UserInfo() {
           </Button>
         </div>
       )}
-      {isError && (
+      {status === "error" && (
         <div>
           <h2 className="text-center text-red-600">{error.response?.data.error.message}</h2>
         </div>

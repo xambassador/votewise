@@ -8,7 +8,7 @@ import React, { useCallback, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 
-import { Button } from "@votewise/ui";
+import { Button, makeToast } from "@votewise/ui";
 import { FiX as CloseIcon } from "@votewise/ui/icons";
 
 import { AuthScreenLayout } from "components/AuthScreenLayout";
@@ -66,6 +66,7 @@ const Page: NextPageWithLayout = () => {
             .then(() => {
               router.push("/");
               setStatus("resolved");
+              makeToast("User onboarded successfully", "success");
             })
             .catch((err: any) => {
               methods.setError("apiError", {

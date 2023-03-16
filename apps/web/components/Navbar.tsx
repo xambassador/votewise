@@ -1,8 +1,10 @@
+import { useStore } from "zustand";
+
 import Link from "next/link";
 
 import React from "react";
 
-import { SearchField } from "@votewise/ui";
+import { SearchField, Skeleton, SkeletonContainer } from "@votewise/ui";
 import {
   FiBell as Bell,
   FiUsers as Group,
@@ -10,8 +12,39 @@ import {
   FiTrendingUp as Trending,
 } from "@votewise/ui/icons";
 
+import store from "lib/store";
+
 import { Logo } from "./Logo";
 import { UserPill } from "./UserPill";
+
+function UserInfoBoxSkeleton() {
+  return (
+    <SkeletonContainer className="flex items-center">
+      <Skeleton as="div" className="mr-2 h-12 w-12 rounded-full" />
+      <Skeleton as="div" className="h-4 w-28 rounded-lg" />
+    </SkeletonContainer>
+  );
+}
+
+function UserInfoBox() {
+  const user = useStore(store, (state) => state.user);
+  const status = useStore(store, (state) => state.status);
+
+  return (
+    <>
+      <button type="button">
+        <Bell className="h-6 w-6 text-gray-800" />
+      </button>
+      {status === "loading" && <UserInfoBoxSkeleton />}
+      {status === "success" && user && (
+        <UserPill
+          username={user.name}
+          src={user.profile_image || "https://images.unsplash.com/photo-1438761681033-6461ffad8d80"}
+        />
+      )}
+    </>
+  );
+}
 
 export function Navbar() {
   return (
@@ -54,13 +87,7 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          <button type="button">
-            <Bell className="h-6 w-6 text-gray-800" />
-          </button>
-          <UserPill
-            username="Selma knight"
-            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
-          />
+          <UserInfoBox />
         </div>
       </div>
     </nav>

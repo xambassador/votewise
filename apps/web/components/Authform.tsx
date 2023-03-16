@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-import React from "react";
+import React, { useState } from "react";
 import type { ReactNode } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 
 import {
+  Alert,
   Button,
   Divider,
   EmailField,
@@ -15,7 +16,7 @@ import {
   PasswordField,
   TwitterAuthButton,
 } from "@votewise/ui";
-import { FiX as CloseIcon, FiMail as Email, FiEyeOff as EyeOff } from "@votewise/ui/icons";
+import { FiX as CloseIcon, FiMail as Email, FiEyeOff as EyeOff, FiEye as EyeOn } from "@votewise/ui/icons";
 
 import { axioInstance } from "lib/axios";
 
@@ -33,6 +34,39 @@ type FormValues = {
   rememberMe: boolean;
   apiError: string;
 };
+
+// Separate component for password field to isolate re-rendering
+function Password() {
+  const { register } = useFormContext<FormValues>();
+  const [toggle, setToggle] = useState(false);
+
+  return (
+    <PasswordField
+      label="Password"
+      type={toggle ? "text" : "password"}
+      {...register("password", {
+        required: "Password is required",
+        minLength: {
+          value: 8,
+          message: "Password must have at least 8 characters",
+        },
+        maxLength: {
+          value: 20,
+          message: "Password must have at most 20 characters",
+        },
+      })}
+    >
+      <button
+        className="absolute right-4 top-1/2 -translate-y-1/2"
+        type="button"
+        onClick={() => setToggle(!toggle)}
+      >
+        {toggle && <EyeOn className="h-6 w-6 text-gray-500" />}
+        {!toggle && <EyeOff className="h-6 w-6 text-gray-500" />}
+      </button>
+    </PasswordField>
+  );
+}
 
 export function AuthForm(props: AuthFormProps) {
   const {
@@ -61,7 +95,7 @@ export function AuthForm(props: AuthFormProps) {
       await axioInstance.post(url, data);
       router.push("/onboarding");
     } catch (err: any) {
-      const msg = err.response.data.message || "Something went wrong";
+      const msg = err.response?.data.error.message || "Something went wrong";
       methods.setError("apiError", { message: msg });
     }
   };
@@ -73,12 +107,17 @@ export function AuthForm(props: AuthFormProps) {
         onSubmit={methods.handleSubmit(authenticate)}
       >
         {errors.apiError && (
-          <div className="flex items-center justify-between text-red-600">
-            <p>{errors.apiError.message}</p>
+          <Alert
+            type="error"
+            showBorder={false}
+            accent
+            contentWrapperProps={{ className: "flex items-center justify-between w-full ml-3" }}
+          >
+            <p className="text-red-900">{errors.apiError.message}</p>
             <button type="button" onClick={resetErrors}>
               <CloseIcon className="text-gray-500" />
             </button>
-          </div>
+          </Alert>
         )}
         <div className="flex flex-col gap-5">
           <div>
@@ -97,22 +136,8 @@ export function AuthForm(props: AuthFormProps) {
             >
               <Email className="absolute right-4 top-1/2 h-6 w-6 -translate-y-1/2 text-gray-500" />
             </EmailField>
-            <PasswordField
-              label="Password"
-              {...register("password", {
-                required: "Password is required",
-                minLength: {
-                  value: 8,
-                  message: "Password must have at least 8 characters",
-                },
-                maxLength: {
-                  value: 20,
-                  message: "Password must have at most 20 characters",
-                },
-              })}
-            >
-              <EyeOff className="absolute right-4 top-1/2 h-6 w-6 -translate-y-1/2 text-gray-500" />
-            </PasswordField>
+
+            <Password />
 
             <div className="flex w-full items-center justify-between">
               <div className="flex items-center">
@@ -142,9 +167,9 @@ export function AuthForm(props: AuthFormProps) {
         <Divider>Or</Divider>
 
         <div className="flex flex-col gap-3">
-          <GoogleAuthButton />
-          <FacebookAuthButton />
-          <TwitterAuthButton />
+          <GoogleAuthButton type="button" />
+          <FacebookAuthButton type="button" />
+          <TwitterAuthButton type="button" />
         </div>
       </form>
     </FormProvider>

@@ -102,7 +102,13 @@ export const TextField = forwardRef<HTMLInputElement, InputFieldProps>((props, r
 ));
 
 export const PasswordField = forwardRef<HTMLInputElement, InputFieldProps>((props, ref) => (
-  <InputField data-testid="password" type="password" placeholder="•••••••••••••" ref={ref} {...props} />
+  <InputField
+    data-testid="password"
+    type={props.type || "password"}
+    placeholder="•••••••••••••"
+    ref={ref}
+    {...props}
+  />
 ));
 
 export const EmailInput = forwardRef<HTMLInputElement, InputFieldProps>((props, ref) => (

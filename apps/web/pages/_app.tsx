@@ -12,6 +12,8 @@ import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 
+import { Toaster } from "@votewise/ui";
+
 import { ProgressBar } from "components";
 
 const queryClient = new QueryClient();
@@ -26,6 +28,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     <QueryClientProvider client={queryClient}>
       <ProgressBar />
       <Component {...pageProps} />
+      <Toaster position="top-right" />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );

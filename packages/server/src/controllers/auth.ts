@@ -159,7 +159,7 @@ export const login = async (req: Request, res: Response) => {
     const isPasswordCorrect = await UserService.validatePassword(payload.password, user.password);
 
     if (!isPasswordCorrect) {
-      return res.status(UNAUTHORIZED).json(INVALID_CREDENTIALS_RESPONSE);
+      return res.status(BAD_REQUEST).json(INVALID_CREDENTIALS_RESPONSE);
     }
 
     // Create a new accessToken and refreshToken

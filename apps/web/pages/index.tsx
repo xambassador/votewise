@@ -1,8 +1,14 @@
+import dayjs from "dayjs";
+import plugin from "dayjs/plugin/relativeTime";
+
 import type { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 
 import React from "react";
+import { useQuery } from "react-query";
 
+import { parseHashTags } from "@votewise/lib/hashtags";
+import type { GetPostsResponse } from "@votewise/types";
 import { FiMessageCircle as Message, FiSend as Sent, FiThumbsUp as Upvote } from "@votewise/ui/icons";
 
 import {
@@ -19,93 +25,81 @@ import {
 
 import { getServerSession } from "server/lib/getServerSession";
 
-const imgs = [
-  { src: "https://images.unsplash.com/photo-1677869274156-d3da0d0addb5" },
-  { src: "https://images.unsplash.com/photo-1672745256937-4e60a4534413" },
-  { src: "https://images.unsplash.com/photo-1666627830631-4e3d18bb9f73" },
-  { src: "https://images.unsplash.com/photo-1677432658720-3d84f9d657b4" },
-];
+import { getPosts } from "server/services/post";
+import { getPosts as fetchPosts } from "services/post";
 
-export default function Home() {
+dayjs.extend(plugin);
+
+type Props = {
+  data: GetPostsResponse;
+};
+
+type PostType = GetPostsResponse["data"]["posts"][0];
+
+function PostCard(props: { post: PostType }) {
+  const { post } = props;
+  const parsedText = parseHashTags(post.content);
+
+  return (
+    <Post>
+      <PostUserPill
+        avatar={post.author.profile_image}
+        location={post.author.location}
+        timeAgo={dayjs(post.updated_at).fromNow()}
+        userName={post.author.name}
+      />
+      <PostTitle>
+        <Link href={`/post/${post.id}`}>{post.title}</Link>
+      </PostTitle>
+      <PostGallary images={post.post_assets} />
+      <PostText>{parsedText.text}</PostText>
+      {parsedText.hashtags.length > 0 && (
+        <PostHashTags>
+          {parsedText.hashtags.map((hashtag) => (
+            <Link key={hashtag} href={`/hashtag/${hashtag}`}>
+              {hashtag}
+            </Link>
+          ))}
+        </PostHashTags>
+      )}
+      <PostFooter>
+        <ButtonGroup>
+          <span>
+            <Upvote className="h-5 w-5 text-gray-500" />
+          </span>
+          <span className="text-sm text-gray-600">{post.upvotes_count}</span>
+        </ButtonGroup>
+        <ButtonGroup>
+          <span>
+            <Message className="h-5 w-5 text-gray-500" />
+          </span>
+          <span className="text-sm text-gray-600">{post.comments_count} Comments</span>
+        </ButtonGroup>
+        <ButtonGroup>
+          <span>
+            <Sent className="h-5 w-5 text-gray-500" />
+          </span>
+          <span className="text-sm text-gray-600">Share</span>
+        </ButtonGroup>
+      </PostFooter>
+    </Post>
+  );
+}
+
+export default function Home(props: Props) {
+  const { data: initialData } = props;
+  const { data } = useQuery("posts", fetchPosts, {
+    initialData,
+  });
+
+  // TODO: Store posts in zustand store
+
   return (
     <Layout>
       <div className="flex flex-col gap-8">
-        <Post>
-          <PostUserPill
-            avatar="https://images.unsplash.com/photo-1438761681033-6461ffad8d80"
-            location="Japan"
-            timeAgo="2 hours ago"
-            userName="Naomi Yoshida"
-          />
-          <PostTitle>
-            <Link href="/">This is Naoimi’s Cool Idea to save environment</Link>
-          </PostTitle>
-          <PostText>
-            The chair sat in the corner where it had been for over 25 years. The only difference was there was
-            someone actually sitting in it. How long had it been since someone had done that? Ten years or
-            more he imagined. Yet there was no denying the presence in the chair now.
-          </PostText>
-          <PostHashTags>#cool #coolidea #uiux #frontend</PostHashTags>
-          <PostFooter>
-            <ButtonGroup>
-              <span>
-                <Upvote />
-              </span>
-              <span className="text-sm text-gray-600">802</span>
-            </ButtonGroup>
-            <ButtonGroup>
-              <span>
-                <Message />
-              </span>
-              <span className="text-sm text-gray-600">38 Comments</span>
-            </ButtonGroup>
-            <ButtonGroup>
-              <span>
-                <Sent />
-              </span>
-              <span className="text-sm text-gray-600">Share</span>
-            </ButtonGroup>
-          </PostFooter>
-        </Post>
-
-        <Post>
-          <PostUserPill
-            avatar="https://images.unsplash.com/photo-1438761681033-6461ffad8d80"
-            location="Japan"
-            timeAgo="2 hours ago"
-            userName="Naomi Yoshida"
-          />
-          <PostTitle>
-            <Link href="/">This is Naoimi’s Cool Idea to save environment</Link>
-          </PostTitle>
-          <PostGallary images={imgs} />
-          <PostText>
-            The chair sat in the corner where it had been for over 25 years. The only difference was there was
-            someone actually sitting in it. How long had it been since someone had done that? Ten years or
-            more he imagined. Yet there was no denying the presence in the chair now.
-          </PostText>
-          <PostHashTags>#cool #coolidea #uiux #frontend</PostHashTags>
-          <PostFooter>
-            <ButtonGroup>
-              <span>
-                <Upvote />
-              </span>
-              <span className="text-sm text-gray-600">802</span>
-            </ButtonGroup>
-            <ButtonGroup>
-              <span>
-                <Message />
-              </span>
-              <span className="text-sm text-gray-600">38 Comments</span>
-            </ButtonGroup>
-            <ButtonGroup>
-              <span>
-                <Sent />
-              </span>
-              <span className="text-sm text-gray-600">Share</span>
-            </ButtonGroup>
-          </PostFooter>
-        </Post>
+        {data?.data.posts.map((post) => (
+          <PostCard key={post.slug} post={post} />
+        ))}
       </div>
     </Layout>
   );
@@ -125,7 +119,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     };
   }
 
+  const response = await getPosts(session.accessToken);
+
   return {
-    props: {},
+    props: {
+      data: response.data,
+      session,
+    },
   };
 };

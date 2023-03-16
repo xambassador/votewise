@@ -61,7 +61,7 @@ export function PostUserPill({
       <Avatar src={avatar} />
       <div className="ml-4 flex flex-col">
         <PostUserName>{userName}</PostUserName>
-        <div className="mt-2 flex gap-2 text-gray-600">
+        <div className="flex gap-2 text-gray-600">
           <Location>
             <span>
               <PostMapPinIcon />
@@ -105,13 +105,17 @@ function Figure({ children }: { children: ReactNode }) {
   );
 }
 
-export function PostGallary({ images }: { images: { src: string }[] }) {
+export function PostGallary({ images }: { images: { url: string }[] }) {
+  if (!images.length) {
+    return null;
+  }
+
   return (
     <div className="grid grid-cols-2 gap-6">
       {images.map((img) => (
-        <Figure key={img.src}>
+        <Figure key={img.url}>
           <Image
-            src={img.src}
+            src={img.url}
             alt="Post"
             resetWidthAndHeight
             className="h-full w-full rounded-lg object-cover"
