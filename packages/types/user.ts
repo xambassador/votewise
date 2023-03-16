@@ -3,4 +3,14 @@ type AcceptOrRejectFriendRequestPayload = {
   type: "ACCEPT" | "REJECT";
 };
 
-export type { AcceptOrRejectFriendRequestPayload };
+type UsernameAvailableResponse = {
+  success: true;
+  message: string;
+  data: {
+    username: string;
+    message: string;
+  };
+  error: null;
+};
+
+export type { AcceptOrRejectFriendRequestPayload, UsernameAvailableResponse };
