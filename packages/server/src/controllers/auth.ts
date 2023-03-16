@@ -46,18 +46,12 @@ import {
   USER_NOT_FOUND_RESPONSE,
   VALIDATION_FAILED_MSG,
   getErrorReason,
-  logger,
 } from "@/src/utils";
 import { isEmail } from "@/src/zodValidation/auth";
 
 dotenv.config();
 
 const { FRONTEND_URL } = process.env;
-
-if (!FRONTEND_URL) {
-  logger("FRONTEND_URL is not defined in .env file", "error");
-  process.exit(1);
-}
 
 const { BAD_REQUEST, CONFLICT, CREATED, NOT_FOUND, UNAUTHORIZED, OK, INTERNAL_SERVER_ERROR } =
   httpStatusCodes;

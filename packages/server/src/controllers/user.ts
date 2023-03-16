@@ -79,15 +79,16 @@ export const checkUsernameAvailability = async (req: Request, res: Response) => 
 };
 
 // -----------------------------------------------------------------------------------------
-export const getMyDetails = (req: Request, res: Response) => {
+export const getMyDetails = async (req: Request, res: Response) => {
   const { user } = req.session;
   try {
+    const data = await UserService.getMyDetails(user.id);
     return res.status(OK).json(
       new JSONResponse(
         USER_DETAILS_FETCHED_SUCCESSFULLY_MSG,
         {
           message: USER_DETAILS_FETCHED_SUCCESSFULLY_MSG,
-          user,
+          user: data,
         },
         null,
         true

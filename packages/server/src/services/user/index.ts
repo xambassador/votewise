@@ -124,10 +124,38 @@ class UserService {
           id: userId,
         },
         select: {
-          password: false,
+          id: true,
+          username: true,
+          about: true,
+          cover_image: true,
+          profile_image: true,
+          name: true,
+          email: true,
+          facebook: true,
+          instagram: true,
+          twitter: true,
+          updated_at: true,
+          last_login: true,
+          created_at: true,
+          location: true,
+          is_email_verify: true,
+          gender: true,
+          _count: {
+            select: {
+              followers: true,
+              following: true,
+              posts: true,
+            },
+          },
         },
       });
-      return data;
+      return {
+        ...data,
+        followers: data?._count?.followers,
+        following: data?._count?.following,
+        posts: data?._count?.posts,
+        _count: undefined,
+      };
     } catch (err) {
       throw new Error("Error while fetching user");
     }

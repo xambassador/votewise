@@ -28,7 +28,21 @@ class OnboardingService {
           onboarded: true,
         },
         select: {
-          password: false,
+          id: true,
+          username: true,
+          name: true,
+          profile_image: true,
+          cover_image: true,
+          location: true,
+          gender: true,
+          twitter: true,
+          email: true,
+          facebook: true,
+          about: true,
+          onboarded: true,
+          last_login: true,
+          is_email_verify: true,
+          updated_at: true,
         },
       });
       return user;
