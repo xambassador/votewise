@@ -28,7 +28,7 @@ function UserAvatarWithBanner({
   banner = "https://images.unsplash.com/photo-1677608088332-433015612b03",
 }) {
   return (
-    <div className="relative w-full">
+    <div className="relative z-[unset] w-full">
       <figure className="w-full">
         <Image
           src={banner}

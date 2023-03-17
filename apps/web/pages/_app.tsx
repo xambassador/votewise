@@ -2,6 +2,7 @@ import "nprogress/nprogress.css";
 import "react-lazy-load-image-component/src/effects/black-and-white.css";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import "react-lazy-load-image-component/src/effects/opacity.css";
+import "simplebar-react/dist/simplebar.min.css";
 import "styles/globals.css";
 
 import type { NextPage } from "next";

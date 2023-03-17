@@ -97,6 +97,9 @@ module.exports = {
         "outline-green": "0 0 0 3px rgba(81, 207, 102, 0.5)",
         "outline-orange": "0 0 0 3px rgba(255, 146, 43, 0.5)",
         "auth-form": "0px 2px 6px -1px rgba(0, 0, 0, 0.08)",
+        "notification-container":
+          "0px 20px 25px -5px rgba(0, 0, 0, 0.1), 0px 10px 10px -5px rgba(0, 0, 0, 0.04);",
+        dropdown: "0px 4px 12px rgba(0, 0, 0, 0.05), 0px 20px 25px -5px rgba(0, 0, 0, 0.1);",
       },
       width: {
         15: "3.75rem",

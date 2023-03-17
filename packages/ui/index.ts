@@ -13,3 +13,5 @@ export * from "./components/skeleton";
 export * from "./components/alert";
 export * from "./components/toast";
 export { Toast as Toaster } from "./components/toast/Toaster";
+
+export * from "./components/menu";

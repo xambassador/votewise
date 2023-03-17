@@ -22,27 +22,31 @@ function getThemeClasses(theme: "primary" | "secondary" | "tritertiary") {
     "rounded-lg py-4 flex w-full items-center justify-center font-semibold disabled:cursor-not-allowed disabled:bg-blue-300";
   if (theme === "primary") {
     classnames += " bg-blue-500 text-blue-50 px-0";
+    return classnames;
   }
 
   if (theme === "secondary") {
-    classnames += "bg-gray-50 text-gray-600 px-0 border border-gray-200";
+    classnames += " bg-gray-50 text-gray-600 px-0 border border-gray-200";
+    return classnames;
   }
 
   if (theme === "tritertiary") {
     classnames += " bg-black text-gray-50 rounded-full";
+    return classnames;
   }
 
   return classnames;
 }
 
 export function Button(props: ButtonProps) {
-  const { className, children, primary = true, secondary, isLoading, loaderProps, ...rest } = props;
-  // eslint-disable-next-line no-nested-ternary
-  const classnames = primary
-    ? getThemeClasses("primary")
-    : secondary
-    ? getThemeClasses("secondary")
-    : getThemeClasses("tritertiary");
+  const { className, children, primary, secondary, tritertiary, isLoading, loaderProps, ...rest } = props;
+
+  let classnames;
+  if (primary) classnames = getThemeClasses("primary");
+  else if (secondary) classnames = getThemeClasses("secondary");
+  else if (tritertiary) classnames = getThemeClasses("tritertiary");
+  else classnames = getThemeClasses("primary");
+
   return (
     // eslint-disable-next-line react/button-has-type
     <button className={classNames(classnames, className)} disabled={isLoading} {...rest}>

@@ -31,8 +31,21 @@ export const getAxiosServerWithAuth = (token: string) => {
   return axiosServerInstance;
 };
 
-axiosServerInstance.interceptors.request.use((config) => {
-  logger("========== Axios Server Instance ==========");
-  logger(`====> Request: ${config.method} ${config.url} Body payload:====> ${JSON.stringify(config.data)}`);
-  return config;
-});
+axiosServerInstance.interceptors.request.use(
+  (config) => {
+    logger("========== Axios Server Instance ==========");
+    logger(`====> Request: ${config.method} ${config.url} Body payload:====> ${JSON.stringify(config.data)}`);
+    return config;
+  },
+  (error) => {
+    logger("========== Axios Server Instance ==========");
+    logger(
+      `====> Request: ${error.config.method} ${error.config.url} Body payload:====> ${JSON.stringify(
+        error.config.data
+      )}`
+    );
+    logger(`====> Error: ${error}`);
+    logger(`====> Error Response Data: ${error?.response.data}`);
+    return Promise.reject(error);
+  }
+);
