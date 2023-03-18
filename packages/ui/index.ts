@@ -15,3 +15,4 @@ export * from "./components/toast";
 export { Toast as Toaster } from "./components/toast/Toaster";
 
 export * from "./components/menu";
+export * from "./components/modal";
