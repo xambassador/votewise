@@ -1,5 +1,3 @@
-import { useStore } from "zustand";
-
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -14,9 +12,8 @@ import {
   DropdownMenuItem,
   DropdownMenuItems,
   DropdownTransition,
+  Loader,
   SearchField,
-  Skeleton,
-  SkeletonContainer,
 } from "@votewise/ui";
 import {
   FiBell as Bell,
@@ -25,7 +22,10 @@ import {
   FiTrendingUp as Trending,
 } from "@votewise/ui/icons";
 
+import { useAsync } from "lib/hooks/useAsync";
 import { useMyDetails } from "lib/hooks/useMyDetails";
+
+import { signout } from "services/auth";
 
 import { Logo } from "./Logo";
 import { Notification, NotificationActionPanel, NotificationContainer } from "./notification";
@@ -36,6 +36,7 @@ import { GroupCommentNotification } from "./notification/GroupPostCommentNotific
 import { GroupPostUpvoteNotification } from "./notification/GroupPostUpvoteNotification";
 import { JoinGroupNotification } from "./notification/JoinGroupNotification";
 import { UpvotePostNotification } from "./notification/UpvotePostNotification";
+import { UserPillSkeleton } from "./skeletons/UserInfoSkeleton";
 
 function Notifications() {
   return (
@@ -94,12 +95,32 @@ function NotificationButton() {
   );
 }
 
-function UserInfoBoxSkeleton() {
+function SignoutButton() {
+  const router = useRouter();
+
+  const { run, status } = useAsync({
+    status: "idle",
+    data: null,
+    error: null,
+  });
+
+  const handleOnClick = () => {
+    const promise = signout();
+    run(promise, () => {
+      router.push("/signin");
+    });
+  };
+
   return (
-    <SkeletonContainer className="flex items-center">
-      <Skeleton as="div" className="mr-2 h-12 w-12 rounded-full" />
-      <Skeleton as="div" className="h-4 w-28 rounded-lg" />
-    </SkeletonContainer>
+    <button
+      type="button"
+      className="flex items-center"
+      onClick={handleOnClick}
+      disabled={status === "pending"}
+    >
+      <span className="mr-2">{status === "pending" ? "Signing out..." : "Sign out"}</span>
+      {status === "pending" && <Loader className="h-3 w-3" loaderColor="#238BE6" />}
+    </button>
   );
 }
 
@@ -109,7 +130,7 @@ function UserInfoBox() {
   return (
     <>
       <NotificationButton />
-      {status === "loading" && <UserInfoBoxSkeleton />}
+      {status === "loading" && <UserPillSkeleton />}
       {status === "success" && data.data.user && (
         <div className="flex items-center gap-2">
           <Avatar src={data.data.user.profile_image} alt="Avatar" width={48} height={48} rounded />
@@ -131,7 +152,7 @@ function UserInfoBox() {
                   <Link href="/privacy">Privacy</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <button type="button">Signout</button>
+                  <SignoutButton />
                 </DropdownMenuItem>
               </DropdownMenuItems>
             </DropdownTransition>

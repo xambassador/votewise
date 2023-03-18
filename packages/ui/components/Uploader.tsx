@@ -3,7 +3,13 @@ import Image from "next/image";
 import React, { useEffect, useId, useState } from "react";
 import type { ReactNode } from "react";
 
-function Thumbnail({ file, render }: { file: File | null; render: (url: string | null) => ReactNode }) {
+export function Thumbnail({
+  file,
+  render,
+}: {
+  file: File | null;
+  render: (url: string | null) => ReactNode;
+}) {
   const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {

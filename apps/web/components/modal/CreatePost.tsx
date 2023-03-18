@@ -1,15 +1,26 @@
 import { useStore } from "zustand";
 
-import React from "react";
+import React, { useEffect, useId, useState } from "react";
 import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
 
-import type { GetPostsResponse } from "@votewise/types";
-import { Avatar, Button, Input, ModalTitle, TextArea, UnstyledSelect, makeToast } from "@votewise/ui";
+import type { GetPostsResponse, MyDetailsResponse } from "@votewise/types";
+import {
+  Avatar,
+  Button,
+  Image,
+  Input,
+  ModalTitle,
+  TextArea,
+  Thumbnail,
+  UnstyledSelect,
+  makeToast,
+} from "@votewise/ui";
 import { FiGlobe, Picture } from "@votewise/ui/icons";
 
 import { ErrorMessage } from "components/ErrorMessage";
 
+import { usePicker } from "lib/hooks/usePicker";
 import store from "lib/store";
 
 import { createPost } from "services/user";
@@ -18,6 +29,18 @@ const options = [
   { label: "Public", value: "PUBLIC" },
   { label: "Group Only", value: "GROUP_ONLY" },
 ];
+
+type FormValues = {
+  title: string;
+  content: string;
+  status: "OPEN"; // NOTE: Right now sending status as OPEN, it can be change from profile page
+  type: {
+    label: string;
+    value: "PUBLIC" | "GROUP_ONLY";
+  };
+  postAssets: { url: string; type: string }[];
+  apiError: string;
+};
 
 function PostTypeSelectMenu() {
   const { control } = useFormContext<FormValues>();
@@ -38,18 +61,71 @@ function PostTypeSelectMenu() {
   );
 }
 
+function PostAsset({ file, onSuccess }: { file: File; onSuccess: (url: string, file: File) => void }) {
+  const onFileUploadSuccess = (url: string) => {
+    onSuccess(url, file);
+  };
+
+  const { handleOnReady } = usePicker(onFileUploadSuccess);
+
+  useEffect(() => {
+    handleOnReady(file);
+  }, [file, handleOnReady]);
+
+  return (
+    <Thumbnail
+      file={file}
+      render={(url) =>
+        url && <Image src={url} alt="Post Asset" width={100} height={100} className="rounded-lg" />
+      }
+    />
+  );
+}
+
+function PostAssetsContainer({
+  files,
+  onSuccess,
+}: {
+  files: File[];
+  onSuccess: (url: string, file: File) => void;
+}) {
+  return (
+    <div className="mb-4 grid max-h-[calc((150/16)*1rem)] w-full grid-cols-4 gap-2 overflow-y-auto px-4">
+      {files.map((file) => (
+        <PostAsset file={file} key={file.name} onSuccess={onSuccess} />
+      ))}
+    </div>
+  );
+}
+
 function PostEditor() {
   const {
     register,
     formState: { errors },
+    setValue,
+    getValues,
   } = useFormContext<FormValues>();
+  const id = useId();
+  const [files, setFiles] = useState<File[]>([]);
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFiles([...files, ...Array.from(e.target.files)]);
+    }
+  };
+
+  const handleOnSuccess = (url: string, file: File) => {
+    const values = getValues("postAssets");
+    const newValues = values ? [...values, { url, type: file.type }] : [{ url, type: file.type }];
+    setValue("postAssets", newValues);
+  };
 
   return (
     <>
-      <div className="relative h-[calc((136/16)*1rem)] overflow-hidden rounded-lg border border-gray-200">
+      <div className="relative overflow-hidden rounded-lg border border-gray-200">
         <TextArea
           placeholder="What's in your mind, Naomi?"
-          className="h-full resize-none border-none text-gray-600 placeholder:text-base placeholder:text-gray-400 focus:ring-0"
+          className="h-[calc((120/16)*1rem)] resize-none border-none text-gray-600 placeholder:text-base placeholder:text-gray-400 focus:ring-0"
           {...register("content", {
             required: "Content is required",
             minLength: {
@@ -58,26 +134,26 @@ function PostEditor() {
             },
           })}
         />
-        <button type="button" className="absolute bottom-4 left-4 flex items-center gap-2">
+        {files.length > 0 && <PostAssetsContainer files={files} onSuccess={handleOnSuccess} />}
+        <div className="flex items-center gap-2 pb-4 pl-4">
           <Picture />
-          <span className="text-gray-600">Photo / Video</span>
-        </button>
+          <input
+            type="file"
+            accept="image/*,video/*"
+            className="hidden"
+            id={id}
+            multiple
+            onChange={handleOnChange}
+          />
+          <label htmlFor={id} className="cursor-pointer text-gray-600">
+            Photo / Video
+          </label>
+        </div>
       </div>
       {errors.content && <p className="text-left text-red-600">{errors.content.message}</p>}
     </>
   );
 }
-
-type FormValues = {
-  title: string;
-  content: string;
-  status: "OPEN"; // NOTE: Right now sending status as OPEN, it can be change from profile page
-  type: {
-    label: string;
-    value: "PUBLIC" | "GROUP_ONLY";
-  };
-  apiError: string;
-};
 
 export function CreatePost({ setOpen }: { setOpen: (open: boolean) => void }) {
   const user = useStore(store, (state) => state.user);
@@ -96,15 +172,23 @@ export function CreatePost({ setOpen }: { setOpen: (open: boolean) => void }) {
   const queryClient = useQueryClient();
   const mutation = useMutation(
     (data: FormValues) =>
-      createPost({ title: data.title, content: data.content, type: data.type.value, status: data.status }),
+      createPost({
+        title: data.title,
+        content: data.content,
+        type: data.type.value,
+        status: data.status,
+        postAssets: data.postAssets,
+      }),
     {
       onMutate: (variables) => {
-        const { title, content, type, status } = variables;
+        const { title, content, type, status, postAssets } = variables;
         // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
         queryClient.cancelQueries("posts");
+        queryClient.cancelQueries("user-info");
 
         // Snapshot the previous value
         const previousPosts = queryClient.getQueryData<GetPostsResponse>("posts");
+        const previousUserInfo = queryClient.getQueriesData<MyDetailsResponse>("user-info");
 
         // Optimistically update to the new value
         if (previousPosts) {
@@ -129,7 +213,12 @@ export function CreatePost({ setOpen }: { setOpen: (open: boolean) => void }) {
                   comments_count: 0,
                   created_at: new Date(),
                   group_id: null,
-                  post_assets: [],
+                  post_assets: [
+                    ...(postAssets?.map((asset) => ({
+                      id: 1101,
+                      url: asset.url,
+                    })) as { url: string }[]),
+                  ],
                   slug: title,
                   updated_at: new Date(),
                 },
@@ -139,8 +228,21 @@ export function CreatePost({ setOpen }: { setOpen: (open: boolean) => void }) {
           }));
         }
 
+        if (previousUserInfo) {
+          queryClient.setQueryData<MyDetailsResponse>("user-info", (old) => ({
+            ...(old as MyDetailsResponse),
+            data: {
+              ...(old?.data as MyDetailsResponse["data"]),
+              user: {
+                ...(old?.data.user as MyDetailsResponse["data"]["user"]),
+                posts: old?.data ? old.data.user.posts + 1 : 0,
+              },
+            },
+          }));
+        }
+
         // Return a context object with the snapshotted value
-        return { previousPosts };
+        return { previousPosts, previousUserInfo };
       },
       onSuccess: () => {
         makeToast("Post created successfully", "success");
@@ -151,10 +253,12 @@ export function CreatePost({ setOpen }: { setOpen: (open: boolean) => void }) {
         setError("apiError", { message });
         // If the mutation fails, use the context returned from onMutate to roll back
         queryClient.setQueryData("posts", context?.previousPosts);
+        queryClient.setQueryData("user-info", context?.previousUserInfo);
       },
       onSettled: () => {
         // Always refetch after error or success:
         queryClient.invalidateQueries("posts");
+        queryClient.invalidateQueries("user-info");
       },
     }
   );

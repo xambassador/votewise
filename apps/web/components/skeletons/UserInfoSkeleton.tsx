@@ -24,3 +24,12 @@ export function UserInfoSkeleton() {
     </SkeletonContainer>
   );
 }
+
+export function UserPillSkeleton() {
+  return (
+    <SkeletonContainer className="flex items-center">
+      <Skeleton as="div" className="mr-2 h-12 w-12 rounded-full" />
+      <Skeleton as="div" className="h-4 w-28 rounded-lg" />
+    </SkeletonContainer>
+  );
+}

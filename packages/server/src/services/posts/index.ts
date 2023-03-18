@@ -682,8 +682,10 @@ class PostService {
   }
 
   // ---------------------------------
-  // TODO: Add images and videos to post case
-  async createPost({ content, title, status, type = "PUBLIC", groupId }: CreatePostPayload, userId: number) {
+  async createPost(
+    { content, title, status, type = "PUBLIC", groupId, postAssets }: CreatePostPayload,
+    userId: number
+  ) {
     const slug = slugify(`${title}-${nanoid(5)}`, { lower: true });
     try {
       const post = await prisma.post.create({
@@ -695,6 +697,9 @@ class PostService {
           type,
           group_id: groupId,
           author_id: userId,
+          post_assets: {
+            create: postAssets,
+          },
         },
       });
       await HashTagService.addHashtags(post.id, content);

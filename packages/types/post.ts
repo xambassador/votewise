@@ -21,6 +21,10 @@ type CreatePostPayload = {
   type?: PostType;
   status: PostStatus;
   groupId?: number;
+  postAssets?: {
+    url: string;
+    type: string;
+  }[];
 };
 
 type UpdatePostPayload = {

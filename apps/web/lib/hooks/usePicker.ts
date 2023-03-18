@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import { useUploader } from "./useUploader";
 
@@ -7,11 +7,11 @@ const UPLOAD_URL = `${BASE_URL}/upload`;
 const HANDSHAKE_URL = `${BASE_URL}/handshake`;
 
 export function usePicker(onSuccess: (url: string) => void) {
-  const [image, setImage] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "pending" | "resolved" | "rejected">("idle");
 
-  useUploader(image, {
+  useUploader(file, {
     uploadUrl: UPLOAD_URL as string,
     handshakeUrl: HANDSHAKE_URL as string,
     deleteUrl: (token, filename) => `${UPLOAD_URL}?token=${token}&filename=${filename}`,
@@ -25,11 +25,12 @@ export function usePicker(onSuccess: (url: string) => void) {
     },
   });
 
-  const handleOnReady = (file: File) => {
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  const handleOnReady = useCallback((file: File) => {
     setError(null);
     setStatus("pending");
-    setImage(file);
-  };
+    setFile(file);
+  }, []);
 
   const handleOnError = (err: string) => {
     setError(err);
