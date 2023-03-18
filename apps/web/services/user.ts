@@ -1,6 +1,8 @@
 import type { AxiosResponse } from "axios";
 
 import type {
+  CreatePostPayload,
+  CreatePostResponse,
   MyDetailsResponse,
   OnboardingPayload,
   OnboardingResponse,
@@ -36,5 +38,14 @@ export const onboardUser = async (data: OnboardingPayload) => {
  */
 export const getMyDetails = async () => {
   const response: AxiosResponse<MyDetailsResponse> = await axioInstance.get("/me");
+  return response.data;
+};
+
+/**
+ * @description Create a new post
+ */
+
+export const createPost = async (payload: CreatePostPayload) => {
+  const response: AxiosResponse<CreatePostResponse> = await axioInstance.post("/post", payload);
   return response.data;
 };

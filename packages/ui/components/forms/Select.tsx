@@ -129,6 +129,7 @@ export function UnstyledSelect<
 >({ className, ...props }: SelectProps<Option, IsMulti, Group>) {
   return (
     <ReactSelect
+      className={classNames("w-full", className)}
       {...props}
       isSearchable={false}
       theme={(theme) => ({ ...theme, borderRadius: 0, border: "none" })}
@@ -137,6 +138,10 @@ export function UnstyledSelect<
         Input: InputComponent,
       }}
       styles={{
+        menuList: (provided) => ({
+          ...provided,
+          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.05), 0px 20px 25px -5px rgba(0, 0, 0, 0.1)",
+        }),
         container: (provided) => ({
           ...provided,
           width: "100%",
@@ -149,16 +154,26 @@ export function UnstyledSelect<
         }),
         option: (provided, state) => ({
           ...provided,
-          color: state.isSelected ? "var(--brand-text-color)" : "black",
+          color: state.isSelected ? "var(--gray-600)" : "var(--gray-600)",
           ":active": {
-            backgroundColor: state.isSelected ? "" : "var(--brand-color)",
-            color: "var(--brand-text-color)",
+            backgroundColor: state.isSelected ? "var(--blue-100)" : "var(--blue-100)",
+            color: "var(--gray-600)",
           },
+          ":hover": {
+            backgroundColor: state.isSelected ? "var(--blue-100)" : "var(--blue-100)",
+            color: "var(--gray-600)",
+            transition: "all 0.3s ease",
+          },
+          backgroundColor: state.isSelected ? "var(--blue-100)" : "#fff",
+          marginBottom: "12px",
+          borderRadius: "4px",
+          padding: "0.5rem 0.75rem",
         }),
         indicatorSeparator: () => ({
           display: "hidden",
           color: "black",
         }),
+        ...props.styles,
       }}
     />
   );

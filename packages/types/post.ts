@@ -35,6 +35,24 @@ type ChangeStatusPayload = {
   status: PostStatus;
 };
 
+type CreatePostResponse = {
+  data: {
+    message: string;
+    post: {
+      id: number;
+      author_id: number;
+      title: string;
+      content: string;
+      slug: string;
+      type: PostType;
+      status: PostStatus;
+      group_id: number | null;
+      created_at: Date;
+      updated_at: Date;
+    };
+  };
+} & BaseResponse;
+
 type GetPostsResponse = {
   data: {
     message: string;
@@ -79,4 +97,5 @@ export type {
   UpdatePostPayload,
   ChangeStatusPayload,
   GetPostsResponse,
+  CreatePostResponse,
 };

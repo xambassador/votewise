@@ -88,7 +88,7 @@ export function Post({ className, children }: { className?: string; children?: R
   return (
     <div
       className={classNames(
-        "flex max-w-[calc((774/16)*1rem)] flex-col gap-5 rounded-lg border border-gray-200 bg-white p-5",
+        "flex min-w-[calc((774/16)*1rem)] max-w-[calc((774/16)*1rem)] flex-col gap-5 rounded-lg border border-gray-200 bg-white p-5",
         className
       )}
     >

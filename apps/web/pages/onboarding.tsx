@@ -9,9 +9,9 @@ import { FormProvider, useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 
 import { Button, makeToast } from "@votewise/ui";
-import { FiX as CloseIcon } from "@votewise/ui/icons";
 
 import { AuthScreenLayout } from "components/AuthScreenLayout";
+import { ErrorMessage } from "components/ErrorMessage";
 import { IllustrationSection } from "components/IllustrationSection";
 import { StepOne, StepTwo } from "components/onboarding";
 import { AvatarPicker } from "components/onboarding/AvatarPicker";
@@ -116,12 +116,7 @@ const Page: NextPageWithLayout = () => {
                 <div className="flex flex-col gap-5">
                   <div>
                     {errors.apiError && (
-                      <div className="mb-2 flex items-center justify-center text-red-600">
-                        <p>{errors.apiError.message}</p>
-                        <button type="button" onClick={resetErrors} className="ml-2">
-                          <CloseIcon className="text-gray-500" />
-                        </button>
-                      </div>
+                      <ErrorMessage resetErrors={resetErrors}>{errors.apiError.message}</ErrorMessage>
                     )}
                     <h2 className="mb-5 text-center text-3xl font-bold text-gray-800">
                       Tell us more about you

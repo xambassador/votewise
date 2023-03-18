@@ -5,7 +5,6 @@ import type { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 
 import React from "react";
-import { useQuery } from "react-query";
 
 import { parseHashTags } from "@votewise/lib/hashtags";
 import type { GetPostsResponse } from "@votewise/types";
@@ -23,10 +22,10 @@ import {
   PostUserPill,
 } from "components";
 
+import { usePosts } from "lib/hooks/usePosts";
 import { getServerSession } from "server/lib/getServerSession";
 
 import { getPosts } from "server/services/post";
-import { getPosts as fetchPosts } from "services/post";
 
 dayjs.extend(plugin);
 
@@ -57,7 +56,7 @@ function PostCard(props: { post: PostType }) {
         <PostHashTags>
           {parsedText.hashtags.map((hashtag) => (
             <Link key={hashtag} href={`/hashtag/${hashtag}`}>
-              {hashtag}
+              #{hashtag}{" "}
             </Link>
           ))}
         </PostHashTags>
@@ -88,11 +87,7 @@ function PostCard(props: { post: PostType }) {
 
 export default function Home(props: Props) {
   const { data: initialData } = props;
-  const { data } = useQuery("posts", fetchPosts, {
-    initialData,
-  });
-
-  // TODO: Store posts in zustand store
+  const { data } = usePosts(initialData);
 
   return (
     <Layout>
