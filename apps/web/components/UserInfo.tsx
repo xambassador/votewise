@@ -1,17 +1,13 @@
-import type { AxiosError } from "axios";
 import { useStore } from "zustand";
 
 import React, { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { useQuery } from "react-query";
 
-import type { ErrorResponse } from "@votewise/types";
 import { Avatar, Button, Image, Modal } from "@votewise/ui";
 import { FiEdit as Edit } from "@votewise/ui/icons";
 
+import { useMyDetails } from "lib/hooks/useMyDetails";
 import store from "lib/store";
-
-import { getMyDetails } from "services/user";
 
 import { CreatePost } from "./modal/CreatePost";
 import { UserInfoSkeleton } from "./skeletons/UserInfoSkeleton";
@@ -46,23 +42,18 @@ function UserAvatarWithBanner({
   );
 }
 
-const fetcher = () => getMyDetails();
-type Response = Awaited<ReturnType<typeof fetcher>>;
-
 export function UserInfo() {
-  const { data, error, status } = useQuery<Response, AxiosError<ErrorResponse>>("user-info", fetcher);
+  const { data, error, status } = useMyDetails();
 
   const setUser = useStore(store, (state) => state.setUser);
-  const setStatus = useStore(store, (state) => state.setStatus);
 
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    setStatus(status);
     if (data) {
       setUser(data.data.user);
     }
-  }, [data, setStatus, setUser, status]);
+  }, [data, setUser]);
 
   return (
     <>
@@ -110,7 +101,7 @@ export function UserInfo() {
       </Wrapper>
 
       <Modal open={open} setOpen={setOpen}>
-        <CreatePost />
+        <CreatePost setOpen={setOpen} />
       </Modal>
     </>
   );

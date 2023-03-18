@@ -25,7 +25,7 @@ import {
   FiTrendingUp as Trending,
 } from "@votewise/ui/icons";
 
-import store from "lib/store";
+import { useMyDetails } from "lib/hooks/useMyDetails";
 
 import { Logo } from "./Logo";
 import { Notification, NotificationActionPanel, NotificationContainer } from "./notification";
@@ -104,22 +104,21 @@ function UserInfoBoxSkeleton() {
 }
 
 function UserInfoBox() {
-  const user = useStore(store, (state) => state.user);
-  const status = useStore(store, (state) => state.status);
+  const { status, data } = useMyDetails();
 
   return (
     <>
       <NotificationButton />
       {status === "loading" && <UserInfoBoxSkeleton />}
-      {status === "success" && user && (
+      {status === "success" && data.data.user && (
         <div className="flex items-center gap-2">
-          <Avatar src={user.profile_image} alt="Avatar" width={48} height={48} rounded />
+          <Avatar src={data.data.user.profile_image} alt="Avatar" width={48} height={48} rounded />
           <DropdownMenu>
-            <DropdownButton>{user.name}</DropdownButton>
+            <DropdownButton>{data.data.user.name}</DropdownButton>
             <DropdownTransition>
               <DropdownMenuItems>
                 <DropdownMenuItem className="flex flex-col items-start gap-[10px]">
-                  <span>{user.email}</span>
+                  <span>{data.data.user.email}</span>
                   <div className="w-full rounded-full border border-gray-200" />
                 </DropdownMenuItem>
                 <DropdownMenuItem>
