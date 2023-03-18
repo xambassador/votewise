@@ -2,104 +2,187 @@ import type { ReactNode } from "react";
 import React from "react";
 
 import { classNames } from "@votewise/lib";
-import { Avatar, Image } from "@votewise/ui";
+import { Avatar, Badge, Image, Input } from "@votewise/ui";
 import { FiClock as Clock, FiMapPin as MapPin } from "@votewise/ui/icons";
 
-export function PostMapPinIcon({ className = "" }) {
-  return <MapPin className={className} />;
+type PostMapPinIconProps = React.ComponentProps<typeof MapPin>;
+export function PostMapPinIcon(props: PostMapPinIconProps) {
+  const { className, ...rest } = props;
+  return <MapPin className={className} {...rest} />;
 }
 
-export function Location({ className, children }: { className?: string; children?: ReactNode }) {
-  return <div className={classNames("flex items-center gap-1", className)}>{children}</div>;
+type LocationProps = React.HtmlHTMLAttributes<HTMLDivElement>;
+export function Location(props: LocationProps) {
+  const { className, children, ...rest } = props;
+  return (
+    <div className={classNames("flex items-center gap-1", className)} {...rest}>
+      {children}
+    </div>
+  );
 }
 
-export function PostTimeAgoClockIcon({ className = "" }) {
-  return <Clock className={className} />;
+type PostTimeAgoClockIconProps = React.ComponentProps<typeof Clock>;
+export function PostTimeAgoClockIcon(props: PostTimeAgoClockIconProps) {
+  const { className, ...rest } = props;
+  return <Clock className={className} {...rest} />;
 }
 
-export function TimeAgo({ className, children }: { className?: string; children: ReactNode }) {
-  return <div className={classNames("flex items-center gap-1", className)}>{children}</div>;
+type TimeAgoProps = React.HtmlHTMLAttributes<HTMLDivElement>;
+export function TimeAgo(props: TimeAgoProps) {
+  const { className, children, ...rest } = props;
+  return (
+    <div className={classNames("flex items-center gap-1", className)} {...rest}>
+      {children}
+    </div>
+  );
 }
 
-export function PostTitle({ className, children }: { className?: string; children?: ReactNode }) {
-  return <h1 className={classNames("text-2xl font-semibold text-gray-600", className)}>{children}</h1>;
+type PostTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
+export function PostTitle(props: PostTitleProps) {
+  const { className, children, ...rest } = props;
+  return (
+    <h1 className={classNames("text-2xl font-semibold text-gray-600", className)} {...rest}>
+      {children}
+    </h1>
+  );
 }
 
-export function PostText({ className, children }: { className?: string; children?: ReactNode }) {
-  return <p className={classNames("text-black-900 leading-6", className)}>{children}</p>;
+type PostTextProps = React.HTMLAttributes<HTMLParagraphElement>;
+export function PostText(props: PostTextProps) {
+  const { className, children, ...rest } = props;
+  return (
+    <p className={classNames("text-black-900 leading-6", className)} {...rest}>
+      {children}
+    </p>
+  );
 }
 
-export function PostHashTags({ className, children }: { className?: string; children?: ReactNode }) {
-  return <p className={classNames("text-blue-700", className)}>{children}</p>;
+type PostHashTagsProps = React.HTMLAttributes<HTMLParagraphElement>;
+export function PostHashTags(props: PostHashTagsProps) {
+  const { className, children, ...rest } = props;
+  return (
+    <p className={classNames("text-blue-700", className)} {...rest}>
+      {children}
+    </p>
+  );
 }
 
-export function ButtonGroup({ className, children }: { className?: string; children: ReactNode }) {
-  return <div className={classNames("flex items-center gap-2", className)}>{children}</div>;
+type ButtonGroupProps = React.HTMLAttributes<HTMLDivElement>;
+export function ButtonGroup(props: ButtonGroupProps) {
+  const { className, children, ...rest } = props;
+  return (
+    <div className={classNames("flex items-center gap-2", className)} {...rest}>
+      {children}
+    </div>
+  );
 }
 
-export function PostHeader({ className, children }: { className?: string; children?: ReactNode }) {
-  return <div className={classNames("flex", className)}>{children}</div>;
+type PostHeaderProps = React.HTMLAttributes<HTMLHeadElement>;
+export function PostHeader(props: PostHeaderProps) {
+  const { className, children, ...rest } = props;
+  return (
+    <header className={classNames("flex justify-between", className)} {...rest}>
+      {children}
+    </header>
+  );
 }
 
-export function PostUserName({ className, children }: { className?: string; children?: ReactNode }) {
-  return <h3 className={classNames("text-black-900 text-xl font-semibold", className)}>{children}</h3>;
+type PostUserNameProps = React.HTMLAttributes<HTMLHeadingElement>;
+export function PostUserName(props: PostUserNameProps) {
+  const { className, children, ...rest } = props;
+  return (
+    <h3 className={classNames("text-black-900 text-xl font-semibold", className)} {...rest}>
+      {children}
+    </h3>
+  );
 }
 
-export function PostUserPill({
-  avatar,
-  userName,
-  location,
-  timeAgo,
-}: {
+type PostUserPillProps = {
   avatar: string;
   userName: string;
   location: string;
   timeAgo: string;
-}) {
+  children?: ReactNode;
+} & {
+  postHeaderProps?: React.ComponentProps<typeof PostHeader>;
+  avatarProps?: React.ComponentProps<typeof Avatar>;
+} & React.HTMLAttributes<HTMLDivElement>;
+export function PostUserPill(props: PostUserPillProps) {
+  const {
+    avatar,
+    userName,
+    location,
+    timeAgo,
+    children,
+    postHeaderProps,
+    className,
+    avatarProps,
+    ...passThrough
+  } = props;
   return (
-    <PostHeader>
-      <Avatar src={avatar} />
-      <div className="ml-4 flex flex-col">
-        <PostUserName>{userName}</PostUserName>
-        <div className="flex gap-2 text-gray-600">
-          <Location>
-            <span>
-              <PostMapPinIcon />
-            </span>
-            <span>{location}</span>
-          </Location>
-          <TimeAgo>
-            <span>
-              <PostTimeAgoClockIcon />
-            </span>
-            <span>{timeAgo}</span>
-          </TimeAgo>
+    <PostHeader {...postHeaderProps}>
+      <div className={classNames("flex", className)} {...passThrough}>
+        <Avatar src={avatar} {...avatarProps} />
+        <div className="ml-4 flex flex-col gap-1">
+          <PostUserName>{userName}</PostUserName>
+          <div className="flex gap-2 text-gray-600">
+            <Location>
+              <span>
+                <PostMapPinIcon />
+              </span>
+              <span>{location}</span>
+            </Location>
+            <TimeAgo>
+              <span>
+                <PostTimeAgoClockIcon />
+              </span>
+              <span>{timeAgo}</span>
+            </TimeAgo>
+          </div>
         </div>
       </div>
+      {children}
     </PostHeader>
   );
 }
 
-export function PostFooter({ className, children }: { className?: string; children?: ReactNode }) {
-  return <div className={classNames("flex items-center gap-7", className)}>{children}</div>;
+type PostFooterProps = React.HTMLAttributes<HTMLDivElement>;
+export function PostFooter(props: PostFooterProps) {
+  const { className, children, ...rest } = props;
+  return (
+    <div className={classNames("flex items-center gap-7", className)} {...rest}>
+      {children}
+    </div>
+  );
 }
 
-export function Post({ className, children }: { className?: string; children?: ReactNode }) {
+type PostProps = React.HTMLAttributes<HTMLDivElement>;
+export function Post(props: PostProps) {
+  const { className, children, ...rest } = props;
   return (
     <div
       className={classNames(
         "flex min-w-[calc((774/16)*1rem)] max-w-[calc((774/16)*1rem)] flex-col gap-5 rounded-lg border border-gray-200 bg-white p-5",
         className
       )}
+      {...rest}
     >
       {children}
     </div>
   );
 }
 
-function Figure({ children }: { children: ReactNode }) {
+type FigureProps = React.HTMLAttributes<HTMLElement>;
+function Figure(props: FigureProps) {
+  const { className, children, ...rest } = props;
   return (
-    <figure className="h-[calc((250/16)*1rem)] max-h-[calc((250/16)*1rem)] w-[calc((350/16)*1rem)]">
+    <figure
+      className={classNames(
+        "h-[calc((250/16)*1rem)] max-h-[calc((250/16)*1rem)] w-[calc((350/16)*1rem)]",
+        className
+      )}
+      {...rest}
+    >
       {children}
     </figure>
   );
@@ -124,5 +207,31 @@ export function PostGallary({ images }: { images: { url: string }[] }) {
         </Figure>
       ))}
     </div>
+  );
+}
+
+type PostStatuPillProps = React.ComponentProps<typeof Badge>;
+export function PostStatuPill(props: PostStatuPillProps) {
+  const { children, className, type = "primary" } = props;
+  return (
+    <Badge type={type} className={className}>
+      {children}
+    </Badge>
+  );
+}
+
+type PostAddCommentInputProps = React.ComponentProps<typeof Input>;
+export function PostAddCommentInput(props: PostAddCommentInputProps) {
+  const { name = "comment", className, ...rest } = props;
+  return (
+    <Input
+      name={name}
+      type="text"
+      className={classNames(
+        "bg-gray-50 py-3 placeholder:text-base placeholder:font-medium placeholder:text-gray-600",
+        className
+      )}
+      {...rest}
+    />
   );
 }
