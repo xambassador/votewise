@@ -88,6 +88,7 @@ async function main() {
   await prisma.follow.deleteMany();
   await prisma.upvote.deleteMany();
   await prisma.comment.deleteMany();
+  await prisma.postAsset.deleteMany();
   await prisma.post.deleteMany();
   await prisma.refreshToken.deleteMany();
   await prisma.user.deleteMany();

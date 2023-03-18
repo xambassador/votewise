@@ -6,7 +6,10 @@ const BASE_URL = process.env.NEXT_PUBLIC_STATIC_UPLOAD_SERVER_URL;
 const UPLOAD_URL = `${BASE_URL}/upload`;
 const HANDSHAKE_URL = `${BASE_URL}/handshake`;
 
-export function usePicker(onSuccess: (url: string) => void) {
+export function usePicker(
+  onSuccess: (url: string) => void,
+  onProgress?: (e: ProgressEvent<EventTarget>, loaded: number, filesize: number) => void
+) {
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "pending" | "resolved" | "rejected">("idle");
@@ -22,6 +25,9 @@ export function usePicker(onSuccess: (url: string) => void) {
     },
     onError: () => {
       setStatus("rejected");
+    },
+    onProgress: (e: ProgressEvent<EventTarget>, loaded, filesize) => {
+      onProgress?.(e, loaded, filesize);
     },
   });
 

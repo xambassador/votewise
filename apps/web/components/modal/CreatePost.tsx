@@ -10,6 +10,7 @@ import {
   Button,
   Image,
   Input,
+  Loader,
   ModalTitle,
   TextArea,
   Thumbnail,
@@ -66,19 +67,26 @@ function PostAsset({ file, onSuccess }: { file: File; onSuccess: (url: string, f
     onSuccess(url, file);
   };
 
-  const { handleOnReady } = usePicker(onFileUploadSuccess);
+  const { handleOnReady, status } = usePicker(onFileUploadSuccess);
 
   useEffect(() => {
     handleOnReady(file);
   }, [file, handleOnReady]);
 
   return (
-    <Thumbnail
-      file={file}
-      render={(url) =>
-        url && <Image src={url} alt="Post Asset" width={100} height={100} className="rounded-lg" />
-      }
-    />
+    <div className="relative h-[calc((100/16)*1rem)] w-[calc((100/16)*1rem)] overflow-hidden rounded-lg">
+      {status === "pending" && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-gray-600/80">
+          <Loader className="h-5 w-5" loaderColor="#fff" />
+        </div>
+      )}
+      <Thumbnail
+        file={file}
+        render={(url) =>
+          url && <Image src={url} alt="Post Asset" width={100} height={100} className="rounded-lg" />
+        }
+      />
+    </div>
   );
 }
 
