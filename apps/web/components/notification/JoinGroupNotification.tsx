@@ -14,7 +14,10 @@ export function JoinGroupNotification() {
           </NotificationC.NotificationTitle>
           <NotificationC.NotificationTimeAgo>2 hours ago</NotificationC.NotificationTimeAgo>
         </NotificationC.NotificationHeader>
-        <NotificationC.NotificationContent className="rounded bg-gray-100" action="Naomi's personal group">
+        <NotificationC.NotificationContent
+          className="rounded-tr rounded-br bg-gray-100"
+          action="Naomi's personal group"
+        >
           <NotificationC.NotificationActionButtonsPanel>
             <NotificationC.NotificationPrimaryButton>Confirm</NotificationC.NotificationPrimaryButton>
             <NotificationC.NotificationSecondaryButton>Delete</NotificationC.NotificationSecondaryButton>

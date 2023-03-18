@@ -1,18 +1,19 @@
 import type { AxiosError } from "axios";
 import { useStore } from "zustand";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { useQuery } from "react-query";
 
 import type { ErrorResponse } from "@votewise/types";
-import { Avatar, Button, Image } from "@votewise/ui";
+import { Avatar, Button, Image, Modal } from "@votewise/ui";
 import { FiEdit as Edit } from "@votewise/ui/icons";
 
 import store from "lib/store";
 
 import { getMyDetails } from "services/user";
 
+import { CreatePost } from "./modal/CreatePost";
 import { UserInfoSkeleton } from "./skeletons/UserInfoSkeleton";
 
 function Wrapper({ children }: { children: ReactNode }) {
@@ -54,6 +55,8 @@ export function UserInfo() {
   const setUser = useStore(store, (state) => state.setUser);
   const setStatus = useStore(store, (state) => state.setStatus);
 
+  const [open, setOpen] = useState(false);
+
   useEffect(() => {
     setStatus(status);
     if (data) {
@@ -62,44 +65,53 @@ export function UserInfo() {
   }, [data, setStatus, setUser, status]);
 
   return (
-    <Wrapper>
-      {status === "loading" && <UserInfoSkeleton />}
-      {status === "success" && (
-        <div className="flex w-full flex-col">
-          <UserAvatarWithBanner avatar={data?.data.user.profile_image} banner={data?.data.user.cover_image} />
-          <div className="mt-8 text-center">
-            <h1 className="font-semibold capitalize text-gray-600">{data?.data.user.name}</h1>
-            <span className="block text-xs text-gray-500">@{data?.data.user.username}</span>
+    <>
+      <Wrapper>
+        {status === "loading" && <UserInfoSkeleton />}
+        {status === "success" && (
+          <div className="flex w-full flex-col">
+            <UserAvatarWithBanner
+              avatar={data?.data.user.profile_image}
+              banner={data?.data.user.cover_image}
+            />
+            <div className="mt-8 text-center">
+              <h1 className="font-semibold capitalize text-gray-600">{data?.data.user.name}</h1>
+              <span className="block text-xs text-gray-500">@{data?.data.user.username}</span>
+            </div>
+
+            <ul className="mx-auto mt-2 flex w-[calc((190/16)*1rem)] items-center justify-between">
+              <li className="text-center">
+                <span className="block font-bold text-gray-600">{data?.data.user.posts}</span>
+                <span className="block text-xs text-gray-600">Posts</span>
+              </li>
+
+              <li className="text-center">
+                <span className="block font-bold text-gray-600">{data?.data.user.followers}</span>
+                <span className="block text-xs text-gray-600">Followers</span>
+              </li>
+
+              <li className="text-center">
+                <span className="block font-bold text-gray-600">{data?.data.user.following}</span>
+                <span className="block text-xs text-gray-600">Following</span>
+              </li>
+            </ul>
+
+            <Button className="mt-2 gap-2 py-3" onClick={() => setOpen(true)}>
+              <Edit className="h-5 w-5" />
+              <span>Create Post</span>
+            </Button>
           </div>
+        )}
+        {status === "error" && (
+          <div>
+            <h2 className="text-center text-red-600">{error.response?.data.error.message}</h2>
+          </div>
+        )}
+      </Wrapper>
 
-          <ul className="mx-auto mt-2 flex w-[calc((190/16)*1rem)] items-center justify-between">
-            <li className="text-center">
-              <span className="block font-bold text-gray-600">{data?.data.user.posts}</span>
-              <span className="block text-xs text-gray-600">Posts</span>
-            </li>
-
-            <li className="text-center">
-              <span className="block font-bold text-gray-600">{data?.data.user.followers}</span>
-              <span className="block text-xs text-gray-600">Followers</span>
-            </li>
-
-            <li className="text-center">
-              <span className="block font-bold text-gray-600">{data?.data.user.following}</span>
-              <span className="block text-xs text-gray-600">Following</span>
-            </li>
-          </ul>
-
-          <Button className="mt-2 gap-2 py-3">
-            <Edit className="h-5 w-5" />
-            <span>Create Post</span>
-          </Button>
-        </div>
-      )}
-      {status === "error" && (
-        <div>
-          <h2 className="text-center text-red-600">{error.response?.data.error.message}</h2>
-        </div>
-      )}
-    </Wrapper>
+      <Modal open={open} setOpen={setOpen}>
+        <CreatePost />
+      </Modal>
+    </>
   );
 }
