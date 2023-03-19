@@ -76,6 +76,10 @@ type GetPostsResponse = {
       post_assets: {
         url: string;
       }[];
+      upvotes: {
+        user_id: number;
+        id: number;
+      }[];
       author: {
         profile_image: string;
         name: string;
@@ -93,6 +97,73 @@ type GetPostsResponse = {
   };
 } & BaseResponse;
 
+type GetPostResponse = {
+  data: {
+    message: string;
+    post: {
+      id: number;
+      author_id: number;
+      title: string;
+      content: string;
+      slug: string;
+      type: PostType;
+      status: PostStatus;
+      group_id: null | number;
+      created_at: Date;
+      updated_at: Date;
+      profile_image: string;
+      name: string;
+      location: string;
+      author: {
+        profile_image: string;
+        name: string;
+        location: string;
+      };
+      post_assets: {
+        url: string;
+        type: string;
+        id: number;
+      }[];
+      comments: {
+        id: number;
+        user_id: number;
+        updated_at: Date;
+        text: string;
+        user: {
+          id: number;
+          profile_image: string;
+          name: string;
+        };
+        upvotes_count: number;
+      }[];
+      upvotes_count: number;
+      comments_count: number;
+    };
+    meta: {
+      pagination: {
+        total: number;
+        limit: number;
+        next: number;
+        isLastPage: boolean;
+      };
+    };
+  };
+} & BaseResponse;
+
+type LikePostResponse = {
+  data: {
+    message: string;
+    post_total_upvotes: number;
+  };
+} & BaseResponse;
+
+type UnLikePostResponse = {
+  data: {
+    message: string;
+    post_total_upvotes: number;
+  };
+} & BaseResponse;
+
 export type {
   CommentOnPostPayload,
   UpdateCommentOnPostPayload,
@@ -102,4 +173,7 @@ export type {
   ChangeStatusPayload,
   GetPostsResponse,
   CreatePostResponse,
+  LikePostResponse,
+  GetPostResponse,
+  UnLikePostResponse,
 };

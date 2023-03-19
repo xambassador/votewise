@@ -1,12 +1,16 @@
+import { useStore } from "zustand";
+
 import type { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 
 import React from "react";
-import { QueryClient, dehydrate } from "react-query";
+import { QueryClient, dehydrate, useMutation, useQueryClient } from "react-query";
+import type { InfiniteData } from "react-query";
 
+import { classNames } from "@votewise/lib";
 import { parseHashTags } from "@votewise/lib/hashtags";
 import type { GetPostsResponse } from "@votewise/types";
-import { Button } from "@votewise/ui";
+import { Button, makeToast } from "@votewise/ui";
 import { FiMessageCircle as Message, FiSend as Sent, FiThumbsUp as Upvote } from "@votewise/ui/icons";
 
 import {
@@ -18,19 +22,105 @@ import {
   PostText,
   PostTitle,
   PostUserPill,
-} from "components";
+} from "components/post";
 
 import { timeAgo } from "lib/date";
 import { usePosts } from "lib/hooks/usePosts";
+import store from "lib/store";
 import { getServerSession } from "server/lib/getServerSession";
 
 import { getPosts } from "server/services/post";
+import { likePost, unlikePost } from "services/post";
 
 type PostType = GetPostsResponse["data"]["posts"][0];
 
 function PostCard(props: { post: PostType }) {
   const { post } = props;
+  const user = useStore(store, (state) => state.user);
   const parsedText = parseHashTags(post.content);
+  const queryClient = useQueryClient();
+
+  const likeMutation = useMutation((postId: number) => likePost(postId), {
+    onMutate: (variables) => {
+      queryClient.cancelQueries("posts");
+      const previousPosts = queryClient.getQueriesData("posts");
+      queryClient.setQueryData<InfiniteData<GetPostsResponse>>("posts", (old) => ({
+        ...(old as InfiniteData<GetPostsResponse>),
+        pages: old?.pages.map((page) => ({
+          ...(page as GetPostsResponse),
+          data: {
+            ...page.data,
+            // eslint-disable-next-line @typescript-eslint/no-shadow
+            posts: page.data.posts.map((post) => {
+              if (post.id === variables) {
+                return {
+                  ...post,
+                  upvotes_count: post.upvotes_count + 1,
+                  upvotes: [{ user_id: user?.id, id: 121 }, ...post.upvotes],
+                };
+              }
+              return post;
+            }),
+          },
+        })) as GetPostsResponse[],
+      }));
+
+      return {
+        previousPosts,
+      };
+    },
+    onSuccess: () => {},
+    onError: (error: any, _, context) => {
+      const message = error?.response.data.error.message || "Something went wrong";
+      makeToast(message, "error");
+      queryClient.setQueriesData("posts", context?.previousPosts);
+    },
+  });
+
+  const unlikeMutation = useMutation((postId: number) => unlikePost(postId), {
+    onMutate: (variables) => {
+      queryClient.cancelQueries("posts");
+      const previousPosts = queryClient.getQueriesData("posts");
+      queryClient.setQueryData<InfiniteData<GetPostsResponse>>("posts", (old) => ({
+        ...(old as InfiniteData<GetPostsResponse>),
+        pages: old?.pages.map((page) => ({
+          ...(page as GetPostsResponse),
+          data: {
+            ...page.data,
+            // eslint-disable-next-line @typescript-eslint/no-shadow
+            posts: page.data.posts.map((post) => {
+              if (post.id === variables) {
+                return {
+                  ...post,
+                  upvotes_count: post.upvotes_count - 1,
+                  upvotes: post.upvotes.filter((item) => item.user_id !== user?.id),
+                };
+              }
+              return post;
+            }),
+          },
+        })) as GetPostsResponse[],
+      }));
+
+      return {
+        previousPosts,
+      };
+    },
+    onSuccess: () => {},
+    onError: (error: any, _, context) => {
+      const message = error?.response.data.error.message || "Something went wrong";
+      makeToast(message, "error");
+      queryClient.setQueriesData("posts", context?.previousPosts);
+    },
+  });
+
+  const handleOnPostLike = () => {
+    if (post.upvotes.find((item) => item.user_id === user?.id)) {
+      unlikeMutation.mutate(post.id);
+      return;
+    }
+    likeMutation.mutate(post.id);
+  };
 
   return (
     <Post>
@@ -56,9 +146,14 @@ function PostCard(props: { post: PostType }) {
       )}
       <PostFooter>
         <ButtonGroup>
-          <span>
-            <Upvote className="h-5 w-5 text-gray-500" />
-          </span>
+          <button type="button" onClick={handleOnPostLike}>
+            <Upvote
+              className={classNames(
+                "h-5 w-5",
+                post.upvotes.find((item) => item.user_id === user?.id) ? "text-blue-700" : "text-gray-500"
+              )}
+            />
+          </button>
           <span className="text-sm text-gray-600">{post.upvotes_count}</span>
         </ButtonGroup>
         <ButtonGroup>

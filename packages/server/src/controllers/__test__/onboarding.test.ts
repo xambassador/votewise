@@ -237,6 +237,24 @@ describe("Onboarding API", () => {
         },
         data: {
           ...onboaringPayload,
+          onboarded: true,
+        },
+        select: {
+          id: true,
+          username: true,
+          name: true,
+          profile_image: true,
+          cover_image: true,
+          location: true,
+          gender: true,
+          twitter: true,
+          email: true,
+          facebook: true,
+          about: true,
+          onboarded: true,
+          last_login: true,
+          is_email_verify: true,
+          updated_at: true,
         },
       });
       expect(prismaMock.user.update).toHaveBeenCalledTimes(1);

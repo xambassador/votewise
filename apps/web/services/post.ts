@@ -1,6 +1,11 @@
 import type { AxiosResponse } from "axios";
 
-import type { GetPostResponse, GetPostsResponse, LikePostResponse } from "@votewise/types";
+import type {
+  GetPostResponse,
+  GetPostsResponse,
+  LikePostResponse,
+  UnLikePostResponse,
+} from "@votewise/types";
 
 import { axioInstance } from "lib/axios";
 
@@ -32,6 +37,18 @@ export const likePost = async (postId: number) => {
   const response: AxiosResponse<LikePostResponse> = await axioInstance.patch(apiEndpoint, {
     postId,
     type: "LIKE",
+  });
+  return response.data;
+};
+
+/**
+ * @description Unlike post
+ */
+export const unlikePost = async (postId: number) => {
+  const apiEndpoint = "/posts/unlike";
+  const response: AxiosResponse<UnLikePostResponse> = await axioInstance.patch(apiEndpoint, {
+    postId,
+    type: "UNLIKE",
   });
   return response.data;
 };

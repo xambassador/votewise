@@ -37,7 +37,7 @@ export const onboardUser = async (data: OnboardingPayload) => {
  * @description Get user information
  */
 export const getMyDetails = async () => {
-  const response: AxiosResponse<MyDetailsResponse> = await axioInstance.get("/me");
+  const response: AxiosResponse<MyDetailsResponse> = await axioInstance.get("/user/me");
   return response.data;
 };
 

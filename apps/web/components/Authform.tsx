@@ -19,6 +19,7 @@ import {
 import { FiX as CloseIcon, FiMail as Email, FiEyeOff as EyeOff, FiEye as EyeOn } from "@votewise/ui/icons";
 
 import { axioInstance } from "lib/axios";
+import { useAsync } from "lib/hooks/useAsync";
 
 type AuthFormProps = {
   title: string;
@@ -77,11 +78,16 @@ export function AuthForm(props: AuthFormProps) {
     type = "signup",
   } = props;
 
+  const { run, status } = useAsync({
+    data: null,
+    error: null,
+    status: "idle",
+  });
   const router = useRouter();
   const methods = useForm<FormValues>();
   const {
     register,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     clearErrors,
   } = methods;
 
@@ -90,14 +96,17 @@ export function AuthForm(props: AuthFormProps) {
   };
 
   const authenticate: SubmitHandler<FormValues> = async (data) => {
-    const url = type === "signup" ? "/signup" : "/signin";
-    try {
-      await axioInstance.post(url, data);
-      router.push("/onboarding");
-    } catch (err: any) {
-      const msg = err.response?.data.error.message || "Something went wrong";
-      methods.setError("apiError", { message: msg });
-    }
+    const url = type === "signup" ? "/auth/signup" : "/auth/signin";
+    run(
+      axioInstance.post(url, data),
+      () => {
+        router.push("/onboarding");
+      },
+      (err: any) => {
+        const msg = err.response?.data.error.message || "Something went wrong";
+        methods.setError("apiError", { message: msg });
+      }
+    );
   };
 
   return (
@@ -159,7 +168,11 @@ export function AuthForm(props: AuthFormProps) {
             </div>
           </div>
 
-          <Button primary isLoading={isSubmitting} disabled={errors.apiError && true}>
+          <Button
+            primary
+            isLoading={status === "pending"}
+            disabled={(errors.apiError && true) || status === "pending"}
+          >
             {submitButtonLabel}
           </Button>
         </div>

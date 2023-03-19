@@ -253,7 +253,7 @@ describe("POST /api/v1/auth/login", () => {
       },
     });
     expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(1);
-    expect(mockResponse.status).toHaveBeenCalledWith(httpStatusCodes.UNAUTHORIZED);
+    expect(mockResponse.status).toHaveBeenCalledWith(httpStatusCodes.BAD_REQUEST);
     expect(mockResponse.status).not.toHaveBeenCalledWith(httpStatusCodes.OK);
     expect(mockResponse.status).toHaveBeenCalledTimes(1);
     expect(mockResponse.json).toHaveBeenCalledWith({

@@ -92,6 +92,15 @@ class PostService {
             upvotes: true,
           },
         },
+        upvotes: {
+          where: {
+            user_id: userId,
+          },
+          select: {
+            id: true,
+            user_id: true,
+          },
+        },
         post_assets: {
           select: {
             url: true,
