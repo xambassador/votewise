@@ -103,13 +103,14 @@ export const getPosts = async (req: Request, res: Response) => {
 // -----------------------------------------------------------------------------------------
 export const getPost = async (req: Request, res: Response) => {
   const { postId } = req.params;
+  const { user } = req.session;
 
   if (!postId) {
     return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
   }
 
   try {
-    const post = await PostService.getPost(Number(postId));
+    const post = await PostService.getPost(Number(postId), user.id);
     return res.status(OK).json(
       new JSONResponse(
         POST_DETAILS_FETCHED_SUCCESSFULLY_MSG,

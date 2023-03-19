@@ -92,6 +92,8 @@ class PostService {
             upvotes: true,
           },
         },
+        // TODO: Should give informative name to this field
+        // upvotes: this field indicates whether the user who make request has liked the post or not.
         upvotes: {
           where: {
             user_id: userId,
@@ -136,7 +138,7 @@ class PostService {
   }
 
   // ---------------------------------
-  async getPost(postId: number) {
+  async getPost(postId: number, userId: number) {
     try {
       const post = await prisma.post.findUnique({
         where: {
@@ -183,6 +185,17 @@ class PostService {
             skip: 0,
             orderBy: {
               created_at: "desc",
+            },
+          },
+          // TODO: Should give informative name to this field
+          // upvotes: this field indicates whether the user who make request has liked the post or not.
+          upvotes: {
+            where: {
+              user_id: userId,
+            },
+            select: {
+              user_id: true,
+              id: true,
             },
           },
           _count: {
