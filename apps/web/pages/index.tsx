@@ -41,7 +41,7 @@ function PostCard(props: { post: PostType }) {
   const queryClient = useQueryClient();
 
   const likeMutation = useMutation((postId: number) => likePost(postId), {
-    onMutate: (variables) => {
+    onMutate: (postId) => {
       queryClient.cancelQueries("posts");
       const previousPosts = queryClient.getQueriesData("posts");
       queryClient.setQueryData<InfiniteData<GetPostsResponse>>("posts", (old) => ({
@@ -52,7 +52,7 @@ function PostCard(props: { post: PostType }) {
             ...page.data,
             // eslint-disable-next-line @typescript-eslint/no-shadow
             posts: page.data.posts.map((post) => {
-              if (post.id === variables) {
+              if (post.id === postId) {
                 return {
                   ...post,
                   upvotes_count: post.upvotes_count + 1,
@@ -78,7 +78,7 @@ function PostCard(props: { post: PostType }) {
   });
 
   const unlikeMutation = useMutation((postId: number) => unlikePost(postId), {
-    onMutate: (variables) => {
+    onMutate: (postId) => {
       queryClient.cancelQueries("posts");
       const previousPosts = queryClient.getQueriesData("posts");
       queryClient.setQueryData<InfiniteData<GetPostsResponse>>("posts", (old) => ({
@@ -89,7 +89,7 @@ function PostCard(props: { post: PostType }) {
             ...page.data,
             // eslint-disable-next-line @typescript-eslint/no-shadow
             posts: page.data.posts.map((post) => {
-              if (post.id === variables) {
+              if (post.id === postId) {
                 return {
                   ...post,
                   upvotes_count: post.upvotes_count - 1,
@@ -216,6 +216,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
   const queryClient = new QueryClient();
   await queryClient.prefetchInfiniteQuery("posts", async () => {
+    // TODO: Move hardcoded limit and offset to constants
     const { data } = await getPosts(session.accessToken, 5, 0);
     return data;
   });

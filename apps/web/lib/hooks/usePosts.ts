@@ -12,6 +12,7 @@ export const usePosts = () => {
     getNextPageParam: (lastPage) =>
       lastPage.data.meta.pagination.isLastPage ? undefined : lastPage.data.meta.pagination.next,
     refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   return postsQuery;

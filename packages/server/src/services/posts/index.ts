@@ -389,14 +389,52 @@ class PostService {
   // ---------------------------------
   async addComment(postId: number, userId: number, text: string) {
     try {
+      const isPostExist = await prisma.post.findUnique({
+        where: {
+          id: postId,
+        },
+      });
+
+      if (!isPostExist) {
+        throw new Error(POST_NOT_FOUND_MSG);
+      }
+
       const data = await prisma.comment.create({
         data: {
           text,
           post_id: postId,
           user_id: userId,
         },
+        select: {
+          id: true,
+          parent_id: true,
+          post_id: true,
+          text: true,
+          // upvotes represents whether the user who make request has liked the comment or not
+          upvotes: {
+            where: {
+              user_id: userId,
+            },
+            select: {
+              user_id: true,
+              id: true,
+            },
+          },
+          user_id: true,
+          _count: {
+            select: {
+              upvotes: true,
+            },
+          },
+          created_at: true,
+          updated_at: true,
+        },
       });
-      return data;
+      return {
+        ...data,
+        upvotes_count: data._count.upvotes,
+        _count: undefined,
+      };
     } catch (err) {
       throw new Error(ERROR_ADDING_COMMENT_MSG);
     }

@@ -1,6 +1,7 @@
 import type { AxiosResponse } from "axios";
 
 import type {
+  CreateCommentResponse,
   GetPostResponse,
   GetPostsResponse,
   LikePostResponse,
@@ -33,7 +34,7 @@ export const getPost = async (postId: number) => {
  */
 
 export const likePost = async (postId: number) => {
-  const apiEndpoint = "/posts/like";
+  const apiEndpoint = `/posts/${postId}/like`;
   const response: AxiosResponse<LikePostResponse> = await axioInstance.patch(apiEndpoint, {
     postId,
     type: "LIKE",
@@ -45,10 +46,22 @@ export const likePost = async (postId: number) => {
  * @description Unlike post
  */
 export const unlikePost = async (postId: number) => {
-  const apiEndpoint = "/posts/unlike";
+  const apiEndpoint = `/posts/${postId}/unlike`;
   const response: AxiosResponse<UnLikePostResponse> = await axioInstance.patch(apiEndpoint, {
     postId,
     type: "UNLIKE",
+  });
+  return response.data;
+};
+
+/**
+ * @description Comment on post
+ */
+export const commentOnPost = async (postId: number, comment: string) => {
+  const apiEndpoint = `/posts/${postId}/comment`;
+  const response: AxiosResponse<CreateCommentResponse> = await axioInstance.post(apiEndpoint, {
+    postId,
+    text: comment,
   });
   return response.data;
 };

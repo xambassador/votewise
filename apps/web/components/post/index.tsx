@@ -2,8 +2,8 @@ import type { ReactNode } from "react";
 import React from "react";
 
 import { classNames } from "@votewise/lib";
-import { Avatar, Badge, Image, Input } from "@votewise/ui";
-import { FiClock as Clock, FiMapPin as MapPin } from "@votewise/ui/icons";
+import { Avatar, Badge, Image, Input, Loader } from "@votewise/ui";
+import { FiClock as Clock, FiSend, FiMapPin as MapPin } from "@votewise/ui/icons";
 
 type PostMapPinIconProps = React.ComponentProps<typeof MapPin>;
 export function PostMapPinIcon(props: PostMapPinIconProps) {
@@ -214,18 +214,33 @@ export function PostStatuPill(props: PostStatuPillProps) {
   );
 }
 
-type PostAddCommentInputProps = React.ComponentProps<typeof Input>;
+type PostAddCommentInputProps = React.ComponentProps<typeof Input> & {
+  formProps?: React.HTMLAttributes<HTMLFormElement>;
+  isLoading: boolean;
+};
 export function PostAddCommentInput(props: PostAddCommentInputProps) {
-  const { name = "comment", className, ...rest } = props;
+  const { name = "comment", className, formProps, isLoading = false, ...rest } = props;
   return (
-    <Input
-      name={name}
-      type="text"
+    <form
       className={classNames(
-        "bg-gray-50 py-3 placeholder:text-base placeholder:font-medium placeholder:text-gray-600",
-        className
+        "flex w-full items-center overflow-hidden rounded-lg border border-gray-200 bg-gray-50 pr-6 focus-within:ring-1 focus-within:ring-blue-600",
+        formProps?.className
       )}
-      {...rest}
-    />
+      {...formProps}
+    >
+      <Input
+        name={name}
+        type="text"
+        className={classNames(
+          "border-none bg-gray-50 py-3 placeholder:text-base placeholder:font-medium placeholder:text-gray-600 focus:ring-0",
+          className
+        )}
+        {...rest}
+      />
+      <button type="submit" disabled={isLoading}>
+        {isLoading && <Loader className="h-5 w-5" loaderColor="#238BE6" />}
+        {!isLoading && <FiSend className="h-5 w-5 text-gray-600" />}
+      </button>
+    </form>
   );
 }

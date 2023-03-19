@@ -124,6 +124,10 @@ type GetPostResponse = {
         type: string;
         id: number;
       }[];
+      upvotes: {
+        user_id: number;
+        id: number;
+      }[];
       comments: {
         id: number;
         user_id: number;
@@ -164,6 +168,24 @@ type UnLikePostResponse = {
   };
 } & BaseResponse;
 
+type CreateCommentResponse = {
+  data: {
+    message: string;
+    comment: {
+      id: number;
+      parent_id: number | null;
+      post_id: number;
+      text: string;
+      upvotes: {
+        user_id: number;
+        id: number;
+      }[];
+      user_id: number;
+      upvotes_count: number;
+    };
+  };
+} & BaseResponse;
+
 export type {
   CommentOnPostPayload,
   UpdateCommentOnPostPayload,
@@ -176,4 +198,5 @@ export type {
   LikePostResponse,
   GetPostResponse,
   UnLikePostResponse,
+  CreateCommentResponse,
 };

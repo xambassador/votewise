@@ -72,7 +72,7 @@ function NotificationButton() {
     <Popover className="relative">
       {({ open }) => (
         <>
-          <Popover.Button type="button" className="rounded-full p-3 transition-all hover:bg-gray-50">
+          <Popover.Button type="button" className="rounded-full p-3 transition-all hover:bg-gray-200">
             <Bell className="h-6 w-6 text-gray-800" />
           </Popover.Button>
           <Transition
@@ -198,7 +198,7 @@ export function Navbar() {
                     router.pathname === link.href &&
                       "bg-black-900 flex items-center gap-2 rounded-full p-3 text-gray-50",
                     router.pathname !== link.href &&
-                      "inline-block rounded-full p-3 transition-all hover:bg-gray-50"
+                      "inline-block rounded-full p-3 transition-all hover:bg-gray-200"
                   )}
                 >
                   <span>

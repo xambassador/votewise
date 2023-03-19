@@ -33,6 +33,8 @@ import {
   POSTS_FETCHED_SUCCESSFULLY_MSG,
   POST_ALREADY_LIKED_MSG,
   POST_DETAILS_FETCHED_SUCCESSFULLY_MSG,
+  POST_NOT_FOUND_MSG,
+  POST_NOT_FOUND_RESPONSE,
   POST_NOT_LIKED_MSG,
   POST_UNLIKED_SUCCESSFULLY_MSG,
   REPLAY_ADDED_SUCCESSFULLY_MSG,
@@ -312,6 +314,9 @@ export const commentOnPost = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
+    if (msg === POST_NOT_FOUND_MSG) {
+      return res.status(NOT_FOUND).json(POST_NOT_FOUND_RESPONSE);
+    }
     return res.status(INTERNAL_SERVER_ERROR).json(
       new JSONResponse(
         SOMETHING_WENT_WRONG_MSG,

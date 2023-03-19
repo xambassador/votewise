@@ -83,7 +83,7 @@ export const getServerSession = async (
         accessToken: response.data.accessToken,
       };
     } catch (err: any) {
-      logger(`====> Error refreshing token   ${err?.response}`, "error");
+      logger(`====> Error refreshing token   ${err?.response.data.error.message}`, "error");
       clearCookies(res);
       return null;
     }
