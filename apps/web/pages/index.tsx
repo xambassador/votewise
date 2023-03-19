@@ -5,14 +5,15 @@ import type { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 
 import React from "react";
+import { QueryClient, dehydrate } from "react-query";
 
 import { parseHashTags } from "@votewise/lib/hashtags";
 import type { GetPostsResponse } from "@votewise/types";
+import { Button } from "@votewise/ui";
 import { FiMessageCircle as Message, FiSend as Sent, FiThumbsUp as Upvote } from "@votewise/ui/icons";
 
 import {
   ButtonGroup,
-  Layout,
   Post,
   PostFooter,
   PostGallary,
@@ -28,10 +29,6 @@ import { getServerSession } from "server/lib/getServerSession";
 import { getPosts } from "server/services/post";
 
 dayjs.extend(plugin);
-
-type Props = {
-  data: GetPostsResponse;
-};
 
 type PostType = GetPostsResponse["data"]["posts"][0];
 
@@ -85,24 +82,36 @@ function PostCard(props: { post: PostType }) {
   );
 }
 
-export default function Home(props: Props) {
-  const { data: initialData } = props;
-  const { data } = usePosts(initialData);
+export default function Home() {
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } = usePosts();
 
   return (
-    <Layout>
-      <div className="flex flex-col gap-8">
-        {data?.data.posts.map((post) => (
-          <PostCard key={post.slug} post={post} />
+    <div className="flex flex-col gap-8">
+      {(status !== "loading" || !isFetching) &&
+        data?.pages?.map((page, i) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <React.Fragment key={i}>
+            {page.data.posts.map((post) => (
+              <PostCard key={post.slug} post={post} />
+            ))}
+          </React.Fragment>
         ))}
-      </div>
-    </Layout>
+
+      <Button
+        className="bg-gray-800 py-3 text-gray-50"
+        onClick={() => fetchNextPage()}
+        disabled={!hasNextPage || isFetchingNextPage}
+        isLoading={isFetchingNextPage || isFetching}
+      >
+        {hasNextPage && "Load More"}
+        {!hasNextPage && "Nothing more to load"}
+      </Button>
+    </div>
   );
 }
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const { req, res } = context;
-
   const session = await getServerSession({ req, res });
 
   if (!session) {
@@ -114,12 +123,19 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     };
   }
 
-  const response = await getPosts(session.accessToken);
+  const queryClient = new QueryClient();
+  await queryClient.prefetchInfiniteQuery("posts", async () => {
+    const { data } = await getPosts(session.accessToken, 5, 0);
+    return data;
+  });
+  const dehydratedClient = dehydrate(queryClient);
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  dehydratedClient.queries[0].state.data.pageParams = [null];
 
   return {
     props: {
-      data: response.data,
-      session,
+      dehydratedState: dehydratedClient,
     },
   };
 };

@@ -9,28 +9,41 @@ import type { NextPage } from "next";
 import type { AppProps } from "next/app";
 
 import type { ReactElement, ReactNode } from "react";
-import React from "react";
-import { QueryClient, QueryClientProvider } from "react-query";
+import React, { useState } from "react";
+import { Hydrate, QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 
 import { Toaster } from "@votewise/ui";
 
-import { ProgressBar } from "components";
-
-const queryClient = new QueryClient();
+import { AuthScreenLayout } from "components/AuthScreenLayout";
+import { Layout } from "components/Layout";
+import { ProgressBar } from "components/Progressbar";
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
-export default function App({ Component, pageProps }: AppPropsWithLayout) {
-  const getLayout = Component.getLayout ?? ((page) => page);
-  return getLayout(
+export default function App({ Component, pageProps, router }: AppPropsWithLayout) {
+  const { pathname } = router;
+  const [queryClient] = useState(() => new QueryClient());
+
+  let LayoutComponent;
+  if (pathname === "/signin" || pathname === "/signup" || pathname === "/onboarding") {
+    LayoutComponent = AuthScreenLayout;
+  } else {
+    LayoutComponent = Layout;
+  }
+
+  return (
     <QueryClientProvider client={queryClient}>
-      <ProgressBar />
-      <Component {...pageProps} />
-      <Toaster position="top-right" />
-      <ReactQueryDevtools initialIsOpen={false} />
+      <LayoutComponent>
+        <ProgressBar />
+        <Hydrate state={pageProps.dehydratedState}>
+          <Component {...pageProps} />
+        </Hydrate>
+        <Toaster position="top-right" />
+        <ReactQueryDevtools initialIsOpen={false} />
+      </LayoutComponent>
     </QueryClientProvider>
   );
 }

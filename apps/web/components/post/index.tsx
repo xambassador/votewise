@@ -176,13 +176,7 @@ type FigureProps = React.HTMLAttributes<HTMLElement>;
 function Figure(props: FigureProps) {
   const { className, children, ...rest } = props;
   return (
-    <figure
-      className={classNames(
-        "h-[calc((250/16)*1rem)] max-h-[calc((250/16)*1rem)] w-[calc((350/16)*1rem)]",
-        className
-      )}
-      {...rest}
-    >
+    <figure className={classNames("h-fit", className)} {...rest}>
       {children}
     </figure>
   );
@@ -194,15 +188,15 @@ export function PostGallary({ images }: { images: { url: string }[] }) {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-6">
+    <div className={classNames("grid grid-cols-2 gap-6", images.length === 1 && "grid-cols-1")}>
       {images.map((img) => (
-        <Figure key={img.url}>
+        <Figure key={img.url} className={classNames(images.length > 1 && "h-full")}>
           <Image
             src={img.url}
             alt="Post"
             resetWidthAndHeight
             className="h-full w-full rounded-lg object-cover"
-            wrapperClassName="max-h-[calc((250/16)*1rem)] w-full h-full"
+            wrapperClassName="w-full h-full"
           />
         </Figure>
       ))}

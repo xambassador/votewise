@@ -4,7 +4,12 @@ import type { GetPostsResponse } from "@votewise/types";
 
 import { axioInstance } from "lib/axios";
 
-export const getPosts = async () => {
-  const response: AxiosResponse<GetPostsResponse> = await axioInstance.get("/posts");
+/**
+ * @description Get all posts
+ * @returns
+ */
+export const getPosts = async (limit = 5, offset = 0) => {
+  const apiEndpoint = `/posts?limit=${limit}&offset=${offset}`;
+  const response: AxiosResponse<GetPostsResponse> = await axioInstance.get(apiEndpoint);
   return response.data;
 };

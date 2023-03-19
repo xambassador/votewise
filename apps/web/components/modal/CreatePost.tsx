@@ -4,7 +4,7 @@ import React, { useEffect, useId, useState } from "react";
 import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
 
-import type { GetPostsResponse, MyDetailsResponse } from "@votewise/types";
+import type { MyDetailsResponse } from "@votewise/types";
 import {
   Avatar,
   Button,
@@ -188,54 +188,14 @@ export function CreatePost({ setOpen }: { setOpen: (open: boolean) => void }) {
         postAssets: data.postAssets,
       }),
     {
-      onMutate: (variables) => {
-        const { title, content, type, status, postAssets } = variables;
+      onMutate: () => {
         // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-        queryClient.cancelQueries("posts");
         queryClient.cancelQueries("user-info");
 
         // Snapshot the previous value
-        const previousPosts = queryClient.getQueryData<GetPostsResponse>("posts");
-        const previousUserInfo = queryClient.getQueriesData<MyDetailsResponse>("user-info");
+        const previousUserInfo = queryClient.getQueryData<MyDetailsResponse>("user-info");
 
         // Optimistically update to the new value
-        if (previousPosts) {
-          queryClient.setQueryData<GetPostsResponse>("posts", (old) => ({
-            ...(old as GetPostsResponse),
-            data: {
-              ...(old?.data as GetPostsResponse["data"]),
-              posts: [
-                {
-                  id: 1101,
-                  title,
-                  content,
-                  upvotes_count: 0,
-                  type: type.value,
-                  status,
-                  author: {
-                    location: user?.location as string,
-                    name: user?.name as string,
-                    profile_image: user?.profile_image as string,
-                  },
-                  author_id: user?.id as number,
-                  comments_count: 0,
-                  created_at: new Date(),
-                  group_id: null,
-                  post_assets: [
-                    ...(postAssets?.map((asset) => ({
-                      id: 1101,
-                      url: asset.url,
-                    })) as { url: string }[]),
-                  ],
-                  slug: title,
-                  updated_at: new Date(),
-                },
-                ...(old?.data.posts as GetPostsResponse["data"]["posts"]),
-              ],
-            },
-          }));
-        }
-
         if (previousUserInfo) {
           queryClient.setQueryData<MyDetailsResponse>("user-info", (old) => ({
             ...(old as MyDetailsResponse),
@@ -250,7 +210,7 @@ export function CreatePost({ setOpen }: { setOpen: (open: boolean) => void }) {
         }
 
         // Return a context object with the snapshotted value
-        return { previousPosts, previousUserInfo };
+        return { previousUserInfo };
       },
       onSuccess: () => {
         makeToast("Post created successfully", "success");
@@ -260,7 +220,6 @@ export function CreatePost({ setOpen }: { setOpen: (open: boolean) => void }) {
         const message = error?.response.data.error.message || "Something went wrong";
         setError("apiError", { message });
         // If the mutation fails, use the context returned from onMutate to roll back
-        queryClient.setQueryData("posts", context?.previousPosts);
         queryClient.setQueryData("user-info", context?.previousUserInfo);
       },
       onSettled: () => {

@@ -10,11 +10,13 @@ import type { GetPostsResponse } from "@votewise/types";
  */
 export const getPosts = async (
   token: string,
+  limit: number,
+  offset: number,
   options?: {
     headers: AxiosRequestConfig["headers"];
   }
 ) => {
-  const apiEndpoint = `${POST_ROUTE_V1}${GET_POSTS_V1}`;
+  const apiEndpoint = `${POST_ROUTE_V1}${GET_POSTS_V1}?limit=${limit}&offset=${offset}`;
   const response: AxiosResponse<GetPostsResponse> = await getAxiosServerWithAuth(token).get(apiEndpoint, {
     headers: options?.headers,
   });

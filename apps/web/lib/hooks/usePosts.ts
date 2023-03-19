@@ -1,12 +1,18 @@
-import { useQuery } from "react-query";
-
-import type { GetPostsResponse } from "@votewise/types";
+import { useInfiniteQuery } from "react-query";
 
 import { getPosts } from "services/post";
 
-export const usePosts = (initialData: GetPostsResponse) => {
-  const postsQuery = useQuery("posts", getPosts, {
-    initialData,
+const fetchPosts = async ({ pageParam = 0 }) => {
+  const response = await getPosts(5, pageParam);
+  return response;
+};
+
+export const usePosts = () => {
+  const postsQuery = useInfiniteQuery("posts", fetchPosts, {
+    getNextPageParam: (lastPage) =>
+      lastPage.data.meta.pagination.isLastPage ? undefined : lastPage.data.meta.pagination.next,
+    refetchOnWindowFocus: false,
   });
+
   return postsQuery;
 };

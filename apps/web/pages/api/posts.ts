@@ -12,6 +12,7 @@ const { UNAUTHORIZED } = httpStatusCodes;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const headers = getProxyHeaders(req);
+  const { limit, offset } = req.query;
 
   try {
     const session = await getServerSession({ req, res });
@@ -19,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
     }
 
-    const response = await getPosts(session.accessToken, { headers });
+    const response = await getPosts(session.accessToken, limit, offset, { headers });
 
     const { headers: responseHeaders, data, status } = response;
     Object.entries(responseHeaders).forEach((keyArr) => {
