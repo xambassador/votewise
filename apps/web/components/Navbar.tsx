@@ -184,7 +184,7 @@ const links = [
 export function Navbar() {
   const router = useRouter();
   return (
-    <nav className="bg-white py-5 shadow-sm">
+    <nav className="fixed top-0 left-0 right-0 z-10 bg-white py-5 shadow-sm">
       <div className="container mx-auto flex items-center justify-between gap-[calc((155/16)*1rem)]">
         <Logo />
 

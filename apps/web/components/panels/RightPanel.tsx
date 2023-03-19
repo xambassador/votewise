@@ -39,5 +39,5 @@ export function UserRecommendations() {
 }
 
 export function RightPanel({ children }: { children: ReactNode }) {
-  return <div className="flex flex-col gap-7">{children}</div>;
+  return <div className="sticky top-[calc((150/16)*1rem)] flex h-fit flex-col gap-7">{children}</div>;
 }

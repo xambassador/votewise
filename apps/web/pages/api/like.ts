@@ -6,13 +6,13 @@ import { getProxyHeaders } from "server/lib/getProxyHeaders";
 import { getServerSession } from "server/lib/getServerSession";
 import { UNAUTHORIZED_RESPONSE } from "server/lib/response";
 
-import { getPosts } from "server/services/post";
+import { likePost } from "server/services/post";
 
 const { UNAUTHORIZED } = httpStatusCodes;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { postId } = req.body;
   const headers = getProxyHeaders(req);
-  const { limit, offset } = req.query;
 
   try {
     const session = await getServerSession({ req, res });
@@ -20,7 +20,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
     }
 
-    const response = await getPosts(session.accessToken, limit, offset, { headers });
+    const response = await likePost(session.accessToken, Number(postId), {
+      headers,
+    });
 
     const { headers: responseHeaders, data, status } = response;
     Object.entries(responseHeaders).forEach((keyArr) => {

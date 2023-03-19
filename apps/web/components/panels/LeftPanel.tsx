@@ -6,7 +6,7 @@ import { UserPill } from "../UserPill";
 
 export function LeftPanel() {
   return (
-    <aside className="h-fit max-h-[calc((700/16)*1rem)] max-w-[calc((342/16)*1rem)] overflow-hidden rounded-lg border border-gray-200 bg-white py-5 px-10">
+    <aside className="sticky top-[calc((150/16)*1rem)] h-fit max-h-[calc((700/16)*1rem)] max-w-[calc((342/16)*1rem)] overflow-hidden rounded-lg border border-gray-200 bg-white py-5 px-10">
       <div>
         <SearchField name="search" placeholder="Search people or group" />
       </div>

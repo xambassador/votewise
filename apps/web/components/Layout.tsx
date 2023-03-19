@@ -14,7 +14,7 @@ export function Layout({ children }: Props) {
   return (
     <div className="min-h-screen min-w-full">
       <Navbar />
-      <main className="mt-14">
+      <main className="mt-[calc((150/16)*1rem)]">
         <div className="container mx-auto flex justify-between pb-6">
           <LeftPanel />
           {children}

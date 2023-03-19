@@ -1,5 +1,7 @@
 import { useStore } from "zustand";
 
+import { useRouter } from "next/router";
+
 import React, { useEffect, useId, useState } from "react";
 import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
@@ -165,6 +167,7 @@ function PostEditor() {
 
 export function CreatePost({ setOpen }: { setOpen: (open: boolean) => void }) {
   const user = useStore(store, (state) => state.user);
+  const router = useRouter();
   const methods = useForm<FormValues>({
     defaultValues: {
       status: "OPEN",
@@ -214,6 +217,10 @@ export function CreatePost({ setOpen }: { setOpen: (open: boolean) => void }) {
       },
       onSuccess: () => {
         makeToast("Post created successfully", "success");
+        const { pathname } = router;
+        if (pathname !== "/") {
+          router.push("/");
+        }
         setOpen(false);
       },
       onError: (error: any, variables, context) => {

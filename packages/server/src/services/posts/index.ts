@@ -134,6 +134,13 @@ class PostService {
           id: postId,
         },
         include: {
+          post_assets: {
+            select: {
+              url: true,
+              type: true,
+              id: true,
+            },
+          },
           author: {
             select: {
               profile_image: true,
@@ -185,6 +192,7 @@ class PostService {
           _count: undefined,
         })),
         upvotes_count: post?._count.upvotes,
+        comments_count: post?._count.comments,
         _count: undefined,
         meta: {
           pagination: {

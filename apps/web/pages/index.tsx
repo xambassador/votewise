@@ -1,6 +1,3 @@
-import dayjs from "dayjs";
-import plugin from "dayjs/plugin/relativeTime";
-
 import type { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 
@@ -23,12 +20,11 @@ import {
   PostUserPill,
 } from "components";
 
+import { timeAgo } from "lib/date";
 import { usePosts } from "lib/hooks/usePosts";
 import { getServerSession } from "server/lib/getServerSession";
 
 import { getPosts } from "server/services/post";
-
-dayjs.extend(plugin);
 
 type PostType = GetPostsResponse["data"]["posts"][0];
 
@@ -41,7 +37,7 @@ function PostCard(props: { post: PostType }) {
       <PostUserPill
         avatar={post.author.profile_image}
         location={post.author.location}
-        timeAgo={dayjs(post.updated_at).fromNow()}
+        timeAgo={timeAgo(post.updated_at)}
         userName={post.author.name}
       />
       <PostTitle>

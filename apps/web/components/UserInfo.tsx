@@ -1,10 +1,13 @@
 import { useStore } from "zustand";
 
+import { useRouter } from "next/router";
+
 import React, { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
+import { classNames } from "@votewise/lib";
 import { Avatar, Button, Image, Modal } from "@votewise/ui";
-import { FiEdit as Edit } from "@votewise/ui/icons";
+import { FiEdit as Edit, FiFacebook, FiInstagram, FiTwitter, FiMapPin as Map } from "@votewise/ui/icons";
 
 import { useMyDetails } from "lib/hooks/useMyDetails";
 import store from "lib/store";
@@ -44,16 +47,26 @@ function UserAvatarWithBanner({
 
 export function UserInfo() {
   const { data, error, status } = useMyDetails();
+  const { pathname } = useRouter();
 
   const setUser = useStore(store, (state) => state.setUser);
 
   const [open, setOpen] = useState(false);
+  const [isProfilePage, setIsProfilePage] = useState(false);
 
   useEffect(() => {
     if (data) {
       setUser(data.data.user);
     }
   }, [data, setUser]);
+
+  useEffect(() => {
+    if (pathname === "/profile") {
+      setIsProfilePage(true);
+    } else {
+      setIsProfilePage(false);
+    }
+  }, [pathname]);
 
   return (
     <>
@@ -70,7 +83,14 @@ export function UserInfo() {
               <span className="block text-xs text-gray-500">@{data?.data.user.username}</span>
             </div>
 
-            <ul className="mx-auto mt-2 flex w-[calc((190/16)*1rem)] items-center justify-between">
+            {isProfilePage && <p className="my-4 text-sm text-gray-600">{data.data.user.about}</p>}
+
+            <ul
+              className={classNames(
+                "mx-auto mt-2 flex w-[calc((190/16)*1rem)] items-center justify-between",
+                isProfilePage && "w-full"
+              )}
+            >
               <li className="text-center">
                 <span className="block font-bold text-gray-600">{data?.data.user.posts}</span>
                 <span className="block text-xs text-gray-600">Posts</span>
@@ -86,6 +106,41 @@ export function UserInfo() {
                 <span className="block text-xs text-gray-600">Following</span>
               </li>
             </ul>
+
+            {isProfilePage && (
+              <ul className="my-4 flex flex-col gap-3">
+                <li className="flex items-center gap-1">
+                  <span>
+                    <Map className="h-5 w-5 text-gray-500" />
+                  </span>
+                  <span className="text-gray-600">{data.data.user.location}</span>
+                </li>
+                {data.data.user.instagram && (
+                  <li className="flex items-center gap-1">
+                    <span>
+                      <FiInstagram className="h-5 w-5 text-gray-500" />
+                    </span>
+                    <span className="text-gray-600">{data.data.user.instagram}</span>
+                  </li>
+                )}
+                {data.data.user.facebook && (
+                  <li className="flex items-center gap-1">
+                    <span>
+                      <FiFacebook className="h-5 w-5 text-gray-500" />
+                    </span>
+                    <span className="text-gray-600">{data.data.user.facebook}</span>
+                  </li>
+                )}
+                {data.data.user.twitter && (
+                  <li className="flex items-center gap-1">
+                    <span>
+                      <FiTwitter className="h-5 w-5 text-gray-500" />
+                    </span>
+                    <span className="text-gray-600">{data.data.user.twitter}</span>
+                  </li>
+                )}
+              </ul>
+            )}
 
             <Button className="mt-2 gap-2 py-3" onClick={() => setOpen(true)}>
               <Edit className="h-5 w-5" />

@@ -3,7 +3,7 @@ import { useInfiniteQuery } from "react-query";
 import { getPosts } from "services/post";
 
 const fetchPosts = async ({ pageParam = 0 }) => {
-  const response = await getPosts(5, pageParam);
+  const response = await getPosts(5, pageParam || 0);
   return response;
 };
 
