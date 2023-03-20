@@ -164,7 +164,12 @@ export const login = async (req: Request, res: Response) => {
 
     // Create a new accessToken and refreshToken
     const accessToken = JWTService.generateAccessToken({ userId: user.id });
-    const refreshToken = JWTService.generateRefreshToken({ userId: user.id });
+    const refreshToken = JWTService.generateRefreshToken(
+      { userId: user.id },
+      {
+        expiresIn: payload.rememberMe ? "7d" : "1d",
+      }
+    );
     await JWTService.saveRefreshToken(user.id, refreshToken, true);
     await UserService.updateLastLogin(user.id);
 

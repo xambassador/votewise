@@ -485,6 +485,7 @@ export const replyToCommentOnPost = async (req: Request, res: Response) => {
 // -----------------------------------------------------------------------------------------
 export const getRepliesToCommentOnPost = async (req: Request, res: Response) => {
   const { postId, commentId } = req.params;
+  const { user } = req.session;
 
   if (!postId) {
     return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
@@ -497,7 +498,13 @@ export const getRepliesToCommentOnPost = async (req: Request, res: Response) => 
   const { limit, offset } = getLimitAndOffset(req);
 
   try {
-    const data = await PostService.getRepliesToComment(Number(postId), Number(commentId), limit, offset);
+    const data = await PostService.getRepliesToComment(
+      Number(postId),
+      Number(commentId),
+      user.id,
+      limit,
+      offset
+    );
     return res.status(OK).json(
       new JSONResponse(
         GETTING_REPLIES_FROM_COMMENT_MSG,

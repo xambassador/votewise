@@ -103,8 +103,15 @@ class PostService extends BasePostService {
       include: {
         _count: {
           select: {
-            comments: true,
             upvotes: true,
+          },
+        },
+        comments: {
+          where: {
+            parent_id: null,
+          },
+          select: {
+            id: true,
           },
         },
         // TODO: Should give informative name to this field
@@ -140,7 +147,7 @@ class PostService extends BasePostService {
     return {
       posts: posts.map((post) => ({
         ...post,
-        comments_count: post._count.comments,
+        comments_count: post.comments.length,
         upvotes_count: post._count.upvotes,
         _count: undefined,
       })),
@@ -187,20 +194,25 @@ class PostService extends BasePostService {
           },
           _count: {
             select: {
-              comments: true,
               upvotes: true,
             },
           },
         },
       });
+      const totalComments = await prisma.comment.count({
+        where: {
+          post_id: postId,
+          parent_id: null,
+        },
+      });
       return {
         ...post,
         upvotes_count: post?._count.upvotes,
-        comments_count: post?._count.comments,
+        comments_count: totalComments,
         _count: undefined,
         meta: {
           pagination: {
-            ...getPagination(post?._count.comments || 0, 5, 0),
+            ...getPagination(totalComments || 0, 5, 0),
           },
         },
       };
@@ -219,12 +231,14 @@ class PostService extends BasePostService {
       const totalComments = await prisma.comment.count({
         where: {
           post_id: postId,
+          parent_id: null,
         },
       });
 
       const comments = await prisma.comment.findMany({
         where: {
           post_id: postId,
+          parent_id: null,
         },
         select: {
           user: {
@@ -234,6 +248,7 @@ class PostService extends BasePostService {
               profile_image: true,
             },
           },
+          parent_id: true,
           user_id: true,
           id: true,
           updated_at: true,
@@ -247,10 +262,26 @@ class PostService extends BasePostService {
         take: limit,
         skip: offset,
         orderBy: {
-          created_at: "desc",
+          updated_at: "desc",
         },
       });
-      const data = comments.map((comment) => ({
+
+      const commentsWithReplies = await Promise.all(
+        comments.map(async (comment) => {
+          const replies = await prisma.comment.count({
+            where: {
+              post_id: postId,
+              parent_id: comment.id,
+            },
+          });
+          return {
+            ...comment,
+            num_replies: replies,
+          };
+        })
+      );
+
+      const data = commentsWithReplies.map((comment) => ({
         ...comment,
         upvotes_count: comment._count.upvotes,
         _count: undefined,
@@ -508,6 +539,14 @@ class PostService extends BasePostService {
         data: {
           text,
         },
+        select: {
+          id: true,
+          text: true,
+          user_id: true,
+          parent_id: true,
+          updated_at: true,
+          created_at: true,
+        },
       });
 
       return data;
@@ -541,6 +580,14 @@ class PostService extends BasePostService {
           user_id: userId,
           parent_id: commentId,
         },
+        select: {
+          id: true,
+          text: true,
+          user_id: true,
+          parent_id: true,
+          updated_at: true,
+          created_at: true,
+        },
       });
 
       return data;
@@ -551,7 +598,7 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
-  async getRepliesToComment(postId: number, commentId: number, limit = 5, offset = 0) {
+  async getRepliesToComment(postId: number, commentId: number, userId: number, limit = 5, offset = 0) {
     try {
       const comment = await prisma.comment.findUnique({
         where: {
@@ -577,9 +624,26 @@ class PostService extends BasePostService {
           parent_id: commentId,
         },
         select: {
+          _count: {
+            select: {
+              upvotes: true,
+            },
+          },
           updated_at: true,
           created_at: true,
           text: true,
+          id: true,
+          // TODO: Need to add more informative name
+          // upvotes represents whether the user who make request has liked the comment or not
+          upvotes: {
+            where: {
+              user_id: userId,
+            },
+            select: {
+              user_id: true,
+              id: true,
+            },
+          },
           user: {
             select: {
               profile_image: true,
@@ -597,6 +661,8 @@ class PostService extends BasePostService {
       return {
         comments: data.map((r) => ({
           ...r,
+          upvotes_count: r._count.upvotes,
+          _count: undefined,
         })),
         meta: {
           pagination: {

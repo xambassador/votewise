@@ -166,16 +166,63 @@ type GetPostCommentsResponse = {
     comments: {
       user: {
         name: string;
-        id: string;
+        id: number;
         profile_image: string;
       };
+      parent_id: number | null;
       user_id: number;
       id: number;
       updated_at: Date;
       text: string;
       upvotes_count: number;
+      num_replies: number;
     }[];
     meta: Pagination;
+  };
+} & BaseResponse;
+
+type UpdateCommentResponse = {
+  data: {
+    message: string;
+    comment: {
+      id: number;
+      text: string;
+      user_id: number;
+      parent_id: number;
+      updated_at: Date;
+      created_at: Date;
+    };
+  };
+} & BaseResponse;
+
+type ReplyToCommentResponse = UpdateCommentResponse;
+
+type GetRepliesResponse = {
+  data: {
+    message: string;
+    replies: {
+      user: {
+        id: number;
+        name: string;
+        profile_image: string;
+      };
+      upvotes: {
+        user_id: number;
+        id: number;
+      }[];
+      id: number;
+      text: string;
+      created_at: Date;
+      updated_at: Date;
+      upvotes_count: number;
+    }[];
+    meta: Pagination;
+  };
+} & BaseResponse;
+
+type DeleteCommentResponse = {
+  data: {
+    message: string;
   };
 } & BaseResponse;
 
@@ -195,4 +242,8 @@ export type {
   PostStatus,
   PostType,
   GetPostCommentsResponse,
+  UpdateCommentResponse,
+  ReplyToCommentResponse,
+  GetRepliesResponse,
+  DeleteCommentResponse,
 };
