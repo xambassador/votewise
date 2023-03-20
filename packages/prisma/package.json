@@ -12,6 +12,7 @@
         "db:migrate": "yarn prisma migrate dev",
         "db:studio": "yarn prisma studio",
         "db:seed": "yarn prisma db seed",
+        "db:clean": "ts-node --transpile-only ./cleanDb.ts",
         "seed": "ts-node --transpile-only ./seed.ts"
     },
     "devDependencies": {

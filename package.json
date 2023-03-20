@@ -18,6 +18,7 @@
     "db:migrate": "lerna exec --scope @votewise/prisma -- yarn run db:migrate",
     "db:studio": "lerna exec --scope @votewise/prisma -- yarn run db:studio",
     "db:seed": "lerna exec --scope @votewise/prisma -- yarn run db:seed",
+    "db:clean": "lerna exec --scope @votewise/prisma -- yarn run db:clean",
     "clean": "lerna clean --yes && rm -rf node_modules && rm -rf ./apps/web/.next",
     "dev": "lerna run dev --parallel --stream --no-bail --scope @votewise/web --scope @votewise/server --scope @votewise/static-server & npm run static-server & wait",
     "dev:window": "lerna run dev --parallel --stream --no-bail --scope @votewise/web --scope @votewise/server --scope @votewise/static-server",
