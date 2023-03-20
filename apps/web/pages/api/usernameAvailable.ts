@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { CHECK_USERNAME_AVAILABILITY_V1, USER_ROUTE_V1 } from "@votewise/lib";
 
 import { axiosServerInstance } from "server/lib/axios";
+import { getError } from "server/lib/getError";
 import { getProxyHeaders } from "server/lib/getProxyHeaders";
 
 const apiEndpoint = `${USER_ROUTE_V1}${CHECK_USERNAME_AVAILABILITY_V1}`;
@@ -23,8 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(status).json(data);
   } catch (err: any) {
-    const status = err.response.status || 500;
-    const data = err.response.data || { message: "Something went wrong" };
+    const { status, data } = getError(err);
     return res.status(status).json(data);
   }
 }

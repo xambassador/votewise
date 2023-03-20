@@ -2,6 +2,7 @@ import httpStatusCodes from "http-status-codes";
 
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import { getError } from "server/lib/getError";
 import { getProxyHeaders } from "server/lib/getProxyHeaders";
 import { getServerSession } from "server/lib/getServerSession";
 import { UNAUTHORIZED_RESPONSE } from "server/lib/response";
@@ -32,8 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(status).json(data);
   } catch (err: any) {
-    const status = err.response.status || 500;
-    const data = err.response.data || { message: "Something went wrong" };
+    const { status, data } = getError(err);
     return res.status(status).json(data);
   }
 }

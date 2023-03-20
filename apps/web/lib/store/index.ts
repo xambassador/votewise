@@ -2,7 +2,7 @@ import { createStore } from "zustand";
 
 import type { MyDetailsResponse } from "@votewise/types";
 
-type User = MyDetailsResponse["data"]["user"];
+export type User = MyDetailsResponse["data"]["user"];
 
 interface State {
   user: User | null;

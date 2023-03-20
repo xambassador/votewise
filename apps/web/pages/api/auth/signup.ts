@@ -8,6 +8,7 @@ import { logger } from "@votewise/lib/logger";
 import type { RegisterUserPayload } from "@votewise/types";
 
 import { axiosServerInstance } from "server/lib/axios";
+import { getError } from "server/lib/getError";
 import { getProxyHeaders } from "server/lib/getProxyHeaders";
 
 const apiEndpoint = `${AUTH_ROUTE_V1}${REGISTER_USER_V1}`;
@@ -65,9 +66,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(status).json(data);
   } catch (err: any) {
-    logger(err.response.data, "error");
-    const status = err.response.status || 500;
-    const data = err.response.data || { message: "Something went wrong" };
+    const { status, data } = getError(err);
     return res.status(status).json(data);
   }
 }

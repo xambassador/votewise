@@ -5,13 +5,30 @@ import Link from "next/link";
 
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
-import { QueryClient, dehydrate, useMutation, useQuery, useQueryClient } from "react-query";
+import { QueryClient, dehydrate, useQuery, useQueryClient } from "react-query";
 
 import { classNames } from "@votewise/lib";
 import { parseHashTags } from "@votewise/lib/hashtags";
-import type { GetPostResponse } from "@votewise/types";
-import { Avatar, Button, makeToast } from "@votewise/ui";
-import { FiMessageCircle as Message, FiSend as Sent, FiThumbsUp as Upvote } from "@votewise/ui/icons";
+import type { GetPostCommentsResponse, GetPostResponse } from "@votewise/types";
+import {
+  Avatar,
+  Button,
+  DropdownButton,
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuItems,
+  DropdownTransition,
+  Spinner,
+  makeToast,
+} from "@votewise/ui";
+import {
+  FiTrash2 as DeleteIcon,
+  FiMessageCircle as Message,
+  FiEdit2 as PencilIcon,
+  FiSend as Sent,
+  FiThumbsUp as Upvote,
+  FiXCircle as XCircle,
+} from "@votewise/ui/icons";
 
 import { ButtonGroup } from "components";
 import {
@@ -36,135 +53,229 @@ import {
 } from "components/post/comments";
 
 import { timeAgo } from "lib/date";
+import { useCommentMutation } from "lib/hooks/useCommentMutation";
+import { useGetComments } from "lib/hooks/useGetComments";
+import { useLikeMutation } from "lib/hooks/useLikeMutation";
+import { useUnLikeMutation } from "lib/hooks/useUnlikeMutation";
+import { parsePostStatus } from "lib/parsePostStatus";
 import store from "lib/store";
+import type { User } from "lib/store";
 import { getServerSession } from "server/lib/getServerSession";
 
-import { getPost } from "server/services/post";
-import { commentOnPost, getPost as fetchPost, likePost, unlikePost } from "services/post";
+import { getPost, getPostComments } from "server/services/post";
+import { getPost as fetchPost } from "services/post";
 
 type Props = {
   postId: number;
+  user: User | null;
 };
 
-export default function Page(props: Props) {
-  const { postId } = props;
-  const user = useStore(store, (state) => state.user);
+type PageProps = {
+  postId: number;
+};
+
+type PostCommentProps = {
+  comment: GetPostCommentsResponse["data"]["comments"][0];
+  user: User | null;
+};
+
+type PostAddCommentProps = {
+  user: User | null;
+  post: GetPostResponse["data"]["post"];
+};
+
+type PostCommentsProps = {
+  user: User | null;
+  postId: number;
+};
+
+function PostComment(props: PostCommentProps) {
+  const { user, comment } = props;
+  const [toggle, setToggle] = useState(false);
+
+  const handleOnDropDownItemClick = (action: "DELETE" | "UPDATE") => {
+    if (action === "UPDATE") {
+      setToggle(true);
+    }
+  };
+
+  return (
+    <Comment>
+      <CommentHeader>
+        <Avatar src={comment.user.profile_image} width={48} height={48} rounded className="flex-[0_0_48px]" />
+        <span className="text-base font-medium text-gray-800">{comment.user.name}</span>
+        <span className="text-sm text-gray-600">{timeAgo(comment.updated_at)}</span>
+
+        {user?.id === comment.user_id && (
+          // TODO: Move this to a separate component and use it here
+          <DropdownMenu className="ml-auto">
+            <DropdownButton>
+              <EllipsisHorizontalIcon className="h-6 w-6 text-gray-500" />
+            </DropdownButton>
+            <DropdownTransition>
+              <DropdownMenuItems>
+                <DropdownMenuItem
+                  className="gap-2"
+                  as="button"
+                  onClick={() => handleOnDropDownItemClick("UPDATE")}
+                >
+                  <PencilIcon className="h-5 w-5 text-gray-500" />
+                  <span>Update</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="gap-2"
+                  as="button"
+                  onClick={() => handleOnDropDownItemClick("DELETE")}
+                >
+                  <DeleteIcon className="h-5 w-5 text-gray-500" />
+                  <span>Delete</span>
+                </DropdownMenuItem>
+              </DropdownMenuItems>
+            </DropdownTransition>
+          </DropdownMenu>
+        )}
+      </CommentHeader>
+
+      <CommentBody>
+        <CommentSeparator />
+        <div className="ml-3 flex w-full flex-col gap-2">
+          {!toggle && <CommentText>{comment.text}</CommentText>}
+          {toggle && (
+            <PostAddCommentInput
+              className="w-full"
+              name="comment"
+              placeholder="Add your comment"
+              value={comment.text}
+              isLoading={false}
+              formProps={{ className: "mb-2" }}
+            />
+          )}
+          <CommentActions upvoteText={comment.upvotes_count}>
+            {toggle && (
+              <ButtonGroup>
+                <button type="button" className="flex items-center gap-1" onClick={() => setToggle(false)}>
+                  <span>
+                    <XCircle className="h-5 w-5 text-gray-500" />
+                  </span>
+                  <span className="text-sm text-gray-600">Cancel</span>
+                </button>
+              </ButtonGroup>
+            )}
+          </CommentActions>
+        </div>
+      </CommentBody>
+    </Comment>
+  );
+}
+
+function PostComments(props: PostCommentsProps) {
+  const { user, postId } = props;
+  const {
+    data: comments,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status: commentsStatus,
+  } = useGetComments(postId);
+
+  return (
+    <CommentsWrapper>
+      {(commentsStatus !== "loading" || !isFetching) &&
+        comments?.pages.map((page, i) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <React.Fragment key={i}>
+            {page.data.comments.length === 0 && (
+              <div>
+                <h2 className="text-center text-lg font-semibold text-gray-600">No comments yet</h2>
+              </div>
+            )}
+            {page.data.comments.length > 0 &&
+              page.data.comments.map((c) => <PostComment key={c.id} comment={c} user={user} />)}
+            {page.data.comments.length > 0 && (
+              <Button
+                className="bg-gray-800 py-3 text-gray-50 disabled:bg-gray-800"
+                onClick={() => fetchNextPage()}
+                disabled={!hasNextPage || isFetchingNextPage}
+                isLoading={isFetchingNextPage || isFetching}
+              >
+                {hasNextPage && "Load more discussions"}
+                {!hasNextPage && "No more discussions"}
+              </Button>
+            )}
+          </React.Fragment>
+        ))}
+    </CommentsWrapper>
+  );
+}
+
+function PostAddComment(props: PostAddCommentProps) {
+  const { user, post } = props;
+  const queryClient = useQueryClient();
   const [comment, setComment] = useState("");
+
+  function handleError(err: any) {
+    const message = err?.response.data.error.message || "Something went wrong";
+    makeToast(message, "error");
+  }
+
+  const commentMutation = useCommentMutation(comment, queryClient, user as User, {
+    onSuccess: () => setComment(""),
+    onError: handleError,
+  });
+
+  const handleOnAddComment = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!comment) {
+      makeToast("Comment should not be empty", "warning");
+      return;
+    }
+    commentMutation.mutate(post.id);
+  };
+
+  return (
+    <div className="flex gap-7">
+      <Avatar
+        src={user?.profile_image as string}
+        width={48}
+        height={48}
+        rounded
+        className="flex-[0_0_48px]"
+      />
+      <PostAddCommentInput
+        name="comment"
+        placeholder="Add your comment"
+        onChange={(e) => setComment(e.target.value)}
+        value={comment}
+        formProps={{
+          onSubmit: handleOnAddComment,
+        }}
+        isLoading={commentMutation.isLoading}
+        disabled={commentMutation.isLoading || post.status === "CLOSED"}
+      />
+    </div>
+  );
+}
+
+function PostDetails(props: Props) {
+  const { postId, user } = props;
   const queryClient = useQueryClient();
   const { data, status } = useQuery(["post", postId], () => fetchPost(postId), {
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-shadow
-  const likeMutation = useMutation((postId: number) => likePost(postId), {
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    onMutate: (postId) => {
-      queryClient.cancelQueries(["post", postId]);
-      const previousPosts = queryClient.getQueryData(["post", postId]);
-      queryClient.setQueryData<GetPostResponse>(["post", postId], (old) => ({
-        ...(old as GetPostResponse),
-        data: {
-          ...old?.data,
-          post: {
-            ...old?.data.post,
-            upvotes_count: old?.data ? old.data.post.upvotes_count + 1 : 0,
-            upvotes: old
-              ? [{ user_id: user?.id, id: 121 }, ...old.data.post.upvotes]
-              : [{ user_id: user?.id, id: 121 }],
-          },
-        } as GetPostResponse["data"],
-      }));
+  function handleError(err: any) {
+    const message = err?.response.data.error.message || "Something went wrong";
+    makeToast(message, "error");
+  }
 
-      return {
-        previousPosts,
-      };
-    },
-    onSuccess: () => {},
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    onError: (error: any, postId, context) => {
-      const message = error?.response.data.error.message || "Something went wrong";
-      makeToast(message, "error");
-      queryClient.setQueryData(["post", postId], context?.previousPosts);
-    },
+  const likeMutation = useLikeMutation(queryClient, user as User, {
+    onError: handleError,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-shadow
-  const unlikeMutation = useMutation((postId: number) => unlikePost(postId), {
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    onMutate: (postId) => {
-      queryClient.cancelQueries(["post", postId]);
-      const previousPosts = queryClient.getQueryData(["post", postId]);
-      queryClient.setQueryData<GetPostResponse>(["post", postId], (old) => ({
-        ...(old as GetPostResponse),
-        data: {
-          ...old?.data,
-          post: {
-            ...old?.data.post,
-            upvotes_count: old?.data ? old.data.post.upvotes_count - 1 : 0,
-            upvotes: old?.data.post.upvotes.filter((upvote) => upvote.user_id !== user?.id),
-          },
-        } as GetPostResponse["data"],
-      }));
-
-      return {
-        previousPosts,
-      };
-    },
-    onSuccess: () => {},
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    onError: (error: any, postId, context) => {
-      const message = error?.response.data.error.message || "Something went wrong";
-      makeToast(message, "error");
-      queryClient.setQueryData(["post", postId], context?.previousPosts);
-    },
-  });
-
-  // eslint-disable-next-line @typescript-eslint/no-shadow
-  const commentMutation = useMutation((postId: number) => commentOnPost(postId, comment), {
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    onMutate: (postId) => {
-      queryClient.cancelQueries(["post", postId]);
-      const previousPosts = queryClient.getQueryData(["post", postId]);
-      queryClient.setQueryData<GetPostResponse>(["post", postId], (old) => ({
-        ...(old as GetPostResponse),
-        data: {
-          ...(old?.data as GetPostResponse["data"]),
-          post: {
-            ...old?.data.post,
-            comments_count: old?.data ? old.data.post.comments_count + 1 : 0,
-            comments: [
-              {
-                id: 121,
-                text: comment,
-                updated_at: new Date(),
-                upvotes_count: 0,
-                user_id: user?.id,
-                user: {
-                  id: user?.id,
-                  name: user?.name,
-                  profile_image: user?.profile_image,
-                },
-              },
-              ...(old?.data.post.comments as GetPostResponse["data"]["post"]["comments"]),
-            ],
-          } as GetPostResponse["data"]["post"],
-        },
-      }));
-
-      return {
-        previousPosts,
-      };
-    },
-    onSuccess: () => {
-      setComment("");
-    },
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    onError: (error: any, postId, context) => {
-      const message = error?.response.data.error.message || "Something went wrong";
-      makeToast(message, "error");
-      queryClient.setQueryData(["post", postId], context?.previousPosts);
-    },
+  const unlikeMutation = useUnLikeMutation(queryClient, user as User, {
+    onError: handleError,
   });
 
   const handleOnLike = () => {
@@ -175,18 +286,14 @@ export default function Page(props: Props) {
     likeMutation.mutate(postId);
   };
 
-  const handleOnAddComment = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!comment) {
-      makeToast("Comment should not be empty", "warning");
-      return;
-    }
-    commentMutation.mutate(postId);
-  };
-
   return (
     <div>
-      {status === "loading" && <div>Loading...</div>}
+      {status === "loading" && (
+        <div className="mx-auto mb-2 flex w-fit flex-col items-center gap-2">
+          <Spinner />
+          <span className="font-semibold text-gray-600">Loading post</span>
+        </div>
+      )}
       {status === "success" && (
         <Post>
           <PostUserPill
@@ -196,11 +303,15 @@ export default function Page(props: Props) {
             userName={data.data.post.author.name}
           >
             <div className="flex h-fit items-center gap-4">
-              {/* TODO: Make type dynamic */}
-              <PostStatuPill type="success">{data.data.post.status}</PostStatuPill>
-              <button type="button">
-                <EllipsisHorizontalIcon className="h-6 w-6 text-gray-500" />
-              </button>
+              <PostStatuPill type={parsePostStatus(data.data.post.status)}>
+                {data.data.post.status}
+              </PostStatuPill>
+
+              {user?.id === data.data.post.author_id && (
+                <button type="button">
+                  <EllipsisHorizontalIcon className="h-6 w-6 text-gray-500" />
+                </button>
+              )}
             </div>
           </PostUserPill>
           <PostTitle>
@@ -219,7 +330,12 @@ export default function Page(props: Props) {
           )}
           <PostFooter>
             <ButtonGroup>
-              <button type="button" onClick={handleOnLike}>
+              <button
+                type="button"
+                disabled={data.data.post.status === "CLOSED"}
+                className="disabled:cursor-not-allowed"
+                onClick={handleOnLike}
+              >
                 <Upvote
                   className={classNames(
                     "h-5 w-5",
@@ -245,67 +361,18 @@ export default function Page(props: Props) {
             </ButtonGroup>
           </PostFooter>
 
-          <div className="flex gap-7">
-            <Avatar
-              src={user?.profile_image as string}
-              width={48}
-              height={48}
-              rounded
-              className="flex-[0_0_48px]"
-            />
-            <PostAddCommentInput
-              name="comment"
-              placeholder="Add your comment"
-              onChange={(e) => setComment(e.target.value)}
-              value={comment}
-              formProps={{
-                onSubmit: handleOnAddComment,
-              }}
-              isLoading={commentMutation.isLoading}
-            />
-          </div>
-
-          <CommentsWrapper>
-            {data.data.post.comments.length === 0 && (
-              <div className="py-4 text-center">
-                <h1 className="text-xl font-medium text-gray-700">No comments yet</h1>
-              </div>
-            )}
-            {data.data.post.comments.length > 0 &&
-              data.data.post.comments.map((c) => (
-                <Comment key={c.id}>
-                  <CommentHeader>
-                    <Avatar
-                      src={c.user.profile_image}
-                      width={48}
-                      height={48}
-                      rounded
-                      className="flex-[0_0_48px]"
-                    />
-                    <span className="text-base font-medium text-gray-800">{c.user.name}</span>
-                    <span className="text-sm text-gray-600">{timeAgo(c.updated_at)}</span>
-                    <button type="button" className="ml-auto">
-                      <EllipsisHorizontalIcon className="h-6 w-6 text-gray-500" />
-                    </button>
-                  </CommentHeader>
-
-                  <CommentBody>
-                    <CommentSeparator />
-                    <div className="ml-3 flex flex-col gap-2">
-                      <CommentText>{c.text}</CommentText>
-                      <CommentActions upvoteText={c.upvotes_count} />
-                    </div>
-                  </CommentBody>
-                </Comment>
-              ))}
-            {!data.data.meta.pagination.isLastPage && (
-              <Button className="bg-gray-800 py-3 text-gray-50">Load more discussion</Button>
-            )}
-          </CommentsWrapper>
+          <PostAddComment user={user} post={data.data.post} />
+          <PostComments user={user} postId={postId} />
         </Post>
       )}
     </div>
   );
+}
+
+export default function Page(props: PageProps) {
+  const { postId } = props;
+  const user = useStore(store, (state) => state.user);
+  return <PostDetails user={user} postId={postId} />;
 }
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
@@ -334,7 +401,14 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     const { data } = await getPost(session.accessToken, postId);
     return data;
   });
+  await queryClient.prefetchInfiniteQuery(["comments", postId], async () => {
+    const { data } = await getPostComments(session.accessToken, postId, 5, 0);
+    return data;
+  });
   const dehydratedClient = dehydrate(queryClient);
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  dehydratedClient.queries[1].state.data.pageParams = [null];
 
   return {
     props: {

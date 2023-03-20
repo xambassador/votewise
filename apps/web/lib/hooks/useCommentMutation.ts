@@ -1,0 +1,35 @@
+import { useMutation } from "react-query";
+import type { QueryClient } from "react-query";
+
+import type { CreateCommentResponse } from "@votewise/types";
+
+import type { User } from "lib/store";
+
+import { commentOnPost } from "services/post";
+
+type Options = {
+  onSuccess?: (data: CreateCommentResponse, variables: number, context: unknown) => void;
+  onError?: (error: any, variables: number, context: unknown) => void;
+};
+
+/**
+ * @description This hook is used to mutate the post data when user comments on a post
+ * @param comment Comment text
+ * @param queryClient QueryClient instance
+ * @param user Current logged in user. Get it from store
+ * @param options
+ * @returns
+ */
+export function useCommentMutation(comment: string, queryClient: QueryClient, user: User, options: Options) {
+  return useMutation((postId: number) => commentOnPost(postId, comment), {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries(["comments", variables]);
+      options.onSuccess?.(data, variables, context);
+    },
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    onError: (error: any, postId, context) => {
+      options.onError?.(error, postId, context);
+    },
+  });
+}

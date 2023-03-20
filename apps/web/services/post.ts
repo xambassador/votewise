@@ -2,6 +2,7 @@ import type { AxiosResponse } from "axios";
 
 import type {
   CreateCommentResponse,
+  GetPostCommentsResponse,
   GetPostResponse,
   GetPostsResponse,
   LikePostResponse,
@@ -63,5 +64,14 @@ export const commentOnPost = async (postId: number, comment: string) => {
     postId,
     text: comment,
   });
+  return response.data;
+};
+
+/**
+ * @description Get comments for post
+ */
+export const getCommentsForPost = async (postId: number, limit = 5, offset = 0) => {
+  const apiEndpoint = `/posts/${postId}/comments?limit=${limit}&offset=${offset}`;
+  const response: AxiosResponse<GetPostCommentsResponse> = await axioInstance.get(apiEndpoint);
   return response.data;
 };

@@ -146,7 +146,12 @@ function PostCard(props: { post: PostType }) {
       )}
       <PostFooter>
         <ButtonGroup>
-          <button type="button" onClick={handleOnPostLike}>
+          <button
+            type="button"
+            disabled={post.status === "CLOSED"}
+            className="disabled:cursor-not-allowed"
+            onClick={handleOnPostLike}
+          >
             <Upvote
               className={classNames(
                 "h-5 w-5",

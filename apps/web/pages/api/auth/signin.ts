@@ -9,6 +9,7 @@ import type { LoginPayload } from "@votewise/types";
 
 import { axiosServerInstance } from "server/lib/axios";
 import { decodeJwt } from "server/lib/decodeJwt";
+import { getError } from "server/lib/getError";
 import { getProxyHeaders } from "server/lib/getProxyHeaders";
 
 import { getOnboardingStatus } from "server/services/onboarding";
@@ -80,9 +81,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(status).json(data);
   } catch (err: any) {
-    logger(err?.response?.data, "error");
-    const status = err.response.status || 500;
-    const data = err.response.data || { message: "Something went wrong" };
+    const { status, data } = getError(err);
     return res.status(status).json(data);
   }
 }

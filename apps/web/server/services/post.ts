@@ -4,6 +4,7 @@ import { getAxiosServerWithAuth } from "server/lib/axios";
 import {
   COMMENT_ON_POST_V1,
   GET_POSTS_V1,
+  GET_POST_COMMENTS_V1,
   GET_POST_V1,
   LIKE_POST_V1,
   POST_ROUTE_V1,
@@ -11,6 +12,7 @@ import {
 } from "@votewise/lib";
 import type {
   CreateCommentResponse,
+  GetPostCommentsResponse,
   GetPostResponse,
   GetPostsResponse,
   LikePostResponse,
@@ -116,5 +118,31 @@ export const commentOnPost = async (
     }
   );
 
+  return response;
+};
+
+/**
+ * @description Get post comments
+ */
+export const getPostComments = async (
+  token: string,
+  postId: number,
+  limit: number,
+  offset: number,
+  options?: {
+    headers: AxiosRequestConfig["headers"];
+  }
+) => {
+  const apiEndpoint = `${POST_ROUTE_V1}${GET_POST_COMMENTS_V1}`.replace(":postId", postId.toString());
+  const response: AxiosResponse<GetPostCommentsResponse> = await getAxiosServerWithAuth(token).get(
+    apiEndpoint,
+    {
+      headers: options?.headers,
+      params: {
+        limit,
+        offset,
+      },
+    }
+  );
   return response;
 };

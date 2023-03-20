@@ -222,17 +222,18 @@ export function PostAddCommentInput(props: PostAddCommentInputProps) {
   const { name = "comment", className, formProps, isLoading = false, ...rest } = props;
   return (
     <form
+      {...formProps}
       className={classNames(
         "flex w-full items-center overflow-hidden rounded-lg border border-gray-200 bg-gray-50 pr-6 focus-within:ring-1 focus-within:ring-blue-600",
         formProps?.className
       )}
-      {...formProps}
     >
       <Input
         name={name}
         type="text"
         className={classNames(
           "border-none bg-gray-50 py-3 placeholder:text-base placeholder:font-medium placeholder:text-gray-600 focus:ring-0",
+          "disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 disabled:placeholder-gray-400",
           className
         )}
         {...rest}

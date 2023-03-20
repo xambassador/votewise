@@ -74,6 +74,7 @@ export function CommentActions(props: CommentActionsProps) {
     upvoteTextProps,
     replyTextProps,
     upvoteText,
+    children,
     ...passThrogh
   } = props;
   return (
@@ -98,6 +99,8 @@ export function CommentActions(props: CommentActionsProps) {
           Reply
         </span>
       </ButtonGroup>
+
+      {children}
     </div>
   );
 }

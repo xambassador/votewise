@@ -6,6 +6,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { logger } from "@votewise/lib/logger";
 import type { OnboardingPayload } from "@votewise/types";
 
+import { getError } from "server/lib/getError";
 import { getProxyHeaders } from "server/lib/getProxyHeaders";
 import { getServerSession } from "server/lib/getServerSession";
 import { UNAUTHORIZED_RESPONSE } from "server/lib/response";
@@ -44,8 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(status).json(data);
   } catch (err: any) {
     logger(err.response, "error");
-    const status = err.response.status || 500;
-    const data = err.response.data || { message: "Something went wrong" };
+    const { status, data } = getError(err);
     return res.status(status).json(data);
   }
 }
