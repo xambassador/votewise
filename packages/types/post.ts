@@ -1,4 +1,4 @@
-import type { BaseResponse } from "./base";
+import type { BaseResponse, Pagination } from "./base";
 
 type CommentOnPostPayload = {
   text: string;
@@ -86,14 +86,7 @@ type GetPostsResponse = {
         location: string;
       };
     }[];
-    meta: {
-      pagination: {
-        total: number;
-        limit: number;
-        next: number;
-        isLastPage: boolean;
-      };
-    };
+    meta: Pagination;
   };
 } & BaseResponse;
 
@@ -128,29 +121,10 @@ type GetPostResponse = {
         user_id: number;
         id: number;
       }[];
-      comments: {
-        id: number;
-        user_id: number;
-        updated_at: Date;
-        text: string;
-        user: {
-          id: number;
-          profile_image: string;
-          name: string;
-        };
-        upvotes_count: number;
-      }[];
       upvotes_count: number;
       comments_count: number;
     };
-    meta: {
-      pagination: {
-        total: number;
-        limit: number;
-        next: number;
-        isLastPage: boolean;
-      };
-    };
+    meta: Pagination;
   };
 } & BaseResponse;
 
@@ -186,6 +160,25 @@ type CreateCommentResponse = {
   };
 } & BaseResponse;
 
+type GetPostCommentsResponse = {
+  data: {
+    message: string;
+    comments: {
+      user: {
+        name: string;
+        id: string;
+        profile_image: string;
+      };
+      user_id: number;
+      id: number;
+      updated_at: Date;
+      text: string;
+      upvotes_count: number;
+    }[];
+    meta: Pagination;
+  };
+} & BaseResponse;
+
 export type {
   CommentOnPostPayload,
   UpdateCommentOnPostPayload,
@@ -199,4 +192,7 @@ export type {
   GetPostResponse,
   UnLikePostResponse,
   CreateCommentResponse,
+  PostStatus,
+  PostType,
+  GetPostCommentsResponse,
 };

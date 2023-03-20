@@ -2,6 +2,7 @@
  * @file: index.ts
  * @description: Contains all posts related services
  */
+// eslint-disable-next-line max-classes-per-file
 import type { PostStatus } from "@prisma/client";
 import { nanoid } from "nanoid";
 import slugify from "slugify";
@@ -14,6 +15,7 @@ import {
   ALREADY_LIKED_COMMENT_MSG,
   COMMENT_NOT_FOUND_MSG,
   COMMENT_NOT_LIKED_MSG,
+  COMMENT_POST_CLOSED_MSG,
   ERROR_ADDING_COMMENT_MSG,
   ERROR_COMMENT_FETCHED_MSG,
   ERROR_CREATING_POST_MSG,
@@ -32,6 +34,7 @@ import {
   ERROR_UPDATING_POST_MSG,
   ERROR_UPDATING_POST_STATUS_MSG,
   POST_ALREADY_LIKED_MSG,
+  POST_CLOSED_MSG,
   POST_NOT_FOUND_MSG,
   POST_NOT_LIKED_MSG,
   UNAUTHORIZED_MSG,
@@ -40,8 +43,20 @@ import {
 } from "@/src/utils";
 import { validateCreatePostPayload } from "@/src/zodValidation";
 
+// TODO: Move this class to its own file. Add more methods to it.
+class BasePostService {
+  async isPostExist(postId: number) {
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+    });
+    return post;
+  }
+}
+
 // FIXME: Remove comments logic to its own service
-class PostService {
+class PostService extends BasePostService {
   async getPosts(
     userId: number,
     limit = 10,
@@ -159,34 +174,6 @@ class PostService {
               location: true,
             },
           },
-          comments: {
-            where: {
-              parent_id: null,
-            },
-            select: {
-              id: true,
-              user_id: true,
-              updated_at: true,
-              text: true,
-              user: {
-                select: {
-                  id: true,
-                  profile_image: true,
-                  name: true,
-                },
-              },
-              _count: {
-                select: {
-                  upvotes: true,
-                },
-              },
-            },
-            take: 5,
-            skip: 0,
-            orderBy: {
-              created_at: "desc",
-            },
-          },
           // TODO: Should give informative name to this field
           // upvotes: this field indicates whether the user who make request has liked the post or not.
           upvotes: {
@@ -208,11 +195,6 @@ class PostService {
       });
       return {
         ...post,
-        comments: post?.comments.map((comment) => ({
-          ...comment,
-          upvotes_count: comment._count.upvotes,
-          _count: undefined,
-        })),
         upvotes_count: post?._count.upvotes,
         comments_count: post?._count.comments,
         _count: undefined,
@@ -230,11 +212,16 @@ class PostService {
   // ---------------------------------
   async getCommentsForPost(postId: number, limit = 5, offset = 0) {
     try {
+      const post = await this.isPostExist(postId);
+
+      if (!post) throw new Error(POST_NOT_FOUND_MSG);
+
       const totalComments = await prisma.comment.count({
         where: {
           post_id: postId,
         },
       });
+
       const comments = await prisma.comment.findMany({
         where: {
           post_id: postId,
@@ -247,6 +234,7 @@ class PostService {
               profile_image: true,
             },
           },
+          user_id: true,
           id: true,
           updated_at: true,
           text: true,
@@ -276,13 +264,20 @@ class PostService {
         },
       };
     } catch (err) {
-      throw new Error(ERROR_FETCHING_COMMENTS_FOR_POST_MSG);
+      const msg = getErrorReason(err) || ERROR_FETCHING_COMMENTS_FOR_POST_MSG;
+      throw new Error(msg);
     }
   }
 
   // ---------------------------------
   async likePost(postId: number, userId: number) {
     try {
+      const post = await this.isPostExist(postId);
+
+      if (!post) throw new Error(POST_NOT_FOUND_MSG);
+
+      if (post.status === "CLOSED") throw new Error(POST_CLOSED_MSG);
+
       const isAlreadyLiked = await prisma.post.findUnique({
         where: {
           id: postId,
@@ -322,18 +317,20 @@ class PostService {
 
       return data._count.upvotes;
     } catch (err) {
-      const msg = getErrorReason(err);
-      if (msg === POST_ALREADY_LIKED_MSG) {
-        throw new Error(msg);
-      } else {
-        throw new Error(ERROR_LIKING_POST_MSG);
-      }
+      const msg = getErrorReason(err) || ERROR_LIKING_POST_MSG;
+      throw new Error(msg);
     }
   }
 
   // ---------------------------------
   async unlikePost(postId: number, userId: number) {
     try {
+      const post = await this.isPostExist(postId);
+
+      if (!post) throw new Error(POST_NOT_FOUND_MSG);
+
+      if (post.status === "CLOSED") throw new Error(POST_CLOSED_MSG);
+
       const isAlreadyLiked = await prisma.post.findUnique({
         where: {
           id: postId,
@@ -377,26 +374,22 @@ class PostService {
 
       return data._count.upvotes;
     } catch (err) {
-      const msg = getErrorReason(err);
-      if (msg === POST_NOT_LIKED_MSG) {
-        throw new Error(msg);
-      } else {
-        throw new Error(ERROR_UNLIKING_POST_MSG);
-      }
+      const msg = getErrorReason(err) || ERROR_UNLIKING_POST_MSG;
+      throw new Error(msg);
     }
   }
 
   // ---------------------------------
   async addComment(postId: number, userId: number, text: string) {
     try {
-      const isPostExist = await prisma.post.findUnique({
-        where: {
-          id: postId,
-        },
-      });
+      const isPostExist = await this.isPostExist(postId);
 
       if (!isPostExist) {
         throw new Error(POST_NOT_FOUND_MSG);
+      }
+
+      if (isPostExist.status === "CLOSED") {
+        throw new Error(COMMENT_POST_CLOSED_MSG);
       }
 
       const data = await prisma.comment.create({
@@ -436,7 +429,8 @@ class PostService {
         _count: undefined,
       };
     } catch (err) {
-      throw new Error(ERROR_ADDING_COMMENT_MSG);
+      const msg = getErrorReason(err) || ERROR_ADDING_COMMENT_MSG;
+      throw new Error(msg);
     }
   }
 
@@ -477,12 +471,8 @@ class PostService {
         },
       });
     } catch (err) {
-      const msg = getErrorReason(err);
-      if (msg === COMMENT_NOT_FOUND_MSG || msg === UNAUTHORIZED_MSG) {
-        throw new Error(msg);
-      } else {
-        throw new Error(ERROR_DELETING_COMMENT_MSG);
-      }
+      const msg = getErrorReason(err) || ERROR_DELETING_COMMENT_MSG;
+      throw new Error(msg);
     }
   }
 
@@ -522,12 +512,8 @@ class PostService {
 
       return data;
     } catch (err) {
-      const msg = getErrorReason(err);
-      if (msg === COMMENT_NOT_FOUND_MSG || msg === UNAUTHORIZED_MSG) {
-        throw new Error(msg);
-      } else {
-        throw new Error(ERROR_UPDATING_COMMENT_MSG);
-      }
+      const msg = getErrorReason(err) || ERROR_UPDATING_COMMENT_MSG;
+      throw new Error(msg);
     }
   }
 
@@ -559,12 +545,8 @@ class PostService {
 
       return data;
     } catch (err) {
-      const msg = getErrorReason(err);
-      if (msg === COMMENT_NOT_FOUND_MSG) {
-        throw new Error(msg);
-      } else {
-        throw new Error(ERROR_REPLAYING_COMMENT_MSG);
-      }
+      const msg = getErrorReason(err) || ERROR_REPLAYING_COMMENT_MSG;
+      throw new Error(msg);
     }
   }
 
@@ -623,12 +605,8 @@ class PostService {
         },
       };
     } catch (err) {
-      const msg = getErrorReason(err);
-      if (msg === COMMENT_NOT_FOUND_MSG) {
-        throw new Error(msg);
-      } else {
-        throw new Error(ERROR_GETTING_REPLIES_FROM_COMMENT_MSG);
-      }
+      const msg = getErrorReason(err) || ERROR_GETTING_REPLIES_FROM_COMMENT_MSG;
+      throw new Error(msg);
     }
   }
 
@@ -682,12 +660,8 @@ class PostService {
 
       return data;
     } catch (err) {
-      const msg = getErrorReason(err);
-      if (msg === COMMENT_NOT_FOUND_MSG || msg === ALREADY_LIKED_COMMENT_MSG) {
-        throw new Error(msg);
-      } else {
-        throw new Error(ERROR_LIKING_COMMENT_MSG);
-      }
+      const msg = getErrorReason(err) || ERROR_LIKING_COMMENT_MSG;
+      throw new Error(msg);
     }
   }
 
@@ -740,12 +714,8 @@ class PostService {
 
       return data;
     } catch (err) {
-      const msg = getErrorReason(err);
-      if (msg === COMMENT_NOT_FOUND_MSG || msg === COMMENT_NOT_LIKED_MSG) {
-        throw new Error(msg);
-      } else {
-        throw new Error(ERROR_UNLIKING_COMMENT_MSG);
-      }
+      const msg = getErrorReason(err) || ERROR_UNLIKING_COMMENT_MSG;
+      throw new Error(msg);
     }
   }
 
@@ -856,11 +826,8 @@ class PostService {
       await HashTagService.addHashtags(postId, payload.content);
       return data;
     } catch (err) {
-      const msg = getErrorReason(err);
-      if (msg === POST_NOT_FOUND_MSG || msg === UNAUTHORIZED_MSG) {
-        throw new Error(msg);
-      }
-      throw new Error(ERROR_UPDATING_POST_MSG);
+      const msg = getErrorReason(err) || ERROR_UPDATING_POST_MSG;
+      throw new Error(msg);
     }
   }
 
@@ -935,13 +902,8 @@ class PostService {
 
       return true;
     } catch (err) {
-      const msg = getErrorReason(err);
-      if (msg === POST_NOT_FOUND_MSG || msg === UNAUTHORIZED_MSG) {
-        throw new Error(msg);
-      }
-      // eslint-disable-next-line no-console
-      console.log(err);
-      throw new Error(ERROR_DELETING_POST_MSG);
+      const msg = getErrorReason(err) || ERROR_DELETING_POST_MSG;
+      throw new Error(msg);
     }
   }
 
@@ -973,11 +935,8 @@ class PostService {
 
       return data;
     } catch (err) {
-      const msg = getErrorReason(err);
-      if (msg === POST_NOT_FOUND_MSG || msg === UNAUTHORIZED_MSG) {
-        throw new Error(msg);
-      }
-      throw new Error(ERROR_UPDATING_POST_STATUS_MSG);
+      const msg = getErrorReason(err) || ERROR_UPDATING_POST_STATUS_MSG;
+      throw new Error(msg);
     }
   }
 

@@ -10,4 +10,13 @@ type BaseErrorResponse = {
   data: null;
 };
 
-export type { BaseResponse, BaseErrorResponse };
+type Pagination = {
+  pagination: {
+    total: number;
+    limit: number;
+    next: number;
+    isLastPage: boolean;
+  };
+};
+
+export type { BaseResponse, BaseErrorResponse, Pagination };

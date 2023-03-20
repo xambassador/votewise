@@ -25,6 +25,8 @@ import {
   COMMENT_NOT_FOUND_RESPONSE,
   COMMENT_NOT_LIKED_MSG,
   COMMENT_NOT_LIKED_RESPONSE,
+  COMMENT_POST_CLOSED_MSG,
+  COMMENT_POST_CLOSED_RESPONSE,
   COMMENT_UNLIKE_SUCCESSFULLY_MSG,
   COMMENT_UPDATED_SUCCESSFULLY_MSG,
   GETTING_REPLIES_FROM_COMMENT_MSG,
@@ -32,10 +34,14 @@ import {
   INVALID_POST_ID_RESPONSE,
   POSTS_FETCHED_SUCCESSFULLY_MSG,
   POST_ALREADY_LIKED_MSG,
+  POST_ALREADY_LIKED_RESPONSE,
+  POST_CLOSED_MSG,
+  POST_CLOSED_RESPONSE,
   POST_DETAILS_FETCHED_SUCCESSFULLY_MSG,
   POST_NOT_FOUND_MSG,
   POST_NOT_FOUND_RESPONSE,
   POST_NOT_LIKED_MSG,
+  POST_NOT_LIKED_RESPONSE,
   POST_UNLIKED_SUCCESSFULLY_MSG,
   REPLAY_ADDED_SUCCESSFULLY_MSG,
   SOMETHING_WENT_WRONG_MSG,
@@ -211,16 +217,10 @@ export const likePost = async (req: Request, res: Response) => {
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
     if (msg === POST_ALREADY_LIKED_MSG) {
-      return res.status(BAD_REQUEST).json(
-        new JSONResponse(
-          POST_ALREADY_LIKED_MSG,
-          null,
-          {
-            message: msg,
-          },
-          false
-        )
-      );
+      return res.status(BAD_REQUEST).json(POST_ALREADY_LIKED_RESPONSE);
+    }
+    if (msg === POST_CLOSED_MSG) {
+      return res.status(BAD_REQUEST).json(POST_CLOSED_RESPONSE);
     }
     return res.status(INTERNAL_SERVER_ERROR).json(
       new JSONResponse(
@@ -260,17 +260,13 @@ export const unlikePost = async (req: Request, res: Response) => {
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
     if (msg === POST_NOT_LIKED_MSG) {
-      return res.status(BAD_REQUEST).json(
-        new JSONResponse(
-          POST_NOT_LIKED_MSG,
-          null,
-          {
-            message: msg,
-          },
-          false
-        )
-      );
+      return res.status(BAD_REQUEST).json(POST_NOT_LIKED_RESPONSE);
     }
+
+    if (msg === POST_CLOSED_MSG) {
+      return res.status(BAD_REQUEST).json(POST_CLOSED_RESPONSE);
+    }
+
     return res.status(INTERNAL_SERVER_ERROR).json(
       new JSONResponse(
         SOMETHING_WENT_WRONG_MSG,
@@ -317,6 +313,11 @@ export const commentOnPost = async (req: Request, res: Response) => {
     if (msg === POST_NOT_FOUND_MSG) {
       return res.status(NOT_FOUND).json(POST_NOT_FOUND_RESPONSE);
     }
+
+    if (msg === COMMENT_POST_CLOSED_MSG) {
+      return res.status(BAD_REQUEST).json(COMMENT_POST_CLOSED_RESPONSE);
+    }
+
     return res.status(INTERNAL_SERVER_ERROR).json(
       new JSONResponse(
         SOMETHING_WENT_WRONG_MSG,

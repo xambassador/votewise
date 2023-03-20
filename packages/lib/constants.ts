@@ -39,6 +39,8 @@ export const POST_UPDATE_SUCCESSFULLY_MSG = "Post update successfully";
 export const POST_DELETED_SUCCESSFULLY_MSG = "Post deleted successfully";
 export const POST_STATUS_CHANGED_SUCCESSFULLY_MSG = "Post status changed successfully";
 export const POST_ARCHIVED_SUCCESSFULLY_MSG = "Post archived successfully";
+export const COMMENT_POST_CLOSED_MSG = "This idea is now closed. You can't comment on this post anymore.";
+export const POST_CLOSED_MSG = "This idea is now closed. You can't like or comment on this post anymore.";
 export const ERROR_UNLIKING_POST_MSG = "Error while unliking post";
 export const ERROR_LIKING_POST_MSG = "Error while liking post";
 export const ERROR_FETCHING_POSTS_MSG = "Error while fetching posts";
@@ -273,6 +275,42 @@ export const POST_NOT_FOUND_RESPONSE = {
   data: null,
   error: {
     message: POST_NOT_FOUND_MSG,
+  },
+  success: false,
+};
+
+export const COMMENT_POST_CLOSED_RESPONSE = {
+  message: COMMENT_POST_CLOSED_MSG,
+  data: null,
+  error: {
+    message: COMMENT_POST_CLOSED_MSG,
+  },
+  success: false,
+};
+
+export const POST_CLOSED_RESPONSE = {
+  message: POST_CLOSED_MSG,
+  data: null,
+  error: {
+    message: POST_CLOSED_MSG,
+  },
+  success: false,
+};
+
+export const POST_ALREADY_LIKED_RESPONSE = {
+  message: POST_ALREADY_LIKED_MSG,
+  data: null,
+  error: {
+    message: POST_ALREADY_LIKED_MSG,
+  },
+  success: false,
+};
+
+export const POST_NOT_LIKED_RESPONSE = {
+  message: POST_NOT_LIKED_MSG,
+  data: null,
+  error: {
+    message: POST_NOT_LIKED_MSG,
   },
   success: false,
 };
