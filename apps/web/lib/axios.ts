@@ -26,8 +26,7 @@ axioInstance.interceptors.response.use(
   (response) => response,
   (error: any) => {
     if (error.response.status === UNAUTHORIZED) {
-      const router = useRouter();
-      router.push("/signin");
+      window.location.href = "/signin";
       return Promise.reject(error);
     }
 

@@ -63,6 +63,7 @@ type CommentActionsProps = React.HtmlHTMLAttributes<HTMLDivElement> & {
   upvoteTextProps?: React.HTMLAttributes<HTMLSpanElement>;
   replyTextProps?: React.HTMLAttributes<HTMLSpanElement>;
   upvoteText: number;
+  replyText?: number;
 };
 export function CommentActions(props: CommentActionsProps) {
   const {
@@ -75,6 +76,7 @@ export function CommentActions(props: CommentActionsProps) {
     replyTextProps,
     upvoteText,
     children,
+    replyText,
     ...passThrogh
   } = props;
   return (
@@ -96,7 +98,7 @@ export function CommentActions(props: CommentActionsProps) {
           <Message className="h-5 w-5 text-gray-500" {...replyIconProps} />
         </button>
         <span className={classNames("text-sm text-gray-600", replyTextProps?.className)} {...replyTextProps}>
-          Reply
+          {replyText === 1 ? `${replyText} reply` : `${replyText} replies`}
         </span>
       </ButtonGroup>
 

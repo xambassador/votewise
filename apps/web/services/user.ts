@@ -44,7 +44,6 @@ export const getMyDetails = async () => {
 /**
  * @description Create a new post
  */
-
 export const createPost = async (payload: CreatePostPayload) => {
   const response: AxiosResponse<CreatePostResponse> = await axioInstance.post("/user/post", payload);
   return response.data;

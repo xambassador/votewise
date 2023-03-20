@@ -3,20 +3,30 @@ import { getAxiosServerWithAuth } from "server/lib/axios";
 
 import {
   COMMENT_ON_POST_V1,
+  DELETE_COMMENT_ON_POST_V1,
   GET_POSTS_V1,
   GET_POST_COMMENTS_V1,
   GET_POST_V1,
+  GET_REPLIES_TO_COMMENT_ON_POST_V1,
+  LIKE_COMMENT_ON_POST_V1,
   LIKE_POST_V1,
   POST_ROUTE_V1,
+  REPLY_TO_COMMENT_ON_POST_V1,
+  UNLIKE_COMMENT_ON_POST_V1,
   UNLIKE_POST_V1,
+  UPDATE_COMMENT_ON_POST_V1,
 } from "@votewise/lib";
 import type {
   CreateCommentResponse,
+  DeleteCommentResponse,
   GetPostCommentsResponse,
   GetPostResponse,
   GetPostsResponse,
+  GetRepliesResponse,
   LikePostResponse,
+  ReplyToCommentResponse,
   UnLikePostResponse,
+  UpdateCommentResponse,
 } from "@votewise/types";
 
 /**
@@ -142,6 +152,111 @@ export const getPostComments = async (
         limit,
         offset,
       },
+    }
+  );
+  return response;
+};
+
+/**
+ * @description Update comment on post
+ */
+export const updateCommentOnPost = async (
+  token: string,
+  postId: number,
+  commentId: number,
+  comment: string,
+  options?: {
+    headers: AxiosRequestConfig["headers"];
+  }
+) => {
+  const apiEndpoint = `${POST_ROUTE_V1}${UPDATE_COMMENT_ON_POST_V1}`
+    .replace(":postId", postId.toString())
+    .replace(":commentId", commentId.toString());
+  const response: AxiosResponse<UpdateCommentResponse> = await getAxiosServerWithAuth(token).patch(
+    apiEndpoint,
+    {
+      text: comment,
+    },
+    {
+      headers: options?.headers,
+    }
+  );
+
+  return response;
+};
+
+/**
+ * @description Reply to comment on post
+ */
+export const replyToComment = async (
+  token: string,
+  postId: number,
+  commentId: number,
+  comment: string,
+  options?: {
+    headers: AxiosRequestConfig["headers"];
+  }
+) => {
+  const apiEndpoint = `${POST_ROUTE_V1}${REPLY_TO_COMMENT_ON_POST_V1}`
+    .replace(":postId", postId.toString())
+    .replace(":commentId", commentId.toString());
+  const response: AxiosResponse<ReplyToCommentResponse> = await getAxiosServerWithAuth(token).post(
+    apiEndpoint,
+    {
+      text: comment,
+    },
+    {
+      headers: options?.headers,
+    }
+  );
+  return response;
+};
+
+/**
+ * @description Get replies of a comment
+ */
+export const getRepliesToComment = async (
+  token: string,
+  postId: number,
+  commentId: number,
+  limit: number,
+  offset: number,
+  options?: {
+    headers: AxiosRequestConfig["headers"];
+  }
+) => {
+  const apiEndpoint = `${POST_ROUTE_V1}${GET_REPLIES_TO_COMMENT_ON_POST_V1}`
+    .replace(":postId", postId.toString())
+    .replace(":commentId", commentId.toString());
+  const response: AxiosResponse<GetRepliesResponse> = await getAxiosServerWithAuth(token).get(apiEndpoint, {
+    headers: options?.headers,
+    params: {
+      limit,
+      offset,
+    },
+  });
+
+  return response;
+};
+
+/**
+ * @description Delete comment on post
+ */
+export const deleteComment = async (
+  token: string,
+  postId: number,
+  commentId: number,
+  options?: {
+    headers: AxiosRequestConfig["headers"];
+  }
+) => {
+  const apiEndpoint = `${POST_ROUTE_V1}${DELETE_COMMENT_ON_POST_V1}`
+    .replace(":postId", postId.toString())
+    .replace(":commentId", commentId.toString());
+  const response: AxiosResponse<DeleteCommentResponse> = await getAxiosServerWithAuth(token).delete(
+    apiEndpoint,
+    {
+      headers: options?.headers,
     }
   );
   return response;

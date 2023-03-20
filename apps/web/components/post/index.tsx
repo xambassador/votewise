@@ -218,7 +218,8 @@ type PostAddCommentInputProps = React.ComponentProps<typeof Input> & {
   formProps?: React.HTMLAttributes<HTMLFormElement>;
   isLoading: boolean;
 };
-export function PostAddCommentInput(props: PostAddCommentInputProps) {
+
+const PostAddCommentInput = React.forwardRef<HTMLInputElement, PostAddCommentInputProps>((props, ref) => {
   const { name = "comment", className, formProps, isLoading = false, ...rest } = props;
   return (
     <form
@@ -236,6 +237,7 @@ export function PostAddCommentInput(props: PostAddCommentInputProps) {
           "disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 disabled:placeholder-gray-400",
           className
         )}
+        ref={ref}
         {...rest}
       />
       <button type="submit" disabled={isLoading}>
@@ -244,4 +246,6 @@ export function PostAddCommentInput(props: PostAddCommentInputProps) {
       </button>
     </form>
   );
-}
+});
+
+export { PostAddCommentInput };
