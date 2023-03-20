@@ -39,7 +39,8 @@ function getThemeClasses(theme: "primary" | "secondary" | "tritertiary") {
 }
 
 export function Button(props: ButtonProps) {
-  const { className, children, primary, secondary, tritertiary, isLoading, loaderProps, ...rest } = props;
+  const { className, children, primary, secondary, tritertiary, isLoading, loaderProps, disabled, ...rest } =
+    props;
 
   let classnames;
   if (primary) classnames = getThemeClasses("primary");
@@ -49,7 +50,7 @@ export function Button(props: ButtonProps) {
 
   return (
     // eslint-disable-next-line react/button-has-type
-    <button className={classNames(classnames, className)} disabled={isLoading} {...rest}>
+    <button className={classNames(classnames, className)} disabled={disabled || isLoading} {...rest}>
       {isLoading && <Loader {...loaderProps} />}
       {!isLoading && children}
     </button>

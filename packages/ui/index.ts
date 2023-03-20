@@ -8,7 +8,7 @@ export * from "./components/Avatar";
 export * from "./components/Tabs";
 export * from "./components/Badge";
 export * from "./components/Loader";
-
+export * from "./components/ResizablePanel";
 export * from "./components/skeleton";
 export * from "./components/alert";
 export * from "./components/toast";
