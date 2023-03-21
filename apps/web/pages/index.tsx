@@ -194,10 +194,10 @@ export default function Home() {
         ))}
 
       <Button
-        className="bg-gray-800 py-3 text-gray-50 disabled:bg-gray-800"
         onClick={() => fetchNextPage()}
         disabled={!hasNextPage || isFetchingNextPage}
         isLoading={isFetchingNextPage || isFetching}
+        dark
       >
         {hasNextPage && "Load More"}
         {!hasNextPage && "Nothing more to load"}

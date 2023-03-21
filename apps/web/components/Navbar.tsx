@@ -198,7 +198,7 @@ export function Navbar() {
                     router.pathname === link.href &&
                       "bg-black-900 flex items-center gap-2 rounded-full p-3 text-gray-50",
                     router.pathname !== link.href &&
-                      "inline-block rounded-full p-3 transition-all hover:bg-gray-200"
+                      "inline-block rounded-full p-3 transition-colors duration-200 ease-in-out hover:bg-gray-200"
                   )}
                 >
                   <span>

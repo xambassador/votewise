@@ -3,6 +3,7 @@ import type { AxiosResponse } from "axios";
 import type {
   CreatePostPayload,
   CreatePostResponse,
+  GetMyPostsResponse,
   MyDetailsResponse,
   OnboardingPayload,
   OnboardingResponse,
@@ -46,5 +47,18 @@ export const getMyDetails = async () => {
  */
 export const createPost = async (payload: CreatePostPayload) => {
   const response: AxiosResponse<CreatePostResponse> = await axioInstance.post("/user/post", payload);
+  return response.data;
+};
+
+type PostStatus = "open" | "closed" | "archived" | "inprogress";
+/**
+ * @description Get all posts created by the curent logged in user
+ * @param limit Limit of posts to fetch. Default is 5
+ * @param offset Offset of posts to fetch. Default is 0
+ * @returns
+ */
+export const getMyPosts = async (limit = 5, offset = 0, status: PostStatus = "open") => {
+  const apiEndpoint = `/user/posts?limit=${limit}&offset=${offset}&status=${status}`;
+  const response: AxiosResponse<GetMyPostsResponse> = await axioInstance.get(apiEndpoint);
   return response.data;
 };

@@ -144,7 +144,7 @@ export function UserInfo() {
 
             <Button className="mt-2 gap-2 py-3" onClick={() => setOpen(true)}>
               <Edit className="h-5 w-5" />
-              <span>Create Post</span>
+              <span>{isProfilePage ? "Update Profile" : "Create Post"}</span>
             </Button>
           </div>
         )}

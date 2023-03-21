@@ -1,8 +1,13 @@
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
 import { getAxiosServerWithAuth } from "server/lib/axios";
 
-import { GET_ME_V1, USER_CREATE_POST_V1, USER_ROUTE_V1 } from "@votewise/lib";
-import type { CreatePostPayload, CreatePostResponse, MyDetailsResponse } from "@votewise/types";
+import { GET_ME_V1, USER_CREATE_POST_V1, USER_GET_POSTS_V1, USER_ROUTE_V1 } from "@votewise/lib";
+import type {
+  CreatePostPayload,
+  CreatePostResponse,
+  GetMyPostsResponse,
+  MyDetailsResponse,
+} from "@votewise/types";
 
 /**
  * @description Get details of the logged in user
@@ -43,5 +48,28 @@ export const createPost = async (
       headers: options?.headers,
     }
   );
+  return response;
+};
+/**
+ * @description Get all posts created by the curent logged in user
+ * @param token Access token
+ * @param limit Limit of posts to fetch. Default is 5
+ * @param offset Offset of posts to fetch. Default is 0
+ * @param options Axios options
+ */
+export const getMyPosts = async (
+  token: string,
+  limit = 5,
+  offset = 0,
+  status: "open" | "closed" | "archived" | "inprogress" = "open",
+  options?: {
+    headers: AxiosRequestConfig["headers"];
+  }
+) => {
+  // TODO: Need to add status for filtering
+  const apiEndpoint = `${USER_ROUTE_V1}${USER_GET_POSTS_V1}?limit=${limit}&offset=${offset}&status=${status}`;
+  const response: AxiosResponse<GetMyPostsResponse> = await getAxiosServerWithAuth(token).get(apiEndpoint, {
+    headers: options?.headers,
+  });
   return response;
 };
