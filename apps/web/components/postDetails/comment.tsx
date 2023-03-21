@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useQueryClient } from "react-query";
 
-import type { GetPostCommentsResponse } from "@votewise/types";
+import type { GetPostCommentsResponse, GetPostResponse } from "@votewise/types";
 import { Avatar, Spinner, makeToast } from "@votewise/ui";
 import { FiXCircle as XCircle } from "@votewise/ui/icons";
 
@@ -19,7 +19,7 @@ import {
 } from "components/post/comments";
 
 import { timeAgo } from "lib/date";
-import { useDeleteMutation } from "lib/hooks/useDeleteCommentMutation";
+import { useDeleteCommentMutation } from "lib/hooks/useDeleteCommentMutation";
 import { useReplyToCommentMutation } from "lib/hooks/useReplyToCommentMutation";
 import { useUpdateCommentMutation } from "lib/hooks/useUpdateCommentMutation";
 import type { User } from "lib/store";
@@ -60,8 +60,19 @@ export function PostComment(props: PostCommentProps) {
     onSuccess: () => methods.setValue("reply", ""),
   });
 
-  const deleteCommentMutation = useDeleteMutation(queryClient, {
+  const deleteCommentMutation = useDeleteCommentMutation(queryClient, {
     onSuccess: () => {
+      // TODO: Should this optimisic update move to hook itself ????
+      queryClient.setQueryData<GetPostResponse>(["post", postId], (old) => ({
+        ...(old as GetPostResponse),
+        data: {
+          ...old?.data,
+          post: {
+            ...old?.data?.post,
+            comments_count: old?.data ? old.data.post.comments_count - 1 : 0,
+          },
+        } as GetPostResponse["data"],
+      }));
       makeToast("Comment deleted successfully", "success");
     },
     onError: (error) => {

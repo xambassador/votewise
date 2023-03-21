@@ -26,11 +26,9 @@ type Options = {
  */
 export function useReplyToCommentMutation(queryClient: QueryClient, options?: Options) {
   return useMutation((data: Variables) => replyToComment(data.postId, data.commentId, data.comment), {
-    // eslint-disable-next-line @typescript-eslint/no-shadow
     onSuccess: (data, variables, context) => {
       options?.onSuccess?.(data, variables, context);
     },
-    // eslint-disable-next-line @typescript-eslint/no-shadow
     onError: (error: any, postId, context) => {
       options?.onError?.(error, postId, context);
     },

@@ -11,14 +11,40 @@ type Variables = {
   comment: string;
 };
 
-type Options = {
+type Options<T> = {
+  onMutate?: (data: Variables) => {
+    previousComments?: InfiniteData<GetPostCommentsResponse> | undefined;
+    previousData?: InfiniteData<T> | undefined;
+  };
   onSuccess?: (data: UpdateCommentResponse, variables: Variables, context: unknown) => void;
-  onError?: (error: any, variables: Variables, context: unknown) => void;
+  onError?: (
+    error: any,
+    variables: Variables,
+    context:
+      | {
+          previousComments?: InfiniteData<GetPostCommentsResponse> | undefined;
+          previousData?: InfiniteData<T> | undefined;
+        }
+      | undefined
+  ) => void;
 };
 
-export function useUpdateCommentMutation(queryClient: QueryClient, options?: Options) {
+/**
+ * @description Update comment mutation hook. This hook will update the comment in the cache.
+ * By default, it will update the comment in the comments query. Becasue we have two types of queries for comments,
+ * one for comments and one for replies. For updating replies, consumer needs to pass the onMutate option.
+ * @param queryClient QueryClient instance
+ * @param options
+ * @returns
+ */
+export function useUpdateCommentMutation<T>(queryClient: QueryClient, options?: Options<T>) {
   return useMutation((data: Variables) => updateComment(data.postId, data.commentId, data.comment), {
     onMutate: (data) => {
+      // Inversion of control. If consumer wants to handle the mutation, they can pass the onMutate option.
+      if (options?.onMutate) {
+        return options.onMutate(data);
+      }
+
       queryClient.cancelQueries(["comments", data.postId]);
       const previousComments = queryClient.getQueryData<InfiniteData<GetPostCommentsResponse>>([
         "comments",

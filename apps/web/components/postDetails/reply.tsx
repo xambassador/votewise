@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useQueryClient } from "react-query";
+import type { InfiniteData } from "react-query";
 
-import type { GetRepliesResponse } from "@votewise/types";
+import type { GetPostCommentsResponse, GetRepliesResponse } from "@votewise/types";
 import { Avatar, Spinner, makeToast } from "@votewise/ui";
 import { FiXCircle as XCircle } from "@votewise/ui/icons";
 
@@ -11,7 +12,7 @@ import { PostAddCommentInput } from "components/post";
 import { Comment, CommentBody, CommentHeader, CommentSeparator, CommentText } from "components/post/comments";
 
 import { timeAgo } from "lib/date";
-import { useDeleteMutation } from "lib/hooks/useDeleteCommentMutation";
+import { useDeleteCommentMutation } from "lib/hooks/useDeleteCommentMutation";
 import { useUpdateCommentMutation } from "lib/hooks/useUpdateCommentMutation";
 import type { User } from "lib/store";
 
@@ -41,22 +42,109 @@ export function CommentReply(props: CommentReplyProps) {
 
   const updateCommentMutation = useUpdateCommentMutation(queryClient, {
     onSuccess: () => {
-      queryClient.invalidateQueries(["replies", postId, commentId]);
       setToggle(false);
     },
-    onError: (error: any) => {
+    onMutate: (data) => {
+      queryClient.cancelQueries(["replies", postId, commentId]);
+      const previousReplies = queryClient.getQueryData<InfiniteData<GetRepliesResponse>>([
+        "replies",
+        postId,
+        commentId,
+      ]);
+      queryClient.setQueryData<InfiniteData<GetRepliesResponse>>(["replies", postId, commentId], (old) => ({
+        ...(old as InfiniteData<GetRepliesResponse>),
+        pages: old?.pages.map((page) => ({
+          ...page,
+          data: {
+            ...page.data,
+            replies: page.data.replies.map((r) => {
+              if (r.id === reply.id) {
+                return {
+                  ...r,
+                  text: data.comment,
+                };
+              }
+              return r;
+            }),
+          },
+        })) as GetRepliesResponse[],
+      }));
+      return { previousData: previousReplies };
+    },
+    onError: (error, _, context) => {
       const msg = error?.response?.data?.message || "Something went wrong";
       makeToast(msg, "error");
+      if (context?.previousData) {
+        queryClient.setQueryData<InfiniteData<GetRepliesResponse>>(
+          ["replies", postId, commentId],
+          context.previousData
+        );
+      }
     },
   });
 
-  const deleteCommentMutation = useDeleteMutation(queryClient, {
+  const deleteCommentMutation = useDeleteCommentMutation(queryClient, {
+    onMutate: () => {
+      queryClient.cancelQueries(["comments", postId]);
+      queryClient.cancelQueries(["replies", postId, commentId]);
+      const previousComments = queryClient.getQueryData<InfiniteData<GetPostCommentsResponse>>([
+        "comments",
+        postId,
+      ]);
+      const previousData = queryClient.getQueryData<InfiniteData<GetRepliesResponse>>([
+        "replies",
+        postId,
+        commentId,
+      ]);
+      queryClient.setQueryData<InfiniteData<GetPostCommentsResponse>>(["comments", postId], (old) => ({
+        ...(old as InfiniteData<GetPostCommentsResponse>),
+        pages: old?.pages.map((page) => ({
+          ...page,
+          data: {
+            ...page.data,
+            comments: page.data.comments.map((c) => {
+              if (c.id === commentId) {
+                return {
+                  ...c,
+                  num_replies: c.num_replies - 1,
+                };
+              }
+              return c;
+            }),
+          },
+        })) as GetPostCommentsResponse[],
+      }));
+      queryClient.setQueryData<InfiniteData<GetRepliesResponse>>(["replies", postId, commentId], (old) => ({
+        ...(old as InfiniteData<GetRepliesResponse>),
+        pages: old?.pages.map((page) => ({
+          ...page,
+          data: {
+            ...page.data,
+            replies: page.data.replies.filter((r) => r.id !== reply.id),
+          },
+        })) as GetRepliesResponse[],
+      }));
+
+      return { previousData, previousComments };
+    },
     onSuccess: () => {
       makeToast("Comment deleted successfully", "success");
     },
-    onError: (error) => {
+    onError: (error, _, context) => {
       const msg = error?.response?.data?.message || "Something went wrong";
       makeToast(msg, "error");
+      if (context?.previousData) {
+        queryClient.setQueryData<InfiniteData<GetRepliesResponse>>(
+          ["replies", postId, commentId],
+          context.previousData
+        );
+      }
+      if (context?.previousComments) {
+        queryClient.setQueryData<InfiniteData<GetPostCommentsResponse>>(
+          ["comments", postId],
+          context.previousComments
+        );
+      }
     },
   });
 

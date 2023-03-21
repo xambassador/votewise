@@ -22,12 +22,11 @@ type Options = {
  */
 export function useCommentMutation(comment: string, queryClient: QueryClient, user: User, options: Options) {
   return useMutation((postId: number) => commentOnPost(postId, comment), {
-    // eslint-disable-next-line @typescript-eslint/no-shadow
+    // TODO: Can we do optimistic update here, On infinite query???
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries(["comments", variables]);
       options.onSuccess?.(data, variables, context);
     },
-    // eslint-disable-next-line @typescript-eslint/no-shadow
     onError: (error: any, postId, context) => {
       options.onError?.(error, postId, context);
     },

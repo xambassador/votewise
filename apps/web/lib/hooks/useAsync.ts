@@ -31,6 +31,11 @@ const getAsyncReducer =
     }
   };
 
+/**
+ * @description A hook to prevent state updates after unmounting
+ * @param dispatch React dispatch function
+ * @returns
+ */
 function useSafeDispatch<T>(dispatch: React.Dispatch<AsyncAction<T>>) {
   const mountedRef = React.useRef(false);
 
@@ -53,6 +58,11 @@ function useSafeDispatch<T>(dispatch: React.Dispatch<AsyncAction<T>>) {
   );
 }
 
+/**
+ * @description A hook to handle async state
+ * @param initialState The initial state of the async state
+ * @returns
+ */
 export function useAsync<T>(initialState: AsyncState<T>) {
   const asyncReducer = getAsyncReducer<T>();
   const [state, unsafeDispatch] = React.useReducer(asyncReducer, initialState);

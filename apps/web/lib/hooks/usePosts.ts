@@ -7,6 +7,10 @@ const fetchPosts = async ({ pageParam = 0 }) => {
   return response;
 };
 
+/**
+ * @description This hook is used to fetch posts with pagination
+ * @returns
+ */
 export const usePosts = () => {
   const postsQuery = useInfiniteQuery("posts", fetchPosts, {
     getNextPageParam: (lastPage) =>

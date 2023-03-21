@@ -29,7 +29,20 @@ export function PostAddComment(props: PostAddCommentProps) {
   }
 
   const commentMutation = useCommentMutation(text, queryClient, user as User, {
-    onSuccess: () => methods.setValue("text", ""),
+    onSuccess: () => {
+      methods.setValue("text", "");
+      // Update the post query to reflect the new comment count
+      queryClient.setQueryData<GetPostResponse>(["post", post.id], (old) => ({
+        ...(old as GetPostResponse),
+        data: {
+          ...old?.data,
+          post: {
+            ...old?.data?.post,
+            comments_count: old?.data ? old.data.post.comments_count + 1 : 0,
+          },
+        } as GetPostResponse["data"],
+      }));
+    },
     onError: handleError,
   });
 

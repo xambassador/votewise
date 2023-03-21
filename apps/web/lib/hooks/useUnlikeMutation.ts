@@ -22,7 +22,6 @@ type Options = {
  */
 export function useUnLikeMutation(queryClient: QueryClient, user: User, options?: Options) {
   return useMutation((postId: number) => unlikePost(postId), {
-    // eslint-disable-next-line @typescript-eslint/no-shadow
     onMutate: (postId) => {
       queryClient.cancelQueries(["post", postId]);
       const previousPosts = queryClient.getQueryData(["post", postId]);
@@ -45,7 +44,6 @@ export function useUnLikeMutation(queryClient: QueryClient, user: User, options?
     onSuccess: (data, variables, context) => {
       options?.onSuccess?.(data, variables, context);
     },
-    // eslint-disable-next-line @typescript-eslint/no-shadow
     onError: (error: any, postId, context) => {
       queryClient.setQueryData(["post", postId], context?.previousPosts);
       options?.onError?.(error, postId, context);
