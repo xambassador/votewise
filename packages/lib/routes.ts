@@ -50,7 +50,7 @@ export const GET_REPLIES_TO_COMMENT_ON_POST_V1 = "/:postId/comment/:commentId/re
 export const DELETE_COMMENT_ON_POST_V1 = "/:postId/comment/:commentId";
 // PATCH /api/v1/posts/:postId/comment/:commentId/like => Like comment on post
 export const LIKE_COMMENT_ON_POST_V1 = "/:postId/comment/:commentId/like";
-// PATCH /api/v1/posts/:postId/comment/:commentId/unlike => Unlike comment on post
+// DELETE /api/v1/posts/:postId/comment/:commentId/unlike => Unlike comment on post
 export const UNLIKE_COMMENT_ON_POST_V1 = "/:postId/comment/:commentId/unlike";
 
 // User routes.

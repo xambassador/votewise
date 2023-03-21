@@ -176,6 +176,10 @@ type GetPostCommentsResponse = {
       text: string;
       upvotes_count: number;
       num_replies: number;
+      upvotes: {
+        user_id: number;
+        id: number;
+      }[];
     }[];
     meta: Pagination;
   };
@@ -191,6 +195,28 @@ type UpdateCommentResponse = {
       parent_id: number;
       updated_at: Date;
       created_at: Date;
+    };
+  };
+} & BaseResponse;
+
+type LikeCommentResponse = {
+  data: {
+    message: string;
+    comment: {
+      id: true;
+      updated_at: true;
+      user_id: true;
+    };
+  };
+} & BaseResponse;
+
+type UnLikeCommentResponse = {
+  data: {
+    message: string;
+    comment: {
+      id: true;
+      updated_at: true;
+      user_id: true;
     };
   };
 } & BaseResponse;
@@ -246,4 +272,6 @@ export type {
   ReplyToCommentResponse,
   GetRepliesResponse,
   DeleteCommentResponse,
+  LikeCommentResponse,
+  UnLikeCommentResponse,
 };

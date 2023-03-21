@@ -20,7 +20,9 @@ import {
 
 import { timeAgo } from "lib/date";
 import { useDeleteCommentMutation } from "lib/hooks/useDeleteCommentMutation";
+import { useLikeCommentMutation } from "lib/hooks/useLikeCommentMutation";
 import { useReplyToCommentMutation } from "lib/hooks/useReplyToCommentMutation";
+import { useUnLikeCommentMutation } from "lib/hooks/useUnlikCommentMutation";
 import { useUpdateCommentMutation } from "lib/hooks/useUpdateCommentMutation";
 import type { User } from "lib/store";
 
@@ -58,6 +60,22 @@ export function PostComment(props: PostCommentProps) {
 
   const replyToCommentMutation = useReplyToCommentMutation(queryClient, {
     onSuccess: () => methods.setValue("reply", ""),
+  });
+
+  const likeCommentMutation = useLikeCommentMutation(queryClient, {
+    onSuccess: () => {},
+    onError: (error) => {
+      const msg = error?.response?.data?.message || "Something went wrong";
+      makeToast(msg, "error");
+    },
+  });
+
+  const unLikeCommentMutation = useUnLikeCommentMutation(queryClient, {
+    onSuccess: () => {},
+    onError: (error) => {
+      const msg = error?.response?.data?.message || "Something went wrong";
+      makeToast(msg, "error");
+    },
   });
 
   const deleteCommentMutation = useDeleteCommentMutation(queryClient, {
@@ -109,6 +127,22 @@ export function PostComment(props: PostCommentProps) {
     });
   };
 
+  const handleOnLikeComment = () => {
+    if (comment.upvotes.find((upvote) => upvote.user_id === user?.id)) {
+      unLikeCommentMutation.mutate({
+        postId,
+        commentId: comment.id,
+        user: user as User,
+      });
+      return;
+    }
+    likeCommentMutation.mutate({
+      postId,
+      commentId: comment.id,
+      user: user as User,
+    });
+  };
+
   return (
     <Comment>
       <CommentHeader>
@@ -143,6 +177,12 @@ export function PostComment(props: PostCommentProps) {
           )}
           <CommentActions
             upvoteText={comment.upvotes_count}
+            upvoteIconProps={{
+              className: comment.upvotes.find((upvote) => upvote.user_id === user?.id) ? "text-blue-500" : "",
+            }}
+            upvoteButtonProps={{
+              onClick: handleOnLikeComment,
+            }}
             replyText={comment.num_replies}
             replyButtonProps={{
               onClick: () => setToggleReply(!toggleReply),

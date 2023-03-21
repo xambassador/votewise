@@ -23,8 +23,10 @@ import type {
   GetPostResponse,
   GetPostsResponse,
   GetRepliesResponse,
+  LikeCommentResponse,
   LikePostResponse,
   ReplyToCommentResponse,
+  UnLikeCommentResponse,
   UnLikePostResponse,
   UpdateCommentResponse,
 } from "@votewise/types";
@@ -107,7 +109,12 @@ export const getPost = async (
 };
 
 /**
- * @description Comment on post
+ * @description Add comment to post
+ * @param token Access token
+ * @param postId Post id
+ * @param comment Comment text
+ * @param options Axios request options
+ * @returns
  */
 export const commentOnPost = async (
   token: string,
@@ -132,7 +139,13 @@ export const commentOnPost = async (
 };
 
 /**
- * @description Get post comments
+ * @description Get comments of a post
+ * @param token Access token
+ * @param postId Post id
+ * @param limit Limit of comments to fetch
+ * @param offset Offset of comments to start fetching from
+ * @param options Axios request options
+ * @returns
  */
 export const getPostComments = async (
   token: string,
@@ -159,6 +172,12 @@ export const getPostComments = async (
 
 /**
  * @description Update comment on post
+ * @param token Access token
+ * @param postId Post id
+ * @param commentId Comment id
+ * @param comment Comment text
+ * @param options Axios request options
+ * @returns
  */
 export const updateCommentOnPost = async (
   token: string,
@@ -187,6 +206,12 @@ export const updateCommentOnPost = async (
 
 /**
  * @description Reply to comment on post
+ * @param token Access token
+ * @param postId Post id
+ * @param commentId Comment id
+ * @param comment Comment text
+ * @param options Axios request options
+ * @returns
  */
 export const replyToComment = async (
   token: string,
@@ -213,7 +238,14 @@ export const replyToComment = async (
 };
 
 /**
- * @description Get replies of a comment
+ * @description Get replies of a comment on post
+ * @param token Access token
+ * @param postId Post id
+ * @param commentId Comment id
+ * @param limit Limit of replies to get
+ * @param offset Offset of replies to start from
+ * @param options
+ * @returns
  */
 export const getRepliesToComment = async (
   token: string,
@@ -241,6 +273,11 @@ export const getRepliesToComment = async (
 
 /**
  * @description Delete comment on post
+ * @param token Access token
+ * @param postId Post id
+ * @param commentId Comment id
+ * @param options Axios request options
+ * @returns
  */
 export const deleteComment = async (
   token: string,
@@ -254,6 +291,63 @@ export const deleteComment = async (
     .replace(":postId", postId.toString())
     .replace(":commentId", commentId.toString());
   const response: AxiosResponse<DeleteCommentResponse> = await getAxiosServerWithAuth(token).delete(
+    apiEndpoint,
+    {
+      headers: options?.headers,
+    }
+  );
+  return response;
+};
+
+/**
+ * @description Like a comment on post
+ * @param token Access token
+ * @param postId Post id
+ * @param commentId Comment id
+ * @param options Axios request options
+ * @returns
+ */
+export const likeComment = async (
+  token: string,
+  postId: number,
+  commentId: number,
+  options?: {
+    headers: AxiosRequestConfig["headers"];
+  }
+) => {
+  const apiEndpoint = `${POST_ROUTE_V1}${LIKE_COMMENT_ON_POST_V1}`
+    .replace(":postId", postId.toString())
+    .replace(":commentId", commentId.toString());
+  const response: AxiosResponse<LikeCommentResponse> = await getAxiosServerWithAuth(token).patch(
+    apiEndpoint,
+    {},
+    {
+      headers: options?.headers,
+    }
+  );
+  return response;
+};
+
+/**
+ * @description Unlike a comment on post
+ * @param token Access token
+ * @param postId Post id
+ * @param commentId Comment id
+ * @param options Axios request options
+ * @returns
+ */
+export const unlikeComment = async (
+  token: string,
+  postId: number,
+  commentId: number,
+  options?: {
+    headers: AxiosRequestConfig["headers"];
+  }
+) => {
+  const apiEndpoint = `${POST_ROUTE_V1}${UNLIKE_COMMENT_ON_POST_V1}`
+    .replace(":postId", postId.toString())
+    .replace(":commentId", commentId.toString());
+  const response: AxiosResponse<UnLikeCommentResponse> = await getAxiosServerWithAuth(token).delete(
     apiEndpoint,
     {
       headers: options?.headers,

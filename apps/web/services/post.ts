@@ -7,8 +7,10 @@ import type {
   GetPostResponse,
   GetPostsResponse,
   GetRepliesResponse,
+  LikeCommentResponse,
   LikePostResponse,
   ReplyToCommentResponse,
+  UnLikeCommentResponse,
   UnLikePostResponse,
   UpdateCommentResponse,
 } from "@votewise/types";
@@ -138,5 +140,27 @@ export const getReplies = async (postId: number, commentId: number, limit = 5, o
 export const deleteComment = async (postId: number, commentId: number) => {
   const apiEndpoint = `/posts/${postId}/comments/${commentId}/delete`;
   const response: AxiosResponse<DeleteCommentResponse> = await axioInstance.delete(apiEndpoint);
+  return response.data;
+};
+
+/**
+ * @description Like comment
+ * @param postId Post id to like comment on
+ * @param commentId Comment id to like
+ */
+export const likeComment = async (postId: number, commentId: number) => {
+  const apiEndpoint = `/posts/${postId}/comments/${commentId}/like`;
+  const response: AxiosResponse<LikeCommentResponse> = await axioInstance.patch(apiEndpoint);
+  return response.data;
+};
+
+/**
+ * @description Unlike comment
+ * @param postId Post id to unlike comment on
+ * @param commentId Comment id to unlike
+ */
+export const unlikeComment = async (postId: number, commentId: number) => {
+  const apiEndpoint = `/posts/${postId}/comments/${commentId}/unlike`;
+  const response: AxiosResponse<UnLikeCommentResponse> = await axioInstance.delete(apiEndpoint);
   return response.data;
 };

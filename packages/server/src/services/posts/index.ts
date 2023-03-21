@@ -222,7 +222,7 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
-  async getCommentsForPost(postId: number, limit = 5, offset = 0) {
+  async getCommentsForPost(postId: number, userId: number, limit = 5, offset = 0) {
     try {
       const post = await this.isPostExist(postId);
 
@@ -253,6 +253,17 @@ class PostService extends BasePostService {
           id: true,
           updated_at: true,
           text: true,
+          // TODO: Should give informative name to this field
+          // upvotes: this field indicates whether the user who make request has liked the comment or not.
+          upvotes: {
+            where: {
+              user_id: userId,
+            },
+            select: {
+              id: true,
+              user_id: true,
+            },
+          },
           _count: {
             select: {
               upvotes: true,
@@ -722,6 +733,11 @@ class PostService extends BasePostService {
             },
           },
         },
+        select: {
+          id: true,
+          updated_at: true,
+          user_id: true,
+        },
       });
 
       return data;
@@ -775,6 +791,11 @@ class PostService extends BasePostService {
               id: isAlreadyLiked.upvotes[0].id,
             },
           },
+        },
+        select: {
+          id: true,
+          updated_at: true,
+          user_id: true,
         },
       });
 

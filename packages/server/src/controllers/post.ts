@@ -157,6 +157,7 @@ export const getPost = async (req: Request, res: Response) => {
 // -----------------------------------------------------------------------------------------
 export const getCommentsForPost = async (req: Request, res: Response) => {
   const { postId } = req.params;
+  const { user } = req.session;
 
   if (!postId) {
     return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
@@ -164,7 +165,7 @@ export const getCommentsForPost = async (req: Request, res: Response) => {
 
   try {
     const { limit, offset } = getLimitAndOffset(req);
-    const data = await PostService.getCommentsForPost(Number(postId), limit, offset);
+    const data = await PostService.getCommentsForPost(Number(postId), user.id, limit, offset);
     return res.status(OK).json(
       new JSONResponse(
         "Post comments fetched successfully",
