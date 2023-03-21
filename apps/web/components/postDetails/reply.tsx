@@ -62,6 +62,7 @@ export function CommentReply(props: CommentReplyProps) {
                 return {
                   ...r,
                   text: data.comment,
+                  updated_at: new Date(),
                 };
               }
               return r;
@@ -128,7 +129,7 @@ export function CommentReply(props: CommentReplyProps) {
       return { previousData, previousComments };
     },
     onSuccess: () => {
-      makeToast("Comment deleted successfully", "success");
+      makeToast(`Your comment "${reply.text}" is deleted successfully.`, "success");
     },
     onError: (error, _, context) => {
       const msg = error?.response?.data?.message || "Something went wrong";

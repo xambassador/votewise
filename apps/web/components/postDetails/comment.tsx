@@ -73,7 +73,7 @@ export function PostComment(props: PostCommentProps) {
           },
         } as GetPostResponse["data"],
       }));
-      makeToast("Comment deleted successfully", "success");
+      makeToast(`Your comment "${comment.text}" is deleted successfully.`, "success");
     },
     onError: (error) => {
       const msg = error?.response?.data?.message || "Something went wrong";
