@@ -128,6 +128,8 @@ class PostService extends BasePostService {
         post_assets: {
           select: {
             url: true,
+            type: true,
+            id: true,
           },
         },
         author: {
@@ -846,17 +848,50 @@ class PostService extends BasePostService {
       const posts = await prisma.post.findMany({
         where: {
           author_id: userId,
-        },
-        orderBy: {
-          updated_at: "desc",
+          status,
         },
         include: {
+          // TODO: Need to give more informative name
+          // upvotes indicates whether the user who make request has liked the post or not
+          upvotes: {
+            where: {
+              user_id: userId,
+            },
+            select: {
+              id: true,
+              user_id: true,
+            },
+          },
+          author: {
+            select: {
+              name: true,
+              location: true,
+              profile_image: true,
+            },
+          },
+          post_assets: {
+            select: {
+              url: true,
+              type: true,
+              id: true,
+            },
+          },
+          comments: {
+            where: {
+              parent_id: null,
+            },
+            select: {
+              id: true,
+            },
+          },
           _count: {
             select: {
               upvotes: true,
-              comments: true,
             },
           },
+        },
+        orderBy: {
+          updated_at: "desc",
         },
         take: limit,
         skip: offset,
@@ -864,8 +899,8 @@ class PostService extends BasePostService {
       return {
         posts: posts.map((p) => ({
           ...p,
-          upvotes: p._count.upvotes,
-          comments: p._count.comments,
+          upvotes_count: p._count.upvotes,
+          comments_count: p.comments.length,
           _count: undefined,
         })),
         meta: {
@@ -897,19 +932,47 @@ class PostService extends BasePostService {
         throw new Error(UNAUTHORIZED_MSG);
       }
 
-      const data = await prisma.post.update({
-        where: {
-          id: postId,
-        },
-        data: {
-          content: payload.content,
-          title: payload.title,
-          slug,
-          type: payload.type,
-          status: payload.status,
-          group_id: payload.groupId,
-        },
-      });
+      // TODO: Need to find a better way to update post assets
+      const promises = [
+        prisma.postAsset.deleteMany({
+          where: {
+            post_id: postId,
+          },
+        }),
+        prisma.post.update({
+          where: {
+            id: postId,
+          },
+          data: {
+            content: payload.content,
+            title: payload.title,
+            slug,
+            type: payload.type,
+            status: payload.status,
+            group_id: payload.groupId,
+            post_assets: {
+              createMany: {
+                data: payload.post_assets,
+              },
+            },
+          },
+          select: {
+            id: true,
+            author_id: true,
+            title: true,
+            content: true,
+            slug: true,
+            type: true,
+            status: true,
+            group_id: true,
+            created_at: true,
+            updated_at: true,
+          },
+        }),
+      ];
+
+      const [, data] = await prisma.$transaction(promises);
+
       await HashTagService.addHashtags(postId, payload.content);
       return data;
     } catch (err) {

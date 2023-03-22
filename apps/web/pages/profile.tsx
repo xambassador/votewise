@@ -16,6 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuItems,
   DropdownTransition,
+  Modal,
   Spinner,
 } from "@votewise/ui";
 import {
@@ -25,10 +26,12 @@ import {
   FiFilter,
   FiTrash2,
   FiMessageCircle as Message,
+  Planet,
   FiSend as Sent,
   FiThumbsUp as Upvote,
 } from "@votewise/ui/icons";
 
+import { UpdatePost } from "components/modal/UpdatePost";
 import {
   ButtonGroup,
   Post,
@@ -48,8 +51,11 @@ import { getServerSession } from "server/lib/getServerSession";
 
 import { getMyPosts } from "server/services/user";
 
+type PostStatus = "open" | "closed" | "archived" | "inprogress";
+
 type PostCardProps = {
   post: GetMyPostsResponse["data"]["posts"][0];
+  postStatus: PostStatus;
 };
 
 type IndicatorProps = {
@@ -65,10 +71,12 @@ function Indicator(props: IndicatorProps) {
   );
 }
 
-type PostStatus = "open" | "closed" | "archived" | "inprogress";
-
 type DropdownProps = {
-  defaultSelected?: PostStatus;
+  selected: PostStatus;
+  onFilterChange: (status: PostStatus) => void;
+  onUpdate: () => void;
+  onDelete: () => void;
+  onArchive: () => void;
 };
 
 type FilterDropdownProps = {
@@ -140,11 +148,10 @@ function FilterDropdown(props: FilterDropdownProps) {
 }
 
 function PostDropdown(props: DropdownProps) {
-  const { defaultSelected = "open" } = props;
-  const [selected, setSelected] = useState<PostStatus>(defaultSelected);
+  const { selected = "open", onFilterChange, onArchive, onDelete, onUpdate } = props;
 
   const handleOnDropdownItemClick = (status: PostStatus) => {
-    setSelected(status);
+    onFilterChange(status);
   };
 
   return (
@@ -185,19 +192,19 @@ function PostDropdown(props: DropdownProps) {
             <span>In progress</span>
           </DropdownMenuItem>
           <div className="w-full rounded-full border border-gray-200" />
-          <DropdownMenuItem className="group cursor-pointer gap-2">
+          <DropdownMenuItem className="group cursor-pointer gap-2" as="button" onClick={onUpdate}>
             <span>
               <FiEdit2 className="h-5 w-5 text-gray-500" />
             </span>
             <span>Update</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="group cursor-pointer gap-2">
+          <DropdownMenuItem className="group cursor-pointer gap-2" as="button" onClick={onDelete}>
             <span>
               <FiTrash2 className="h-5 w-5 text-gray-500" />
             </span>
             <span>Delete</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="group cursor-pointer gap-2">
+          <DropdownMenuItem className="group cursor-pointer gap-2" as="button" onClick={onArchive}>
             <span>
               <FiArchive className="h-5 w-5 text-gray-500" />
             </span>
@@ -210,8 +217,14 @@ function PostDropdown(props: DropdownProps) {
 }
 
 function PostCard(props: PostCardProps) {
-  const { post } = props;
+  const { post, postStatus } = props;
+  const [selected, setSelected] = useState<PostStatus>("open");
+  const [open, setOpen] = useState(false);
   const parsedText = parseHashTags(post.content);
+
+  const handleOnUpdate = () => {
+    setOpen(true);
+  };
 
   return (
     <Post>
@@ -223,8 +236,13 @@ function PostCard(props: PostCardProps) {
       >
         <div className="flex h-fit items-center gap-4">
           <PostStatuPill type={parsePostStatus(post.status)}>{post.status}</PostStatuPill>
-
-          <PostDropdown />
+          <PostDropdown
+            selected={post.status.toLowerCase() as PostStatus}
+            onFilterChange={() => {}}
+            onDelete={() => {}}
+            onUpdate={handleOnUpdate}
+            onArchive={() => {}}
+          />
         </div>
       </PostUserPill>
       <PostTitle>
@@ -266,6 +284,10 @@ function PostCard(props: PostCardProps) {
           <span className="text-sm text-gray-600">Share</span>
         </ButtonGroup>
       </PostFooter>
+
+      <Modal open={open} setOpen={setOpen}>
+        <UpdatePost setOpen={setOpen} post={post} postStatus={postStatus} />
+      </Modal>
     </Post>
   );
 }
@@ -323,13 +345,23 @@ export default function Page() {
             <span className="text-lg font-semibold text-gray-600">Loading...</span>
           </div>
         )}
+
+        {data?.pages[0].data.posts.length === 0 && status !== "loading" && (
+          <div className="flex flex-col items-center">
+            <Planet className="fill-gray-600" width={200} height={200} />
+            <h2 className="text-xl font-semibold text-gray-600">
+              Sorry!, we don&apos;t have anything to show you.
+            </h2>
+          </div>
+        )}
+
         {status !== "loading" &&
           !isFetching &&
           data?.pages.map((page, i) => (
             // eslint-disable-next-line react/no-array-index-key
             <React.Fragment key={i}>
               {page.data.posts.map((post) => (
-                <PostCard post={post} key={post.id} />
+                <PostCard post={post} key={post.id} postStatus={postStatus} />
               ))}
             </React.Fragment>
           ))}

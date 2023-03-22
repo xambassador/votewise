@@ -1,12 +1,20 @@
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
 import { getAxiosServerWithAuth } from "server/lib/axios";
 
-import { GET_ME_V1, USER_CREATE_POST_V1, USER_GET_POSTS_V1, USER_ROUTE_V1 } from "@votewise/lib";
+import {
+  GET_ME_V1,
+  USER_CREATE_POST_V1,
+  USER_GET_POSTS_V1,
+  USER_ROUTE_V1,
+  USER_UPDATE_POST_V1,
+} from "@votewise/lib";
 import type {
   CreatePostPayload,
   CreatePostResponse,
   GetMyPostsResponse,
   MyDetailsResponse,
+  UpdatePostPayload,
+  UpdatePostResponse,
 } from "@votewise/types";
 
 /**
@@ -71,5 +79,32 @@ export const getMyPosts = async (
   const response: AxiosResponse<GetMyPostsResponse> = await getAxiosServerWithAuth(token).get(apiEndpoint, {
     headers: options?.headers,
   });
+  return response;
+};
+
+/**
+ * @description Update post
+ * @param token Access token
+ * @param postId Post id
+ * @param payload Payload to update post
+ * @param options Axios Request options
+ * @returns
+ */
+export const updatePost = async (
+  token: string,
+  postId: string,
+  payload: UpdatePostPayload,
+  options?: {
+    headers: AxiosRequestConfig["headers"];
+  }
+) => {
+  const apiEndpoint = `${USER_ROUTE_V1}${USER_UPDATE_POST_V1}`.replace(":postId", postId);
+  const response: AxiosResponse<UpdatePostResponse> = await getAxiosServerWithAuth(token).patch(
+    apiEndpoint,
+    payload,
+    {
+      headers: options?.headers,
+    }
+  );
   return response;
 };

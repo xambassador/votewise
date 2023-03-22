@@ -1,13 +1,13 @@
+import { isEqual } from "lodash";
 import { useStore } from "zustand";
 
-import { useRouter } from "next/router";
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
+import type { InfiniteData } from "react-query";
 
-import type { MyDetailsResponse } from "@votewise/types";
-import { Avatar, Button, Image, Input, makeToast } from "@votewise/ui";
+import type { GetMyPostsResponse, PostStatus } from "@votewise/types";
+import { Avatar, Button, Image, Input } from "@votewise/ui";
 import { Picture } from "@votewise/ui/icons";
 
 import { ErrorMessage } from "components/ErrorMessage";
@@ -15,7 +15,7 @@ import { ErrorMessage } from "components/ErrorMessage";
 import { usePicker } from "lib/hooks/usePicker";
 import store from "lib/store";
 
-import { createPost } from "services/user";
+import { updatePost } from "services/user";
 
 import {
   PostModalContainer,
@@ -36,10 +36,12 @@ const options = [
   { label: "Group Only", value: "GROUP_ONLY" },
 ] as { label: string; value: "PUBLIC" | "GROUP_ONLY" }[];
 
+type Post = GetMyPostsResponse["data"]["posts"][0];
+
 type FormValues = {
   title: string;
   content: string;
-  status: "OPEN"; // NOTE: Right now sending status as OPEN, it can be change from profile page
+  status: PostStatus;
   type: {
     label: string;
     value: "PUBLIC" | "GROUP_ONLY";
@@ -75,15 +77,20 @@ function PostAsset({ file, onSuccess }: { file: File; onSuccess: (url: string, f
 function PostAssetsContainer({
   files,
   onSuccess,
+  children,
+  className,
 }: {
   files: File[];
+  children?: React.ReactNode;
+  className?: string;
   onSuccess: (url: string, file: File) => void;
 }) {
   return (
-    <PostModalFilesContainer>
+    <PostModalFilesContainer className={className}>
       {files.map((file) => (
         <PostAsset file={file} key={file.name} onSuccess={onSuccess} />
       ))}
+      {children}
     </PostModalFilesContainer>
   );
 }
@@ -96,6 +103,8 @@ function PostEditor() {
     setValue,
     getValues,
   } = useFormContext<FormValues>();
+  const defaultAssets = getValues("postAssets");
+  const { current: assets } = useRef<{ url: string; type: string }[]>(defaultAssets);
   const [files, setFiles] = useState<File[]>([]);
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,7 +123,7 @@ function PostEditor() {
     <>
       <PostModalEditor>
         <PostModalTextArea
-          placeholder={`What's in your mind, ${user?.name}?`}
+          placeholder={`What's on your mind, ${user?.name}?`}
           {...register("content", {
             required: "Content is required",
             minLength: {
@@ -123,7 +132,20 @@ function PostEditor() {
             },
           })}
         />
-        {files.length > 0 && <PostAssetsContainer files={files} onSuccess={handleOnSuccess} />}
+        <PostAssetsContainer
+          files={files}
+          onSuccess={handleOnSuccess}
+          className={!files.length && !defaultAssets.length ? "mb-0" : ""}
+        >
+          {assets.map((asset) => (
+            <div
+              key={asset.url}
+              className="relative h-[calc((100/16)*1rem)] w-[calc((100/16)*1rem)] overflow-hidden rounded-lg"
+            >
+              <Image src={asset.url} alt="Post Asset" width={100} height={100} className="rounded-lg" />
+            </div>
+          ))}
+        </PostAssetsContainer>
         <div className="flex items-center gap-2 pb-4 pl-4">
           <Picture />
           <PostModalFileUploaderInput
@@ -138,14 +160,26 @@ function PostEditor() {
   );
 }
 
-export function CreatePost({ setOpen }: { setOpen: (open: boolean) => void }) {
+type UpdatePostProps = {
+  setOpen: (open: boolean) => void;
+  post: Post;
+  postStatus: "open" | "closed" | "archived" | "inprogress";
+};
+
+export function UpdatePost(props: UpdatePostProps) {
+  const { setOpen, post, postStatus } = props;
   const user = useStore(store, (state) => state.user);
-  const router = useRouter();
   const methods = useForm<FormValues>({
     defaultValues: {
-      status: "OPEN",
+      status: post.status,
+      title: post.title,
+      content: post.content,
+      postAssets: post.post_assets,
+      type: { ...options.find((o) => o.value === post.type) },
     },
   });
+  const oldPost = useRef(post);
+
   const {
     register,
     setError,
@@ -154,71 +188,86 @@ export function CreatePost({ setOpen }: { setOpen: (open: boolean) => void }) {
   } = methods;
 
   const queryClient = useQueryClient();
+
   const mutation = useMutation(
-    (data: FormValues) =>
-      createPost({
-        title: data.title,
+    (data: {
+      title: string;
+      content: string;
+      status: PostStatus;
+      type: "PUBLIC" | "GROUP_ONLY";
+      postAssets: { url: string; type: string }[];
+    }) =>
+      updatePost(post.id, {
         content: data.content,
-        type: data.type.value,
+        post_assets: data.postAssets,
         status: data.status,
-        postAssets: data.postAssets,
+        title: data.title,
+        type: data.type,
       }),
     {
-      onMutate: () => {
-        // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-        queryClient.cancelQueries("user-info");
-
-        // Snapshot the previous value
-        const previousUserInfo = queryClient.getQueryData<MyDetailsResponse>("user-info");
-
-        // Optimistically update to the new value
-        if (previousUserInfo) {
-          queryClient.setQueryData<MyDetailsResponse>("user-info", (old) => ({
-            ...(old as MyDetailsResponse),
+      onMutate: (variables) => {
+        queryClient.cancelQueries(["my-posts", postStatus]);
+        const previousPosts = queryClient.getQueryData<InfiniteData<GetMyPostsResponse>>([
+          "my-posts",
+          postStatus,
+        ]);
+        queryClient.setQueryData<InfiniteData<GetMyPostsResponse>>(["my-posts", postStatus], (old) => ({
+          ...(old as InfiniteData<GetMyPostsResponse>),
+          pages: old?.pages.map((page) => ({
+            ...page,
             data: {
-              ...(old?.data as MyDetailsResponse["data"]),
-              user: {
-                ...(old?.data.user as MyDetailsResponse["data"]["user"]),
-                posts: old?.data ? old.data.user.posts + 1 : 0,
-              },
+              ...page.data,
+              posts: page.data.posts.map((p) => {
+                if (p.id === post.id) {
+                  return {
+                    ...p,
+                    title: variables.title,
+                    content: variables.content,
+                    post_assets: variables.postAssets,
+                    updated_at: new Date(),
+                    type: variables.type,
+                    status: variables.status,
+                  };
+                }
+                return p;
+              }),
             },
-          }));
-        }
+          })) as GetMyPostsResponse[],
+        }));
 
-        // Return a context object with the snapshotted value
-        return { previousUserInfo };
+        return { previousPosts };
       },
       onSuccess: () => {
-        makeToast("Post created successfully", "success");
-        const { pathname } = router;
-        if (pathname !== "/") {
-          router.push("/");
-        }
         setOpen(false);
       },
       onError: (error: any, variables, context) => {
-        const message = error?.response.data.error.message || "Something went wrong";
-        setError("apiError", { message });
-        // If the mutation fails, use the context returned from onMutate to roll back
-        queryClient.setQueryData("user-info", context?.previousUserInfo);
-      },
-      onSettled: () => {
-        // Always refetch after error or success:
-        queryClient.invalidateQueries("posts");
-        queryClient.invalidateQueries("user-info");
+        const msg = error?.response.data.error.message || "Something went wrong";
+        setError("apiError", msg);
+        if (context?.previousPosts) {
+          queryClient.setQueryData(["my-posts", postStatus], context.previousPosts);
+        }
       },
     }
   );
 
   const handleOnSubmit = async (data: FormValues) => {
-    mutation.mutate(data);
+    const newChanges = {
+      content: data.content,
+      postAssets: data.postAssets,
+      status: data.status,
+      title: data.title,
+      type: data.type.value,
+    };
+    const isChanged = isEqual(oldPost.current, newChanges);
+    if (!isChanged) {
+      return;
+    }
+    mutation.mutate(newChanges);
   };
-
-  const { isLoading } = mutation;
 
   return (
     <PostModalContainer>
-      <PostModalTitle>Create Post</PostModalTitle>
+      <PostModalTitle>Update Post</PostModalTitle>
       <PostModalContent>
         <FormProvider {...methods}>
           <PostModalForm onSubmit={methods.handleSubmit(handleOnSubmit)}>
@@ -226,7 +275,10 @@ export function CreatePost({ setOpen }: { setOpen: (open: boolean) => void }) {
               <Avatar src={user?.profile_image as string} rounded width={60} height={60} />
               <div className="flex flex-1 flex-col items-start">
                 <h4 className="text-xl font-semibold text-gray-600">{user?.name}</h4>
-                <PostTypeSelectMenu options={options} defaultOption={options[0]} />
+                <PostTypeSelectMenu
+                  options={options}
+                  defaultOption={options.find((o) => o.value === post.type)}
+                />
               </div>
             </div>
 
@@ -252,8 +304,8 @@ export function CreatePost({ setOpen }: { setOpen: (open: boolean) => void }) {
                 {errors.apiError.message}
               </ErrorMessage>
             )}
-            <Button type="submit" isLoading={isLoading} disabled={isLoading}>
-              Create
+            <Button type="submit" isLoading={mutation.isLoading} disabled={mutation.isLoading}>
+              Update
             </Button>
           </PostModalForm>
         </FormProvider>

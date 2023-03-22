@@ -7,6 +7,8 @@ import type {
   MyDetailsResponse,
   OnboardingPayload,
   OnboardingResponse,
+  UpdatePostPayload,
+  UpdatePostResponse,
   UsernameAvailableResponse,
 } from "@votewise/types";
 
@@ -60,5 +62,19 @@ type PostStatus = "open" | "closed" | "archived" | "inprogress";
 export const getMyPosts = async (limit = 5, offset = 0, status: PostStatus = "open") => {
   const apiEndpoint = `/user/posts?limit=${limit}&offset=${offset}&status=${status}`;
   const response: AxiosResponse<GetMyPostsResponse> = await axioInstance.get(apiEndpoint);
+  return response.data;
+};
+
+/**
+ * @description Update a post
+ * @param postId Post ID to update
+ * @param payload Payload to update the post with
+ * @returns
+ */
+export const updatePost = async (postId: number, payload: UpdatePostPayload) => {
+  const response: AxiosResponse<UpdatePostResponse> = await axioInstance.patch(
+    `/user/posts/${postId}`,
+    payload
+  );
   return response.data;
 };
