@@ -5,6 +5,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import fs from "fs";
+import http from "http";
 import { promisify } from "util";
 import { v4 } from "uuid";
 
@@ -21,7 +22,7 @@ const staticServerPort = process.env.STATIC_WEB_SERVER_PORT || 8787;
 
 // ----------
 const app = express();
-
+const httpServer = http.createServer(app);
 // ----------
 app.use(
   cors({
@@ -229,6 +230,19 @@ app.get("/heartbeat", (req, res) => {
 });
 
 // ----------
-app.listen(port, () => {
+httpServer.listen(port, () => {
   logger(`Static Server is on fire 🔥🔥🔥 on ${port}`, "info");
+});
+
+// ----------
+// Handle graceful shutdown
+process.on("SIGTERM", () => {
+  logger("🚨 SIGTERM signal received: closing HTTP server");
+  httpServer.close(() => {
+    logger(`🚨🚨🚨 💤Server is going to shutdown .....`);
+
+    // Gracefully exit the process
+    logger(`💤💤💤Server is shutdown .....`);
+    process.exit(0);
+  });
 });
