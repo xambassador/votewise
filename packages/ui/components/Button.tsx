@@ -12,12 +12,13 @@ type ButtonProps = {
   primary?: boolean;
   secondary?: boolean;
   tritertiary?: boolean;
+  dark?: boolean;
   isLoading?: boolean;
 } & React.ButtonHTMLAttributes<HTMLButtonElement> & {
     loaderProps?: React.ComponentProps<typeof Loader>;
   };
 
-function getThemeClasses(theme: "primary" | "secondary" | "tritertiary") {
+function getThemeClasses(theme: "primary" | "secondary" | "tritertiary" | "dark") {
   let classnames =
     "rounded-lg py-4 flex w-full items-center justify-center font-semibold disabled:cursor-not-allowed disabled:bg-blue-300";
   if (theme === "primary") {
@@ -35,17 +36,32 @@ function getThemeClasses(theme: "primary" | "secondary" | "tritertiary") {
     return classnames;
   }
 
+  if (theme === "dark") {
+    classnames += " bg-gray-800 py-3 text-gray-50 disabled:bg-gray-800";
+  }
+
   return classnames;
 }
 
 export function Button(props: ButtonProps) {
-  const { className, children, primary, secondary, tritertiary, isLoading, loaderProps, disabled, ...rest } =
-    props;
+  const {
+    className,
+    children,
+    primary,
+    secondary,
+    tritertiary,
+    dark,
+    isLoading,
+    loaderProps,
+    disabled,
+    ...rest
+  } = props;
 
   let classnames;
   if (primary) classnames = getThemeClasses("primary");
   else if (secondary) classnames = getThemeClasses("secondary");
   else if (tritertiary) classnames = getThemeClasses("tritertiary");
+  else if (dark) classnames = getThemeClasses("dark");
   else classnames = getThemeClasses("primary");
 
   return (

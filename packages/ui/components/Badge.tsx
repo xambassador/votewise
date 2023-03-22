@@ -11,16 +11,19 @@ type BadgeProps = {
 
 export function Badge({ children, type, className }: BadgeProps) {
   let classes =
-    "bg-gray-800 py-[2px] px-[10px] text-sm text-gray-400 h-fit flex rounded-full items-center justify-center";
+    "bg-gray-800 py-[2px] px-[10px] text-sm text-gray-50 h-fit flex rounded-full items-center justify-center hover:bg-gray-700 transition-colors duration-200 ease-in-out";
   switch (type) {
     case "success":
-      classes = classNames(classes, "bg-green-200 text-green-800");
+      classes = classNames(classes, "bg-green-200 text-green-800 hover:bg-green-200");
       break;
     case "danger":
-      classes = classNames(classes, "bg-red-100 text-red-800");
+      classes = classNames(classes, "bg-red-100 text-red-800 hover:bg-red-100");
       break;
     case "warning":
-      classes = classNames(classes, "bg-orange-200 text-orange-700");
+      classes = classNames(classes, "bg-orange-200 text-orange-700 hover:bg-orange-200");
+      break;
+    case "secondary":
+      classes = classNames(classes, "bg-gray-200 text-gray-800 hover:bg-gray-300");
       break;
     default:
       break;

@@ -33,6 +33,10 @@ type UpdatePostPayload = {
   type?: PostType;
   status: PostStatus;
   groupId?: number;
+  post_assets: {
+    url: string;
+    type: string;
+  }[];
 };
 
 type ChangeStatusPayload = {
@@ -61,8 +65,6 @@ type GetPostsResponse = {
   data: {
     message: string;
     posts: {
-      comments_count: number;
-      upvotes_count: number;
       id: number;
       author_id: number;
       title: string;
@@ -73,8 +75,12 @@ type GetPostsResponse = {
       group_id: number | null;
       created_at: Date;
       updated_at: Date;
+      comments_count: number;
+      upvotes_count: number;
       post_assets: {
         url: string;
+        type: string;
+        id: number;
       }[];
       upvotes: {
         user_id: number;
@@ -252,6 +258,24 @@ type DeleteCommentResponse = {
   };
 } & BaseResponse;
 
+type UpdatePostResponse = {
+  data: {
+    message: string;
+    post: {
+      id: number;
+      author_id: number;
+      title: string;
+      content: string;
+      slug: string;
+      type: PostType;
+      status: PostStatus;
+      group_id: number;
+      created_at: Date;
+      updated_at: Date;
+    };
+  };
+} & BaseResponse;
+
 export type {
   CommentOnPostPayload,
   UpdateCommentOnPostPayload,
@@ -274,4 +298,5 @@ export type {
   DeleteCommentResponse,
   LikeCommentResponse,
   UnLikeCommentResponse,
+  UpdatePostResponse,
 };

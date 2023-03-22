@@ -1,3 +1,6 @@
+import type { BaseResponse, Pagination } from "./base";
+import type { PostStatus, PostType } from "./post";
+
 type AcceptOrRejectFriendRequestPayload = {
   requestId: number;
   type: "ACCEPT" | "REJECT";
@@ -43,4 +46,44 @@ type MyDetailsResponse = {
   error: null;
 };
 
-export type { AcceptOrRejectFriendRequestPayload, UsernameAvailableResponse, MyDetailsResponse };
+type GetMyPostsResponse = {
+  data: {
+    message: string;
+    posts: {
+      id: number;
+      author_id: number;
+      title: string;
+      content: string;
+      slug: string;
+      type: PostType;
+      status: PostStatus;
+      group_id: number | null;
+      created_at: Date;
+      updated_at: Date;
+      upvotes: {
+        user_id: number;
+        id: number;
+      }[];
+      post_assets: {
+        url: string;
+        type: string;
+        id: number;
+      }[];
+      author: {
+        profile_image: string;
+        name: string;
+        location: string;
+      };
+      comments_count: number;
+      upvotes_count: number;
+    }[];
+    meta: Pagination;
+  };
+} & BaseResponse;
+
+export type {
+  AcceptOrRejectFriendRequestPayload,
+  UsernameAvailableResponse,
+  MyDetailsResponse,
+  GetMyPostsResponse,
+};
