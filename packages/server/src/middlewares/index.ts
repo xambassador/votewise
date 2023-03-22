@@ -11,7 +11,7 @@ import helmet from "helmet";
 import { logger } from "@votewise/lib/logger";
 
 const registerMiddlewares = (app: Application) => {
-  logger("Registering middlewares....");
+  logger("▶️ Registering middlewares....");
   app.use(compression());
   app.use(
     cors({
@@ -31,7 +31,7 @@ const registerMiddlewares = (app: Application) => {
     }
     next();
   });
-  logger("Middlewares registered....");
+  logger("✅ Middlewares registered....");
 };
 
 export { registerMiddlewares };

@@ -25,7 +25,7 @@ import userRouter from "@/src/routes/user";
 
 // Register routes
 const registerRoutes = (app: Application) => {
-  logger("Registering routes...");
+  logger("▶️ Registering routes...");
 
   app.use(HEALTH_ROUTE, healthCheckRouter);
   app.use(AUTH_ROUTE_V1, authRouter);
@@ -35,7 +35,7 @@ const registerRoutes = (app: Application) => {
   app.use(GROUPS_ROUTE_V1, groupRouter);
   app.use("*", notFoundRouter);
 
-  logger("Routes registered...");
+  logger("✅ Routes registered...");
 };
 
 export { registerRoutes };
