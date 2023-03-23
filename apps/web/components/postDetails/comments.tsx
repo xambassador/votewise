@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Button } from "@votewise/ui";
+import { AnimatedList, Button } from "@votewise/ui";
 
 import { CommentsWrapper } from "components/post/comments";
 
@@ -24,15 +24,17 @@ export function PostComments(props: PostCommentsProps) {
         data?.pages.map((page, i) => (
           // eslint-disable-next-line react/no-array-index-key
           <React.Fragment key={i}>
-            {page.data.comments.length === 0 && (
-              <div>
-                <h2 className="text-center text-lg font-semibold text-gray-600">No comments yet</h2>
-              </div>
-            )}
-            {page.data.comments.length > 0 &&
-              page.data.comments.map((c) => (
-                <PostComment key={c.id} comment={c} user={user} postId={postId} />
-              ))}
+            <AnimatedList>
+              {page.data.comments.length === 0 && (
+                <div>
+                  <h2 className="text-center text-lg font-semibold text-gray-600">No comments yet</h2>
+                </div>
+              )}
+              {page.data.comments.length > 0 &&
+                page.data.comments.map((c) => (
+                  <PostComment key={c.id} comment={c} user={user} postId={postId} />
+                ))}
+            </AnimatedList>
           </React.Fragment>
         ))}
       {hasNextPage && (

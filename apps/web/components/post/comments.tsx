@@ -10,9 +10,9 @@ export function CommentsWrapper({ className, children }: { className?: string; c
   return <div className={classNames("flex flex-col gap-5", className)}>{children}</div>;
 }
 
-type CommentProps = React.HtmlHTMLAttributes<HTMLDivElement>;
+type CommentProps = React.HtmlHTMLAttributes<HTMLLIElement>;
 export function Comment(props: CommentProps) {
-  return <div {...props} />;
+  return <li {...props} />;
 }
 
 type CommentHeaderProps = React.HtmlHTMLAttributes<HTMLDivElement>;

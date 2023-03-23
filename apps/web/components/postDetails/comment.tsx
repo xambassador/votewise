@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useQueryClient } from "react-query";
 
 import type { GetPostCommentsResponse, GetPostResponse } from "@votewise/types";
-import { Avatar, Spinner, makeToast } from "@votewise/ui";
+import { AnimatedList, Avatar, Spinner, makeToast } from "@votewise/ui";
 import { FiXCircle as XCircle } from "@votewise/ui/icons";
 
 import { CommentReplies } from "@/components/postDetails/replies";
@@ -199,21 +199,23 @@ export function PostComment(props: PostCommentProps) {
               </ButtonGroup>
             )}
           </CommentActions>
-          {toggleReply && (
-            <>
-              {comment.num_replies > 0 && (
-                <CommentReplies postId={postId} commentId={comment.id} user={user} />
-              )}
-              <PostAddCommentInput
-                className="w-full"
-                placeholder={`Reply to ${comment.user.name} ...`}
-                isLoading={replyToCommentMutation.isLoading}
-                disabled={replyToCommentMutation.isLoading}
-                formProps={{ onSubmit: methods.handleSubmit(handleOnReplyComment) }}
-                {...methods.register("reply")}
-              />
-            </>
-          )}
+          <AnimatedList>
+            {toggleReply && (
+              <>
+                {comment.num_replies > 0 && (
+                  <CommentReplies postId={postId} commentId={comment.id} user={user} />
+                )}
+                <PostAddCommentInput
+                  className="w-full"
+                  placeholder={`Reply to ${comment.user.name} ...`}
+                  isLoading={replyToCommentMutation.isLoading}
+                  disabled={replyToCommentMutation.isLoading}
+                  formProps={{ onSubmit: methods.handleSubmit(handleOnReplyComment) }}
+                  {...methods.register("reply")}
+                />
+              </>
+            )}
+          </AnimatedList>
         </div>
       </CommentBody>
     </Comment>
