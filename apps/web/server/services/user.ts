@@ -58,6 +58,8 @@ export const createPost = async (
   );
   return response;
 };
+
+type OrderBy = "asc" | "desc";
 /**
  * @description Get all posts created by the curent logged in user
  * @param token Access token
@@ -70,12 +72,13 @@ export const getMyPosts = async (
   limit = 5,
   offset = 0,
   status: "open" | "closed" | "archived" | "inprogress" = "open",
+  orderBy: OrderBy = "desc",
   options?: {
     headers: AxiosRequestConfig["headers"];
   }
 ) => {
   // TODO: Need to add status for filtering
-  const apiEndpoint = `${USER_ROUTE_V1}${USER_GET_POSTS_V1}?limit=${limit}&offset=${offset}&status=${status}`;
+  const apiEndpoint = `${USER_ROUTE_V1}${USER_GET_POSTS_V1}?limit=${limit}&offset=${offset}&status=${status}&orderBy=${orderBy}`;
   const response: AxiosResponse<GetMyPostsResponse> = await getAxiosServerWithAuth(token).get(apiEndpoint, {
     headers: options?.headers,
   });

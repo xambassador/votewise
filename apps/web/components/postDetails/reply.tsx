@@ -126,11 +126,10 @@ export function CommentReply(props: CommentReplyProps) {
         })) as GetRepliesResponse[],
       }));
 
+      makeToast(`Your comment "${reply.text}" is deleted successfully.`, "success");
       return { previousData, previousComments };
     },
-    onSuccess: () => {
-      makeToast(`Your comment "${reply.text}" is deleted successfully.`, "success");
-    },
+    onSuccess: () => {},
     onError: (error, _, context) => {
       const msg = error?.response?.data?.message || "Something went wrong";
       makeToast(msg, "error");

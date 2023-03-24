@@ -64,7 +64,7 @@ export function DropdownMenuItems(props: DropdownMenuItemsProps) {
     <Menu.Items
       as={as}
       className={classNames(
-        "shadow-dropdown absolute right-0 z-10 mt-2 flex w-56 origin-top-right flex-col gap-[10px] rounded-lg bg-white py-5 px-7 outline-none",
+        "shadow-dropdown absolute right-0 z-10 mt-2 flex w-56 origin-top-right flex-col gap-2 rounded-lg border border-gray-200 bg-white p-5 outline-none",
         className
       )}
       ref={ref}
@@ -75,13 +75,22 @@ export function DropdownMenuItems(props: DropdownMenuItemsProps) {
   );
 }
 
+type DropdownMenuItemsGroupProps = React.HTMLAttributes<HTMLDivElement>;
+export function DropdownMenuItemsGroup(props: DropdownMenuItemsGroupProps) {
+  const { className, ...rest } = props;
+  return <div className={classNames("flex flex-col gap-1", className)} {...rest} />;
+}
+
 type DropdownMenuItemProps = React.ComponentProps<typeof Menu.Item>;
 export function DropdownMenuItem(props: DropdownMenuItemProps) {
   const { as = "div", children, className, ref, ...rest } = props;
   return (
     <Menu.Item
       as={as}
-      className={classNames("group flex items-center text-base font-semibold text-gray-600", className)}
+      className={classNames(
+        "group flex items-center rounded p-1 text-base font-semibold text-gray-600 transition-colors ease-in hover:bg-gray-50",
+        className
+      )}
       ref={ref}
       {...rest}
     >

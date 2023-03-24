@@ -61,7 +61,7 @@ export const GET_ME_V1 = "/me";
 export const CHECK_USERNAME_AVAILABILITY_V1 = "/usernames";
 // POST /api/v1/user/posts => Create new post
 export const USER_CREATE_POST_V1 = "/posts";
-// GET /api/v1/user/posts?limit=5&offset=0&status=open => Get all posts of current user
+// GET /api/v1/user/posts?limit=5&offset=0&status=open&orderBy=desc => Get all posts of current user
 export const USER_GET_POSTS_V1 = "/posts";
 // PATCH /api/v1/user/posts/:postId (update post)
 export const USER_UPDATE_POST_V1 = "/posts/:postId";

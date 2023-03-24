@@ -53,14 +53,20 @@ export const createPost = async (payload: CreatePostPayload) => {
 };
 
 type PostStatus = "open" | "closed" | "archived" | "inprogress";
+type OrderBy = "asc" | "desc";
 /**
  * @description Get all posts created by the curent logged in user
  * @param limit Limit of posts to fetch. Default is 5
  * @param offset Offset of posts to fetch. Default is 0
  * @returns
  */
-export const getMyPosts = async (limit = 5, offset = 0, status: PostStatus = "open") => {
-  const apiEndpoint = `/user/posts?limit=${limit}&offset=${offset}&status=${status}`;
+export const getMyPosts = async (
+  limit = 5,
+  offset = 0,
+  status: PostStatus = "open",
+  orderBy: OrderBy = "desc"
+) => {
+  const apiEndpoint = `/user/posts?limit=${limit}&offset=${offset}&status=${status}&orderBy=${orderBy}`;
   const response: AxiosResponse<GetMyPostsResponse> = await axioInstance.get(apiEndpoint);
   return response.data;
 };

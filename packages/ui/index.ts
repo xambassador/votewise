@@ -18,3 +18,5 @@ export * from "./components/menu";
 export * from "./components/modal";
 
 export * from "./components/animation/FadeIn";
+export * from "./components/animation/List";
+export * from "./components/animation/AnimatePresence";

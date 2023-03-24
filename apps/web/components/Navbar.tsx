@@ -11,6 +11,7 @@ import {
   DropdownMenu,
   DropdownMenuItem,
   DropdownMenuItems,
+  DropdownMenuItemsGroup,
   DropdownTransition,
   Loader,
   SearchField,
@@ -133,27 +134,40 @@ function UserInfoBox() {
       {status === "loading" && <UserPillSkeleton />}
       {status === "success" && data.data.user && (
         <div className="flex items-center gap-2">
-          <Avatar src={data.data.user.profile_image} alt="Avatar" width={48} height={48} rounded />
+          <Avatar
+            src={data.data.user.profile_image}
+            className="border-2 border-gray-700 bg-blue-500"
+            alt="Avatar"
+            width={48}
+            height={48}
+            rounded
+          />
           <DropdownMenu>
             <DropdownButton>{data.data.user.name}</DropdownButton>
             <DropdownTransition>
               <DropdownMenuItems>
-                <DropdownMenuItem className="flex flex-col items-start gap-[10px]">
-                  <span>{data.data.user.email}</span>
+                <DropdownMenuItemsGroup>
+                  <DropdownMenuItem>
+                    <span>{data.data.user.email}</span>
+                  </DropdownMenuItem>
+                </DropdownMenuItemsGroup>
+                <DropdownMenuItemsGroup>
                   <div className="w-full rounded-full border border-gray-200" />
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href="/profile">Profile</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href="/settings">Settings</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href="/privacy">Privacy</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <SignoutButton />
-                </DropdownMenuItem>
+                </DropdownMenuItemsGroup>
+                <DropdownMenuItemsGroup>
+                  <DropdownMenuItem>
+                    <Link href="/profile">Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/settings">Settings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/privacy">Privacy</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <SignoutButton />
+                  </DropdownMenuItem>
+                </DropdownMenuItemsGroup>
               </DropdownMenuItems>
             </DropdownTransition>
           </DropdownMenu>

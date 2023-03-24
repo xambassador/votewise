@@ -837,7 +837,13 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
-  async getPostsByUserId(userId: number, limit = 5, offset = 0, status = "OPEN" as PostStatus) {
+  async getPostsByUserId(
+    userId: number,
+    limit = 5,
+    offset = 0,
+    status = "OPEN" as PostStatus,
+    orderBy: "asc" | "desc" = "desc"
+  ) {
     try {
       const totalPosts = await prisma.post.count({
         where: {
@@ -891,7 +897,7 @@ class PostService extends BasePostService {
           },
         },
         orderBy: {
-          updated_at: "desc",
+          updated_at: orderBy,
         },
         take: limit,
         skip: offset,
