@@ -81,9 +81,16 @@ type GetMyPostsResponse = {
   };
 } & BaseResponse;
 
+type DeletePostResponse = {
+  data: {
+    message: string;
+  };
+} & BaseResponse;
+
 export type {
   AcceptOrRejectFriendRequestPayload,
   UsernameAvailableResponse,
   MyDetailsResponse,
   GetMyPostsResponse,
+  DeletePostResponse,
 };

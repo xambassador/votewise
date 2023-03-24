@@ -4,12 +4,12 @@ import cookie from "cookie";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { AUTH_ROUTE_V1, REGISTER_USER_V1 } from "@votewise/lib";
-import { logger } from "@votewise/lib/logger";
 import type { RegisterUserPayload } from "@votewise/types";
 
 import { axiosServerInstance } from "server/lib/axios";
 import { getError } from "server/lib/getError";
 import { getProxyHeaders } from "server/lib/getProxyHeaders";
+import { getProxyResponseHeaders } from "server/lib/getProxyResponseHeaders";
 
 const apiEndpoint = `${AUTH_ROUTE_V1}${REGISTER_USER_V1}`;
 const { COOKIE_ACCESS_TOKEN_KEY, COOKIE_REFRESH_TOKEN_KEY, COOKIE_IS_ONBOARDED_KEY } = process.env;
@@ -59,10 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ]);
 
     const { headers: responseHeaders, data, status } = response;
-    Object.entries(responseHeaders).forEach((keyArr) => {
-      const [key, value] = keyArr;
-      res.setHeader(key, value);
-    });
+    getProxyResponseHeaders(res, responseHeaders);
 
     return res.status(status).json(data);
   } catch (err: any) {

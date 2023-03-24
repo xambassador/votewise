@@ -4,13 +4,13 @@ import cookie from "cookie";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { AUTH_ROUTE_V1, LOGIN_USER_V1 } from "@votewise/lib";
-import { logger } from "@votewise/lib/logger";
 import type { LoginPayload } from "@votewise/types";
 
 import { axiosServerInstance } from "server/lib/axios";
 import { decodeJwt } from "server/lib/decodeJwt";
 import { getError } from "server/lib/getError";
 import { getProxyHeaders } from "server/lib/getProxyHeaders";
+import { getProxyResponseHeaders } from "server/lib/getProxyResponseHeaders";
 
 import { getOnboardingStatus } from "server/services/onboarding";
 
@@ -74,10 +74,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ]);
 
     const { headers: responseHeaders, data, status } = response;
-    Object.entries(responseHeaders).forEach((keyArr) => {
-      const [key, value] = keyArr;
-      res.setHeader(key, value);
-    });
+    getProxyResponseHeaders(res, responseHeaders);
 
     return res.status(status).json(data);
   } catch (err: any) {

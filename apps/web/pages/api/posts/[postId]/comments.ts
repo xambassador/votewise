@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import { getError } from "server/lib/getError";
 import { getProxyHeaders } from "server/lib/getProxyHeaders";
+import { getProxyResponseHeaders } from "server/lib/getProxyResponseHeaders";
 import { getServerSession } from "server/lib/getServerSession";
 import { UNAUTHORIZED_RESPONSE } from "server/lib/response";
 
@@ -32,10 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     );
 
     const { headers: responseHeaders, data, status } = response;
-    Object.entries(responseHeaders).forEach((keyArr) => {
-      const [key, value] = keyArr;
-      res.setHeader(key, value);
-    });
+    getProxyResponseHeaders(res, responseHeaders);
 
     return res.status(status).json(data);
   } catch (err: any) {

@@ -5,6 +5,7 @@ import { CHECK_USERNAME_AVAILABILITY_V1, USER_ROUTE_V1 } from "@votewise/lib";
 import { axiosServerInstance } from "server/lib/axios";
 import { getError } from "server/lib/getError";
 import { getProxyHeaders } from "server/lib/getProxyHeaders";
+import { getProxyResponseHeaders } from "server/lib/getProxyResponseHeaders";
 
 const apiEndpoint = `${USER_ROUTE_V1}${CHECK_USERNAME_AVAILABILITY_V1}`;
 
@@ -17,10 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     const { headers: responseHeaders, data, status } = response;
-    Object.entries(responseHeaders).forEach((keyArr) => {
-      const [key, value] = keyArr;
-      res.setHeader(key, value);
-    });
+    getProxyResponseHeaders(res, responseHeaders);
 
     return res.status(status).json(data);
   } catch (err: any) {
