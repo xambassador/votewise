@@ -1,37 +1,17 @@
 import type { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 
-import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
-import { QueryClient, dehydrate } from "react-query";
+import { QueryClient, dehydrate, useQueryClient } from "react-query";
 
 import { classNames } from "@votewise/lib";
 import { parseHashTags } from "@votewise/lib/hashtags";
 import type { GetMyPostsResponse } from "@votewise/types";
-import {
-  Badge,
-  Button,
-  DropdownButton,
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuItems,
-  DropdownMenuItemsGroup,
-  DropdownTransition,
-  Modal,
-  Spinner,
-} from "@votewise/ui";
-import {
-  FiArchive,
-  FiClock,
-  FiEdit2,
-  FiFilter,
-  FiTrash2,
-  FiMessageCircle as Message,
-  Planet,
-  FiSend as Sent,
-  FiThumbsUp as Upvote,
-} from "@votewise/ui/icons";
+import { Badge, Button, Modal, Spinner, makeToast } from "@votewise/ui";
+import { FiMessageCircle as Message, Planet, FiSend as Sent, FiThumbsUp as Upvote } from "@votewise/ui/icons";
 
+import { FilterDropdown } from "components/Dropdowns/FilterDropdown";
+import { PostOptionsDropdown } from "components/Dropdowns/PostOptionsDropdown";
 import { UpdatePost } from "components/modal/UpdatePost";
 import {
   ButtonGroup,
@@ -46,6 +26,7 @@ import {
 } from "components/post";
 
 import { timeAgo } from "lib/date";
+import { useDeletePostMutation } from "lib/hooks/useDeltePostMutation";
 import { useGetMyPosts } from "lib/hooks/useGetMyPosts";
 import { parsePostStatus } from "lib/parsePostStatus";
 import { getServerSession } from "server/lib/getServerSession";
@@ -53,190 +34,40 @@ import { getServerSession } from "server/lib/getServerSession";
 import { getMyPosts } from "server/services/user";
 
 type PostStatus = "open" | "closed" | "archived" | "inprogress";
+type PostType = GetMyPostsResponse["data"]["posts"][0];
 
 type PostCardProps = {
-  post: GetMyPostsResponse["data"]["posts"][0];
+  post: PostType;
   postStatus: PostStatus;
+  orderBy: "asc" | "desc";
+  onDelete: (post: PostType) => void;
 };
-
-type IndicatorProps = {
-  isSelected: boolean;
-};
-function Indicator(props: IndicatorProps) {
-  const { isSelected } = props;
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="8" cy="8" r="8" fill={isSelected ? "#51CF66" : "#6B7280"} />
-      <circle cx="8" cy="8" r="3" fill="#F9FAFB" />
-    </svg>
-  );
-}
-
-type DropdownProps = {
-  selected: PostStatus;
-  onFilterChange: (status: PostStatus) => void;
-  onUpdate: () => void;
-  onDelete: () => void;
-  onArchive: () => void;
-};
-
-type FilterDropdownProps = {
-  selected: PostStatus;
-  onFilterChange: (status: PostStatus | "orderBy") => void;
-};
-
-function FilterDropdown(props: FilterDropdownProps) {
-  // TODO: Can implement Control props pattern to make this more reusable
-  const { onFilterChange, selected } = props;
-
-  const handleOnDropdownItemClick = (status: PostStatus | "orderBy") => {
-    onFilterChange?.(status);
-  };
-
-  return (
-    <DropdownMenu>
-      <DropdownButton>
-        <Badge type="primary" className="flex items-center gap-2 rounded py-1">
-          <span>
-            <FiFilter className="h-5 w-5 text-gray-50" />
-          </span>
-          <span className="text-gray-50">Filters</span>
-        </Badge>
-      </DropdownButton>
-      <DropdownTransition>
-        <DropdownMenuItems>
-          <DropdownMenuItemsGroup>
-            <DropdownMenuItem
-              className="group cursor-pointer gap-2"
-              as="button"
-              onClick={() => handleOnDropdownItemClick("open")}
-            >
-              <span>
-                <Indicator isSelected={selected === "open"} />
-              </span>
-              <span>Open</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="group cursor-pointer gap-2"
-              as="button"
-              onClick={() => handleOnDropdownItemClick("closed")}
-            >
-              <span>
-                <Indicator isSelected={selected === "closed"} />
-              </span>
-              <span>Closed</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="group cursor-pointer gap-2"
-              as="button"
-              onClick={() => handleOnDropdownItemClick("inprogress")}
-            >
-              <span>
-                <Indicator isSelected={selected === "inprogress"} />
-              </span>
-              <span>In progress</span>
-            </DropdownMenuItem>
-          </DropdownMenuItemsGroup>
-          <div className="w-full rounded-full border border-gray-200" />
-          <DropdownMenuItemsGroup>
-            <DropdownMenuItem
-              className="group cursor-pointer gap-2"
-              as="button"
-              onClick={() => handleOnDropdownItemClick("orderBy")}
-            >
-              <span>
-                <FiClock className="h-5 w-5 text-gray-500" />
-              </span>
-              <span>Time</span>
-            </DropdownMenuItem>
-          </DropdownMenuItemsGroup>
-        </DropdownMenuItems>
-      </DropdownTransition>
-    </DropdownMenu>
-  );
-}
-
-function PostDropdown(props: DropdownProps) {
-  const { selected = "open", onFilterChange, onArchive, onDelete, onUpdate } = props;
-
-  const handleOnDropdownItemClick = (status: PostStatus) => {
-    onFilterChange(status);
-  };
-
-  return (
-    <DropdownMenu>
-      <DropdownButton>
-        <EllipsisHorizontalIcon className="h-6 w-6 text-gray-500" />
-      </DropdownButton>
-      <DropdownTransition>
-        <DropdownMenuItems>
-          <DropdownMenuItemsGroup>
-            <DropdownMenuItem
-              className="group cursor-pointer gap-2"
-              as="button"
-              onClick={() => handleOnDropdownItemClick("open")}
-            >
-              <span>
-                <Indicator isSelected={selected === "open"} />
-              </span>
-              <span>Open</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="group cursor-pointer gap-2"
-              as="button"
-              onClick={() => handleOnDropdownItemClick("closed")}
-            >
-              <span>
-                <Indicator isSelected={selected === "closed"} />
-              </span>
-              <span>Closed</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="group cursor-pointer gap-2"
-              as="button"
-              onClick={() => handleOnDropdownItemClick("inprogress")}
-            >
-              <span>
-                <Indicator isSelected={selected === "inprogress"} />
-              </span>
-              <span>In progress</span>
-            </DropdownMenuItem>
-          </DropdownMenuItemsGroup>
-          <div className="w-full rounded-full border border-gray-200" />
-          <DropdownMenuItemsGroup>
-            <DropdownMenuItem className="group cursor-pointer gap-2" as="button" onClick={onUpdate}>
-              <span>
-                <FiEdit2 className="h-5 w-5 text-gray-500" />
-              </span>
-              <span>Update</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="group cursor-pointer gap-2" as="button" onClick={onDelete}>
-              <span>
-                <FiTrash2 className="h-5 w-5 text-gray-500" />
-              </span>
-              <span>Delete</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="group cursor-pointer gap-2" as="button" onClick={onArchive}>
-              <span>
-                <FiArchive className="h-5 w-5 text-gray-500" />
-              </span>
-              <span>Archive</span>
-            </DropdownMenuItem>
-          </DropdownMenuItemsGroup>
-        </DropdownMenuItems>
-      </DropdownTransition>
-    </DropdownMenu>
-  );
-}
 
 function PostCard(props: PostCardProps) {
-  const { post, postStatus } = props;
-  const [selected, setSelected] = useState<PostStatus>("open");
+  const { post, postStatus, orderBy, onDelete } = props;
   const [open, setOpen] = useState(false);
   const parsedText = parseHashTags(post.content);
+  const queryClient = useQueryClient();
+  const deletePostMutation = useDeletePostMutation(queryClient, {
+    onSuccess: () => {
+      onDelete(post);
+    },
+    onError: (error: any) => {
+      const msg = error?.response.data.error.message || "Something went wrong";
+      makeToast(msg, "error");
+    },
+  });
 
   const handleOnUpdate = () => {
     setOpen(true);
+  };
+
+  const handleOnDelete = () => {
+    deletePostMutation.mutate({
+      postId: post.id,
+      status: postStatus,
+      orderBy,
+    });
   };
 
   return (
@@ -249,13 +80,16 @@ function PostCard(props: PostCardProps) {
       >
         <div className="flex h-fit items-center gap-4">
           <PostStatuPill type={parsePostStatus(post.status)}>{post.status}</PostStatuPill>
-          <PostDropdown
-            selected={post.status.toLowerCase() as PostStatus}
-            onFilterChange={() => {}}
-            onDelete={() => {}}
-            onUpdate={handleOnUpdate}
-            onArchive={() => {}}
-          />
+          {deletePostMutation.isLoading && <Spinner className="h-5 w-5" />}
+          {!deletePostMutation.isLoading && (
+            <PostOptionsDropdown
+              selected={post.status.toLowerCase() as PostStatus}
+              onFilterChange={() => {}}
+              onDelete={handleOnDelete}
+              onUpdate={handleOnUpdate}
+              onArchive={() => {}}
+            />
+          )}
         </div>
       </PostUserPill>
       <PostTitle>
@@ -321,6 +155,10 @@ export default function Page() {
     setPostStatus(s);
   };
 
+  const handleOnPostDelete = (post: PostType) => {
+    makeToast(`Your post "${post.title} has been removed."`, "success");
+  };
+
   return (
     <div className="min-w-[calc((774/16)*1rem)]">
       {/* Profile tabs */}
@@ -353,7 +191,7 @@ export default function Page() {
           </li>
         </ul>
         <div className="ml-auto">
-          <FilterDropdown selected={postStatus} onFilterChange={handleOnFilterChange} />
+          <FilterDropdown selected={postStatus} onFilterChange={handleOnFilterChange} orderBy={orderBy} />
         </div>
       </div>
 
@@ -380,7 +218,13 @@ export default function Page() {
             // eslint-disable-next-line react/no-array-index-key
             <React.Fragment key={i}>
               {page.data.posts.map((post) => (
-                <PostCard post={post} key={post.id} postStatus={postStatus} />
+                <PostCard
+                  post={post}
+                  key={post.id}
+                  postStatus={postStatus}
+                  orderBy={orderBy}
+                  onDelete={handleOnPostDelete}
+                />
               ))}
             </React.Fragment>
           ))}

@@ -3,6 +3,7 @@ import type { AxiosResponse } from "axios";
 import type {
   CreatePostPayload,
   CreatePostResponse,
+  DeletePostResponse,
   GetMyPostsResponse,
   MyDetailsResponse,
   OnboardingPayload,
@@ -82,5 +83,15 @@ export const updatePost = async (postId: number, payload: UpdatePostPayload) => 
     `/user/posts/${postId}`,
     payload
   );
+  return response.data;
+};
+
+/**
+ * @description Delete post.
+ * @param postId Post id
+ */
+export const deletePost = async (postId: number) => {
+  const apiEndpoint = `/user/posts/${postId}`;
+  const response: AxiosResponse<DeletePostResponse> = await axioInstance.delete(apiEndpoint);
   return response.data;
 };

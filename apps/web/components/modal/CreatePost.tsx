@@ -233,7 +233,7 @@ export function CreatePost({ setOpen }: { setOpen: (open: boolean) => void }) {
             <div className="flex flex-col gap-4">
               <Input
                 type="text"
-                className="w-full rounded placeholder:text-base placeholder:text-gray-400"
+                className="w-full rounded text-gray-600 placeholder:text-base placeholder:text-gray-400"
                 placeholder="Give the title to your idea."
                 {...register("title", {
                   required: "Title is required",

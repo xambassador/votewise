@@ -1,4 +1,3 @@
-import { isEqual } from "lodash";
 import { useStore } from "zustand";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -178,7 +177,7 @@ export function UpdatePost(props: UpdatePostProps) {
       type: { ...options.find((o) => o.value === post.type) },
     },
   });
-  const oldPost = useRef(post);
+  const oldPost = useRef<typeof post | null>(post);
 
   const {
     register,
@@ -258,12 +257,15 @@ export function UpdatePost(props: UpdatePostProps) {
       title: data.title,
       type: data.type.value,
     };
-    const isChanged = isEqual(oldPost.current, newChanges);
-    if (!isChanged) {
-      return;
-    }
     mutation.mutate(newChanges);
   };
+
+  useEffect(
+    () => () => {
+      oldPost.current = null;
+    },
+    []
+  );
 
   return (
     <PostModalContainer>
@@ -285,7 +287,7 @@ export function UpdatePost(props: UpdatePostProps) {
             <div className="flex flex-col gap-4">
               <Input
                 type="text"
-                className="w-full rounded placeholder:text-base placeholder:text-gray-400"
+                className="w-full rounded text-gray-600 placeholder:text-base placeholder:text-gray-400"
                 placeholder="Give the title to your idea."
                 {...register("title", {
                   required: "Title is required",

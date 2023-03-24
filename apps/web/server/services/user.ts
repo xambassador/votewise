@@ -2,6 +2,7 @@ import type { AxiosRequestConfig, AxiosResponse } from "axios";
 import { getAxiosServerWithAuth } from "server/lib/axios";
 
 import {
+  DELETE_POST_V1,
   GET_ME_V1,
   USER_CREATE_POST_V1,
   USER_GET_POSTS_V1,
@@ -11,6 +12,7 @@ import {
 import type {
   CreatePostPayload,
   CreatePostResponse,
+  DeletePostResponse,
   GetMyPostsResponse,
   MyDetailsResponse,
   UpdatePostPayload,
@@ -77,7 +79,6 @@ export const getMyPosts = async (
     headers: AxiosRequestConfig["headers"];
   }
 ) => {
-  // TODO: Need to add status for filtering
   const apiEndpoint = `${USER_ROUTE_V1}${USER_GET_POSTS_V1}?limit=${limit}&offset=${offset}&status=${status}&orderBy=${orderBy}`;
   const response: AxiosResponse<GetMyPostsResponse> = await getAxiosServerWithAuth(token).get(apiEndpoint, {
     headers: options?.headers,
@@ -95,7 +96,7 @@ export const getMyPosts = async (
  */
 export const updatePost = async (
   token: string,
-  postId: string,
+  postId: number,
   payload: UpdatePostPayload,
   options?: {
     headers: AxiosRequestConfig["headers"];
@@ -105,6 +106,23 @@ export const updatePost = async (
   const response: AxiosResponse<UpdatePostResponse> = await getAxiosServerWithAuth(token).patch(
     apiEndpoint,
     payload,
+    {
+      headers: options?.headers,
+    }
+  );
+  return response;
+};
+
+export const deletePost = async (
+  token: string,
+  postId: number,
+  options?: {
+    headers: AxiosRequestConfig["headers"];
+  }
+) => {
+  const apiEndpoint = `${USER_ROUTE_V1}${DELETE_POST_V1}`.replace(":postId", String(postId));
+  const response: AxiosResponse<DeletePostResponse> = await getAxiosServerWithAuth(token).delete(
+    apiEndpoint,
     {
       headers: options?.headers,
     }
