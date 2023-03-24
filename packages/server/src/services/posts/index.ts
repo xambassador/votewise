@@ -1033,6 +1033,12 @@ class PostService extends BasePostService {
         });
       }
 
+      await prisma.commentUpvote.deleteMany({
+        where: {
+          post_id: postId,
+        },
+      });
+
       await prisma.comment.deleteMany({
         where: {
           post_id: postId,
