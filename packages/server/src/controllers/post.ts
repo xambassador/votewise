@@ -266,6 +266,10 @@ export const unlikePost = async (req: Request, res: Response) => {
       return res.status(BAD_REQUEST).json(POST_NOT_LIKED_RESPONSE);
     }
 
+    if (msg === FORBIDDEN_MSG) {
+      return res.status(FORBIDDEN).json(FORBIDDEN_RESPONSE);
+    }
+
     if (msg === POST_CLOSED_MSG) {
       return res.status(BAD_REQUEST).json(POST_CLOSED_RESPONSE);
     }

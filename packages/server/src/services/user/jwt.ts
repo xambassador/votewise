@@ -2,9 +2,8 @@ import jsonwebtoken from "jsonwebtoken";
 
 import dotenv from "dotenv";
 
+import { logger } from "@votewise/lib/logger";
 import { prisma } from "@votewise/prisma";
-
-import { logger } from "@/src/utils";
 
 dotenv.config();
 

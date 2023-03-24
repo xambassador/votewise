@@ -57,6 +57,15 @@ class BasePostService {
 
 // FIXME: Remove comments logic to its own service
 class PostService extends BasePostService {
+  /**
+   * @description Get all posts
+   * @param userId Authenticated user id
+   * @param limit Limit of posts to fetch
+   * @param offset Offset of posts to fetch
+   * @param sortby Sort by upvote, comment or date
+   * @param sortorder Sort order asc or desc
+   * @returns
+   */
   async getPosts(
     userId: number,
     limit = 10,
@@ -162,6 +171,12 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
+  /**
+   * @description Get post details for a given post id
+   * @param postId Post id for which details are to be fetched
+   * @param userId Authenticated user id
+   * @returns
+   */
   async getPost(postId: number, userId: number) {
     try {
       const post = await prisma.post.findUnique({
@@ -201,6 +216,7 @@ class PostService extends BasePostService {
           },
         },
       });
+      // Total comments for a post
       const totalComments = await prisma.comment.count({
         where: {
           post_id: postId,
@@ -224,12 +240,22 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
+  /**
+   * @description Get comments for given post id
+   * @param postId Post id for which comments are to be fetched
+   * @param userId Authenticated user id
+   * @param limit Limit to fetch comments
+   * @param offset Offset to skip comments
+   * @returns
+   * @throws Error if post is not found,
+   */
   async getCommentsForPost(postId: number, userId: number, limit = 5, offset = 0) {
     try {
+      // Check for post exists
       const post = await this.isPostExist(postId);
-
       if (!post) throw new Error(POST_NOT_FOUND_MSG);
 
+      // Total comments for a post
       const totalComments = await prisma.comment.count({
         where: {
           post_id: postId,
@@ -279,6 +305,7 @@ class PostService extends BasePostService {
         },
       });
 
+      // Get number of replies for each comment
       const commentsWithReplies = await Promise.all(
         comments.map(async (comment) => {
           const replies = await prisma.comment.count({
@@ -299,6 +326,7 @@ class PostService extends BasePostService {
         upvotes_count: comment._count.upvotes,
         _count: undefined,
       }));
+
       return {
         comments: data,
         meta: {
@@ -314,14 +342,22 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
+  /**
+   * @description Like a post
+   * @param postId Post id for like
+   * @param userId Authenticated user id
+   * @returns
+   * @throws Error if post is not found, post is closed, user has already liked the post or error while liking the post
+   */
   async likePost(postId: number, userId: number) {
     try {
       const post = await this.isPostExist(postId);
-
       if (!post) throw new Error(POST_NOT_FOUND_MSG);
 
+      // If post is closed, then throw error
       if (post.status === "CLOSED") throw new Error(POST_CLOSED_MSG);
 
+      // Check if user has already liked the post
       const isAlreadyLiked = await prisma.post.findUnique({
         where: {
           id: postId,
@@ -335,6 +371,7 @@ class PostService extends BasePostService {
         },
       });
 
+      // If user has already liked the post, then throw error
       if (isAlreadyLiked && isAlreadyLiked.upvotes.length > 0) {
         throw new Error(POST_ALREADY_LIKED_MSG);
       }
@@ -367,14 +404,22 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
+  /**
+   * @description Unlike a post
+   * @param postId Post id for unlike
+   * @param userId Authenticated user id
+   * @returns
+   * @throws Error if post is not found, post is closed, user has not liked the post or error while unliking the post
+   */
   async unlikePost(postId: number, userId: number) {
     try {
       const post = await this.isPostExist(postId);
-
       if (!post) throw new Error(POST_NOT_FOUND_MSG);
 
+      // If post is closed, then throw error
       if (post.status === "CLOSED") throw new Error(POST_CLOSED_MSG);
 
+      // Check if user has already liked the post
       const isAlreadyLiked = await prisma.post.findUnique({
         where: {
           id: postId,
@@ -388,12 +433,18 @@ class PostService extends BasePostService {
         },
       });
 
-      if (!isAlreadyLiked) {
+      // If not liked, then throw error
+      if (!isAlreadyLiked || isAlreadyLiked.upvotes.length === 0) {
         throw new Error(POST_NOT_LIKED_MSG);
       }
 
       if (isAlreadyLiked && isAlreadyLiked.upvotes.length === 0) {
         throw new Error(POST_NOT_LIKED_MSG);
+      }
+
+      // Check is same user who liked the post is trying to unlike it.
+      if (isAlreadyLiked && isAlreadyLiked.upvotes[0].user_id !== userId) {
+        throw new Error(FORBIDDEN_MSG);
       }
 
       const data = await prisma.post.update({
@@ -424,17 +475,19 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
+  /**
+   * @description Add comment to a post
+   * @param postId Post id for adding comment
+   * @param userId Authenticated user id
+   * @param text Comment text
+   * @returns
+   * @throws Error if post is not found, post is closed or error while adding comment
+   */
   async addComment(postId: number, userId: number, text: string) {
     try {
       const isPostExist = await this.isPostExist(postId);
-
-      if (!isPostExist) {
-        throw new Error(POST_NOT_FOUND_MSG);
-      }
-
-      if (isPostExist.status === "CLOSED") {
-        throw new Error(COMMENT_POST_CLOSED_MSG);
-      }
+      if (!isPostExist) throw new Error(POST_NOT_FOUND_MSG);
+      if (isPostExist.status === "CLOSED") throw new Error(COMMENT_POST_CLOSED_MSG);
 
       const data = await prisma.comment.create({
         data: {
@@ -467,6 +520,7 @@ class PostService extends BasePostService {
           updated_at: true,
         },
       });
+
       return {
         ...data,
         upvotes_count: data._count.upvotes,
@@ -479,6 +533,15 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
+  /**
+   * @description Delete comment from a post
+   * @param postId Post id for delete comment
+   * @param commentId Comment id of comment to be deleted
+   * @param userId Authenticated user id
+   * @returns true if comment deleted successfully
+   * @throws Error if comment is not found, comment does not belongs to post or user is not authorized to delete the comment.
+   * Errors: COMMENT_NOT_FOUND, FORBIDDEN_MSG, ERROR_DELETING_COMMENT
+   */
   async deleteComment(postId: number, commentId: number, userId: number) {
     try {
       // check if comment belongs to post and user
@@ -492,28 +555,34 @@ class PostService extends BasePostService {
         },
       });
 
-      if (!comment) {
-        throw new Error(COMMENT_NOT_FOUND_MSG);
-      }
+      // If no comment found, then throw error
+      if (!comment) throw new Error(COMMENT_NOT_FOUND_MSG);
 
-      if (comment.post_id !== postId) {
-        throw new Error(COMMENT_NOT_FOUND_MSG);
-      }
+      // If comment found but not belongs to post, then throw error
+      if (comment.post_id !== postId) throw new Error(COMMENT_NOT_FOUND_MSG);
 
-      if (comment.user_id !== userId) {
-        throw new Error(FORBIDDEN_MSG);
-      }
+      // If comment found but not belongs to user who is trying to delete it, then throw error
+      if (comment.user_id !== userId) throw new Error(FORBIDDEN_MSG);
 
-      await prisma.commentUpvote.deleteMany({
-        where: {
-          comment_id: commentId,
-        },
-      });
-      await prisma.comment.delete({
-        where: {
-          id: commentId,
-        },
-      });
+      // Looks good, delete comment
+      const promises = [
+        prisma.commentUpvote.deleteMany({
+          where: {
+            comment_id: commentId,
+          },
+        }),
+        prisma.comment.delete({
+          where: {
+            id: commentId,
+          },
+        }),
+      ];
+
+      // Delete all upvotes of comment
+      // Delete all replies of comment
+      await prisma.$transaction(promises);
+
+      return true;
     } catch (err) {
       const msg = getErrorReason(err) || ERROR_DELETING_COMMENT_MSG;
       throw new Error(msg);
@@ -521,8 +590,19 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
+  /**
+   * @description Update comment
+   * @param postId Post id for which comment is to be updated
+   * @param commentId Comment id of comment to be updated
+   * @param userId Authenticated user id
+   * @param text Comment text
+   * @returns
+   * @throws Error if comment is not found, comment does not belongs to post or user is not authorized to update the comment.
+   * Errors: COMMENT_NOT_FOUND, FORBIDDEN_MSG, ERROR_UPDATING_COMMENT
+   */
   async updateComment(postId: number, commentId: number, userId: number, text: string) {
     try {
+      // Find comment
       const comment = await prisma.comment.findUnique({
         where: {
           id: commentId,
@@ -533,17 +613,14 @@ class PostService extends BasePostService {
         },
       });
 
-      if (!comment) {
-        throw new Error(COMMENT_NOT_FOUND_MSG);
-      }
+      // If comment not found, then throw error
+      if (!comment) throw new Error(COMMENT_NOT_FOUND_MSG);
 
-      if (comment.post_id !== postId) {
-        throw new Error(COMMENT_NOT_FOUND_MSG);
-      }
+      // If comment found but not belongs to given post id post, then throw error
+      if (comment.post_id !== postId) throw new Error(COMMENT_NOT_FOUND_MSG);
 
-      if (comment.user_id !== userId) {
-        throw new Error(FORBIDDEN_MSG);
-      }
+      // If comment found but not belongs to user who is trying to update it, then throw error
+      if (comment.user_id !== userId) throw new Error(FORBIDDEN_MSG);
 
       const data = await prisma.comment.update({
         where: {
@@ -570,21 +647,30 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
+  /**
+   * @description Add reply to a comment
+   * @param postId Post id for which reply is to be added
+   * @param commentId Comment id for which reply is to be added
+   * @param userId Authenticated user id
+   * @param text Reply text
+   * @returns
+   * @throws Error if comment is not found, comment does not belongs to post or user is not authorized to add reply to the comment.
+   * Errors: COMMENT_NOT_FOUND, FORBIDDEN_MSG, ERROR_ADDING_COMMENT
+   */
   async addReplyToComment(postId: number, commentId: number, userId: number, text: string) {
     try {
+      // Find comment
       const comment = await prisma.comment.findUnique({
         where: {
           id: commentId,
         },
       });
 
-      if (!comment) {
-        throw new Error(COMMENT_NOT_FOUND_MSG);
-      }
+      // If comment not found
+      if (!comment) throw new Error(COMMENT_NOT_FOUND_MSG);
 
-      if (comment.post_id !== postId) {
-        throw new Error(COMMENT_NOT_FOUND_MSG);
-      }
+      // If comment found but not belongs to given post id's post, then throw error
+      if (comment.post_id !== postId) throw new Error(COMMENT_NOT_FOUND_MSG);
 
       const data = await prisma.comment.create({
         data: {
@@ -611,6 +697,17 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
+  /**
+   * @description Get replies to a comment
+   * @param postId Post id for which replies are to be fetched
+   * @param commentId Comment id for which replies are to be fetched
+   * @param userId Authenticated user id
+   * @param limit Limit of replies to be fetched
+   * @param offset Offset of replies to be fetched
+   * @returns
+   * @throws Error if comment is not found, comment does not belongs to post or user is not authorized to get replies to the comment.
+   * Errors: COMMENT_NOT_FOUND, FORBIDDEN_MSG, ERROR_GETTING_REPLIES_FROM_COMMENT_MSG
+   */
   async getRepliesToComment(postId: number, commentId: number, userId: number, limit = 5, offset = 0) {
     try {
       const comment = await prisma.comment.findUnique({
@@ -619,19 +716,18 @@ class PostService extends BasePostService {
         },
       });
 
-      if (!comment) {
-        throw new Error(COMMENT_NOT_FOUND_MSG);
-      }
+      // If comment not found
+      if (!comment) throw new Error(COMMENT_NOT_FOUND_MSG);
 
-      if (comment.post_id !== postId) {
-        throw new Error(COMMENT_NOT_FOUND_MSG);
-      }
+      // If comment found but not belongs to given post id's post, then throw error
+      if (comment.post_id !== postId) throw new Error(COMMENT_NOT_FOUND_MSG);
 
       const totalReplyCount = await prisma.comment.count({
         where: {
           parent_id: commentId,
         },
       });
+
       const data = await prisma.comment.findMany({
         where: {
           parent_id: commentId,
@@ -671,6 +767,7 @@ class PostService extends BasePostService {
           updated_at: "desc",
         },
       });
+
       return {
         comments: data.map((r) => ({
           ...r,
@@ -690,6 +787,15 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
+  /**
+   * @description Like a comment
+   * @param postId Post id for which comment is to be liked
+   * @param commentId Comment id of comment that is to be liked
+   * @param userId Authenticated user id
+   * @returns
+   * @throws Error if comment is not found, comment does not belongs to post or user is not authorized to like the comment.
+   * Errors: COMMENT_NOT_FOUND, FORBIDDEN_MSG, ALREADY_LIKED_COMMENT_MSG, ERROR_LIKING_COMMENT_MSG
+   */
   async likeComment(postId: number, commentId: number, userId: number) {
     try {
       const comment = await prisma.comment.findUnique({
@@ -698,14 +804,13 @@ class PostService extends BasePostService {
         },
       });
 
-      if (!comment) {
-        throw new Error(COMMENT_NOT_FOUND_MSG);
-      }
+      // If comment not found
+      if (!comment) throw new Error(COMMENT_NOT_FOUND_MSG);
 
-      if (comment.post_id !== postId) {
-        throw new Error(COMMENT_NOT_FOUND_MSG);
-      }
+      // If comment does not belongs to given post id's post, then throw error
+      if (comment.post_id !== postId) throw new Error(COMMENT_NOT_FOUND_MSG);
 
+      // Check for is comment already liked by user
       const isAlreadyLiked = await prisma.comment.findUnique({
         where: {
           id: commentId,
@@ -750,6 +855,15 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
+  /**
+   * @description Unlike a comment
+   * @param postId Post id for which comment is to be unliked
+   * @param commentId Comment id of comment that is to be unliked
+   * @param userId Authenticated user id
+   * @returns
+   * @throws Error if comment is not found, comment does not belongs to post or user is not authorized to unlike the comment.
+   * Errors: COMMENT_NOT_FOUND, FORBIDDEN_MSG, COMMENT_NOT_LIKED_MSG, ERROR_UNLIKING_COMMENT_MSG
+   */
   async unlikeComment(postId: number, commentId: number, userId: number) {
     try {
       const comment = await prisma.comment.findUnique({
@@ -758,13 +872,10 @@ class PostService extends BasePostService {
         },
       });
 
-      if (!comment) {
-        throw new Error(COMMENT_NOT_FOUND_MSG);
-      }
+      if (!comment) throw new Error(COMMENT_NOT_FOUND_MSG);
 
-      if (comment.post_id !== postId) {
-        throw new Error(COMMENT_NOT_FOUND_MSG);
-      }
+      // Comment does not belongs to given post id's post, then throw error
+      if (comment.post_id !== postId) throw new Error(COMMENT_NOT_FOUND_MSG);
 
       const isAlreadyLiked = await prisma.comment.findUnique({
         where: {
@@ -782,6 +893,9 @@ class PostService extends BasePostService {
       if (!isAlreadyLiked || isAlreadyLiked.upvotes.length === 0) {
         throw new Error(COMMENT_NOT_LIKED_MSG);
       }
+
+      // Check if current user is unliking his own comment
+      if (isAlreadyLiked.upvotes[0].user_id !== userId) throw new Error(FORBIDDEN_MSG);
 
       const data = await prisma.comment.update({
         where: {
@@ -809,6 +923,12 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
+  /**
+   * @description Create a post
+   * @param param0 Create post payload
+   * @param userId Authenticated user id
+   * @returns
+   */
   async createPost(
     { content, title, status, type = "PUBLIC", groupId, postAssets }: CreatePostPayload,
     userId: number
@@ -837,6 +957,15 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
+  /**
+   * @description Get posts by user id
+   * @param userId User id of user whose posts are to be fetched
+   * @param limit Limit of posts to be fetched
+   * @param offset Offset of posts to be fetched
+   * @param status Post status
+   * @param orderBy Order by
+   * @returns
+   */
   async getPostsByUserId(
     userId: number,
     limit = 5,
@@ -851,6 +980,7 @@ class PostService extends BasePostService {
           status,
         },
       });
+
       const posts = await prisma.post.findMany({
         where: {
           author_id: userId,
@@ -902,6 +1032,7 @@ class PostService extends BasePostService {
         take: limit,
         skip: offset,
       });
+
       return {
         posts: posts.map((p) => ({
           ...p,
@@ -921,6 +1052,15 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
+  /**
+   * @description Update post
+   * @param postId Post id of post to be updated
+   * @param userId Authenticated user id
+   * @param payload Payload to update post
+   * @returns
+   * @throws Error if post does not exists, if post author is not same as authenticated user
+   * Errors, POST_NOT_FOUND_MSG, FORBIDDEN_MSG, ERROR_UPDATING_POST_MSG
+   */
   async updatePost(postId: number, userId: number, payload: UpdatePostPayload) {
     const slug = slugify(`${payload.title}-${nanoid(5)}`, { lower: true });
     try {
@@ -930,13 +1070,11 @@ class PostService extends BasePostService {
         },
       });
 
-      if (!post) {
-        throw new Error(POST_NOT_FOUND_MSG);
-      }
+      // If post does not exists, then throw error
+      if (!post) throw new Error(POST_NOT_FOUND_MSG);
 
-      if (post.author_id !== userId) {
-        throw new Error(FORBIDDEN_MSG);
-      }
+      // If post author is not same as authenticated user, then throw error
+      if (post.author_id !== userId) throw new Error(FORBIDDEN_MSG);
 
       // TODO: Need to find a better way to update post assets
       const promises = [
@@ -988,6 +1126,14 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
+  /**
+   * @description Delete post
+   * @param postId Post id of post to be deleted
+   * @param userId Authenticated user id
+   * @returns
+   * @throws Error if post does not exists, if post author is not same as authenticated user
+   * Errors, POST_NOT_FOUND_MSG, FORBIDDEN_MSG, ERROR_DELETING_POST_MSG
+   */
   async deleteMyPost(postId: number, userId: number) {
     try {
       const post = await prisma.post.findUnique({
@@ -1004,13 +1150,11 @@ class PostService extends BasePostService {
         },
       });
 
-      if (!post) {
-        throw new Error(POST_NOT_FOUND_MSG);
-      }
+      // If post does not exists, then throw error
+      if (!post) throw new Error(POST_NOT_FOUND_MSG);
 
-      if (post.author_id !== userId) {
-        throw new Error(FORBIDDEN_MSG);
-      }
+      // If post author is not same as authenticated user, then throw error
+      if (post.author_id !== userId) throw new Error(FORBIDDEN_MSG);
 
       await prisma.postHashTag.deleteMany({
         where: {
@@ -1070,6 +1214,15 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
+  /**
+   * @description Change post status
+   * @param postId Post id for which status is to be changed
+   * @param payload Payload to change post status
+   * @param userId Authenticated user id
+   * @returns
+   * @throws Error if post does not exists, if post author is not same as authenticated user
+   * Errors, POST_NOT_FOUND_MSG, FORBIDDEN_MSG, ERROR_UPDATING_POST_STATUS_MSG
+   */
   async changeStatus(postId: number, payload: ChangeStatusPayload, userId: number) {
     try {
       const post = await prisma.post.findUnique({
@@ -1078,13 +1231,9 @@ class PostService extends BasePostService {
         },
       });
 
-      if (!post) {
-        throw new Error(POST_NOT_FOUND_MSG);
-      }
+      if (!post) throw new Error(POST_NOT_FOUND_MSG);
 
-      if (post.author_id !== userId) {
-        throw new Error(FORBIDDEN_MSG);
-      }
+      if (post.author_id !== userId) throw new Error(FORBIDDEN_MSG);
 
       const data = await prisma.post.update({
         where: {
@@ -1107,6 +1256,13 @@ class PostService extends BasePostService {
   }
 
   // ---------------------------------
+  /**
+   * @description Get comments of a user
+   * @param userId User id of user whose comments are to be fetched
+   * @param limit Limit of comments to be fetched
+   * @param offset Offset of comments to be fetched
+   * @returns
+   */
   async getCommentsByUserId(userId: number, limit = 5, offset = 0) {
     try {
       const totalComments = await prisma.comment.count({
