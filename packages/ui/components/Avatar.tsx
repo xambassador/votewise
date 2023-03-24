@@ -31,11 +31,11 @@ export function Avatar(props: ImageProps) {
     className
   );
 
-  const imageClassName = classNames(rounded ? "rounded-full" : "rounded-lg");
+  const imageClassName = classNames(rounded ? "rounded-full" : "rounded-lg", imageProps?.className);
 
   return (
     <div className={avatarClassName}>
-      <Image src={src} alt={alt} width={width} height={height} className={imageClassName} {...imageProps} />
+      <Image src={src} alt={alt} width={width} height={height} {...imageProps} className={imageClassName} />
     </div>
   );
 }
