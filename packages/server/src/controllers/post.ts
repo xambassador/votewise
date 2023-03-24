@@ -29,6 +29,8 @@ import {
   COMMENT_POST_CLOSED_RESPONSE,
   COMMENT_UNLIKE_SUCCESSFULLY_MSG,
   COMMENT_UPDATED_SUCCESSFULLY_MSG,
+  FORBIDDEN_MSG,
+  FORBIDDEN_RESPONSE,
   GETTING_REPLIES_FROM_COMMENT_MSG,
   INVALID_COMMENT_ID_RESPONSE,
   INVALID_POST_ID_RESPONSE,
@@ -53,7 +55,7 @@ import {
 } from "@/src/utils";
 
 // -----------------------------------------------------------------------------------------
-const { OK, BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, UNAUTHORIZED } = httpStatusCodes;
+const { OK, BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, UNAUTHORIZED, FORBIDDEN } = httpStatusCodes;
 
 // -----------------------------------------------------------------------------------------
 export const getPosts = async (req: Request, res: Response) => {
@@ -367,6 +369,10 @@ export const deleteCommentOnPost = async (req: Request, res: Response) => {
       return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
     }
 
+    if (msg === FORBIDDEN_MSG) {
+      return res.status(FORBIDDEN).json(FORBIDDEN_RESPONSE);
+    }
+
     return res.status(INTERNAL_SERVER_ERROR).json(
       new JSONResponse(
         SOMETHING_WENT_WRONG_MSG,
@@ -419,6 +425,9 @@ export const updateCommentOnPost = async (req: Request, res: Response) => {
     }
     if (msg === UNAUTHORIZED_MSG) {
       return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
+    }
+    if (msg === FORBIDDEN_MSG) {
+      return res.status(FORBIDDEN).json(FORBIDDEN_RESPONSE);
     }
     return res.status(INTERNAL_SERVER_ERROR).json(
       new JSONResponse(

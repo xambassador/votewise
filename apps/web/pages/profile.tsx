@@ -28,6 +28,7 @@ import {
 import { timeAgo } from "lib/date";
 import { useDeletePostMutation } from "lib/hooks/useDeltePostMutation";
 import { useGetMyPosts } from "lib/hooks/useGetMyPosts";
+import { usePostChangeStatusMutation } from "lib/hooks/usePostChangeStatusMutation";
 import { parsePostStatus } from "lib/parsePostStatus";
 import { getServerSession } from "server/lib/getServerSession";
 
@@ -46,13 +47,25 @@ type PostCardProps = {
 function PostCard(props: PostCardProps) {
   const { post, postStatus, orderBy, onDelete } = props;
   const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState(post.status.toLowerCase() as PostStatus);
   const parsedText = parseHashTags(post.content);
   const queryClient = useQueryClient();
+
   const deletePostMutation = useDeletePostMutation(queryClient, {
     onSuccess: () => {
       onDelete(post);
     },
     onError: (error: any) => {
+      const msg = error?.response.data.error.message || "Something went wrong";
+      makeToast(msg, "error");
+    },
+  });
+
+  const updateStatusMutation = usePostChangeStatusMutation(queryClient, {
+    onSuccess: (data) => {
+      makeToast(`Post status updated to ${data.data.post.status}`, "success");
+    },
+    onError: (error) => {
       const msg = error?.response.data.error.message || "Something went wrong";
       makeToast(msg, "error");
     },
@@ -70,6 +83,14 @@ function PostCard(props: PostCardProps) {
     });
   };
 
+  const handleOnDropDownChange = (s: PostStatus) => {
+    updateStatusMutation.mutate({
+      postId: post.id,
+      status: s,
+    });
+    setSelected(s);
+  };
+
   return (
     <Post>
       <PostUserPill
@@ -80,11 +101,13 @@ function PostCard(props: PostCardProps) {
       >
         <div className="flex h-fit items-center gap-4">
           <PostStatuPill type={parsePostStatus(post.status)}>{post.status}</PostStatuPill>
-          {deletePostMutation.isLoading && <Spinner className="h-5 w-5" />}
+          {(deletePostMutation.isLoading || updateStatusMutation.isLoading) && (
+            <Spinner className="h-5 w-5" />
+          )}
           {!deletePostMutation.isLoading && (
             <PostOptionsDropdown
-              selected={post.status.toLowerCase() as PostStatus}
-              onFilterChange={() => {}}
+              selected={selected}
+              onFilterChange={handleOnDropDownChange}
               onDelete={handleOnDelete}
               onUpdate={handleOnUpdate}
               onArchive={() => {}}

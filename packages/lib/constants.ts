@@ -10,6 +10,7 @@ export const INVALID_EMAIL_MSG = "Invalid email";
 export const EMAIL_SENT_MSG = "Email sent successfully";
 export const EMAIL_QUEUE_MSG = "Request is queued for process. Check your mail box..";
 export const UNAUTHORIZED_MSG = "Unauthorized";
+export const FORBIDDEN_MSG = "Forbidden";
 export const PASSWORD_RESET_MSG = "Password reset successfully";
 export const EMAIL_VERIFIED_MSG = "Email verified successfully";
 export const EMAIL_ALREADY_VERIFIED_MSG = "Email already verified";
@@ -149,6 +150,15 @@ export const UNAUTHORIZED_RESPONSE = {
   data: null,
   error: {
     message: UNAUTHORIZED_MSG,
+  },
+  success: false,
+};
+
+export const FORBIDDEN_RESPONSE = {
+  message: FORBIDDEN_MSG,
+  data: null,
+  error: {
+    message: `You don't have permission to access this resource or perform this action.`,
   },
   success: false,
 };

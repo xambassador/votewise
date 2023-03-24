@@ -33,11 +33,11 @@ import {
   ERROR_UPDATING_COMMENT_MSG,
   ERROR_UPDATING_POST_MSG,
   ERROR_UPDATING_POST_STATUS_MSG,
+  FORBIDDEN_MSG,
   POST_ALREADY_LIKED_MSG,
   POST_CLOSED_MSG,
   POST_NOT_FOUND_MSG,
   POST_NOT_LIKED_MSG,
-  UNAUTHORIZED_MSG,
   getErrorReason,
   getPagination,
 } from "@/src/utils";
@@ -501,7 +501,7 @@ class PostService extends BasePostService {
       }
 
       if (comment.user_id !== userId) {
-        throw new Error(UNAUTHORIZED_MSG);
+        throw new Error(FORBIDDEN_MSG);
       }
 
       await prisma.commentUpvote.deleteMany({
@@ -542,7 +542,7 @@ class PostService extends BasePostService {
       }
 
       if (comment.user_id !== userId) {
-        throw new Error(UNAUTHORIZED_MSG);
+        throw new Error(FORBIDDEN_MSG);
       }
 
       const data = await prisma.comment.update({
@@ -935,7 +935,7 @@ class PostService extends BasePostService {
       }
 
       if (post.author_id !== userId) {
-        throw new Error(UNAUTHORIZED_MSG);
+        throw new Error(FORBIDDEN_MSG);
       }
 
       // TODO: Need to find a better way to update post assets
@@ -1009,7 +1009,7 @@ class PostService extends BasePostService {
       }
 
       if (post.author_id !== userId) {
-        throw new Error(UNAUTHORIZED_MSG);
+        throw new Error(FORBIDDEN_MSG);
       }
 
       await prisma.postHashTag.deleteMany({
@@ -1082,8 +1082,8 @@ class PostService extends BasePostService {
         throw new Error(POST_NOT_FOUND_MSG);
       }
 
-      if (post.id !== userId) {
-        throw new Error(UNAUTHORIZED_MSG);
+      if (post.author_id !== userId) {
+        throw new Error(FORBIDDEN_MSG);
       }
 
       const data = await prisma.post.update({
@@ -1092,6 +1092,10 @@ class PostService extends BasePostService {
         },
         data: {
           status: payload.status,
+        },
+        select: {
+          id: true,
+          status: true,
         },
       });
 

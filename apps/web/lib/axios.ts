@@ -14,7 +14,7 @@ const { UNAUTHORIZED } = httpStatusCodes;
  * @description: Axios instance for NextJS client side code. This must be used in client side only.
  * This is used to make API calls to NextJS API routes. Don't make API calls to the backend server using this instance.
  */
-export const axioInstance = axios.create({
+export const axiosInstance = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api`,
   headers: {
     "Content-Type": "application/json",
@@ -22,7 +22,7 @@ export const axioInstance = axios.create({
   },
 });
 
-axioInstance.interceptors.response.use(
+axiosInstance.interceptors.response.use(
   (response) => response,
   (error: any) => {
     if (error.response.status === UNAUTHORIZED) {

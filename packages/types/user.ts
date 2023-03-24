@@ -87,10 +87,21 @@ type DeletePostResponse = {
   };
 } & BaseResponse;
 
+type UpdatePostStatusResponse = {
+  data: {
+    message: string;
+    post: {
+      id: number;
+      status: PostStatus;
+    };
+  };
+} & BaseResponse;
+
 export type {
   AcceptOrRejectFriendRequestPayload,
   UsernameAvailableResponse,
   MyDetailsResponse,
   GetMyPostsResponse,
   DeletePostResponse,
+  UpdatePostStatusResponse,
 };

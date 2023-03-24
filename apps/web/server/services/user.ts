@@ -4,6 +4,7 @@ import { getAxiosServerWithAuth } from "server/lib/axios";
 import {
   DELETE_POST_V1,
   GET_ME_V1,
+  UPDATE_POST_STATUS_V1,
   USER_CREATE_POST_V1,
   USER_GET_POSTS_V1,
   USER_ROUTE_V1,
@@ -15,8 +16,10 @@ import type {
   DeletePostResponse,
   GetMyPostsResponse,
   MyDetailsResponse,
+  PostStatus,
   UpdatePostPayload,
   UpdatePostResponse,
+  UpdatePostStatusResponse,
 } from "@votewise/types";
 
 /**
@@ -102,7 +105,7 @@ export const updatePost = async (
     headers: AxiosRequestConfig["headers"];
   }
 ) => {
-  const apiEndpoint = `${USER_ROUTE_V1}${USER_UPDATE_POST_V1}`.replace(":postId", postId);
+  const apiEndpoint = `${USER_ROUTE_V1}${USER_UPDATE_POST_V1}`.replace(":postId", String(postId));
   const response: AxiosResponse<UpdatePostResponse> = await getAxiosServerWithAuth(token).patch(
     apiEndpoint,
     payload,
@@ -113,6 +116,13 @@ export const updatePost = async (
   return response;
 };
 
+/**
+ * @description Delete post
+ * @param token Access token
+ * @param postId Post id
+ * @param options Axios Request options
+ * @returns
+ */
 export const deletePost = async (
   token: string,
   postId: number,
@@ -123,6 +133,33 @@ export const deletePost = async (
   const apiEndpoint = `${USER_ROUTE_V1}${DELETE_POST_V1}`.replace(":postId", String(postId));
   const response: AxiosResponse<DeletePostResponse> = await getAxiosServerWithAuth(token).delete(
     apiEndpoint,
+    {
+      headers: options?.headers,
+    }
+  );
+  return response;
+};
+
+/**
+ * @description Update post status
+ * @param token Access token
+ * @param postId Post id
+ * @param status Status to update
+ * @param options
+ * @returns
+ */
+export const updatePostStatus = async (
+  token: string,
+  postId: number,
+  status: PostStatus,
+  options?: {
+    headers: AxiosRequestConfig["headers"];
+  }
+) => {
+  const apiEndpoint = `${USER_ROUTE_V1}${UPDATE_POST_STATUS_V1}`.replace(":postId", String(postId));
+  const response: AxiosResponse<UpdatePostStatusResponse> = await getAxiosServerWithAuth(token).patch(
+    apiEndpoint,
+    { status },
     {
       headers: options?.headers,
     }

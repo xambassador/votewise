@@ -57,6 +57,8 @@ export const UNLIKE_COMMENT_ON_POST_V1 = "/:postId/comment/:commentId/unlike";
 export const USER_ROUTE_V1 = "/api/v1/user";
 // GET /api/v1/user/me
 export const GET_ME_V1 = "/me";
+// PATCH /api/v1/user/me => Update user profile
+export const USER_UPDATE_PROFILE_V1 = "/me";
 // GET /api/v1/user/usernames?username=example
 export const CHECK_USERNAME_AVAILABILITY_V1 = "/usernames";
 // POST /api/v1/user/posts => Create new post

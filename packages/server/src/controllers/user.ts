@@ -22,6 +22,8 @@ import UserService from "@/src/services/user";
 import {
   ALREADY_FRIENDS_MSG,
   COMMENT_FETCHED_SUCCESSFULLY_MSG,
+  FORBIDDEN_MSG,
+  FORBIDDEN_RESPONSE,
   FRIEDN_REQUESTS_FETCHED_SUCCESSFULLY_MSG,
   FRIENDS_FETCHED_SUCCESSFULLY_MSG,
   FRIEND_REQUEST_ACCEPTED_SUCCESSFULLY_MSG,
@@ -49,7 +51,7 @@ import {
   getLimitAndOffset,
 } from "@/src/utils";
 
-const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, NOT_FOUND, UNAUTHORIZED } = httpStatusCodes;
+const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, NOT_FOUND, UNAUTHORIZED, FORBIDDEN } = httpStatusCodes;
 
 // -----------------------------------------------------------------------------------------
 export const checkUsernameAvailability = async (req: Request, res: Response) => {
@@ -277,6 +279,10 @@ export const updateMyPost = async (req: Request, res: Response) => {
       return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
     }
 
+    if (msg === FORBIDDEN_MSG) {
+      return res.status(FORBIDDEN).json(FORBIDDEN_RESPONSE);
+    }
+
     return res.status(INTERNAL_SERVER_ERROR).json(
       new JSONResponse(
         INTERNAL_SERVER_ERROR_MSG,
@@ -319,6 +325,9 @@ export const deleteMyPost = async (req: Request, res: Response) => {
     }
     if (msg === UNAUTHORIZED_MSG) {
       return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
+    }
+    if (msg === FORBIDDEN_MSG) {
+      return res.status(FORBIDDEN).json(FORBIDDEN_RESPONSE);
     }
     return res.status(INTERNAL_SERVER_ERROR).json(
       new JSONResponse(
@@ -366,6 +375,11 @@ export const updateStatus = async (req: Request, res: Response) => {
     if (msg === UNAUTHORIZED_MSG) {
       return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
     }
+
+    if (msg === FORBIDDEN_MSG) {
+      return res.status(FORBIDDEN).json(FORBIDDEN_RESPONSE);
+    }
+
     return res.status(INTERNAL_SERVER_ERROR).json(
       new JSONResponse(
         INTERNAL_SERVER_ERROR_MSG,
@@ -595,16 +609,11 @@ export const acceptOrRejectFriendRequest = async (req: Request, res: Response) =
     }
 
     if (msg === UNAUTHORIZED_MSG) {
-      return res.status(UNAUTHORIZED).json(
-        new JSONResponse(
-          UNAUTHORIZED_MSG,
-          null,
-          {
-            message: msg,
-          },
-          false
-        )
-      );
+      return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
+    }
+
+    if (msg === FORBIDDEN_MSG) {
+      return res.status(FORBIDDEN).json(FORBIDDEN_RESPONSE);
     }
 
     return res.status(INTERNAL_SERVER_ERROR).json(

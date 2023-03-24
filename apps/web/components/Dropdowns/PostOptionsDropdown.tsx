@@ -26,10 +26,6 @@ type DropdownProps = {
 export function PostOptionsDropdown(props: DropdownProps) {
   const { selected = "open", onFilterChange, onArchive, onDelete, onUpdate } = props;
 
-  const handleOnDropdownItemClick = (status: PostStatus) => {
-    onFilterChange(status);
-  };
-
   return (
     <DropdownMenu>
       <DropdownButton>
@@ -41,7 +37,7 @@ export function PostOptionsDropdown(props: DropdownProps) {
             <DropdownMenuItem
               className="group cursor-pointer gap-2"
               as="button"
-              onClick={() => handleOnDropdownItemClick("open")}
+              onClick={() => onFilterChange("open")}
             >
               <span>
                 <Indicator isSelected={selected === "open"} />
@@ -51,7 +47,7 @@ export function PostOptionsDropdown(props: DropdownProps) {
             <DropdownMenuItem
               className="group cursor-pointer gap-2"
               as="button"
-              onClick={() => handleOnDropdownItemClick("closed")}
+              onClick={() => onFilterChange("closed")}
             >
               <span>
                 <Indicator isSelected={selected === "closed"} />
@@ -61,7 +57,7 @@ export function PostOptionsDropdown(props: DropdownProps) {
             <DropdownMenuItem
               className="group cursor-pointer gap-2"
               as="button"
-              onClick={() => handleOnDropdownItemClick("inprogress")}
+              onClick={() => onFilterChange("inprogress")}
             >
               <span>
                 <Indicator isSelected={selected === "inprogress"} />

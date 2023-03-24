@@ -10,10 +10,11 @@ import type {
   OnboardingResponse,
   UpdatePostPayload,
   UpdatePostResponse,
+  UpdatePostStatusResponse,
   UsernameAvailableResponse,
 } from "@votewise/types";
 
-import { axioInstance } from "lib/axios";
+import { axiosInstance } from "lib/axios";
 
 /**
  *
@@ -22,7 +23,7 @@ import { axioInstance } from "lib/axios";
  * @returns
  */
 export const checkUsernameAvailability = async (username: string) => {
-  const response: AxiosResponse<UsernameAvailableResponse> = await axioInstance.get(
+  const response: AxiosResponse<UsernameAvailableResponse> = await axiosInstance.get(
     `/usernameAvailable?username=${username}`
   );
   return response.data;
@@ -33,7 +34,7 @@ export const checkUsernameAvailability = async (username: string) => {
  * @description Onboard a user
  */
 export const onboardUser = async (data: OnboardingPayload) => {
-  const response: AxiosResponse<OnboardingResponse> = await axioInstance.post("/onboarding", data);
+  const response: AxiosResponse<OnboardingResponse> = await axiosInstance.post("/onboarding", data);
   return response.data;
 };
 
@@ -41,7 +42,7 @@ export const onboardUser = async (data: OnboardingPayload) => {
  * @description Get user information
  */
 export const getMyDetails = async () => {
-  const response: AxiosResponse<MyDetailsResponse> = await axioInstance.get("/user/me");
+  const response: AxiosResponse<MyDetailsResponse> = await axiosInstance.get("/user/me");
   return response.data;
 };
 
@@ -49,7 +50,7 @@ export const getMyDetails = async () => {
  * @description Create a new post
  */
 export const createPost = async (payload: CreatePostPayload) => {
-  const response: AxiosResponse<CreatePostResponse> = await axioInstance.post("/user/post", payload);
+  const response: AxiosResponse<CreatePostResponse> = await axiosInstance.post("/user/post", payload);
   return response.data;
 };
 
@@ -68,7 +69,7 @@ export const getMyPosts = async (
   orderBy: OrderBy = "desc"
 ) => {
   const apiEndpoint = `/user/posts?limit=${limit}&offset=${offset}&status=${status}&orderBy=${orderBy}`;
-  const response: AxiosResponse<GetMyPostsResponse> = await axioInstance.get(apiEndpoint);
+  const response: AxiosResponse<GetMyPostsResponse> = await axiosInstance.get(apiEndpoint);
   return response.data;
 };
 
@@ -79,7 +80,7 @@ export const getMyPosts = async (
  * @returns
  */
 export const updatePost = async (postId: number, payload: UpdatePostPayload) => {
-  const response: AxiosResponse<UpdatePostResponse> = await axioInstance.patch(
+  const response: AxiosResponse<UpdatePostResponse> = await axiosInstance.patch(
     `/user/posts/${postId}`,
     payload
   );
@@ -92,6 +93,19 @@ export const updatePost = async (postId: number, payload: UpdatePostPayload) => 
  */
 export const deletePost = async (postId: number) => {
   const apiEndpoint = `/user/posts/${postId}`;
-  const response: AxiosResponse<DeletePostResponse> = await axioInstance.delete(apiEndpoint);
+  const response: AxiosResponse<DeletePostResponse> = await axiosInstance.delete(apiEndpoint);
+  return response.data;
+};
+
+/**
+ * @description Change post status
+ * @param postId Post id
+ * @param status Status to change to
+ */
+export const updatePostStatus = async (postId: number, status: PostStatus) => {
+  const apiEndpoint = `/user/posts/${postId}/status`;
+  const response: AxiosResponse<UpdatePostStatusResponse> = await axiosInstance.patch(apiEndpoint, {
+    status: status.toUpperCase(),
+  });
   return response.data;
 };
