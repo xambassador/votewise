@@ -39,7 +39,7 @@ function UserAvatarWithBanner({
         />
       </figure>
       <div className="absolute -bottom-6 left-1/2 -translate-x-1/2">
-        <Avatar src={avatar} alt="Profile" withStroke />
+        <Avatar src={avatar} alt="Profile" withStroke imageProps={{ className: "bg-blue-500" }} />
       </div>
     </div>
   );

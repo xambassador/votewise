@@ -188,8 +188,8 @@ export function CreatePost({ setOpen }: { setOpen: (open: boolean) => void }) {
         // Return a context object with the snapshotted value
         return { previousUserInfo };
       },
-      onSuccess: () => {
-        makeToast("Post created successfully", "success");
+      onSuccess: (data, formValues) => {
+        makeToast(`Your post ${formValues.title} has been published.`, "success");
         const { pathname } = router;
         if (pathname !== "/") {
           router.push("/");

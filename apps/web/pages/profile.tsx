@@ -15,6 +15,7 @@ import {
   DropdownMenu,
   DropdownMenuItem,
   DropdownMenuItems,
+  DropdownMenuItemsGroup,
   DropdownTransition,
   Modal,
   Spinner,
@@ -81,14 +82,14 @@ type DropdownProps = {
 
 type FilterDropdownProps = {
   selected: PostStatus;
-  onFilterChange: (status: PostStatus) => void;
+  onFilterChange: (status: PostStatus | "orderBy") => void;
 };
 
 function FilterDropdown(props: FilterDropdownProps) {
   // TODO: Can implement Control props pattern to make this more reusable
   const { onFilterChange, selected } = props;
 
-  const handleOnDropdownItemClick = (status: PostStatus) => {
+  const handleOnDropdownItemClick = (status: PostStatus | "orderBy") => {
     onFilterChange?.(status);
   };
 
@@ -104,43 +105,51 @@ function FilterDropdown(props: FilterDropdownProps) {
       </DropdownButton>
       <DropdownTransition>
         <DropdownMenuItems>
-          <DropdownMenuItem
-            className="group cursor-pointer gap-2"
-            as="button"
-            onClick={() => handleOnDropdownItemClick("open")}
-          >
-            <span>
-              <Indicator isSelected={selected === "open"} />
-            </span>
-            <span>Open</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className="group cursor-pointer gap-2"
-            as="button"
-            onClick={() => handleOnDropdownItemClick("closed")}
-          >
-            <span>
-              <Indicator isSelected={selected === "closed"} />
-            </span>
-            <span>Closed</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className="group cursor-pointer gap-2"
-            as="button"
-            onClick={() => handleOnDropdownItemClick("inprogress")}
-          >
-            <span>
-              <Indicator isSelected={selected === "inprogress"} />
-            </span>
-            <span>In progress</span>
-          </DropdownMenuItem>
+          <DropdownMenuItemsGroup>
+            <DropdownMenuItem
+              className="group cursor-pointer gap-2"
+              as="button"
+              onClick={() => handleOnDropdownItemClick("open")}
+            >
+              <span>
+                <Indicator isSelected={selected === "open"} />
+              </span>
+              <span>Open</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="group cursor-pointer gap-2"
+              as="button"
+              onClick={() => handleOnDropdownItemClick("closed")}
+            >
+              <span>
+                <Indicator isSelected={selected === "closed"} />
+              </span>
+              <span>Closed</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="group cursor-pointer gap-2"
+              as="button"
+              onClick={() => handleOnDropdownItemClick("inprogress")}
+            >
+              <span>
+                <Indicator isSelected={selected === "inprogress"} />
+              </span>
+              <span>In progress</span>
+            </DropdownMenuItem>
+          </DropdownMenuItemsGroup>
           <div className="w-full rounded-full border border-gray-200" />
-          <DropdownMenuItem className="group cursor-pointer gap-2">
-            <span>
-              <FiClock className="h-5 w-5 text-gray-500" />
-            </span>
-            <span>Time</span>
-          </DropdownMenuItem>
+          <DropdownMenuItemsGroup>
+            <DropdownMenuItem
+              className="group cursor-pointer gap-2"
+              as="button"
+              onClick={() => handleOnDropdownItemClick("orderBy")}
+            >
+              <span>
+                <FiClock className="h-5 w-5 text-gray-500" />
+              </span>
+              <span>Time</span>
+            </DropdownMenuItem>
+          </DropdownMenuItemsGroup>
         </DropdownMenuItems>
       </DropdownTransition>
     </DropdownMenu>
@@ -161,55 +170,59 @@ function PostDropdown(props: DropdownProps) {
       </DropdownButton>
       <DropdownTransition>
         <DropdownMenuItems>
-          <DropdownMenuItem
-            className="group cursor-pointer gap-2"
-            as="button"
-            onClick={() => handleOnDropdownItemClick("open")}
-          >
-            <span>
-              <Indicator isSelected={selected === "open"} />
-            </span>
-            <span>Open</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className="group cursor-pointer gap-2"
-            as="button"
-            onClick={() => handleOnDropdownItemClick("closed")}
-          >
-            <span>
-              <Indicator isSelected={selected === "closed"} />
-            </span>
-            <span>Closed</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className="group cursor-pointer gap-2"
-            as="button"
-            onClick={() => handleOnDropdownItemClick("inprogress")}
-          >
-            <span>
-              <Indicator isSelected={selected === "inprogress"} />
-            </span>
-            <span>In progress</span>
-          </DropdownMenuItem>
+          <DropdownMenuItemsGroup>
+            <DropdownMenuItem
+              className="group cursor-pointer gap-2"
+              as="button"
+              onClick={() => handleOnDropdownItemClick("open")}
+            >
+              <span>
+                <Indicator isSelected={selected === "open"} />
+              </span>
+              <span>Open</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="group cursor-pointer gap-2"
+              as="button"
+              onClick={() => handleOnDropdownItemClick("closed")}
+            >
+              <span>
+                <Indicator isSelected={selected === "closed"} />
+              </span>
+              <span>Closed</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="group cursor-pointer gap-2"
+              as="button"
+              onClick={() => handleOnDropdownItemClick("inprogress")}
+            >
+              <span>
+                <Indicator isSelected={selected === "inprogress"} />
+              </span>
+              <span>In progress</span>
+            </DropdownMenuItem>
+          </DropdownMenuItemsGroup>
           <div className="w-full rounded-full border border-gray-200" />
-          <DropdownMenuItem className="group cursor-pointer gap-2" as="button" onClick={onUpdate}>
-            <span>
-              <FiEdit2 className="h-5 w-5 text-gray-500" />
-            </span>
-            <span>Update</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="group cursor-pointer gap-2" as="button" onClick={onDelete}>
-            <span>
-              <FiTrash2 className="h-5 w-5 text-gray-500" />
-            </span>
-            <span>Delete</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="group cursor-pointer gap-2" as="button" onClick={onArchive}>
-            <span>
-              <FiArchive className="h-5 w-5 text-gray-500" />
-            </span>
-            <span>Archive</span>
-          </DropdownMenuItem>
+          <DropdownMenuItemsGroup>
+            <DropdownMenuItem className="group cursor-pointer gap-2" as="button" onClick={onUpdate}>
+              <span>
+                <FiEdit2 className="h-5 w-5 text-gray-500" />
+              </span>
+              <span>Update</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="group cursor-pointer gap-2" as="button" onClick={onDelete}>
+              <span>
+                <FiTrash2 className="h-5 w-5 text-gray-500" />
+              </span>
+              <span>Delete</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="group cursor-pointer gap-2" as="button" onClick={onArchive}>
+              <span>
+                <FiArchive className="h-5 w-5 text-gray-500" />
+              </span>
+              <span>Archive</span>
+            </DropdownMenuItem>
+          </DropdownMenuItemsGroup>
         </DropdownMenuItems>
       </DropdownTransition>
     </DropdownMenu>
@@ -294,10 +307,17 @@ function PostCard(props: PostCardProps) {
 
 export default function Page() {
   const [postStatus, setPostStatus] = useState<PostStatus>("open");
-  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } =
-    useGetMyPosts(postStatus);
+  const [orderBy, setOrderBy] = useState<"asc" | "desc">("desc");
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } = useGetMyPosts(
+    postStatus,
+    orderBy
+  );
 
-  const handleOnFilterChange = (s: PostStatus) => {
+  const handleOnFilterChange = (s: PostStatus | "orderBy") => {
+    if (s === "orderBy") {
+      setOrderBy((prev) => (prev === "asc" ? "desc" : "asc"));
+      return;
+    }
     setPostStatus(s);
   };
 
@@ -333,13 +353,12 @@ export default function Page() {
           </li>
         </ul>
         <div className="ml-auto">
-          {/* TODO: Replace this button with dropdown one  */}
           <FilterDropdown selected={postStatus} onFilterChange={handleOnFilterChange} />
         </div>
       </div>
 
       <div className="flex flex-col gap-8">
-        {status === "loading" && (
+        {status === "loading" && isFetching && (
           <div className="flex flex-col items-center justify-center gap-2">
             <Spinner className="h-6 w-6" />
             <span className="text-lg font-semibold text-gray-600">Loading...</span>
@@ -393,7 +412,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 
   const queryClient = new QueryClient();
-  await queryClient.prefetchInfiniteQuery(["my-posts", "open"], async () => {
+  await queryClient.prefetchInfiniteQuery(["my-posts", "open", "desc"], async () => {
     // TODO: Move hardcoded limit and offset to constants
     const { data } = await getMyPosts(session.accessToken, 5, 0);
     return data;

@@ -162,9 +162,10 @@ export const createPost = async (req: Request, res: Response) => {
 export const getMyPosts = async (req: Request, res: Response) => {
   const { limit, offset } = getLimitAndOffset(req);
   const { user } = req.session;
-  const { status } = req.query;
+  const { status, orderBy } = req.query;
 
   type Status = "open" | "closed" | "archived" | "inprogress";
+  type OrderBy = "asc" | "desc";
 
   if (status && !["open", "closed", "archived", "inprogress"].includes(status as Status)) {
     return res.status(BAD_REQUEST).json(
@@ -180,6 +181,7 @@ export const getMyPosts = async (req: Request, res: Response) => {
   }
 
   let mappedStatus: PostStatus = "OPEN";
+  const order = orderBy ? (orderBy as OrderBy) : "asc";
   switch (status) {
     case "open":
       mappedStatus = "OPEN";
@@ -198,7 +200,7 @@ export const getMyPosts = async (req: Request, res: Response) => {
   }
 
   try {
-    const data = await PostService.getPostsByUserId(user.id, limit, offset, mappedStatus);
+    const data = await PostService.getPostsByUserId(user.id, limit, offset, mappedStatus, order);
     return res.status(OK).json(
       new JSONResponse(
         POSTS_FETCHED_SUCCESSFULLY_MSG,

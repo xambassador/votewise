@@ -11,8 +11,10 @@ import { getMyPosts } from "server/services/user";
 
 const { UNAUTHORIZED } = httpStatusCodes;
 
+type OrderBy = "asc" | "desc";
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { limit, offset, status: postStatus } = req.query;
+  const { limit, offset, status: postStatus, orderBy } = req.query;
   const headers = getProxyHeaders(req);
 
   try {
@@ -26,6 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       Number(limit),
       Number(offset),
       postStatus as "open" | "closed" | "archived" | "inprogress",
+      orderBy as OrderBy,
       {
         headers,
       }
