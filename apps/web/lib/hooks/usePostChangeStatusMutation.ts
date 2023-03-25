@@ -1,13 +1,17 @@
 import { useMutation } from "react-query";
-import type { QueryClient } from "react-query";
+import type { InfiniteData, QueryClient } from "react-query";
 
-import type { UpdatePostStatusResponse } from "@votewise/types";
+import type { GetMyPostsResponse, UpdatePostStatusResponse } from "@votewise/types";
 
 import { updatePostStatus } from "services/user";
 
+type Status = "open" | "closed" | "archived" | "inprogress";
+type OrderBy = "asc" | "desc";
+
 type Variables = {
   postId: number;
-  status: "open" | "closed" | "archived" | "inprogress";
+  status: Status;
+  orderBy: OrderBy;
 };
 
 type Options = {
@@ -15,9 +19,39 @@ type Options = {
   onError?: (error: any, variables: Variables, context: unknown) => void;
 };
 
-export function usePostChangeStatusMutation(queryClient: QueryClient, options?: Options) {
+export function usePostChangeStatusMutation(
+  postStatus: Status,
+  orderBy: OrderBy,
+  queryClient: QueryClient,
+  options?: Options
+) {
   return useMutation((data: Variables) => updatePostStatus(data.postId, data.status), {
-    onMutate: (data) => {},
+    onMutate: (variables) => {
+      const key = ["my-posts", postStatus, orderBy];
+      queryClient.cancelQueries(key);
+      const previousPosts = queryClient.getQueryData<InfiniteData<GetMyPostsResponse>>(key);
+      queryClient.setQueryData<InfiniteData<GetMyPostsResponse>>(key, (old) => ({
+        ...(old as InfiniteData<GetMyPostsResponse>),
+        pages: old?.pages.map((page) => ({
+          ...page,
+          data: {
+            ...page.data,
+            posts: page.data.posts.map((post) => {
+              if (post.id === variables.postId) {
+                return {
+                  ...post,
+                  status: variables.status.toUpperCase(),
+                  updated_at: new Date(),
+                };
+              }
+              return post;
+            }),
+          },
+        })) as GetMyPostsResponse[],
+      }));
+
+      return { previousPosts };
+    },
     onSuccess: (data, variables, context) => {
       options?.onSuccess?.(data, variables, context);
     },

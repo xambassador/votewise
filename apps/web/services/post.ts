@@ -15,7 +15,7 @@ import type {
   UpdateCommentResponse,
 } from "@votewise/types";
 
-import { axioInstance } from "lib/axios";
+import { axiosInstance } from "lib/axios";
 
 /**
  * @description Get all posts
@@ -23,7 +23,7 @@ import { axioInstance } from "lib/axios";
  */
 export const getPosts = async (limit = 5, offset = 0) => {
   const apiEndpoint = `/posts?limit=${limit}&offset=${offset}`;
-  const response: AxiosResponse<GetPostsResponse> = await axioInstance.get(apiEndpoint);
+  const response: AxiosResponse<GetPostsResponse> = await axiosInstance.get(apiEndpoint);
   return response.data;
 };
 
@@ -33,7 +33,7 @@ export const getPosts = async (limit = 5, offset = 0) => {
  */
 export const getPost = async (postId: number) => {
   const apiEndpoint = `/posts/${postId}`;
-  const response: AxiosResponse<GetPostResponse> = await axioInstance.get(apiEndpoint);
+  const response: AxiosResponse<GetPostResponse> = await axiosInstance.get(apiEndpoint);
   return response.data;
 };
 
@@ -43,7 +43,7 @@ export const getPost = async (postId: number) => {
  */
 export const likePost = async (postId: number) => {
   const apiEndpoint = `/posts/${postId}/like`;
-  const response: AxiosResponse<LikePostResponse> = await axioInstance.patch(apiEndpoint, {
+  const response: AxiosResponse<LikePostResponse> = await axiosInstance.patch(apiEndpoint, {
     postId,
     type: "LIKE",
   });
@@ -56,7 +56,7 @@ export const likePost = async (postId: number) => {
  */
 export const unlikePost = async (postId: number) => {
   const apiEndpoint = `/posts/${postId}/unlike`;
-  const response: AxiosResponse<UnLikePostResponse> = await axioInstance.patch(apiEndpoint, {
+  const response: AxiosResponse<UnLikePostResponse> = await axiosInstance.patch(apiEndpoint, {
     postId,
     type: "UNLIKE",
   });
@@ -70,7 +70,7 @@ export const unlikePost = async (postId: number) => {
  */
 export const commentOnPost = async (postId: number, comment: string) => {
   const apiEndpoint = `/posts/${postId}/comment`;
-  const response: AxiosResponse<CreateCommentResponse> = await axioInstance.post(apiEndpoint, {
+  const response: AxiosResponse<CreateCommentResponse> = await axiosInstance.post(apiEndpoint, {
     postId,
     text: comment,
   });
@@ -85,7 +85,7 @@ export const commentOnPost = async (postId: number, comment: string) => {
  */
 export const getCommentsForPost = async (postId: number, limit = 5, offset = 0) => {
   const apiEndpoint = `/posts/${postId}/comments?limit=${limit}&offset=${offset}`;
-  const response: AxiosResponse<GetPostCommentsResponse> = await axioInstance.get(apiEndpoint);
+  const response: AxiosResponse<GetPostCommentsResponse> = await axiosInstance.get(apiEndpoint);
   return response.data;
 };
 
@@ -97,7 +97,7 @@ export const getCommentsForPost = async (postId: number, limit = 5, offset = 0) 
  */
 export const updateComment = async (postId: number, commentId: number, comment: string) => {
   const apiEndpoint = `/posts/${postId}/comments/${commentId}`;
-  const response: AxiosResponse<UpdateCommentResponse> = await axioInstance.patch(apiEndpoint, {
+  const response: AxiosResponse<UpdateCommentResponse> = await axiosInstance.patch(apiEndpoint, {
     text: comment,
   });
   return response.data;
@@ -111,7 +111,7 @@ export const updateComment = async (postId: number, commentId: number, comment: 
  */
 export const replyToComment = async (postId: number, commentId: number, comment: string) => {
   const apiEndpoint = `/posts/${postId}/comments/${commentId}/reply`;
-  const response: AxiosResponse<ReplyToCommentResponse> = await axioInstance.post(apiEndpoint, {
+  const response: AxiosResponse<ReplyToCommentResponse> = await axiosInstance.post(apiEndpoint, {
     text: comment,
   });
   return response.data;
@@ -127,7 +127,7 @@ export const replyToComment = async (postId: number, commentId: number, comment:
  */
 export const getReplies = async (postId: number, commentId: number, limit = 5, offset = 0) => {
   const apiEndpoint = `/posts/${postId}/comments/${commentId}/replies?limit=${limit}&offset=${offset}`;
-  const response: AxiosResponse<GetRepliesResponse> = await axioInstance.get(apiEndpoint);
+  const response: AxiosResponse<GetRepliesResponse> = await axiosInstance.get(apiEndpoint);
   return response.data;
 };
 
@@ -139,7 +139,7 @@ export const getReplies = async (postId: number, commentId: number, limit = 5, o
  */
 export const deleteComment = async (postId: number, commentId: number) => {
   const apiEndpoint = `/posts/${postId}/comments/${commentId}/delete`;
-  const response: AxiosResponse<DeleteCommentResponse> = await axioInstance.delete(apiEndpoint);
+  const response: AxiosResponse<DeleteCommentResponse> = await axiosInstance.delete(apiEndpoint);
   return response.data;
 };
 
@@ -150,7 +150,7 @@ export const deleteComment = async (postId: number, commentId: number) => {
  */
 export const likeComment = async (postId: number, commentId: number) => {
   const apiEndpoint = `/posts/${postId}/comments/${commentId}/like`;
-  const response: AxiosResponse<LikeCommentResponse> = await axioInstance.patch(apiEndpoint);
+  const response: AxiosResponse<LikeCommentResponse> = await axiosInstance.patch(apiEndpoint);
   return response.data;
 };
 
@@ -161,6 +161,6 @@ export const likeComment = async (postId: number, commentId: number) => {
  */
 export const unlikeComment = async (postId: number, commentId: number) => {
   const apiEndpoint = `/posts/${postId}/comments/${commentId}/unlike`;
-  const response: AxiosResponse<UnLikeCommentResponse> = await axioInstance.delete(apiEndpoint);
+  const response: AxiosResponse<UnLikeCommentResponse> = await axiosInstance.delete(apiEndpoint);
   return response.data;
 };

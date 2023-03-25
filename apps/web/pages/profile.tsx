@@ -1,7 +1,7 @@
 import type { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { QueryClient, dehydrate, useQueryClient } from "react-query";
 
 import { classNames } from "@votewise/lib";
@@ -46,6 +46,8 @@ type PostCardProps = {
 
 function PostCard(props: PostCardProps) {
   const { post, postStatus, orderBy, onDelete } = props;
+  const previosStatus = useRef(post.status.toLowerCase() as PostStatus);
+  const previosOrderBy = useRef(orderBy);
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(post.status.toLowerCase() as PostStatus);
   const parsedText = parseHashTags(post.content);
@@ -61,15 +63,20 @@ function PostCard(props: PostCardProps) {
     },
   });
 
-  const updateStatusMutation = usePostChangeStatusMutation(queryClient, {
-    onSuccess: (data) => {
-      makeToast(`Post status updated to ${data.data.post.status}`, "success");
-    },
-    onError: (error) => {
-      const msg = error?.response.data.error.message || "Something went wrong";
-      makeToast(msg, "error");
-    },
-  });
+  const updateStatusMutation = usePostChangeStatusMutation(
+    previosStatus.current,
+    previosOrderBy.current,
+    queryClient,
+    {
+      onSuccess: (data) => {
+        makeToast(`Post status updated to ${data.data.post.status}`, "success");
+      },
+      onError: (error) => {
+        const msg = error?.response.data.error.message || "Something went wrong";
+        makeToast(msg, "error");
+      },
+    }
+  );
 
   const handleOnUpdate = () => {
     setOpen(true);
@@ -87,6 +94,7 @@ function PostCard(props: PostCardProps) {
     updateStatusMutation.mutate({
       postId: post.id,
       status: s,
+      orderBy,
     });
     setSelected(s);
   };
