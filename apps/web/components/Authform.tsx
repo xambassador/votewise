@@ -18,7 +18,7 @@ import {
 } from "@votewise/ui";
 import { FiX as CloseIcon, FiMail as Email, FiEyeOff as EyeOff, FiEye as EyeOn } from "@votewise/ui/icons";
 
-import { axioInstance } from "lib/axios";
+import { axiosInstance } from "lib/axios";
 import { useAsync } from "lib/hooks/useAsync";
 
 type AuthFormProps = {
@@ -98,7 +98,7 @@ export function AuthForm(props: AuthFormProps) {
   const authenticate: SubmitHandler<FormValues> = async (data) => {
     const url = type === "signup" ? "/auth/signup" : "/auth/signin";
     run(
-      axioInstance.post(url, data),
+      axiosInstance.post(url, data),
       () => {
         router.push("/onboarding");
       },

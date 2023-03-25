@@ -1,3 +1,5 @@
+import type { PostStatus } from "types/post";
+
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import React from "react";
 
@@ -12,8 +14,6 @@ import {
 import { FiArchive, FiEdit2, FiTrash2 } from "@votewise/ui/icons";
 
 import { Indicator } from "../Indicator";
-
-type PostStatus = "open" | "closed" | "archived" | "inprogress";
 
 type DropdownProps = {
   selected: PostStatus;

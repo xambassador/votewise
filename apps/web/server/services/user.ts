@@ -6,6 +6,7 @@ import {
   GET_ME_V1,
   UPDATE_POST_STATUS_V1,
   USER_CREATE_POST_V1,
+  USER_GET_COMMENTS_V1,
   USER_GET_POSTS_V1,
   USER_ROUTE_V1,
   USER_UPDATE_POST_V1,
@@ -14,6 +15,7 @@ import type {
   CreatePostPayload,
   CreatePostResponse,
   DeletePostResponse,
+  GetMyCommentsResponse,
   GetMyPostsResponse,
   MyDetailsResponse,
   PostStatus,
@@ -160,6 +162,34 @@ export const updatePostStatus = async (
   const response: AxiosResponse<UpdatePostStatusResponse> = await getAxiosServerWithAuth(token).patch(
     apiEndpoint,
     { status },
+    {
+      headers: options?.headers,
+    }
+  );
+  return response;
+};
+
+/**
+ * @description Get comments created by the current logged in user
+ * @param token Access token
+ * @param limit Limit to fetch comments
+ * @param offset Offset to fetch comments
+ * @param options Option
+ * @returns
+ */
+export const getMyComments = async (
+  token: string,
+  status: PostStatus,
+  orderBy: OrderBy,
+  limit = 5,
+  offset = 0,
+  options?: {
+    headers: AxiosRequestConfig["headers"];
+  }
+) => {
+  const apiEndpoint = `${USER_ROUTE_V1}${USER_GET_COMMENTS_V1}?limit=${limit}&offset=${offset}&status=${status}&orderBy=${orderBy}`;
+  const response: AxiosResponse<GetMyCommentsResponse> = await getAxiosServerWithAuth(token).get(
+    apiEndpoint,
     {
       headers: options?.headers,
     }

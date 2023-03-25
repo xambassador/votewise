@@ -1,9 +1,11 @@
 import type { AxiosResponse } from "axios";
+import type { OrderBy, PostStatus } from "types/post";
 
 import type {
   CreatePostPayload,
   CreatePostResponse,
   DeletePostResponse,
+  GetMyCommentsResponse,
   GetMyPostsResponse,
   MyDetailsResponse,
   OnboardingPayload,
@@ -54,8 +56,6 @@ export const createPost = async (payload: CreatePostPayload) => {
   return response.data;
 };
 
-type PostStatus = "open" | "closed" | "archived" | "inprogress";
-type OrderBy = "asc" | "desc";
 /**
  * @description Get all posts created by the curent logged in user
  * @param limit Limit of posts to fetch. Default is 5
@@ -107,5 +107,17 @@ export const updatePostStatus = async (postId: number, status: PostStatus) => {
   const response: AxiosResponse<UpdatePostStatusResponse> = await axiosInstance.patch(apiEndpoint, {
     status: status.toUpperCase(),
   });
+  return response.data;
+};
+
+/**
+ * @description Get all comments created by the current logged in user
+ * @param limit Limit to fetch comments. Default is 5
+ * @param offset Offset to fetch comments. Default is 0
+ * @returns
+ */
+export const getMyComments = async (status: PostStatus, orderBy: OrderBy, limit = 5, offset = 0) => {
+  const apiEndpoint = `/user/comments?limit=${limit}&offset=${offset}&status=${status.toUpperCase()}&orderBy=${orderBy}`;
+  const response: AxiosResponse<GetMyCommentsResponse> = await axiosInstance.get(apiEndpoint);
   return response.data;
 };

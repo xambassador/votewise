@@ -94,7 +94,7 @@ class PostService extends BasePostService {
 
       default:
         orderBy = {
-          created_at: sortorder,
+          updated_at: sortorder,
         };
     }
 
@@ -1263,16 +1263,31 @@ class PostService extends BasePostService {
    * @param offset Offset of comments to be fetched
    * @returns
    */
-  async getCommentsByUserId(userId: number, limit = 5, offset = 0) {
+  async getCommentsByUserId(
+    userId: number,
+    status: PostStatus = "OPEN",
+    orderBy: "asc" | "desc" = "desc",
+    limit = 5,
+    offset = 0
+  ) {
     try {
       const totalComments = await prisma.comment.count({
         where: {
           user_id: userId,
+          post: {
+            status,
+          },
+          parent_id: null,
         },
       });
+
       const comments = await prisma.comment.findMany({
         where: {
           user_id: userId,
+          post: {
+            status,
+          },
+          parent_id: null,
         },
         include: {
           post: {
@@ -1286,19 +1301,37 @@ class PostService extends BasePostService {
                   name: true,
                   profile_image: true,
                   id: true,
+                  location: true,
                 },
               },
             },
           },
+          _count: {
+            select: {
+              upvotes: true,
+            },
+          },
+          user: {
+            select: {
+              profile_image: true,
+              name: true,
+              id: true,
+            },
+          },
         },
         orderBy: {
-          updated_at: "desc",
+          updated_at: orderBy,
         },
         take: limit,
         skip: offset,
       });
+
       return {
-        comments,
+        comments: comments.map((comment) => ({
+          ...comment,
+          upvotes_count: comment._count.upvotes,
+          _count: undefined,
+        })),
         meta: {
           pagination: {
             ...getPagination(totalComments, limit, offset),

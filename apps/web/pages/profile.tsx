@@ -1,3 +1,5 @@
+import type { OrderBy, PostStatus } from "types/post";
+
 import type { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 
@@ -7,7 +9,7 @@ import { QueryClient, dehydrate, useQueryClient } from "react-query";
 import { classNames } from "@votewise/lib";
 import { parseHashTags } from "@votewise/lib/hashtags";
 import type { GetMyPostsResponse } from "@votewise/types";
-import { Badge, Button, Modal, Spinner, makeToast } from "@votewise/ui";
+import { Avatar, Badge, Button, Modal, Spinner, makeToast } from "@votewise/ui";
 import { FiMessageCircle as Message, Planet, FiSend as Sent, FiThumbsUp as Upvote } from "@votewise/ui/icons";
 
 import { FilterDropdown } from "components/Dropdowns/FilterDropdown";
@@ -24,23 +26,25 @@ import {
   PostTitle,
   PostUserPill,
 } from "components/post";
+import { Comment, CommentBody, CommentHeader, CommentSeparator, CommentText } from "components/post/comments";
 
 import { timeAgo } from "lib/date";
 import { useDeletePostMutation } from "lib/hooks/useDeltePostMutation";
+import { useGetMyComments } from "lib/hooks/useGetMyComments";
 import { useGetMyPosts } from "lib/hooks/useGetMyPosts";
+import { useIsMounted } from "lib/hooks/useIsMounted";
 import { usePostChangeStatusMutation } from "lib/hooks/usePostChangeStatusMutation";
 import { parsePostStatus } from "lib/parsePostStatus";
 import { getServerSession } from "server/lib/getServerSession";
 
 import { getMyPosts } from "server/services/user";
 
-type PostStatus = "open" | "closed" | "archived" | "inprogress";
 type PostType = GetMyPostsResponse["data"]["posts"][0];
 
 type PostCardProps = {
   post: PostType;
   postStatus: PostStatus;
-  orderBy: "asc" | "desc";
+  orderBy: OrderBy;
   onDelete: (post: PostType) => void;
 };
 
@@ -99,6 +103,14 @@ function PostCard(props: PostCardProps) {
     setSelected(s);
   };
 
+  const handleOnArchive = () => {
+    updateStatusMutation.mutate({
+      postId: post.id,
+      status: "archived",
+      orderBy,
+    });
+  };
+
   return (
     <Post>
       <PostUserPill
@@ -118,7 +130,7 @@ function PostCard(props: PostCardProps) {
               onFilterChange={handleOnDropDownChange}
               onDelete={handleOnDelete}
               onUpdate={handleOnUpdate}
-              onArchive={() => {}}
+              onArchive={handleOnArchive}
             />
           )}
         </div>
@@ -164,19 +176,251 @@ function PostCard(props: PostCardProps) {
       </PostFooter>
 
       <Modal open={open} setOpen={setOpen}>
-        <UpdatePost setOpen={setOpen} post={post} postStatus={postStatus} />
+        <UpdatePost
+          setOpen={setOpen}
+          post={post}
+          postStatus={previosStatus.current}
+          orderBy={previosOrderBy.current}
+        />
       </Modal>
     </Post>
   );
 }
 
-export default function Page() {
-  const [postStatus, setPostStatus] = useState<PostStatus>("open");
-  const [orderBy, setOrderBy] = useState<"asc" | "desc">("desc");
+type Props = {
+  postStatus: PostStatus;
+  orderBy: OrderBy;
+};
+
+function Posts(props: Props & { refetchOnMount: boolean }) {
+  const { postStatus, orderBy, refetchOnMount } = props;
   const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } = useGetMyPosts(
+    postStatus,
+    orderBy,
+    {
+      refetchOnMount,
+    }
+  );
+
+  const handleOnPostDelete = (post: PostType) => {
+    makeToast(`Your post "${post.title} has been removed."`, "success");
+  };
+
+  return (
+    <div className="flex flex-col gap-8">
+      {(status === "loading" || isFetching) && (
+        <div className="flex flex-col items-center justify-center gap-2">
+          <Spinner className="h-6 w-6" />
+          <span className="text-lg font-semibold text-gray-600">Loading...</span>
+        </div>
+      )}
+
+      {data?.pages[0].data.posts.length === 0 && status !== "loading" && !isFetching && (
+        <div className="flex flex-col items-center">
+          <Planet className="fill-gray-600" width={200} height={200} />
+          <h2 className="text-xl font-semibold text-gray-600">
+            Sorry!, we don&apos;t have anything to show you.
+          </h2>
+        </div>
+      )}
+
+      {status !== "loading" &&
+        !isFetching &&
+        data?.pages.map((page, i) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <React.Fragment key={i}>
+            {page.data.posts.map((post) => (
+              <PostCard
+                post={post}
+                key={post.id}
+                postStatus={postStatus}
+                orderBy={orderBy}
+                onDelete={handleOnPostDelete}
+              />
+            ))}
+          </React.Fragment>
+        ))}
+
+      <Button
+        onClick={() => fetchNextPage()}
+        disabled={!hasNextPage || isFetchingNextPage}
+        isLoading={isFetchingNextPage || isFetching}
+        dark
+      >
+        {hasNextPage && "Load More"}
+        {!hasNextPage && "Nothing more to load"}
+      </Button>
+    </div>
+  );
+}
+
+function Comments(props: Props) {
+  const { orderBy, postStatus } = props;
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } = useGetMyComments(
     postStatus,
     orderBy
   );
+  return (
+    <div className="flex flex-col gap-8">
+      {(status === "loading" || isFetching) && (
+        <div className="flex flex-col items-center justify-center gap-2">
+          <Spinner className="h-6 w-6" />
+          <span className="text-lg font-semibold text-gray-600">Loading...</span>
+        </div>
+      )}
+
+      {data?.pages[0].data.comments.length === 0 && status !== "loading" && !isFetching && (
+        <div className="flex flex-col items-center">
+          <Planet className="fill-gray-600" width={200} height={200} />
+          <h2 className="text-xl font-semibold text-gray-600">
+            Sorry!, we don&apos;t have anything to show you.
+          </h2>
+        </div>
+      )}
+
+      {status !== "loading" &&
+        !isFetching &&
+        data?.pages.map((page, i) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <React.Fragment key={i}>
+            {page.data.comments.map((comment) => (
+              <Post key={comment.id}>
+                <PostUserPill
+                  userName={comment.post.author.name}
+                  avatar={comment.post.author.profile_image}
+                  location={comment.post.author.location}
+                  timeAgo={timeAgo(comment.post.updated_at)}
+                >
+                  <div className="flex h-fit items-center gap-4">
+                    <PostStatuPill type={parsePostStatus(comment.post.status)}>
+                      {comment.post.status}
+                    </PostStatuPill>
+                  </div>
+                </PostUserPill>
+                <PostTitle>
+                  <Link href={`/post/${comment.post.id}`}>{comment.post.title}</Link>
+                </PostTitle>
+
+                <ul>
+                  <Comment>
+                    <CommentHeader>
+                      <Avatar
+                        src={comment.user.profile_image}
+                        width={48}
+                        height={48}
+                        rounded
+                        className="flex-[0_0_48px]"
+                      />
+                      <span className="text-base font-medium text-gray-800">{comment.user.name}</span>
+                      <span className="text-sm text-gray-600">{timeAgo(comment.updated_at)}</span>
+                    </CommentHeader>
+                    <CommentBody>
+                      <CommentSeparator />
+                      <div className="ml-3 flex w-full flex-col gap-2">
+                        <CommentText>{comment.text}</CommentText>
+                        <div className="flex items-center gap-2">
+                          <span>
+                            <Upvote className="h-5 w-5 text-gray-500" />
+                          </span>
+                          <span className="text-sm text-gray-600">{comment.upvotes_count}</span>
+                        </div>
+                      </div>
+                    </CommentBody>
+                  </Comment>
+                </ul>
+              </Post>
+            ))}
+          </React.Fragment>
+        ))}
+
+      <Button
+        onClick={() => fetchNextPage()}
+        disabled={!hasNextPage || isFetchingNextPage}
+        isLoading={isFetchingNextPage || isFetching}
+        dark
+      >
+        {hasNextPage && "Load More"}
+        {!hasNextPage && "Nothing more to load"}
+      </Button>
+    </div>
+  );
+}
+
+function Archived(props: Props) {
+  const { postStatus, orderBy } = props;
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } = useGetMyPosts(
+    postStatus,
+    orderBy,
+    {
+      refetchOnMount: true,
+    }
+  );
+
+  const handleOnPostDelete = (post: PostType) => {
+    makeToast(`Your post "${post.title} has been removed."`, "success");
+  };
+
+  return (
+    <div className="flex flex-col gap-8">
+      {(status === "loading" || isFetching) && (
+        <div className="flex flex-col items-center justify-center gap-2">
+          <Spinner className="h-6 w-6" />
+          <span className="text-lg font-semibold text-gray-600">Loading...</span>
+        </div>
+      )}
+
+      {data?.pages[0].data.posts.length === 0 && status !== "loading" && !isFetching && (
+        <div className="flex flex-col items-center">
+          <Planet className="fill-gray-600" width={200} height={200} />
+          <h2 className="text-xl font-semibold text-gray-600">
+            Sorry!, we don&apos;t have anything to show you.
+          </h2>
+        </div>
+      )}
+
+      {status !== "loading" &&
+        !isFetching &&
+        data?.pages.map((page, i) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <React.Fragment key={i}>
+            {page.data.posts.map((post) => (
+              <PostCard
+                post={post}
+                key={post.id}
+                postStatus={postStatus}
+                orderBy={orderBy}
+                onDelete={handleOnPostDelete}
+              />
+            ))}
+          </React.Fragment>
+        ))}
+
+      <Button
+        onClick={() => fetchNextPage()}
+        disabled={!hasNextPage || isFetchingNextPage}
+        isLoading={isFetchingNextPage || isFetching}
+        dark
+      >
+        {hasNextPage && "Load More"}
+        {!hasNextPage && "Nothing more to load"}
+      </Button>
+    </div>
+  );
+}
+
+const tabs = [
+  { label: "Posts", value: "POST" },
+  { label: "Comments", value: "COMMENTS" },
+  { label: "Archived", value: "ARCHIVED" },
+  { label: "Friends", value: "FRIENDS" },
+  { label: "Groups", value: "GROUPS" },
+];
+
+export default function Page() {
+  const [postStatus, setPostStatus] = useState<PostStatus>("open");
+  const [orderBy, setOrderBy] = useState<OrderBy>("desc");
+  const [selectedTab, setSelectedTab] = useState(tabs[0].value);
+  const isMounted = useIsMounted();
 
   const handleOnFilterChange = (s: PostStatus | "orderBy") => {
     if (s === "orderBy") {
@@ -186,8 +430,8 @@ export default function Page() {
     setPostStatus(s);
   };
 
-  const handleOnPostDelete = (post: PostType) => {
-    makeToast(`Your post "${post.title} has been removed."`, "success");
+  const handleOnTabChange = (tab: (typeof tabs)[0]) => {
+    setSelectedTab(tab.value);
   };
 
   return (
@@ -195,81 +439,24 @@ export default function Page() {
       {/* Profile tabs */}
       <div className="mb-10 flex items-center">
         <ul className="flex items-center gap-4">
-          <li>
-            <button type="button">
-              <Badge type="primary">Posts</Badge>
-            </button>
-          </li>
-          <li>
-            <button type="button">
-              <Badge type="secondary">Comments</Badge>
-            </button>
-          </li>
-          <li>
-            <button type="button">
-              <Badge type="secondary">Archived</Badge>
-            </button>
-          </li>
-          <li>
-            <button type="button">
-              <Badge type="secondary">Friends</Badge>
-            </button>
-          </li>
-          <li>
-            <button type="button">
-              <Badge type="secondary">Groups</Badge>
-            </button>
-          </li>
+          {tabs.map((tab) => (
+            <li key={tab.label}>
+              <button type="button" onClick={() => handleOnTabChange(tab)}>
+                <Badge type={selectedTab === tab.value ? "primary" : "secondary"}>{tab.label}</Badge>
+              </button>
+            </li>
+          ))}
         </ul>
         <div className="ml-auto">
           <FilterDropdown selected={postStatus} onFilterChange={handleOnFilterChange} orderBy={orderBy} />
         </div>
       </div>
 
-      <div className="flex flex-col gap-8">
-        {status === "loading" && isFetching && (
-          <div className="flex flex-col items-center justify-center gap-2">
-            <Spinner className="h-6 w-6" />
-            <span className="text-lg font-semibold text-gray-600">Loading...</span>
-          </div>
-        )}
-
-        {data?.pages[0].data.posts.length === 0 && status !== "loading" && (
-          <div className="flex flex-col items-center">
-            <Planet className="fill-gray-600" width={200} height={200} />
-            <h2 className="text-xl font-semibold text-gray-600">
-              Sorry!, we don&apos;t have anything to show you.
-            </h2>
-          </div>
-        )}
-
-        {status !== "loading" &&
-          !isFetching &&
-          data?.pages.map((page, i) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <React.Fragment key={i}>
-              {page.data.posts.map((post) => (
-                <PostCard
-                  post={post}
-                  key={post.id}
-                  postStatus={postStatus}
-                  orderBy={orderBy}
-                  onDelete={handleOnPostDelete}
-                />
-              ))}
-            </React.Fragment>
-          ))}
-
-        <Button
-          onClick={() => fetchNextPage()}
-          disabled={!hasNextPage || isFetchingNextPage}
-          isLoading={isFetchingNextPage || isFetching}
-          dark
-        >
-          {hasNextPage && "Load More"}
-          {!hasNextPage && "Nothing more to load"}
-        </Button>
-      </div>
+      {selectedTab === "POST" && (
+        <Posts orderBy={orderBy} postStatus={postStatus} refetchOnMount={isMounted.current} />
+      )}
+      {selectedTab === "COMMENTS" && <Comments orderBy={orderBy} postStatus={postStatus} />}
+      {selectedTab === "ARCHIVED" && <Archived orderBy={orderBy} postStatus="archived" />}
     </div>
   );
 }

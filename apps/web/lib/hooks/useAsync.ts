@@ -1,16 +1,6 @@
+import type { AsyncAction, AsyncState } from "types/async";
+
 import React from "react";
-
-type AsyncState<T> = {
-  status: "idle" | "pending" | "resolved" | "rejected";
-  data: T | null;
-  error: any | null;
-};
-
-type AsyncAction<T> = {
-  type: "pending" | "resolved" | "rejected";
-  data: T | null;
-  error: any | null;
-};
 
 const getAsyncReducer =
   <T>() =>

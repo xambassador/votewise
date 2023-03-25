@@ -11,6 +11,7 @@
       "@/store/*": ["store/*"],
       "@/services/*": ["services/*"],
       "@/server/*": ["server/*"],
+      "@/types/*": ["types/*"],
       "@votewise/ui/*": ["@votewise/ui/*"]
     }
   },

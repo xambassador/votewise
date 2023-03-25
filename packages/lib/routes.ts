@@ -71,7 +71,7 @@ export const USER_UPDATE_POST_V1 = "/posts/:postId";
 export const DELETE_POST_V1 = "/posts/:postId";
 // PATCH /api/v1/user/posts/:postId/status => Update post status
 export const UPDATE_POST_STATUS_V1 = "/posts/:postId/status";
-// GET /api/v1/user/comments?limit=5&offset=0 => Get all comments of current user
+// GET /api/v1/user/comments?limit=5&offset=0&status=open&orderBy=desc => Get all comments of current user
 export const USER_GET_COMMENTS_V1 = "/comments";
 
 // GET /api/v1/user/friends?limit=5&offset=0 => Get all friends of current user

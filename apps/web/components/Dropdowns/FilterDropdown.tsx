@@ -1,3 +1,5 @@
+import type { OrderBy, PostStatus } from "types/post";
+
 import React from "react";
 
 import {
@@ -13,11 +15,9 @@ import { FiArrowDown, FiClock, FiFilter } from "@votewise/ui/icons";
 
 import { Indicator } from "../Indicator";
 
-type PostStatus = "open" | "closed" | "archived" | "inprogress";
-
 type FilterDropdownProps = {
   selected: PostStatus;
-  orderBy: "asc" | "desc";
+  orderBy: OrderBy;
   onFilterChange: (status: PostStatus | "orderBy") => void;
 };
 

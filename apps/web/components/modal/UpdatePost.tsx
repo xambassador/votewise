@@ -163,10 +163,11 @@ type UpdatePostProps = {
   setOpen: (open: boolean) => void;
   post: Post;
   postStatus: "open" | "closed" | "archived" | "inprogress";
+  orderBy: "asc" | "desc";
 };
 
 export function UpdatePost(props: UpdatePostProps) {
-  const { setOpen, post, postStatus } = props;
+  const { setOpen, post, postStatus, orderBy } = props;
   const user = useStore(store, (state) => state.user);
   const methods = useForm<FormValues>({
     defaultValues: {
@@ -187,6 +188,7 @@ export function UpdatePost(props: UpdatePostProps) {
   } = methods;
 
   const queryClient = useQueryClient();
+  const key = ["my-posts", postStatus, orderBy];
 
   const mutation = useMutation(
     (data: {
@@ -206,11 +208,8 @@ export function UpdatePost(props: UpdatePostProps) {
     {
       onMutate: (variables) => {
         queryClient.cancelQueries(["my-posts", postStatus]);
-        const previousPosts = queryClient.getQueryData<InfiniteData<GetMyPostsResponse>>([
-          "my-posts",
-          postStatus,
-        ]);
-        queryClient.setQueryData<InfiniteData<GetMyPostsResponse>>(["my-posts", postStatus], (old) => ({
+        const previousPosts = queryClient.getQueryData<InfiniteData<GetMyPostsResponse>>(key);
+        queryClient.setQueryData<InfiniteData<GetMyPostsResponse>>(key, (old) => ({
           ...(old as InfiniteData<GetMyPostsResponse>),
           pages: old?.pages.map((page) => ({
             ...page,
@@ -243,7 +242,7 @@ export function UpdatePost(props: UpdatePostProps) {
         const msg = error?.response.data.error.message || "Something went wrong";
         setError("apiError", msg);
         if (context?.previousPosts) {
-          queryClient.setQueryData(["my-posts", postStatus], context.previousPosts);
+          queryClient.setQueryData(key, context.previousPosts);
         }
       },
     }

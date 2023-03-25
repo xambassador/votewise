@@ -1,3 +1,5 @@
+import type { OrderBy, PostStatus } from "types/post";
+
 import { useMutation } from "react-query";
 import type { InfiniteData, QueryClient } from "react-query";
 
@@ -7,8 +9,8 @@ import { deletePost } from "services/user";
 
 type Variables = {
   postId: number;
-  orderBy: "asc" | "desc";
-  status: "open" | "closed" | "archived" | "inprogress";
+  orderBy: OrderBy;
+  status: PostStatus;
 };
 
 type Options<T> = {

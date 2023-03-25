@@ -97,6 +97,40 @@ type UpdatePostStatusResponse = {
   };
 } & BaseResponse;
 
+type GetMyCommentsResponse = {
+  data: {
+    message: string;
+    comments: {
+      id: number;
+      text: string;
+      post_id: number;
+      parent_id: number;
+      user_id: number;
+      created_at: Date;
+      updated_at: Date;
+      post: {
+        id: number;
+        title: string;
+        status: PostStatus;
+        updated_at: Date;
+        author: {
+          id: number;
+          name: string;
+          profile_image: string;
+          location: string;
+        };
+      };
+      user: {
+        id: number;
+        profile_image: string;
+        name: string;
+      };
+      upvotes_count: number;
+    }[];
+    meta: Pagination;
+  };
+} & BaseResponse;
+
 export type {
   AcceptOrRejectFriendRequestPayload,
   UsernameAvailableResponse,
@@ -104,4 +138,5 @@ export type {
   GetMyPostsResponse,
   DeletePostResponse,
   UpdatePostStatusResponse,
+  GetMyCommentsResponse,
 };

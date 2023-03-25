@@ -396,10 +396,13 @@ export const updateStatus = async (req: Request, res: Response) => {
 // -----------------------------------------------------------------------------------------
 export const getMyComments = async (req: Request, res: Response) => {
   const { limit, offset } = getLimitAndOffset(req);
+  const { orderBy, status } = req.query;
   const { user } = req.session;
+  const defaulOrderBy = (orderBy || "desc") as "asc" | "desc";
+  const defaultStatus = (status || "OPEN") as "OPEN" | "CLOSED" | "INPROGRESS" | "ARCHIVED";
 
   try {
-    const data = await PostService.getCommentsByUserId(user.id, limit, offset);
+    const data = await PostService.getCommentsByUserId(user.id, defaultStatus, defaulOrderBy, limit, offset);
     return res.status(OK).json(
       new JSONResponse(
         COMMENT_FETCHED_SUCCESSFULLY_MSG,

@@ -30,6 +30,7 @@ export function usePostChangeStatusMutation(
       const key = ["my-posts", postStatus, orderBy];
       queryClient.cancelQueries(key);
       const previousPosts = queryClient.getQueryData<InfiniteData<GetMyPostsResponse>>(key);
+
       queryClient.setQueryData<InfiniteData<GetMyPostsResponse>>(key, (old) => ({
         ...(old as InfiniteData<GetMyPostsResponse>),
         pages: old?.pages.map((page) => ({
@@ -57,6 +58,10 @@ export function usePostChangeStatusMutation(
     },
     onError: (error, variables, context) => {
       options?.onError?.(error, variables, context);
+    },
+    onSettled: () => {
+      const key = ["my-posts", postStatus, orderBy];
+      queryClient.invalidateQueries(key);
     },
   });
 }
