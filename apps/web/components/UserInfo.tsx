@@ -13,6 +13,7 @@ import { useMyDetails } from "lib/hooks/useMyDetails";
 import store from "lib/store";
 
 import { CreatePost } from "./modal/CreatePost";
+import { Profile as ProfileModal } from "./modal/Profile";
 import { UserInfoSkeleton } from "./skeletons/UserInfoSkeleton";
 
 function Wrapper({ children }: { children: ReactNode }) {
@@ -156,7 +157,8 @@ export function UserInfo() {
       </Wrapper>
 
       <Modal open={open} setOpen={setOpen}>
-        <CreatePost setOpen={setOpen} />
+        {isProfilePage && <ProfileModal />}
+        {!isProfilePage && <CreatePost setOpen={setOpen} />}
       </Modal>
     </>
   );

@@ -56,7 +56,7 @@ type InputFieldProps = {
     labelProps?: React.ComponentProps<typeof Label>;
   };
 
-const InputField = forwardRef<HTMLInputElement, InputFieldProps>((props, ref) => {
+export const InputField = forwardRef<HTMLInputElement, InputFieldProps>((props, ref) => {
   const id = useId();
   const methods = useFormContext();
   const {
