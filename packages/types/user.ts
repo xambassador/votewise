@@ -131,6 +131,26 @@ type GetMyCommentsResponse = {
   };
 } & BaseResponse;
 
+type FriendType = "FRIENDS" | "PENDING_USER_TO_FRIEND_REQUEST" | "PENDING_FRIEND_TO_USER_REQUEST";
+
+type GetFriendsResponse = {
+  data: {
+    message: string;
+    friends: {
+      id: number;
+      type: FriendType;
+      updated_at: Date;
+      friend_id: number;
+      name: string;
+      username: string;
+      location: string;
+      profile_image: string;
+      about: string;
+    }[];
+    meta: Pagination;
+  };
+} & BaseResponse;
+
 export type {
   AcceptOrRejectFriendRequestPayload,
   UsernameAvailableResponse,
@@ -139,4 +159,6 @@ export type {
   DeletePostResponse,
   UpdatePostStatusResponse,
   GetMyCommentsResponse,
+  FriendType,
+  GetFriendsResponse,
 };
