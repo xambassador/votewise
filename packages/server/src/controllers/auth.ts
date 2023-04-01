@@ -93,6 +93,7 @@ export const register = async (req: Request, res: Response) => {
       }
     );
     const url = `${FRONTEND_URL}/verify-email?token=${verifyToken}`;
+    // TODO: Replace this with a template
     const emailData = {
       to: newUser.email,
       subject: "Verify your email address",

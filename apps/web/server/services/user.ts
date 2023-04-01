@@ -7,6 +7,7 @@ import {
   UPDATE_POST_STATUS_V1,
   USER_CREATE_POST_V1,
   USER_GET_COMMENTS_V1,
+  USER_GET_FRIENDS_V1,
   USER_GET_POSTS_V1,
   USER_ROUTE_V1,
   USER_UPDATE_POST_V1,
@@ -15,6 +16,7 @@ import type {
   CreatePostPayload,
   CreatePostResponse,
   DeletePostResponse,
+  GetFriendsResponse,
   GetMyCommentsResponse,
   GetMyPostsResponse,
   MyDetailsResponse,
@@ -194,5 +196,28 @@ export const getMyComments = async (
       headers: options?.headers,
     }
   );
+  return response;
+};
+
+/**
+ * @description Get friends of the current logged in user
+ * @param token Access token
+ * @param limit Limit to fetch friends
+ * @param offset Offset to fetch friends
+ * @param options Axios Request options
+ * @returns
+ */
+export const getFriends = async (
+  token: string,
+  limit = 5,
+  offset = 0,
+  options?: {
+    headers: AxiosRequestConfig["headers"];
+  }
+) => {
+  const apiEndpoint = `${USER_ROUTE_V1}${USER_GET_FRIENDS_V1}?limit=${limit}&offset=${offset}`;
+  const response: AxiosResponse<GetFriendsResponse> = await getAxiosServerWithAuth(token).get(apiEndpoint, {
+    headers: options?.headers,
+  });
   return response;
 };

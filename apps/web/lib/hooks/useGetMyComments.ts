@@ -2,7 +2,6 @@ import type { OrderBy, PostStatus } from "types/post";
 
 import { useInfiniteQuery } from "react-query";
 
-// import type { GetMyCommentsResponse } from "@votewise/types";
 import { getMyComments } from "services/user";
 
 export function useGetMyComments(status: PostStatus, orderBy: OrderBy) {

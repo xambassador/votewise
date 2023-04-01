@@ -31,6 +31,7 @@ import { Comment, CommentBody, CommentHeader, CommentSeparator, CommentText } fr
 import { timeAgo } from "lib/date";
 import { useDeletePostMutation } from "lib/hooks/useDeltePostMutation";
 import { useGetMyComments } from "lib/hooks/useGetMyComments";
+import { useGetMyFriends } from "lib/hooks/useGetMyFriends";
 import { useGetMyPosts } from "lib/hooks/useGetMyPosts";
 import { useIsMounted } from "lib/hooks/useIsMounted";
 import { usePostChangeStatusMutation } from "lib/hooks/usePostChangeStatusMutation";
@@ -408,7 +409,57 @@ function Archived(props: Props) {
   );
 }
 
-const tabs = [
+function Friends() {
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } = useGetMyFriends();
+
+  return (
+    <div className="flex flex-col gap-8">
+      {(status === "loading" || isFetching) && (
+        <div className="flex flex-col items-center justify-center gap-2">
+          <Spinner className="h-6 w-6" />
+          <span className="text-lg font-semibold text-gray-600">Loading...</span>
+        </div>
+      )}
+
+      {data?.pages[0].data.friends.length === 0 && status !== "loading" && !isFetching && (
+        <div className="flex flex-col items-center">
+          <Planet className="fill-gray-600" width={200} height={200} />
+          <h2 className="text-xl font-semibold text-gray-600">
+            Sorry!, we don&apos;t have anything to show you.
+          </h2>
+        </div>
+      )}
+
+      {status !== "loading" &&
+        !isFetching &&
+        data?.pages.map((page, i) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <React.Fragment key={i}>
+            {page.data.friends.map((friend) => (
+              <div key={friend.friend_id}>
+                <p>{friend.name}</p>
+              </div>
+            ))}
+          </React.Fragment>
+        ))}
+
+      <Button
+        onClick={() => fetchNextPage()}
+        disabled={!hasNextPage || isFetchingNextPage}
+        isLoading={isFetchingNextPage || isFetching}
+        dark
+      >
+        {hasNextPage && "Load More"}
+        {!hasNextPage && "Nothing more to load"}
+      </Button>
+    </div>
+  );
+}
+
+type TabsValues = "POST" | "COMMENTS" | "ARCHIVED" | "FRIENDS" | "GROUPS";
+type Tab = { label: string; value: TabsValues };
+
+const tabs: Tab[] = [
   { label: "Posts", value: "POST" },
   { label: "Comments", value: "COMMENTS" },
   { label: "Archived", value: "ARCHIVED" },
@@ -419,7 +470,7 @@ const tabs = [
 export default function Page() {
   const [postStatus, setPostStatus] = useState<PostStatus>("open");
   const [orderBy, setOrderBy] = useState<OrderBy>("desc");
-  const [selectedTab, setSelectedTab] = useState(tabs[0].value);
+  const [selectedTab, setSelectedTab] = useState<TabsValues>(tabs[0].value as TabsValues);
   const isMounted = useIsMounted();
 
   const handleOnFilterChange = (s: PostStatus | "orderBy") => {
@@ -430,7 +481,7 @@ export default function Page() {
     setPostStatus(s);
   };
 
-  const handleOnTabChange = (tab: (typeof tabs)[0]) => {
+  const handleOnTabChange = (tab: Tab) => {
     setSelectedTab(tab.value);
   };
 
@@ -457,6 +508,7 @@ export default function Page() {
       )}
       {selectedTab === "COMMENTS" && <Comments orderBy={orderBy} postStatus={postStatus} />}
       {selectedTab === "ARCHIVED" && <Archived orderBy={orderBy} postStatus="archived" />}
+      {selectedTab === "FRIENDS" && <Friends />}
     </div>
   );
 }

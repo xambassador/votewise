@@ -2,8 +2,9 @@ import Queue from "bull";
 
 import dotenv from "dotenv";
 
+import { logger } from "@votewise/lib/logger";
+
 import { EmailTransporter } from "@/src/services/email/EmailTransporter";
-import { logger } from "@/src/utils";
 
 dotenv.config();
 
@@ -53,7 +54,11 @@ async function sendMail({ to, subject, html }: { to: string; subject: string; ht
     subject,
     html,
   });
-  await transport.send();
+  try {
+    await transport.send();
+  } catch (err) {
+    logger(`Error sending email: ${err}`, "error");
+  }
 }
 
 registrationEmailQueue.process(async (job, done) => {

@@ -66,7 +66,7 @@ const Page: NextPageWithLayout = () => {
             .then(() => {
               router.push("/");
               setStatus("resolved");
-              makeToast("User onboarded successfully", "success");
+              makeToast(`Hello, ${data.name}. Welcome to votewise.`, "success");
             })
             .catch((err: any) => {
               methods.setError("apiError", {

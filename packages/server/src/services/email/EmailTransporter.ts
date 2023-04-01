@@ -3,6 +3,8 @@ import type SMTPTransport from "nodemailer/lib/smtp-transport";
 
 import dotenv from "dotenv";
 
+import { logger } from "@votewise/lib/logger";
+
 dotenv.config();
 
 const host = process.env.SMTP_HOST;
@@ -55,6 +57,7 @@ export class EmailTransporter {
     try {
       await this.transporter.sendMail(this.mailOptions);
     } catch (err) {
+      logger(`Failed to send email: ${err}`, "error");
       throw new Error("Failed to send email");
     }
   }

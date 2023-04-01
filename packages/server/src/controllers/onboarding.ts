@@ -11,6 +11,8 @@ import { JSONResponse } from "@/src/lib";
 import OnboardingService from "@/src/services/onboarding";
 import { getErrorReason } from "@/src/utils";
 
+
+// TODO: Remove all hardcoded messages to lib/constants
 export const onboardUser = async (req: Request, res: Response) => {
   const { params } = req;
   const payload = req.body as OnboardingPayload;

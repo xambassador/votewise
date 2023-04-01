@@ -5,6 +5,7 @@ import type {
   CreatePostPayload,
   CreatePostResponse,
   DeletePostResponse,
+  GetFriendsResponse,
   GetMyCommentsResponse,
   GetMyPostsResponse,
   MyDetailsResponse,
@@ -119,5 +120,17 @@ export const updatePostStatus = async (postId: number, status: PostStatus) => {
 export const getMyComments = async (status: PostStatus, orderBy: OrderBy, limit = 5, offset = 0) => {
   const apiEndpoint = `/user/comments?limit=${limit}&offset=${offset}&status=${status.toUpperCase()}&orderBy=${orderBy}`;
   const response: AxiosResponse<GetMyCommentsResponse> = await axiosInstance.get(apiEndpoint);
+  return response.data;
+};
+
+/**
+ * @description Get all friends of the current logged in user
+ * @param limit Limit to fetch friends. Default is 5
+ * @param offset Offset to fetch friends. Default is 0
+ * @returns
+ */
+export const getMyFriends = async (limit = 5, offset = 0) => {
+  const apiEndpoint = `/user/friends?limit=${limit}&offset=${offset}`;
+  const response: AxiosResponse<GetFriendsResponse> = await axiosInstance.get(apiEndpoint);
   return response.data;
 };

@@ -1,9 +1,10 @@
+import { logger } from "@votewise/lib/logger";
+
 import {
   notificationMailQueue,
   passwordResetEmailQueue,
   registrationEmailQueue,
 } from "@/src/services/queues";
-import { logger } from "@/src/utils";
 
 type EmailOption = {
   to: string;
