@@ -157,7 +157,7 @@ export function UserInfo() {
       </Wrapper>
 
       <Modal open={open} setOpen={setOpen}>
-        {isProfilePage && <ProfileModal />}
+        {isProfilePage && <ProfileModal setOpen={setOpen} />}
         {!isProfilePage && <CreatePost setOpen={setOpen} />}
       </Modal>
     </>
