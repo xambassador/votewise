@@ -2,6 +2,12 @@ import httpStatusCodes from "http-status-codes";
 
 import prismaMock from "../../../test/__mock__/prisma";
 import { createRequest, createResponse, getUser } from "../../__mock__";
+import {
+  UNAUTHORIZED_RESPONSE,
+  USERNAME_ALREADY_TAKEN_RESPONSE,
+  USER_ALREADY_ONBOARDED_RESPONSE,
+  VALIDATION_FAILED_MSG,
+} from "../../utils";
 import { onboardUser, onboardingStatus } from "../onboarding";
 
 jest.mock("@votewise/prisma", () => ({ prisma: prismaMock }));
@@ -15,14 +21,7 @@ const onboaringPayload = {
   cover_image: "https://someimage.com",
 };
 
-const unauthorizedError = {
-  success: false,
-  message: "Unauthorized",
-  data: null,
-  error: {
-    message: "Unauthorized",
-  },
-};
+const unauthorizedError = UNAUTHORIZED_RESPONSE;
 
 const user = getUser({
   email: "test@gmail.com",
@@ -119,14 +118,7 @@ describe("Onboarding API", () => {
       await onboardUser(mockRequest, mockResponse);
       expect(mockResponse.status).toHaveBeenCalledWith(httpStatusCodes.BAD_REQUEST);
       expect(mockResponse.status).toHaveBeenCalledTimes(1);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        success: false,
-        message: "User already onboarded",
-        data: null,
-        error: {
-          message: "User already onboarded",
-        },
-      });
+      expect(mockResponse.json).toHaveBeenCalledWith(USER_ALREADY_ONBOARDED_RESPONSE);
       expect(mockResponse.json).toHaveBeenCalledTimes(1);
       expect(mockResponse.status).not.toHaveBeenCalledWith(httpStatusCodes.OK);
       expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
@@ -154,7 +146,7 @@ describe("Onboarding API", () => {
       expect(mockResponse.status).not.toHaveBeenCalledWith(httpStatusCodes.OK);
       expect(mockResponse.json).toHaveBeenCalledWith({
         success: false,
-        message: "Validation failed",
+        message: VALIDATION_FAILED_MSG,
         data: null,
         error: {
           message: expect.any(String),
@@ -190,14 +182,7 @@ describe("Onboarding API", () => {
       expect(mockResponse.status).toHaveBeenCalledWith(httpStatusCodes.BAD_REQUEST);
       expect(mockResponse.status).toHaveBeenCalledTimes(1);
       expect(mockResponse.status).not.toHaveBeenCalledWith(httpStatusCodes.OK);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        success: false,
-        message: "Username already taken",
-        data: null,
-        error: {
-          message: "Username already taken",
-        },
-      });
+      expect(mockResponse.json).toHaveBeenCalledWith(USERNAME_ALREADY_TAKEN_RESPONSE);
       expect(mockResponse.json).toHaveBeenCalledTimes(1);
       expect(prismaMock.user.update).not.toHaveBeenCalled();
     });

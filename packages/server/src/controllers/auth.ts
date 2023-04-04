@@ -74,6 +74,7 @@ export const register = async (req: Request, res: Response) => {
     const user = await UserService.checkIfUserExists(payload.email);
 
     if (user) {
+      // TODO: Replace error handling with express next error handler
       return res.status(CONFLICT).json(USER_ALREADY_EXISTS_RESPONSE);
     }
 

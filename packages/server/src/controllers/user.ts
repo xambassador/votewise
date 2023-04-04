@@ -955,3 +955,7 @@ export const getRequestedGroups = async (req: Request, res: Response) => {
     );
   }
 };
+
+// -----------------------------------------------------------------------------------------
+// IMPLEMENTME: Implement this
+export const updateMyDetails = async (req: Request, res: Response) => {};

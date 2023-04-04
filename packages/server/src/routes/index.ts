@@ -15,6 +15,7 @@ import {
 } from "@votewise/lib";
 import { logger } from "@votewise/lib/logger";
 
+import { errorMiddleware } from "@/src/middlewares/error";
 import authRouter from "@/src/routes/auth";
 import groupRouter from "@/src/routes/group";
 import healthCheckRouter from "@/src/routes/healthCheck";
@@ -34,6 +35,7 @@ const registerRoutes = (app: Application) => {
   app.use(POST_ROUTE_V1, postRouter);
   app.use(GROUPS_ROUTE_V1, groupRouter);
   app.use("*", notFoundRouter);
+  app.use(errorMiddleware);
 
   logger("✅ Routes registered...");
 };

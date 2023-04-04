@@ -23,6 +23,7 @@ import {
   USER_SEND_FRIEND_REQUEST_V1,
   USER_UNFOLLOW_USER_V1,
   USER_UPDATE_POST_V1,
+  USER_UPDATE_PROFILE_V1,
 } from "@votewise/lib";
 
 import {
@@ -65,6 +66,9 @@ router.post(USER_CREATE_POST_V1, authorizationMiddleware, onboardedMiddleware, c
 router.post(USER_SEND_FRIEND_REQUEST_V1, authorizationMiddleware, onboardedMiddleware, addFriend);
 router.post(USER_FOLLOW_USER_V1, authorizationMiddleware, onboardedMiddleware, startFollowing);
 
+router.patch(USER_UPDATE_PROFILE_V1, authorizationMiddleware, onboardedMiddleware, (req, res) => {
+  res.status(200).json({ message: "This route is not implemented yet." });
+});
 router.patch(USER_UPDATE_POST_V1, authorizationMiddleware, onboardedMiddleware, updateMyPost);
 router.patch(UPDATE_POST_STATUS_V1, authorizationMiddleware, onboardedMiddleware, updateStatus);
 router.patch(
