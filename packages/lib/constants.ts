@@ -23,10 +23,12 @@ export const USER_ALREADY_EXISTS_MSG = "User already exists";
 export const USER_CREATED_SUCCESSFULLY_MSG = "User created successfully";
 export const USER_DETAILS_FETCHED_SUCCESSFULLY_MSG = "User details fetched successfully";
 export const USERNAME_AVAIALABLE_MSG = "Username is available";
+export const USER_ONBOARDED_SUCCESSFULLY_MSG = "User onboarded successfully";
 export const USER_NOT_FOUND_MSG = "User not found";
 export const USERNAME_ALREADY_TAKEN_MSG = "Username is already taken";
 export const USERNAME_REQUIRED_MSG = "Username is required";
 export const USER_ALREADY_ONBOARDED_MSG = "User already onboarded";
+export const ERROR_WHILE_ONBOARDING_USER_MSG = "Error while onboarding user";
 
 export const POSTS_FETCHED_SUCCESSFULLY_MSG = "Posts fetched successfully";
 export const POST_DETAILS_FETCHED_SUCCESSFULLY_MSG = "Post details fetched successfully";

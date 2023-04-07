@@ -11,8 +11,8 @@ const createResponse = (res: Partial<Response> = {}) => {
   return response;
 };
 
-const createNext = (next: Partial<NextFunction> = () => {}) => {
-  return next as NextFunction;
+const createNext = () => {
+  return jest.fn() as NextFunction;
 };
 
 export { createRequest, createResponse, createNext };

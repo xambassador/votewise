@@ -2,7 +2,7 @@
  * @file: index.ts
  * @description: Onboarding service
  */
-import { USERNAME_ALREADY_TAKEN_MSG } from "@votewise/lib/constants";
+import { ERROR_WHILE_ONBOARDING_USER_MSG, USERNAME_ALREADY_TAKEN_MSG } from "@votewise/lib/constants";
 import { prisma } from "@votewise/prisma";
 import type { OnboardingPayload } from "@votewise/types";
 
@@ -49,7 +49,7 @@ class OnboardingService {
       });
       return user;
     } catch (err) {
-      const reason = getErrorReason(err) || "Error while onboarding user.";
+      const reason = getErrorReason(err) || ERROR_WHILE_ONBOARDING_USER_MSG;
       throw new Error(reason);
     }
   }

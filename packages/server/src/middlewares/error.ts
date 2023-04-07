@@ -7,11 +7,12 @@ export const errorMiddleware = (err: any, req: Request, res: Response, next: Nex
   logger(err, "error");
   const status = err.status || 500;
   const message = err.message || "Something went wrong";
+  const errorReason = err.reason || message;
   const response = {
     success: false,
     data: null,
     error: {
-      message,
+      message: errorReason,
     },
     message,
   };
