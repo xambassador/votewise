@@ -4,19 +4,13 @@ import httpSatatusCodes from "http-status-codes";
 import prismaMock from "../../../test/__mock__/prisma";
 import { getUser } from "../../__mock__";
 import JWTService from "../../services/user/jwt";
+import { UNAUTHORIZED_RESPONSE } from "../../utils/constants";
 import authorizationMiddleware from "../auth";
 
 jest.mock("@votewise/prisma", () => ({ prisma: prismaMock }));
 
 const { UNAUTHORIZED } = httpSatatusCodes;
-const unauthorizedResponse = {
-  message: "Unauthorized",
-  data: null,
-  error: {
-    message: "Unauthorized",
-  },
-  success: false,
-};
+const unauthorizedResponse = UNAUTHORIZED_RESPONSE;
 
 describe("Authorization middleware", () => {
   test("Should return UNAUTHORIZED if no headers are available.", async () => {

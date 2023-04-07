@@ -1,16 +1,45 @@
-import httpStatusCodes from "http-status-codes";
+import http from "http";
+import httpStatusCodes, { StatusCodes } from "http-status-codes";
+import supertest from "supertest";
 
+import { ONBOARDING_ROUTE_V1, ONBOARDING_UPDATE_V1 } from "@votewise/lib";
+
+import app from "../..";
 import prismaMock from "../../../test/__mock__/prisma";
 import { createRequest, createResponse, getUser } from "../../__mock__";
+import OnboardingService from "../../services/onboarding";
+import JWT from "../../services/user/jwt";
 import {
   UNAUTHORIZED_RESPONSE,
+  USERNAME_ALREADY_TAKEN_MSG,
   USERNAME_ALREADY_TAKEN_RESPONSE,
   USER_ALREADY_ONBOARDED_RESPONSE,
+  USER_ONBOARDED_SUCCESSFULLY_MSG,
   VALIDATION_FAILED_MSG,
 } from "../../utils";
-import { onboardUser, onboardingStatus } from "../onboarding";
+import { onboardingStatus } from "../onboarding";
 
-jest.mock("@votewise/prisma", () => ({ prisma: prismaMock }));
+// https://stackoverflow.com/questions/65554910/jest-referenceerror-cannot-access-before-initialization
+jest.mock("@votewise/prisma", () => {
+  // eslint-disable-next-line global-require
+  const mockPrisma = require("../../../test/__mock__/prisma").default;
+  return {
+    prisma: mockPrisma,
+  };
+});
+
+jest.spyOn(OnboardingService, "onboardUser").mockImplementation((payload, userId) => {
+  return Promise.resolve({
+    ...getUser({
+      id: userId,
+      ...payload,
+    }),
+  });
+});
+
+const getOnboardingUpdateUrl = (userId: string) => {
+  return `${ONBOARDING_ROUTE_V1}${ONBOARDING_UPDATE_V1}`.replace(":userId", userId);
+};
 
 const onboaringPayload = {
   username: "test",
@@ -29,6 +58,17 @@ const user = getUser({
 });
 
 describe("Onboarding API", () => {
+  let server: http.Server;
+
+  beforeAll((done) => {
+    server = http.createServer(app);
+    server.listen(done);
+  });
+
+  afterAll((done) => {
+    server.close(done);
+  });
+
   describe("GET /api/v1/onboarding/:userId/status", () => {
     test("Should return UNAUTHORIZED if authenticated userId and params userId not match", async () => {
       const mockRequest = createRequest({
@@ -76,183 +116,99 @@ describe("Onboarding API", () => {
     });
   });
 
-  describe("PUT /api/v1/onboarding/:userId", () => {
+  describe("PATCH /api/v1/onboarding/:userId", () => {
     test("Should return UNAUTHORIZED if authenticated userId and params userId not match", async () => {
-      const mockRequest = createRequest({
-        params: {
-          userId: "2",
-        },
-        session: {
-          user,
-        },
-        body: {
-          ...onboaringPayload,
-        },
-      });
-      const mockResponse = createResponse();
-      await onboardUser(mockRequest, mockResponse);
-      expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
-      expect(mockResponse.status).toHaveBeenCalledWith(httpStatusCodes.UNAUTHORIZED);
-      expect(mockResponse.status).toHaveBeenCalledTimes(1);
-      expect(mockResponse.status).not.toHaveBeenCalledWith(httpStatusCodes.OK);
-      expect(mockResponse.json).toHaveBeenCalledWith(unauthorizedError);
-      expect(mockResponse.json).toHaveBeenCalledTimes(1);
+      const request = supertest(server);
+      // Trying to onboard user with id 2
+      const url = getOnboardingUpdateUrl("2");
+      // Loged in as user with id 1
+      const token = JWT.generateAccessToken({ userId: 1 });
+      prismaMock.user.findUnique.mockResolvedValue(getUser({ id: 1 }));
+      const response = await request
+        .patch(url)
+        .send(onboaringPayload)
+        .set("Authorization", `Bearer ${token}`);
+
+      expect(response.status).toBe(StatusCodes.UNAUTHORIZED);
+      expect(response.body).toEqual(unauthorizedError);
+      expect(OnboardingService.onboardUser).not.toHaveBeenCalled();
     });
 
     test("Should return BAD_REQUEST if users is already onboarded", async () => {
-      const mockRequest = createRequest({
-        params: {
-          userId: "1",
-        },
-        session: {
-          user: {
-            ...user,
-            onboarded: true,
-          },
-        },
-        body: {
-          ...onboaringPayload,
-        },
-      });
-      const mockResponse = createResponse();
-      await onboardUser(mockRequest, mockResponse);
-      expect(mockResponse.status).toHaveBeenCalledWith(httpStatusCodes.BAD_REQUEST);
-      expect(mockResponse.status).toHaveBeenCalledTimes(1);
-      expect(mockResponse.json).toHaveBeenCalledWith(USER_ALREADY_ONBOARDED_RESPONSE);
-      expect(mockResponse.json).toHaveBeenCalledTimes(1);
-      expect(mockResponse.status).not.toHaveBeenCalledWith(httpStatusCodes.OK);
-      expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
+      const request = supertest(server);
+      const url = getOnboardingUpdateUrl("1");
+      const token = JWT.generateAccessToken({ userId: 1 });
+      prismaMock.user.findUnique.mockResolvedValue(getUser({ id: 1, onboarded: true }));
+      const response = await request
+        .patch(url)
+        .send(onboaringPayload)
+        .set("Authorization", `Bearer ${token}`);
+
+      expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+      expect(response.body).toEqual(USER_ALREADY_ONBOARDED_RESPONSE);
+      expect(OnboardingService.onboardUser).not.toHaveBeenCalled();
     });
 
     test("Should return BAD_REQUEST if payload is invalid", async () => {
-      const mockRequest = createRequest({
-        params: {
-          userId: "1",
-        },
-        session: {
-          user: {
-            ...user,
-            onboarded: false,
-          },
-        },
-        body: {},
-      });
-      const mockResponse = createResponse();
-      await onboardUser(mockRequest, mockResponse);
-      expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
-      expect(prismaMock.user.update).not.toHaveBeenCalled();
-      expect(mockResponse.status).toHaveBeenCalledWith(httpStatusCodes.BAD_REQUEST);
-      expect(mockResponse.status).toHaveBeenCalledTimes(1);
-      expect(mockResponse.status).not.toHaveBeenCalledWith(httpStatusCodes.OK);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        success: false,
+      const request = supertest(server);
+      const url = getOnboardingUpdateUrl("1");
+      const token = JWT.generateAccessToken({ userId: 1 });
+      prismaMock.user.findUnique.mockResolvedValue(getUser({ id: 1, onboarded: false }));
+      const response = await request.patch(url).send().set("Authorization", `Bearer ${token}`);
+
+      expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+      expect(response.body).toEqual({
         message: VALIDATION_FAILED_MSG,
         data: null,
         error: {
           message: expect.any(String),
         },
+        success: false,
       });
-      expect(mockResponse.json).toHaveBeenCalledTimes(1);
+      expect(OnboardingService.onboardUser).not.toHaveBeenCalled();
     });
 
     test("Should return BAD_REQUEST if username is already taken", async () => {
-      const mockRequest = createRequest({
-        params: {
-          userId: "1",
-        },
-        session: {
-          user: {
-            ...user,
-            onboarded: false,
-          },
-        },
-        body: {
-          ...onboaringPayload,
-        },
+      const request = supertest(server);
+      const url = getOnboardingUpdateUrl("1");
+      const token = JWT.generateAccessToken({ userId: 1 });
+      prismaMock.user.findUnique.mockResolvedValue(getUser({ id: 1, onboarded: false }));
+      jest.spyOn(OnboardingService, "onboardUser").mockImplementation(() => {
+        throw new Error(USERNAME_ALREADY_TAKEN_MSG);
       });
-      const mockResponse = createResponse();
-      prismaMock.user.findUnique.mockResolvedValue(user); // username is taken
-      await onboardUser(mockRequest, mockResponse);
-      expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
-        where: {
-          username: onboaringPayload.username,
-        },
-      });
-      expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(1);
-      expect(mockResponse.status).toHaveBeenCalledWith(httpStatusCodes.BAD_REQUEST);
-      expect(mockResponse.status).toHaveBeenCalledTimes(1);
-      expect(mockResponse.status).not.toHaveBeenCalledWith(httpStatusCodes.OK);
-      expect(mockResponse.json).toHaveBeenCalledWith(USERNAME_ALREADY_TAKEN_RESPONSE);
-      expect(mockResponse.json).toHaveBeenCalledTimes(1);
-      expect(prismaMock.user.update).not.toHaveBeenCalled();
+      const response = await request
+        .patch(url)
+        .send(onboaringPayload)
+        .set("Authorization", `Bearer ${token}`);
+
+      expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+      expect(response.body).toEqual(USERNAME_ALREADY_TAKEN_RESPONSE);
+      expect(OnboardingService.onboardUser).toHaveBeenCalledTimes(1);
+      expect(OnboardingService.onboardUser).toHaveBeenCalledWith(onboaringPayload, 1);
     });
 
     test("Should return OK if payload is valid and user is valid", async () => {
-      const mockRequest = createRequest({
-        params: {
-          userId: "1",
-        },
-        session: {
-          user: {
-            ...user,
-            onboarded: false,
-          },
-        },
-        body: {
-          ...onboaringPayload,
-        },
-      });
-      const mockResponse = createResponse();
-      prismaMock.user.findUnique.mockResolvedValue(null); // username is not taken
-      prismaMock.user.update.mockResolvedValue({
-        ...user,
-        ...onboaringPayload,
-        onboarded: true,
-      });
-      await onboardUser(mockRequest, mockResponse);
-      expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
-        where: {
-          username: onboaringPayload.username,
-        },
-      });
-      expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(1);
-      expect(prismaMock.user.update).toHaveBeenCalledWith({
-        where: {
-          id: user.id,
-        },
+      const request = supertest(server);
+      const url = getOnboardingUpdateUrl("1");
+      const token = JWT.generateAccessToken({ userId: 1 });
+      prismaMock.user.findUnique.mockResolvedValue(getUser({ id: 1, onboarded: false }));
+      jest.spyOn(OnboardingService, "onboardUser").mockResolvedValue(getUser({ id: 1, onboarded: true }));
+      const response = await request
+        .patch(url)
+        .send(onboaringPayload)
+        .set("Authorization", `Bearer ${token}`);
+
+      expect(response.status).toBe(StatusCodes.OK);
+      expect(response.body).toEqual({
+        message: USER_ONBOARDED_SUCCESSFULLY_MSG,
         data: {
-          ...onboaringPayload,
-          onboarded: true,
+          user: expect.any(Object),
         },
-        select: {
-          id: true,
-          username: true,
-          name: true,
-          profile_image: true,
-          cover_image: true,
-          location: true,
-          gender: true,
-          twitter: true,
-          email: true,
-          facebook: true,
-          about: true,
-          onboarded: true,
-          last_login: true,
-          is_email_verify: true,
-          updated_at: true,
-        },
-      });
-      expect(prismaMock.user.update).toHaveBeenCalledTimes(1);
-      expect(mockResponse.status).toHaveBeenCalledWith(httpStatusCodes.OK);
-      expect(mockResponse.status).toHaveBeenCalledTimes(1);
-      expect(mockResponse.status).not.toHaveBeenCalledWith(httpStatusCodes.BAD_REQUEST);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        success: true,
-        message: "User onboarded successfully",
-        data: expect.any(Object),
         error: null,
+        success: true,
       });
-      expect(mockResponse.json).toHaveBeenCalledTimes(1);
+      expect(OnboardingService.onboardUser).toHaveBeenCalledTimes(1);
+      expect(OnboardingService.onboardUser).toHaveBeenCalledWith(onboaringPayload, 1);
     });
   });
 });

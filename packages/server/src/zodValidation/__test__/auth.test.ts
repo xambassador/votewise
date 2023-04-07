@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { validateLoginSchema, validateRegisterUserSchema, isEmail } from "../auth";
+import { isEmail, validateLoginSchema, validateRegisterUserSchema } from "../auth";
 
 describe("Register validators", () => {
   test("Should validate a valid register user payload", () => {
