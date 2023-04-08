@@ -245,8 +245,18 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
   const { password } = req.body as ResetPasswordPayload;
   const { token, email } = req.query as ResetPasswordQuery;
 
-  if (!token) return next(createError(StatusCodes.BAD_REQUEST, TOKEN_REQUIRED_MSG));
-  if (!email) return next(createError(StatusCodes.BAD_REQUEST, EMAIL_REQUIRED_MSG));
+  if (!token)
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, {
+        reason: TOKEN_REQUIRED_MSG,
+      })
+    );
+  if (!email)
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, {
+        reason: EMAIL_REQUIRED_MSG,
+      })
+    );
 
   const isValidPayload = UserService.isValidRegisterPayload({
     email,

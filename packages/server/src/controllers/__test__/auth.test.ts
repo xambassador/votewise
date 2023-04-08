@@ -12,6 +12,7 @@ import {
   FORGOT_PASSWORD_V1,
   LOGIN_USER_V1,
   REGISTER_USER_V1,
+  RESET_PASSWORD_V1,
   REVOKE_ACCESS_TOKEN_V1,
 } from "@votewise/lib";
 
@@ -21,11 +22,15 @@ import { errorResponse, getUser } from "../../__mock__";
 import JWT from "../../services/user/jwt";
 import {
   ACCESS_TOKEN_REVOKE_MSG,
+  EMAIL_REQUIRED_MSG,
   INVALID_CREDENTIALS_MSG,
   INVALID_EMAIL_MSG,
   INVALID_REFRESHTOKEN_MSG,
   LOGIN_SUCCESS_MSG,
+  PASSWORD_RESET_RESPONSE,
   REFRESHTOKEN_REQUIRED_MSG,
+  TOKEN_REQUIRED_MSG,
+  UNAUTHORIZED_MSG,
   USER_ALREADY_EXISTS_MSG,
   USER_CREATED_SUCCESSFULLY_MSG,
   USER_NOT_FOUND_MSG,
@@ -346,269 +351,155 @@ describe("Auth controller", () => {
     });
   });
 
-  // describe("POST /api/v1/auth/reset-password", () => {
-  //   test("Should return BAD_REQUEST if the request body is invalid or request params are invalid", async () => {
-  //     const mockRequest = createRequest({
-  //       body: {},
-  //       query: {}, // missing token and email
-  //     });
-  //     const mockResponse = createResponse();
-  //     await resetPassword(mockRequest, mockResponse);
-  //     expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
-  //     expect(mockResponse.status).toHaveBeenCalledWith(httpStatusCodes.BAD_REQUEST);
-  //     expect(mockResponse.status).not.toHaveBeenCalledWith(httpStatusCodes.OK);
-  //     expect(mockResponse.status).toHaveBeenCalledTimes(1);
-  //     expect(mockResponse.json).toHaveBeenCalledWith({
-  //       success: false,
-  //       message: "Validation failed",
-  //       error: {
-  //         message: expect.any(String),
-  //       },
-  //       data: null,
-  //     });
-  //     expect(mockResponse.json).toHaveBeenCalledTimes(1);
-  //   });
+  describe("PATCH /api/v1/auth/reset-password", () => {
+    const url = `${AUTH_ROUTE_V1}${RESET_PASSWORD_V1}`;
 
-  //   test("Should return BAD_REQUEST if the request params are invalid", async () => {
-  //     const mockRequest = createRequest({
-  //       body: {
-  //         password: "test",
-  //       },
-  //       query: {
-  //         email: "test",
-  //         token: "test",
-  //       },
-  //     });
-  //     const mockResponse = createResponse();
-  //     await resetPassword(mockRequest, mockResponse);
-  //     expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
-  //     expect(mockResponse.status).toHaveBeenCalledWith(httpStatusCodes.BAD_REQUEST);
-  //     expect(mockResponse.status).not.toHaveBeenCalledWith(httpStatusCodes.OK);
-  //     expect(mockResponse.status).toHaveBeenCalledTimes(1);
-  //     expect(mockResponse.json).toHaveBeenCalledWith({
-  //       success: false,
-  //       message: "Validation failed",
-  //       error: {
-  //         message: expect.any(String),
-  //       },
-  //       data: null,
-  //     });
-  //     expect(mockResponse.json).toHaveBeenCalledTimes(1);
-  //   });
+    test("Should return BAD_REQUEST if the request params are invalid", async () => {
+      const request = supertest(app);
+      let response = await request
+        .patch(`${url}?email=test&token=test`)
+        .send({
+          password: "test",
+        })
+        .set("x-forwarded-for", faker.internet.ip());
+      expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
+      expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+      expect(response.body).toEqual(errorResponse(VALIDATION_FAILED_MSG));
 
-  //   test("Should return NOT_FOUND if the user is not exists", async () => {
-  //     const token = faker.datatype.uuid();
-  //     const email = faker.internet.email();
-  //     const password = faker.internet.password();
-  //     const mockRequest = createRequest({
-  //       body: {
-  //         password,
-  //       },
-  //       query: {
-  //         token,
-  //         email,
-  //       },
-  //     });
-  //     const mockResponse = createResponse();
-  //     prismaMock.user.findUnique.mockResolvedValue(null);
-  //     await resetPassword(mockRequest, mockResponse);
-  //     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
-  //       where: {
-  //         email,
-  //       },
-  //     });
-  //     expect(prismaMock.user.findUnique).not.toHaveBeenCalledWith({
-  //       where: {
-  //         id: expect.any(Number),
-  //       },
-  //     });
-  //     expect(prismaMock.user.findUnique).not.toHaveBeenCalledWith({
-  //       where: {
-  //         username: email,
-  //       },
-  //     });
-  //     expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(1);
-  //     expect(mockResponse.status).toHaveBeenCalledWith(httpStatusCodes.NOT_FOUND);
-  //     expect(mockResponse.status).not.toHaveBeenCalledWith(httpStatusCodes.OK);
-  //     expect(mockResponse.status).toHaveBeenCalledTimes(1);
-  //     expect(mockResponse.json).toHaveBeenCalledWith({
-  //       success: false,
-  //       message: "User not found",
-  //       error: {
-  //         message: "User not found",
-  //       },
-  //       data: null,
-  //     });
-  //     expect(mockResponse.json).toHaveBeenCalledTimes(1);
-  //   });
+      response = await request.patch(`${url}?email=test`).send({
+        password: "test",
+      });
 
-  //   test("Should return UNAUTHORIZED if the token submitted from different ip", async () => {
-  //     const email = "test@gmail.com";
-  //     const password = "test12345";
-  //     const user = getUser({ email });
-  //     // Generating the fake token that issue when submit for forgot password and sent to email.
-  //     const ip = faker.internet.ip();
-  //     const rid = await bcrypt.hashSync(`${user.id}${ip}`, 10);
-  //     const token = JWT.generateAccessToken({ rid }, { expiresIn: 300 });
-  //     const fakeIp = faker.internet.ip();
+      expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+      expect(response.body).toEqual(errorResponse(VALIDATION_FAILED_MSG, TOKEN_REQUIRED_MSG));
 
-  //     prismaMock.user.findUnique.mockResolvedValue(user);
-  //     const mockRequest = createRequest({
-  //       body: {
-  //         password,
-  //       },
-  //       query: {
-  //         email,
-  //         token,
-  //       },
-  //       headers: {
-  //         "x-forwarded-for": fakeIp, // set ip address to different value
-  //       },
-  //       ip: fakeIp, // set ip address to different value
-  //       header: jest.fn(),
-  //     });
-  //     const mockResponse = createResponse();
-  //     await resetPassword(mockRequest, mockResponse);
-  //     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
-  //       where: {
-  //         email,
-  //       },
-  //     });
-  //     expect(prismaMock.user.findUnique).not.toHaveBeenCalledWith({
-  //       where: {
-  //         id: expect.any(Number),
-  //       },
-  //     });
-  //     expect(prismaMock.user.findUnique).not.toHaveBeenCalledWith({
-  //       where: {
-  //         username: email,
-  //       },
-  //     });
-  //     expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(1);
-  //     expect(prismaMock.user.update).not.toHaveBeenCalled();
-  //     expect(mockResponse.status).toHaveBeenCalledWith(httpStatusCodes.UNAUTHORIZED);
-  //     expect(mockResponse.status).not.toHaveBeenCalledWith(httpStatusCodes.OK);
-  //     expect(mockResponse.status).toHaveBeenCalledTimes(1);
-  //     expect(mockResponse.json).toHaveBeenCalledWith({
-  //       success: false,
-  //       message: "Unauthorized",
-  //       error: {
-  //         message: "Unauthorized",
-  //       },
-  //       data: null,
-  //     });
-  //     expect(mockResponse.json).toHaveBeenCalledTimes(1);
-  //   });
+      response = await request.patch(`${url}?token=token`).send({
+        password: "test",
+      });
 
-  //   test("Should return UNAUTHORIZED if the token was expired", async () => {
-  //     const email = "test@gmail.com";
-  //     const password = "test12344";
-  //     const user = getUser({ email });
-  //     // Generating the fake token that issue when submit for
-  //     // forgot password and sent to email.
-  //     const ip = faker.internet.ip();
-  //     const rid = await bcrypt.hashSync(`${user.id}${ip}`, 10);
-  //     const token = JWT.generateAccessToken({ rid }, { expiresIn: 0 });
-  //     const mockRequest = createRequest({
-  //       body: { password },
-  //       query: { email, token },
-  //       headers: { "x-forwarded-for": ip },
-  //       ip,
-  //       header: jest.fn(),
-  //     });
-  //     const mockResponse = createResponse();
-  //     prismaMock.user.findUnique.mockResolvedValue(user);
-  //     await resetPassword(mockRequest, mockResponse);
-  //     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
-  //       where: {
-  //         email,
-  //       },
-  //     });
-  //     expect(prismaMock.user.findUnique).not.toHaveBeenCalledWith({
-  //       where: {
-  //         id: expect.any(Number),
-  //       },
-  //     });
-  //     expect(prismaMock.user.findUnique).not.toHaveBeenCalledWith({
-  //       where: {
-  //         username: email,
-  //       },
-  //     });
-  //     expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(1);
-  //     expect(prismaMock.user.update).not.toHaveBeenCalled();
-  //     expect(mockResponse.status).toHaveBeenCalledWith(httpStatusCodes.UNAUTHORIZED);
-  //     expect(mockResponse.status).not.toHaveBeenCalledWith(httpStatusCodes.OK);
-  //     expect(mockResponse.status).toHaveBeenCalledTimes(1);
-  //     expect(mockResponse.json).toHaveBeenCalledWith({
-  //       success: false,
-  //       message: "Unauthorized",
-  //       error: {
-  //         message: "Unauthorized",
-  //       },
-  //       data: null,
-  //     });
-  //     expect(mockResponse.json).toHaveBeenCalledTimes(1);
-  //   });
+      expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+      expect(response.body).toEqual(errorResponse(VALIDATION_FAILED_MSG, EMAIL_REQUIRED_MSG));
+    });
 
-  //   test("Should pass validation if submitted data is valid and should update the password", async () => {
-  //     const email = faker.internet.email();
-  //     const password = faker.internet.password();
-  //     const user = getUser({ email });
-  //     // Generating the fake token that issue when submit for
-  //     // forgot password and sent to email.
-  //     const ip = faker.internet.ip();
-  //     const rid = await bcrypt.hashSync(`${user.id}${ip}`, 10);
-  //     const token = JWT.generateAccessToken({ rid }, { expiresIn: 300 });
-  //     const mockRequest = createRequest({
-  //       body: { password },
-  //       query: { email, token },
-  //       headers: { "x-forwarded-for": ip },
-  //       ip,
-  //       header: jest.fn(),
-  //     });
-  //     const mockResponse = createResponse();
+    test("Should return NOT_FOUND if the user is not exists", async () => {
+      const request = supertest(app);
+      const token = faker.datatype.uuid();
+      const email = faker.internet.email();
+      const password = faker.internet.password();
+      prismaMock.user.findUnique.mockResolvedValue(null);
+      const response = await request
+        .patch(`${url}?email=${email}&token=${token}`)
+        .send({
+          password,
+        })
+        .set("x-forwarded-for", faker.internet.ip());
 
-  //     prismaMock.user.findUnique.mockResolvedValue(user);
-  //     prismaMock.user.update.mockResolvedValue(user);
+      expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
+        where: {
+          email,
+        },
+      });
+      expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(1);
+      expect(response.status).toBe(StatusCodes.NOT_FOUND);
+      expect(response.body).toEqual(errorResponse(USER_NOT_FOUND_MSG, USER_NOT_FOUND_MSG));
+    });
 
-  //     await resetPassword(mockRequest, mockResponse);
-  //     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
-  //       where: {
-  //         email,
-  //       },
-  //     });
-  //     expect(prismaMock.user.findUnique).not.toHaveBeenCalledWith({
-  //       where: {
-  //         id: expect.any(Number),
-  //       },
-  //     });
-  //     expect(prismaMock.user.findUnique).not.toHaveBeenCalledWith({
-  //       where: {
-  //         username: email,
-  //       },
-  //     });
-  //     expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(1);
-  //     expect(prismaMock.user.update).toHaveBeenCalledWith({
-  //       where: {
-  //         id: user.id,
-  //       },
-  //       data: {
-  //         password: expect.any(String),
-  //       },
-  //     });
-  //     expect(prismaMock.user.update).toHaveBeenCalledTimes(1);
-  //     expect(mockResponse.status).toHaveBeenCalledWith(httpStatusCodes.OK);
-  //     expect(mockResponse.status).not.toHaveBeenCalledWith(httpStatusCodes.BAD_REQUEST);
-  //     expect(mockResponse.status).toHaveBeenCalledTimes(1);
-  //     expect(mockResponse.json).toHaveBeenCalledWith({
-  //       success: true,
-  //       message: "Password reset successfully",
-  //       error: null,
-  //       data: {
-  //         message: "Password reset successfully",
-  //       },
-  //     });
-  //     expect(mockResponse.json).toHaveBeenCalledTimes(1);
-  //   });
-  // });
+    test("Should return UNAUTHORIZED if the token submitted from different ip", async () => {
+      const request = supertest(app);
+      const email = "test@gmail.com";
+      const password = "test12345";
+      const user = getUser({ email });
+      // Generating the fake token that issue when submit for forgot password and sent to email.
+      const ip = faker.internet.ip();
+      const rid = await bcrypt.hashSync(`${user.id}${ip}`, 10);
+      const token = JWT.generateAccessToken({ rid }, { expiresIn: 300 });
+      const fakeIp = faker.internet.ip();
+      prismaMock.user.findUnique.mockResolvedValue(user);
+      const response = await request
+        .patch(`${url}?email=${email}&token=${token}`)
+        .send({
+          password,
+        })
+        .set("x-forwarded-for", fakeIp);
+
+      expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
+        where: {
+          email,
+        },
+      });
+      expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(1);
+      expect(prismaMock.user.update).not.toHaveBeenCalled();
+      expect(response.status).toBe(StatusCodes.UNAUTHORIZED);
+      expect(response.body).toEqual(errorResponse(UNAUTHORIZED_MSG, UNAUTHORIZED_MSG));
+    });
+
+    test("Should return UNAUTHORIZED if the token was expired", async () => {
+      const request = supertest(app);
+      const email = "test@gmail.com";
+      const password = "test12344";
+      const user = getUser({ email });
+      // Generating the fake token that issue when submit for
+      // forgot password and sent to email.
+      const ip = faker.internet.ip();
+      const rid = await bcrypt.hashSync(`${user.id}${ip}`, 10);
+      const token = JWT.generateAccessToken({ rid }, { expiresIn: 0 });
+      prismaMock.user.findUnique.mockResolvedValue(user);
+      const response = await request
+        .patch(`${url}?email=${email}&token=${token}`)
+        .send({
+          password,
+        })
+        .set("x-forwarded-for", ip);
+
+      expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
+        where: {
+          email,
+        },
+      });
+      expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(1);
+      expect(prismaMock.user.update).not.toHaveBeenCalled();
+      expect(response.status).toBe(StatusCodes.UNAUTHORIZED);
+      expect(response.body).toEqual(errorResponse(UNAUTHORIZED_MSG, UNAUTHORIZED_MSG));
+    });
+
+    test("Should pass validation if submitted data is valid and should update the password", async () => {
+      const request = supertest(app);
+      const email = faker.internet.email();
+      const password = faker.internet.password();
+      const user = getUser({ email });
+      // Generating the fake token that issue when submit for
+      // forgot password and sent to email.
+      const ip = faker.internet.ip();
+      const rid = await bcrypt.hashSync(`${user.id}${ip}`, 10);
+      const token = JWT.generateAccessToken({ rid }, { expiresIn: 300 });
+
+      prismaMock.user.findUnique.mockResolvedValue(user);
+      prismaMock.user.update.mockResolvedValue(user);
+
+      const response = await request
+        .patch(`${url}?email=${email}&token=${token}`)
+        .send({
+          password,
+        })
+        .set("x-forwarded-for", ip);
+
+      expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
+        where: {
+          email,
+        },
+      });
+      expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(1);
+      expect(prismaMock.user.update).toHaveBeenCalledWith({
+        where: {
+          id: user.id,
+        },
+        data: {
+          password: expect.any(String),
+        },
+      });
+      expect(prismaMock.user.update).toHaveBeenCalledTimes(1);
+      expect(response.status).toBe(StatusCodes.OK);
+      expect(response.body).toEqual(PASSWORD_RESET_RESPONSE);
+    });
+  });
 });
