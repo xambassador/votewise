@@ -3,10 +3,10 @@
  * @description: Auth controller
  */
 // -----------------------------------------------------------------------------------------
-// -----------------------------------------------------------------------------------------
 import bcrypt from "bcrypt";
-import type { Request, Response } from "express";
-import httpStatusCodes from "http-status-codes";
+import type { NextFunction, Request, Response } from "express";
+import createError from "http-errors";
+import { StatusCodes } from "http-status-codes";
 
 import dotenv from "dotenv";
 
@@ -28,22 +28,22 @@ import UserService from "@/src/services/user";
 import JWTService from "@/src/services/user/jwt";
 import {
   ACCESS_TOKEN_REVOKE_MSG,
-  EMAIL_ALREADY_VERIFIED_RESPONSE,
-  EMAIL_REQUIRED_RESPONSE,
+  EMAIL_ALREADY_VERIFIED_MSG,
+  EMAIL_REQUIRED_MSG,
   EMAIL_SENT_RESPONSE,
   EMAIL_VERIFIED_RESPONSE,
-  INVALID_CREDENTIALS_RESPONSE,
-  INVALID_EMAIL_RESPONSE,
+  INVALID_CREDENTIALS_MSG,
+  INVALID_EMAIL_MSG,
   INVALID_REFRESHTOKEN_MSG,
-  INVALID_REFRESHTOKEN_RESPONSE,
   LOGIN_SUCCESS_MSG,
   PASSWORD_RESET_RESPONSE,
   REFRESHTOKEN_REQUIRED_MSG,
-  TOKEN_REQUIRED_RESPONSE,
-  UNAUTHORIZED_RESPONSE,
-  USER_ALREADY_EXISTS_RESPONSE,
+  SOMETHING_WENT_WRONG_MSG,
+  TOKEN_REQUIRED_MSG,
+  UNAUTHORIZED_MSG,
+  USER_ALREADY_EXISTS_MSG,
   USER_CREATED_SUCCESSFULLY_MSG,
-  USER_NOT_FOUND_RESPONSE,
+  USER_NOT_FOUND_MSG,
   VALIDATION_FAILED_MSG,
   getErrorReason,
 } from "@/src/utils";
@@ -53,35 +53,28 @@ dotenv.config();
 
 const { FRONTEND_URL } = process.env;
 
-const { BAD_REQUEST, CONFLICT, CREATED, NOT_FOUND, UNAUTHORIZED, OK, INTERNAL_SERVER_ERROR } =
-  httpStatusCodes;
-
 // -----------------------------------------------------------------------------------------
-// Register a new user
-export const register = async (req: Request, res: Response) => {
+export const register = async (req: Request, res: Response, next: NextFunction) => {
   const payload: RegisterUserPayload = req.body;
   const isValid = UserService.isValidRegisterPayload(payload);
 
-  // Validate the request body
   if (!isValid.success) {
-    return res
-      .status(BAD_REQUEST)
-      .json(new JSONResponse(VALIDATION_FAILED_MSG, null, { message: isValid.message }, false));
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, {
+        reason: isValid.message,
+      })
+    );
   }
 
   try {
-    // Check if the user already exists
     const user = await UserService.checkIfUserExists(payload.email);
 
     if (user) {
-      // TODO: Replace error handling with express next error handler
-      return res.status(CONFLICT).json(USER_ALREADY_EXISTS_RESPONSE);
+      return next(createError(StatusCodes.CONFLICT, USER_ALREADY_EXISTS_MSG));
     }
 
-    // Create a new user
     const newUser = await UserService.createUser(payload);
 
-    // Create a new accessToken and refreshToken
     const accessToken = JWTService.generateAccessToken({ userId: newUser.id });
     const refreshToken = JWTService.generateRefreshToken({ userId: newUser.id });
     await JWTService.saveRefreshToken(newUser.id, refreshToken);
@@ -108,8 +101,7 @@ export const register = async (req: Request, res: Response) => {
     const transporter = new EmailService(emailData, "REGISTRATION_MAIL");
     transporter.addToQueue();
 
-    // Send the accessToken and refreshToken to the client
-    return res.status(CREATED).json(
+    return res.status(StatusCodes.CREATED).json(
       new JSONResponse(
         USER_CREATED_SUCCESSFULLY_MSG,
         {
@@ -122,49 +114,28 @@ export const register = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || "Something went wrong";
-    return res.status(INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        "Something went wrong",
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
-    );
+    return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
   }
 };
 
 // -----------------------------------------------------------------------------------------
-// Login a user
-export const login = async (req: Request, res: Response) => {
-  // Validate body payload
+export const login = async (req: Request, res: Response, next: NextFunction) => {
   const payload = req.body as LoginPayload;
   const isValid = UserService.isValidLoginPayload(payload);
 
   if (!isValid.success) {
-    return res
-      .status(BAD_REQUEST)
-      .json(new JSONResponse(VALIDATION_FAILED_MSG, null, { message: isValid.message }, false));
+    return next(createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: isValid.message }));
   }
 
   try {
-    // Check if user is exists or not
     const user = await UserService.checkIfUserExists(payload.username);
 
-    // If user is not exists
-    if (!user) {
-      return res.status(NOT_FOUND).json(USER_NOT_FOUND_RESPONSE);
-    }
+    if (!user) return next(createError(StatusCodes.NOT_FOUND, USER_NOT_FOUND_MSG));
 
-    // Check if the password is correct or not
     const isPasswordCorrect = await UserService.validatePassword(payload.password, user.password);
 
-    if (!isPasswordCorrect) {
-      return res.status(BAD_REQUEST).json(INVALID_CREDENTIALS_RESPONSE);
-    }
+    if (!isPasswordCorrect) return next(createError(StatusCodes.UNAUTHORIZED, INVALID_CREDENTIALS_MSG));
 
-    // Create a new accessToken and refreshToken
     const accessToken = JWTService.generateAccessToken({ userId: user.id });
     const refreshToken = JWTService.generateRefreshToken(
       { userId: user.id },
@@ -175,89 +146,81 @@ export const login = async (req: Request, res: Response) => {
     await JWTService.saveRefreshToken(user.id, refreshToken, true);
     await UserService.updateLastLogin(user.id);
 
-    // Send the accessToken and refreshToken to the client
     return res
-      .status(OK)
+      .status(StatusCodes.OK)
       .json(new JSONResponse(LOGIN_SUCCESS_MSG, { accessToken, refreshToken }, null, true));
   } catch (err) {
     const msg = getErrorReason(err) || "Something went wrong";
-    return res
-      .status(INTERNAL_SERVER_ERROR)
-      .json(new JSONResponse("Something went wrong", null, { message: msg }, false));
+    return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
   }
 };
 
 // -----------------------------------------------------------------------------------------
-// Refresh the access token
-export const refreshAccessToken = async (req: Request, res: Response) => {
+export const refreshAccessToken = async (req: Request, res: Response, next: NextFunction) => {
   const { refreshToken } = req.body as RevokeAccessTokenPayload;
 
-  // Validate the refreshToken
-  if (!refreshToken) {
-    return res
-      .status(BAD_REQUEST)
-      .json(new JSONResponse(VALIDATION_FAILED_MSG, null, { message: REFRESHTOKEN_REQUIRED_MSG }, false));
-  }
+  if (!refreshToken)
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, {
+        reason: REFRESHTOKEN_REQUIRED_MSG,
+      })
+    );
 
   // TODO: need to add validation based on ip address
+  // TODO: Add userId to the payload and check if the user is valid user and he/she validate his/her own token
 
   try {
-    // Verify the refreshToken
     const decoded = JWTService.verifyRefreshToken(refreshToken) as { userId: string };
 
-    if (!decoded) {
-      return res.status(UNAUTHORIZED).json(INVALID_REFRESHTOKEN_RESPONSE);
-    }
+    if (!decoded) return next(createError(StatusCodes.UNAUTHORIZED, INVALID_REFRESHTOKEN_MSG));
 
-    // Check if the refreshToken is in the database
     const isRefreshTokenExists = await JWTService.checkIfRefreshTokenExists(
       Number(decoded.userId),
       refreshToken
     );
 
     if (!isRefreshTokenExists) {
-      return res
-        .status(UNAUTHORIZED)
-        .json(
-          new JSONResponse(INVALID_REFRESHTOKEN_MSG, null, { message: "Refresh token was expired." }, false)
-        );
+      return next(
+        createError(StatusCodes.UNAUTHORIZED, INVALID_REFRESHTOKEN_MSG, {
+          reason: "Refresh token was expired.",
+        })
+      );
     }
 
-    // Create a new accessToken and refreshToken
     const accessToken = JWTService.generateAccessToken({ userId: decoded.userId });
     const newRefreshToken = JWTService.generateRefreshToken({ userId: decoded.userId });
     await JWTService.saveRefreshToken(Number(decoded.userId), newRefreshToken, true);
 
-    // Send the accessToken and refreshToken to the client
     return res
-      .status(OK)
+      .status(StatusCodes.OK)
       .json(
         new JSONResponse(ACCESS_TOKEN_REVOKE_MSG, { accessToken, refreshToken: newRefreshToken }, null, true)
       );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (err: any) {
-    return res.status(UNAUTHORIZED).json(INVALID_REFRESHTOKEN_RESPONSE);
+  } catch (err) {
+    return next(createError(StatusCodes.UNAUTHORIZED, INVALID_REFRESHTOKEN_MSG));
   }
 };
 
 // -----------------------------------------------------------------------------------------
-// Forgot password: Submit email to get a reset password link
-export const forgotPassword = async (req: Request, res: Response) => {
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
   const payload = req.body as ForgotPasswordPayload;
 
-  if (!payload.email) {
-    return res.status(BAD_REQUEST).json(EMAIL_REQUIRED_RESPONSE);
-  }
-
-  if (!isEmail(payload.email)) {
-    return res.status(BAD_REQUEST).json(INVALID_EMAIL_RESPONSE);
-  }
+  if (!payload.email)
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, {
+        reason: EMAIL_REQUIRED_MSG,
+      })
+    );
+  if (!isEmail(payload.email))
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, {
+        reason: INVALID_EMAIL_MSG,
+      })
+    );
 
   try {
     const user = await UserService.checkIfUserExists(payload.email);
-    if (!user) {
-      return res.status(NOT_FOUND).json(USER_NOT_FOUND_RESPONSE);
-    }
+    if (!user) return next(createError(StatusCodes.NOT_FOUND, USER_NOT_FOUND_MSG));
 
     const ip = req.header("X-Forwarded-For") || req.ip;
     const rid = await bcrypt.hash(`${user.id}${ip}`, 10);
@@ -270,28 +233,20 @@ export const forgotPassword = async (req: Request, res: Response) => {
     };
     const transporter = new EmailService(emailData, "REGISTRATION_MAIL");
     transporter.addToQueue();
-    return res.status(OK).json(EMAIL_SENT_RESPONSE);
+    return res.status(StatusCodes.OK).json(EMAIL_SENT_RESPONSE);
   } catch (err) {
     const msg = getErrorReason(err) || "Something went wrong";
-    return res
-      .status(INTERNAL_SERVER_ERROR)
-      .json(new JSONResponse("Something went wrong", null, { message: msg }, false));
+    return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
   }
 };
 
 // -----------------------------------------------------------------------------------------
-// Reset password: Submit new password with token and email from reset password link
-export const resetPassword = async (req: Request, res: Response) => {
+export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
   const { password } = req.body as ResetPasswordPayload;
   const { token, email } = req.query as ResetPasswordQuery;
 
-  if (!token) {
-    return res.status(BAD_REQUEST).json(TOKEN_REQUIRED_RESPONSE);
-  }
-
-  if (!email) {
-    return res.status(BAD_REQUEST).json(EMAIL_REQUIRED_RESPONSE);
-  }
+  if (!token) return next(createError(StatusCodes.BAD_REQUEST, TOKEN_REQUIRED_MSG));
+  if (!email) return next(createError(StatusCodes.BAD_REQUEST, EMAIL_REQUIRED_MSG));
 
   const isValidPayload = UserService.isValidRegisterPayload({
     email,
@@ -299,32 +254,21 @@ export const resetPassword = async (req: Request, res: Response) => {
   });
 
   if (!isValidPayload.success) {
-    return res.status(BAD_REQUEST).json(
-      new JSONResponse(
-        VALIDATION_FAILED_MSG,
-        null,
-        {
-          message: isValidPayload.message,
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: isValidPayload.message })
     );
   }
 
   try {
     const user = await UserService.checkIfUserExists(email);
-    if (!user) {
-      return res.status(NOT_FOUND).json(USER_NOT_FOUND_RESPONSE);
-    }
+    if (!user) return next(createError(StatusCodes.NOT_FOUND, USER_NOT_FOUND_MSG));
 
     const ip = req.header("X-Forwarded-For") || req.ip;
     const ridKey = `${user.id}${ip}`;
     const { rid } = JWTService.verifyAccessToken(token) as { rid: string };
     const isValidRid = await bcrypt.compare(ridKey, rid);
 
-    if (!isValidRid) {
-      return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
-    }
+    if (!isValidRid) return next(createError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED_MSG));
 
     await UserService.updatePassword(password, user.id);
     const emailData = {
@@ -334,71 +278,68 @@ export const resetPassword = async (req: Request, res: Response) => {
     };
     const transporter = new EmailService(emailData, "NOTIFICATION_MAIL");
     transporter.addToQueue();
-    return res.status(OK).json(PASSWORD_RESET_RESPONSE);
+    return res.status(StatusCodes.OK).json(PASSWORD_RESET_RESPONSE);
   } catch (err) {
     const msg = getErrorReason(err);
-    if (msg === "Error while fetching user") {
-      return res.status(NOT_FOUND).json(USER_NOT_FOUND_RESPONSE);
+
+    if (msg === "jwt expired" || msg === "invalid token") {
+      return next(createError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED_MSG));
     }
-    return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
+
+    return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
   }
 };
 
 // -----------------------------------------------------------------------------------------
-// Email verification: Submit token from email verification link send to user when user registers
-export const verifyEmail = async (req: Request, res: Response) => {
+export const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
   const { token } = req.query as VerifyEmailQuery;
 
-  if (!token) {
-    return res.status(httpStatusCodes.BAD_REQUEST).json(TOKEN_REQUIRED_RESPONSE);
-  }
+  if (!token) return next(createError(StatusCodes.BAD_REQUEST, TOKEN_REQUIRED_MSG));
 
   try {
     const { userId } = JWTService.verifyAccessToken(token) as { userId: number };
     await UserService.verifyEmail(userId);
-    return res.status(httpStatusCodes.OK).json(EMAIL_VERIFIED_RESPONSE);
+    return res.status(StatusCodes.OK).json(EMAIL_VERIFIED_RESPONSE);
   } catch (err) {
-    return res.status(httpStatusCodes.UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
+    const msg = getErrorReason(err);
+    if (msg === "jwt expired" || msg === "invalid token") {
+      return next(createError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED_MSG));
+    }
+    return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
   }
 };
 
 // -----------------------------------------------------------------------------------------
-// Resend email verification: Submit email to resend email verification link
-export const resendEmailVerification = async (req: Request, res: Response) => {
+export const resendEmailVerification = async (req: Request, res: Response, next: NextFunction) => {
   const { email } = req.body as ResendEmailVerificationPayload;
 
-  if (!email) {
-    return res.status(httpStatusCodes.BAD_REQUEST).json(EMAIL_REQUIRED_RESPONSE);
+  if (!email) return next(createError(StatusCodes.BAD_REQUEST, EMAIL_REQUIRED_MSG));
+  if (!isEmail(email)) return next(createError(StatusCodes.BAD_REQUEST, INVALID_EMAIL_MSG));
+
+  try {
+    const user = await UserService.checkIfUserExists(email);
+
+    if (!user) return next(createError(StatusCodes.NOT_FOUND, USER_NOT_FOUND_MSG));
+    if (user.is_email_verify) return next(createError(StatusCodes.BAD_REQUEST, EMAIL_ALREADY_VERIFIED_MSG));
+
+    const token = JWTService.generateAccessToken({ userId: user.id }, { expiresIn: 300 });
+    const url = `${process.env.FRONTEND_URL}/verify-email?token=${token}&email=${user.email}`;
+    const emailData = {
+      to: user.email,
+      subject: "Verify your email address",
+      html: `
+          <h1>Verify your email address</h1>
+          <p>Click on the link below to verify your email address</p>
+          <a href="${url}">${url}</a>
+      `,
+    };
+
+    const transporter = new EmailService(emailData, "REGISTRATION_MAIL");
+    transporter.addToQueue();
+
+    return res.status(StatusCodes.OK).json(EMAIL_SENT_RESPONSE);
+  } catch (err) {
+    const msg = getErrorReason(err);
+    return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
   }
-
-  if (!isEmail(email)) {
-    return res.status(httpStatusCodes.BAD_REQUEST).json(INVALID_EMAIL_RESPONSE);
-  }
-
-  const user = await UserService.checkIfUserExists(email);
-
-  if (!user) {
-    return res.status(httpStatusCodes.NOT_FOUND).json(USER_NOT_FOUND_RESPONSE);
-  }
-
-  if (user.is_email_verify) {
-    return res.status(httpStatusCodes.BAD_REQUEST).json(EMAIL_ALREADY_VERIFIED_RESPONSE);
-  }
-
-  const token = JWTService.generateAccessToken({ userId: user.id }, { expiresIn: 300 });
-  const url = `${process.env.FRONTEND_URL}/verify-email?token=${token}&email=${user.email}`;
-  const emailData = {
-    to: user.email,
-    subject: "Verify your email address",
-    html: `
-        <h1>Verify your email address</h1>
-        <p>Click on the link below to verify your email address</p>
-        <a href="${url}">${url}</a>
-    `,
-  };
-
-  const transporter = new EmailService(emailData, "REGISTRATION_MAIL");
-  transporter.addToQueue();
-
-  return res.status(httpStatusCodes.OK).json(EMAIL_SENT_RESPONSE);
 };

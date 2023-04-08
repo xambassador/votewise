@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { prisma } from "@votewise/prisma";
 import type { LoginPayload, RegisterUserPayload } from "@votewise/types";
 
+import { getErrorReason } from "@/src/utils";
 import { isEmail, validateLoginSchema, validateRegisterUserSchema } from "@/src/zodValidation";
 
 class UserService {
@@ -72,7 +73,8 @@ class UserService {
       });
       return user;
     } catch (err) {
-      throw new Error("Error while fetching user");
+      const msg = getErrorReason(err) || "Error while fetching user";
+      throw new Error(msg);
     }
   }
 
@@ -84,15 +86,19 @@ class UserService {
 
   async updatePassword(password: string, userId: number) {
     const hashPassword = await bcrypt.hash(password, 10);
-    const user = await prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        password: hashPassword,
-      },
-    });
-    return user;
+    try {
+      const user = await prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          password: hashPassword,
+        },
+      });
+      return user;
+    } catch (err) {
+      throw new Error("Error while updating password");
+    }
   }
 
   async verifyEmail(userId: number) {

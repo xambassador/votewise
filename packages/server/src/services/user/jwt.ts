@@ -2,7 +2,6 @@ import jsonwebtoken from "jsonwebtoken";
 
 import dotenv from "dotenv";
 
-import { logger } from "@votewise/lib/logger";
 import { prisma } from "@votewise/prisma";
 
 dotenv.config();
@@ -10,42 +9,21 @@ dotenv.config();
 const ACCESS_TOKEN_SECRET = process.env.JWT_SALT_ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.JWT_SALT_REFRESH_TOKEN_SECRET;
 
-if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET) {
-  logger("Missing JWT_SALT_ACCESS_TOKEN_SECRET or JWT_SALT_REFRESH_TOKEN_SECRET", "error");
-  process.exit(1);
-}
-
 class JWTService {
   generateAccessToken(payload: object, config: jsonwebtoken.SignOptions = { expiresIn: "15m" }) {
-    if (!ACCESS_TOKEN_SECRET) {
-      logger("Missing JWT_SALT_ACCESS_TOKEN_SECRET", "error");
-      process.exit(1);
-    }
-    return jsonwebtoken.sign(payload, ACCESS_TOKEN_SECRET, config);
+    return jsonwebtoken.sign(payload, ACCESS_TOKEN_SECRET as string, config);
   }
 
   generateRefreshToken(payload: object, config: jsonwebtoken.SignOptions = { expiresIn: "7d" }) {
-    if (!REFRESH_TOKEN_SECRET) {
-      logger("Missing JWT_SALT_REFRESH_TOKEN_SECRET", "error");
-      process.exit(1);
-    }
-    return jsonwebtoken.sign(payload, REFRESH_TOKEN_SECRET, config);
+    return jsonwebtoken.sign(payload, REFRESH_TOKEN_SECRET as string, config);
   }
 
   verifyAccessToken(token: string) {
-    if (!ACCESS_TOKEN_SECRET) {
-      logger("Missing JWT_SALT_ACCESS_TOKEN_SECRET", "error");
-      process.exit(1);
-    }
-    return jsonwebtoken.verify(token, ACCESS_TOKEN_SECRET);
+    return jsonwebtoken.verify(token, ACCESS_TOKEN_SECRET as string);
   }
 
   verifyRefreshToken(token: string) {
-    if (!REFRESH_TOKEN_SECRET) {
-      logger("Missing JWT_SALT_REFRESH_TOKEN_SECRET", "error");
-      process.exit(1);
-    }
-    return jsonwebtoken.verify(token, REFRESH_TOKEN_SECRET);
+    return jsonwebtoken.verify(token, REFRESH_TOKEN_SECRET as string);
   }
 
   async saveRefreshToken(userId: number, token: string, isUpdate = false) {

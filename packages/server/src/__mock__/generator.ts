@@ -15,4 +15,15 @@ const createNext = () => {
   return jest.fn() as NextFunction;
 };
 
-export { createRequest, createResponse, createNext };
+const errorResponse = (message: string, reason?: string) => {
+  return {
+    success: false,
+    message,
+    error: {
+      message: reason || expect.any(String),
+    },
+    data: null,
+  };
+};
+
+export { createRequest, createResponse, createNext, errorResponse };
