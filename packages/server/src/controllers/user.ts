@@ -30,7 +30,6 @@ import {
   FRIEND_REQUEST_NOT_FOUND_MSG,
   FRIEND_REQUEST_REJECTED_SUCCESSFULLY_MSG,
   FRIEND_REQUEST_SENT_SUCCESSFULLY_MSG,
-  INTERNAL_SERVER_ERROR_MSG,
   INVALID_FRIEND_ID,
   INVALID_POST_ID_MSG,
   POSTS_FETCHED_SUCCESSFULLY_MSG,
@@ -556,7 +555,7 @@ export const getMyFollowers = async (req: Request, res: Response, next: NextFunc
 };
 
 // -----------------------------------------------------------------------------------------
-export const getMyFollowings = async (req: Request, res: Response) => {
+export const getMyFollowings = async (req: Request, res: Response, next: NextFunction) => {
   const { limit, offset } = getLimitAndOffset(req);
   const { user } = req.session;
 
@@ -576,34 +575,24 @@ export const getMyFollowings = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        INTERNAL_SERVER_ERROR_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, {
+        reason: msg,
+      })
     );
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const startFollowing = async (req: Request, res: Response) => {
+export const startFollowing = async (req: Request, res: Response, next: NextFunction) => {
   const { followingId } = req.params;
   const { user } = req.session;
 
   if (!followingId) {
-    return res.status(StatusCodes.BAD_REQUEST).json(
-      new JSONResponse(
-        VALIDATION_FAILED_MSG,
-        null,
-        {
-          message: "Invalid following id",
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, {
+        reason: "Invalid following id",
+      })
     );
   }
 
@@ -623,46 +612,27 @@ export const startFollowing = async (req: Request, res: Response) => {
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
     if (msg === "Already following") {
-      return res.status(StatusCodes.BAD_REQUEST).json(
-        new JSONResponse(
-          "Already following",
-          null,
-          {
-            message: msg,
-          },
-          false
-        )
-      );
+      return next(createError(StatusCodes.BAD_REQUEST, msg));
     }
 
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        INTERNAL_SERVER_ERROR_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, {
+        reason: msg,
+      })
     );
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const stopFollowing = async (req: Request, res: Response) => {
+export const stopFollowing = async (req: Request, res: Response, next: NextFunction) => {
   const { followingId } = req.params;
   const { user } = req.session;
 
   if (!followingId) {
-    return res.status(StatusCodes.BAD_REQUEST).json(
-      new JSONResponse(
-        VALIDATION_FAILED_MSG,
-        null,
-        {
-          message: "Invalid following id",
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, {
+        reason: "Invalid following id",
+      })
     );
   }
 
@@ -682,47 +652,28 @@ export const stopFollowing = async (req: Request, res: Response) => {
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
     if (msg === "Not following") {
-      return res.status(StatusCodes.BAD_REQUEST).json(
-        new JSONResponse(
-          "Not following",
-          null,
-          {
-            message: msg,
-          },
-          false
-        )
-      );
+      return next(createError(StatusCodes.BAD_REQUEST, msg));
     }
 
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        INTERNAL_SERVER_ERROR_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, {
+        reason: msg,
+      })
     );
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const getAllMyGroups = async (req: Request, res: Response) => {
+export const getAllMyGroups = async (req: Request, res: Response, next: NextFunction) => {
   const { limit, offset } = getLimitAndOffset(req);
   const { created, joined } = req.query;
   const { user } = req.session;
 
   if (created && joined && typeof created !== "boolean" && typeof joined !== "boolean") {
-    return res.status(StatusCodes.BAD_REQUEST).json(
-      new JSONResponse(
-        VALIDATION_FAILED_MSG,
-        null,
-        {
-          message: "Invalid query params",
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, {
+        reason: "Invalid query params",
+      })
     );
   }
 
@@ -746,35 +697,25 @@ export const getAllMyGroups = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        INTERNAL_SERVER_ERROR_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, {
+        reason: msg,
+      })
     );
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const getRequestedGroups = async (req: Request, res: Response) => {
+export const getRequestedGroups = async (req: Request, res: Response, next: NextFunction) => {
   const { limit, offset } = getLimitAndOffset(req);
   const { user } = req.session;
   const { pending, rejected } = req.query;
 
   if (pending && rejected && typeof pending !== "boolean" && typeof rejected !== "boolean") {
-    return res.status(StatusCodes.BAD_REQUEST).json(
-      new JSONResponse(
-        VALIDATION_FAILED_MSG,
-        null,
-        {
-          message: "Invalid query params",
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, {
+        reason: "Invalid query params",
+      })
     );
   }
 
@@ -797,16 +738,10 @@ export const getRequestedGroups = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    // REFACTOR: Create a function to handle errors
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        INTERNAL_SERVER_ERROR_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, {
+        reason: msg,
+      })
     );
   }
 };
