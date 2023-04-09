@@ -24,7 +24,6 @@ import {
   ALREADY_FRIENDS_MSG,
   COMMENT_FETCHED_SUCCESSFULLY_MSG,
   FORBIDDEN_MSG,
-  FORBIDDEN_RESPONSE,
   FRIEDN_REQUESTS_FETCHED_SUCCESSFULLY_MSG,
   FRIENDS_FETCHED_SUCCESSFULLY_MSG,
   FRIEND_REQUEST_ACCEPTED_SUCCESSFULLY_MSG,
@@ -32,6 +31,7 @@ import {
   FRIEND_REQUEST_REJECTED_SUCCESSFULLY_MSG,
   FRIEND_REQUEST_SENT_SUCCESSFULLY_MSG,
   INTERNAL_SERVER_ERROR_MSG,
+  INVALID_FRIEND_ID,
   INVALID_POST_ID_MSG,
   POSTS_FETCHED_SUCCESSFULLY_MSG,
   POST_CREATED_SUCCESSFULLY_MSG,
@@ -41,7 +41,6 @@ import {
   POST_UPDATE_SUCCESSFULLY_MSG,
   SOMETHING_WENT_WRONG_MSG,
   UNAUTHORIZED_MSG,
-  UNAUTHORIZED_RESPONSE,
   USERNAME_ALREADY_TAKEN_MSG,
   USERNAME_AVAIALABLE_MSG,
   USERNAME_REQUIRED_MSG,
@@ -330,7 +329,7 @@ export const updateStatus = async (req: Request, res: Response, next: NextFuncti
 };
 
 // -----------------------------------------------------------------------------------------
-export const getMyComments = async (req: Request, res: Response) => {
+export const getMyComments = async (req: Request, res: Response, next: NextFunction) => {
   const { limit, offset } = getLimitAndOffset(req);
   const { orderBy, status } = req.query;
   const { user } = req.session;
@@ -353,21 +352,16 @@ export const getMyComments = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        INTERNAL_SERVER_ERROR_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, {
+        reason: msg,
+      })
     );
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const getMyFriends = async (req: Request, res: Response) => {
+export const getMyFriends = async (req: Request, res: Response, next: NextFunction) => {
   const { limit, offset } = getLimitAndOffset(req);
   const { user } = req.session;
 
@@ -387,34 +381,23 @@ export const getMyFriends = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        INTERNAL_SERVER_ERROR_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, {
+        reason: msg,
+      })
     );
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const addFriend = async (req: Request, res: Response) => {
+export const addFriend = async (req: Request, res: Response, next: NextFunction) => {
   const { friendId } = req.params;
 
-  // TODO: Create Invalid friend id response
   if (!friendId) {
-    return res.status(StatusCodes.BAD_REQUEST).json(
-      new JSONResponse(
-        VALIDATION_FAILED_MSG,
-        null,
-        {
-          message: "Invalid friend id",
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, {
+        reason: INVALID_FRIEND_ID,
+      })
     );
   }
 
@@ -436,45 +419,20 @@ export const addFriend = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    if (msg === ALREADY_FRIENDS_MSG) {
-      return res.status(StatusCodes.BAD_REQUEST).json(
-        new JSONResponse(
-          ALREADY_FRIENDS_MSG,
-          null,
-          {
-            message: msg,
-          },
-          false
-        )
-      );
+    if (msg === ALREADY_FRIENDS_MSG || msg === "Friend request already sent") {
+      return next(createError(StatusCodes.BAD_REQUEST, msg));
     }
-    if (msg === "Friend request already sent") {
-      return res.status(StatusCodes.BAD_REQUEST).json(
-        new JSONResponse(
-          "Friend request already sent",
-          null,
-          {
-            message: msg,
-          },
-          false
-        )
-      );
-    }
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        INTERNAL_SERVER_ERROR_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
+
+    return next(
+      createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, {
+        reason: msg,
+      })
     );
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const acceptOrRejectFriendRequest = async (req: Request, res: Response) => {
+export const acceptOrRejectFriendRequest = async (req: Request, res: Response, next: NextFunction) => {
   const { friendId } = req.params;
   const payload = req.body as AcceptOrRejectFriendRequestPayload;
   const { user } = req.session;
@@ -482,29 +440,18 @@ export const acceptOrRejectFriendRequest = async (req: Request, res: Response) =
   const isValid = FriendService.validateAcceptOrRejectFriendRequestPayload(payload);
 
   if (!isValid.success) {
-    return res.status(StatusCodes.BAD_REQUEST).json(
-      new JSONResponse(
-        VALIDATION_FAILED_MSG,
-        null,
-        {
-          message: isValid.message,
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, {
+        reason: isValid.message,
+      })
     );
   }
 
-  // TODO: Create Invalid friend id response
   if (!friendId) {
-    return res.status(StatusCodes.BAD_REQUEST).json(
-      new JSONResponse(
-        VALIDATION_FAILED_MSG,
-        null,
-        {
-          message: "Invalid friend id",
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, {
+        reason: INVALID_FRIEND_ID,
+      })
     );
   }
 
@@ -521,6 +468,7 @@ export const acceptOrRejectFriendRequest = async (req: Request, res: Response) =
       payload.type === "ACCEPT"
         ? FRIEND_REQUEST_ACCEPTED_SUCCESSFULLY_MSG
         : FRIEND_REQUEST_REJECTED_SUCCESSFULLY_MSG;
+
     return res.status(StatusCodes.OK).json(
       new JSONResponse(
         msg,
@@ -534,42 +482,23 @@ export const acceptOrRejectFriendRequest = async (req: Request, res: Response) =
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    if (msg === FRIEND_REQUEST_NOT_FOUND_MSG) {
-      return res.status(StatusCodes.NOT_FOUND).json(
-        new JSONResponse(
-          FRIEND_REQUEST_NOT_FOUND_MSG,
-          null,
-          {
-            message: msg,
-          },
-          false
-        )
-      );
-    }
+    let code = StatusCodes.INTERNAL_SERVER_ERROR;
 
-    if (msg === UNAUTHORIZED_MSG) {
-      return res.status(StatusCodes.UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
-    }
+    if (msg === FRIEND_REQUEST_NOT_FOUND_MSG) code = StatusCodes.NOT_FOUND;
+    if (msg === UNAUTHORIZED_MSG) code = StatusCodes.UNAUTHORIZED;
+    if (msg === FORBIDDEN_MSG) code = StatusCodes.FORBIDDEN;
 
-    if (msg === FORBIDDEN_MSG) {
-      return res.status(StatusCodes.FORBIDDEN).json(FORBIDDEN_RESPONSE);
-    }
-
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        INTERNAL_SERVER_ERROR_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
+    const message = msg !== SOMETHING_WENT_WRONG_MSG ? msg : SOMETHING_WENT_WRONG_MSG;
+    return next(
+      createError(code, message, {
+        reason: msg,
+      })
     );
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const getMyFriendRequests = async (req: Request, res: Response) => {
+export const getMyFriendRequests = async (req: Request, res: Response, next: NextFunction) => {
   const { limit, offset } = getLimitAndOffset(req);
   const { user } = req.session;
 
@@ -589,21 +518,16 @@ export const getMyFriendRequests = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        INTERNAL_SERVER_ERROR_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, {
+        reason: msg,
+      })
     );
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const getMyFollowers = async (req: Request, res: Response) => {
+export const getMyFollowers = async (req: Request, res: Response, next: NextFunction) => {
   const { limit, offset } = getLimitAndOffset(req);
   const { user } = req.session;
 
@@ -623,15 +547,10 @@ export const getMyFollowers = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        INTERNAL_SERVER_ERROR_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, {
+        reason: msg,
+      })
     );
   }
 };

@@ -75,6 +75,7 @@ export const FRIEDN_REQUESTS_FETCHED_SUCCESSFULLY_MSG = "Friend requests fetched
 export const ALREADY_LIKED_COMMENT_MSG = "Comment already liked";
 export const COMMENT_NOT_LIKED_MSG = "Comment not liked";
 export const FRIEND_REQUEST_NOT_FOUND_MSG = "Friend request not found";
+export const INVALID_FRIEND_ID = "Invalid friend id";
 export const ALREADY_FRIENDS_MSG = "You are already friends";
 export const ERROR_GETTING_REPLIES_FROM_COMMENT_MSG = "Error while getting replies from comment";
 export const INVALID_COMMENT_ID_MSG = "Invalid comment id";
