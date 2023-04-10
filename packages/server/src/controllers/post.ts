@@ -2,8 +2,9 @@
  * @file: post.ts
  * @description: Contains all posts related controllers
  */
-import type { Request, Response } from "express";
-import httpStatusCodes from "http-status-codes";
+import type { NextFunction, Request, Response } from "express";
+import createError from "http-errors";
+import { StatusCodes } from "http-status-codes";
 
 import type {
   CommentOnPostPayload,
@@ -16,49 +17,36 @@ import { JSONResponse } from "@/src/lib";
 import PostService from "@/src/services/posts";
 import {
   ALREADY_LIKED_COMMENT_MSG,
-  ALREADY_LIKED_COMMENT_RESPONSE,
   COMMENT_ADDED_SUCCESSFULLY_MSG,
   COMMENT_DELETED_SUCCESSFULLY_MSG,
   COMMENT_LIKE_SUCCESSFULLY_MSG,
-  COMMENT_NOT_EMPTY_RESPONSE,
   COMMENT_NOT_FOUND_MSG,
-  COMMENT_NOT_FOUND_RESPONSE,
   COMMENT_NOT_LIKED_MSG,
-  COMMENT_NOT_LIKED_RESPONSE,
   COMMENT_POST_CLOSED_MSG,
-  COMMENT_POST_CLOSED_RESPONSE,
   COMMENT_UNLIKE_SUCCESSFULLY_MSG,
   COMMENT_UPDATED_SUCCESSFULLY_MSG,
+  ERROR_COMMENT_NOT_EMPTY_MSG,
   FORBIDDEN_MSG,
-  FORBIDDEN_RESPONSE,
   GETTING_REPLIES_FROM_COMMENT_MSG,
-  INVALID_COMMENT_ID_RESPONSE,
-  INVALID_POST_ID_RESPONSE,
+  INVALID_COMMENT_ID_MSG,
+  INVALID_POST_ID_MSG,
   POSTS_FETCHED_SUCCESSFULLY_MSG,
   POST_ALREADY_LIKED_MSG,
-  POST_ALREADY_LIKED_RESPONSE,
   POST_CLOSED_MSG,
-  POST_CLOSED_RESPONSE,
   POST_DETAILS_FETCHED_SUCCESSFULLY_MSG,
   POST_NOT_FOUND_MSG,
-  POST_NOT_FOUND_RESPONSE,
   POST_NOT_LIKED_MSG,
-  POST_NOT_LIKED_RESPONSE,
   POST_UNLIKED_SUCCESSFULLY_MSG,
   REPLAY_ADDED_SUCCESSFULLY_MSG,
   SOMETHING_WENT_WRONG_MSG,
   UNAUTHORIZED_MSG,
-  UNAUTHORIZED_RESPONSE,
   VALIDATION_FAILED_MSG,
   getErrorReason,
   getLimitAndOffset,
 } from "@/src/utils";
 
 // -----------------------------------------------------------------------------------------
-const { OK, BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, UNAUTHORIZED, FORBIDDEN } = httpStatusCodes;
-
-// -----------------------------------------------------------------------------------------
-export const getPosts = async (req: Request, res: Response) => {
+export const getPosts = async (req: Request, res: Response, next: NextFunction) => {
   const { user } = req.session;
   const { limit, offset } = getLimitAndOffset(req);
   const { sortBy, order } = req.query;
@@ -66,28 +54,16 @@ export const getPosts = async (req: Request, res: Response) => {
   type OrderType = "desc" | "asc";
 
   if (sortBy && !["upvote", "comment", "date"].includes(sortBy as SortBy)) {
-    return res.status(BAD_REQUEST).json(
-      new JSONResponse(
-        VALIDATION_FAILED_MSG,
-        null,
-        {
-          message: "Invalid sort by value",
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, {
+        reason: "Invalid sort by value",
+      })
     );
   }
 
   if (order && !["desc", "asc"].includes(order as OrderType)) {
-    return res.status(BAD_REQUEST).json(
-      new JSONResponse(
-        VALIDATION_FAILED_MSG,
-        null,
-        {
-          message: "Invalid order value",
-        },
-        false
-      )
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: "Invalid order value" })
     );
   }
 
@@ -96,7 +72,7 @@ export const getPosts = async (req: Request, res: Response) => {
 
   const data = await PostService.getPosts(user.id, limit, offset, sortby, sortorder);
 
-  return res.status(OK).json(
+  return res.status(StatusCodes.OK).json(
     new JSONResponse(
       POSTS_FETCHED_SUCCESSFULLY_MSG,
       {
@@ -111,17 +87,17 @@ export const getPosts = async (req: Request, res: Response) => {
 };
 
 // -----------------------------------------------------------------------------------------
-export const getPost = async (req: Request, res: Response) => {
+export const getPost = async (req: Request, res: Response, next: NextFunction) => {
   const { postId } = req.params;
   const { user } = req.session;
 
   if (!postId) {
-    return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
+    return next(createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: INVALID_POST_ID_MSG }));
   }
 
   try {
     const post = await PostService.getPost(Number(postId), user.id);
-    return res.status(OK).json(
+    return res.status(StatusCodes.OK).json(
       new JSONResponse(
         POST_DETAILS_FETCHED_SUCCESSFULLY_MSG,
         {
@@ -137,38 +113,28 @@ export const getPost = async (req: Request, res: Response) => {
       )
     );
   } catch (err) {
-    let message;
-    if (err instanceof Error) {
-      message = err.message;
-    } else {
-      message = SOMETHING_WENT_WRONG_MSG;
-    }
-    return res.status(INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        SOMETHING_WENT_WRONG_MSG,
-        null,
-        {
-          message,
-        },
-        false
-      )
+    const msg = getErrorReason(err);
+    return next(
+      createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, {
+        reason: msg,
+      })
     );
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const getCommentsForPost = async (req: Request, res: Response) => {
+export const getCommentsForPost = async (req: Request, res: Response, next: NextFunction) => {
   const { postId } = req.params;
   const { user } = req.session;
 
   if (!postId) {
-    return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
+    return next(createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: INVALID_POST_ID_MSG }));
   }
 
   try {
     const { limit, offset } = getLimitAndOffset(req);
     const data = await PostService.getCommentsForPost(Number(postId), user.id, limit, offset);
-    return res.status(OK).json(
+    return res.status(StatusCodes.OK).json(
       new JSONResponse(
         "Post comments fetched successfully",
         {
@@ -182,31 +148,22 @@ export const getCommentsForPost = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    return res.status(INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        SOMETHING_WENT_WRONG_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
-    );
+    return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const likePost = async (req: Request, res: Response) => {
+export const likePost = async (req: Request, res: Response, next: NextFunction) => {
   const { postId } = req.params;
   const { user } = req.session;
 
   if (!postId) {
-    return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
+    return next(createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: INVALID_POST_ID_MSG }));
   }
 
   try {
     const data = await PostService.likePost(Number(postId), user.id);
-    return res.status(OK).json(
+    return res.status(StatusCodes.OK).json(
       new JSONResponse(
         "Post liked successfully",
         {
@@ -219,37 +176,26 @@ export const likePost = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    if (msg === POST_ALREADY_LIKED_MSG) {
-      return res.status(BAD_REQUEST).json(POST_ALREADY_LIKED_RESPONSE);
+    if (msg === POST_ALREADY_LIKED_MSG || msg === POST_CLOSED_MSG) {
+      return next(createError(StatusCodes.BAD_REQUEST, msg));
     }
-    if (msg === POST_CLOSED_MSG) {
-      return res.status(BAD_REQUEST).json(POST_CLOSED_RESPONSE);
-    }
-    return res.status(INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        SOMETHING_WENT_WRONG_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
-    );
+
+    return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const unlikePost = async (req: Request, res: Response) => {
+export const unlikePost = async (req: Request, res: Response, next: NextFunction) => {
   const { postId } = req.params;
   const { user } = req.session;
 
   if (!postId) {
-    return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
+    return next(createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: INVALID_POST_ID_MSG }));
   }
 
   try {
     const data = await PostService.unlikePost(Number(postId), user.id);
-    return res.status(OK).json(
+    return res.status(StatusCodes.OK).json(
       new JSONResponse(
         POST_UNLIKED_SUCCESSFULLY_MSG,
         {
@@ -262,49 +208,35 @@ export const unlikePost = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    if (msg === POST_NOT_LIKED_MSG) {
-      return res.status(BAD_REQUEST).json(POST_NOT_LIKED_RESPONSE);
-    }
 
-    if (msg === FORBIDDEN_MSG) {
-      return res.status(FORBIDDEN).json(FORBIDDEN_RESPONSE);
+    if (msg === POST_NOT_LIKED_MSG || msg === POST_CLOSED_MSG) {
+      return next(createError(StatusCodes.BAD_REQUEST, msg));
     }
-
-    if (msg === POST_CLOSED_MSG) {
-      return res.status(BAD_REQUEST).json(POST_CLOSED_RESPONSE);
-    }
-
-    return res.status(INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        SOMETHING_WENT_WRONG_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
-    );
+    if (msg === FORBIDDEN_MSG) return next(createError(StatusCodes.FORBIDDEN, msg));
+    return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const commentOnPost = async (req: Request, res: Response) => {
+export const commentOnPost = async (req: Request, res: Response, next: NextFunction) => {
   const { text } = req.body as CommentOnPostPayload;
   const { postId } = req.params;
 
   if (!postId) {
-    return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
+    return next(createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: INVALID_POST_ID_MSG }));
   }
 
   if (!text) {
-    return res.status(BAD_REQUEST).json(COMMENT_NOT_EMPTY_RESPONSE);
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: ERROR_COMMENT_NOT_EMPTY_MSG })
+    );
   }
 
   const { user } = req.session;
 
   try {
     const data = await PostService.addComment(Number(postId), user.id, text);
-    return res.status(OK).json(
+    return res.status(StatusCodes.OK).json(
       new JSONResponse(
         COMMENT_ADDED_SUCCESSFULLY_MSG,
         {
@@ -317,43 +249,30 @@ export const commentOnPost = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    if (msg === POST_NOT_FOUND_MSG) {
-      return res.status(NOT_FOUND).json(POST_NOT_FOUND_RESPONSE);
-    }
-
-    if (msg === COMMENT_POST_CLOSED_MSG) {
-      return res.status(BAD_REQUEST).json(COMMENT_POST_CLOSED_RESPONSE);
-    }
-
-    return res.status(INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        SOMETHING_WENT_WRONG_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
-    );
+    if (msg === POST_NOT_FOUND_MSG) return next(createError(StatusCodes.NOT_FOUND, msg));
+    if (msg === COMMENT_POST_CLOSED_MSG) return next(createError(StatusCodes.BAD_REQUEST, msg));
+    return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const deleteCommentOnPost = async (req: Request, res: Response) => {
+export const deleteCommentOnPost = async (req: Request, res: Response, next: NextFunction) => {
   const { postId, commentId } = req.params;
   const { user } = req.session;
 
   if (!postId) {
-    return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
+    return next(createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: INVALID_POST_ID_MSG }));
   }
 
   if (!commentId) {
-    return res.status(BAD_REQUEST).json(INVALID_COMMENT_ID_RESPONSE);
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: INVALID_COMMENT_ID_MSG })
+    );
   }
 
   try {
     await PostService.deleteComment(Number(postId), Number(commentId), user.id);
-    return res.status(OK).json(
+    return res.status(StatusCodes.OK).json(
       new JSONResponse(
         COMMENT_DELETED_SUCCESSFULLY_MSG,
         {
@@ -365,53 +284,39 @@ export const deleteCommentOnPost = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    if (msg === COMMENT_NOT_FOUND_MSG) {
-      return res.status(NOT_FOUND).json(COMMENT_NOT_FOUND_RESPONSE);
-    }
-
-    if (msg === UNAUTHORIZED_MSG) {
-      return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
-    }
-
-    if (msg === FORBIDDEN_MSG) {
-      return res.status(FORBIDDEN).json(FORBIDDEN_RESPONSE);
-    }
-
-    return res.status(INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        SOMETHING_WENT_WRONG_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
-    );
+    if (msg === COMMENT_NOT_FOUND_MSG) return next(createError(StatusCodes.NOT_FOUND, msg));
+    if (msg === UNAUTHORIZED_MSG) return next(createError(StatusCodes.UNAUTHORIZED, msg));
+    if (msg === FORBIDDEN_MSG) return next(createError(StatusCodes.FORBIDDEN, msg));
+    return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const updateCommentOnPost = async (req: Request, res: Response) => {
+export const updateCommentOnPost = async (req: Request, res: Response, next: NextFunction) => {
   const { commentId, postId } = req.params;
   const { text } = req.body as UpdateCommentOnPostPayload;
 
   if (!postId) {
-    return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
+    return next(createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: INVALID_POST_ID_MSG }));
   }
 
   if (!commentId) {
-    return res.status(BAD_REQUEST).json(INVALID_COMMENT_ID_RESPONSE);
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: INVALID_COMMENT_ID_MSG })
+    );
   }
 
   if (!text) {
-    return res.status(BAD_REQUEST).json(COMMENT_NOT_EMPTY_RESPONSE);
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: ERROR_COMMENT_NOT_EMPTY_MSG })
+    );
   }
 
   const { user } = req.session;
 
   try {
     const data = await PostService.updateComment(Number(postId), Number(commentId), user.id, text);
-    return res.status(OK).json(
+    return res.status(StatusCodes.OK).json(
       new JSONResponse(
         COMMENT_UPDATED_SUCCESSFULLY_MSG,
         {
@@ -424,50 +329,39 @@ export const updateCommentOnPost = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    if (msg === COMMENT_NOT_FOUND_MSG) {
-      return res.status(NOT_FOUND).json(COMMENT_NOT_FOUND_RESPONSE);
-    }
-    if (msg === UNAUTHORIZED_MSG) {
-      return res.status(UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
-    }
-    if (msg === FORBIDDEN_MSG) {
-      return res.status(FORBIDDEN).json(FORBIDDEN_RESPONSE);
-    }
-    return res.status(INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        SOMETHING_WENT_WRONG_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
-    );
+    if (msg === COMMENT_NOT_FOUND_MSG) return next(createError(StatusCodes.NOT_FOUND, msg));
+    if (msg === UNAUTHORIZED_MSG) return next(createError(StatusCodes.UNAUTHORIZED, msg));
+    if (msg === FORBIDDEN_MSG) return next(createError(StatusCodes.FORBIDDEN, msg));
+    return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const replyToCommentOnPost = async (req: Request, res: Response) => {
+export const replyToCommentOnPost = async (req: Request, res: Response, next: NextFunction) => {
   const { text } = req.body as ReplyToCommentOnPostPayload;
   const { postId, commentId } = req.params;
 
   if (!postId) {
-    return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
+    return next(createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: INVALID_POST_ID_MSG }));
   }
 
   if (!commentId) {
-    return res.status(BAD_REQUEST).json(INVALID_COMMENT_ID_RESPONSE);
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: INVALID_COMMENT_ID_MSG })
+    );
   }
 
   if (!text) {
-    return res.status(BAD_REQUEST).json(COMMENT_NOT_EMPTY_RESPONSE);
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: ERROR_COMMENT_NOT_EMPTY_MSG })
+    );
   }
 
   const { user } = req.session;
 
   try {
     const data = await PostService.addReplyToComment(Number(postId), Number(commentId), user.id, text);
-    return res.status(OK).json(
+    return res.status(StatusCodes.OK).json(
       new JSONResponse(
         REPLAY_ADDED_SUCCESSFULLY_MSG,
         {
@@ -480,33 +374,24 @@ export const replyToCommentOnPost = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    if (msg === COMMENT_NOT_FOUND_MSG) {
-      return res.status(NOT_FOUND).json(COMMENT_NOT_FOUND_RESPONSE);
-    }
-    return res.status(INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        SOMETHING_WENT_WRONG_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
-    );
+    if (msg === COMMENT_NOT_FOUND_MSG) return next(createError(StatusCodes.NOT_FOUND, msg));
+    return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const getRepliesToCommentOnPost = async (req: Request, res: Response) => {
+export const getRepliesToCommentOnPost = async (req: Request, res: Response, next: NextFunction) => {
   const { postId, commentId } = req.params;
   const { user } = req.session;
 
   if (!postId) {
-    return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
+    return next(createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: INVALID_POST_ID_MSG }));
   }
 
   if (!commentId) {
-    return res.status(BAD_REQUEST).json(INVALID_COMMENT_ID_RESPONSE);
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: INVALID_COMMENT_ID_MSG })
+    );
   }
 
   const { limit, offset } = getLimitAndOffset(req);
@@ -519,7 +404,7 @@ export const getRepliesToCommentOnPost = async (req: Request, res: Response) => 
       limit,
       offset
     );
-    return res.status(OK).json(
+    return res.status(StatusCodes.OK).json(
       new JSONResponse(
         GETTING_REPLIES_FROM_COMMENT_MSG,
         {
@@ -533,39 +418,30 @@ export const getRepliesToCommentOnPost = async (req: Request, res: Response) => 
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    if (msg === COMMENT_NOT_FOUND_MSG) {
-      return res.status(NOT_FOUND).json(COMMENT_NOT_FOUND_RESPONSE);
-    }
-    return res.status(INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        SOMETHING_WENT_WRONG_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
-    );
+    if (msg === COMMENT_NOT_FOUND_MSG) return next(createError(StatusCodes.NOT_FOUND, msg));
+    return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const likeComment = async (req: Request, res: Response) => {
+export const likeComment = async (req: Request, res: Response, next: NextFunction) => {
   const { commentId, postId } = req.params;
 
   if (!postId) {
-    return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
+    return next(createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: INVALID_POST_ID_MSG }));
   }
 
   if (!commentId) {
-    return res.status(BAD_REQUEST).json(INVALID_COMMENT_ID_RESPONSE);
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: INVALID_COMMENT_ID_MSG })
+    );
   }
 
   const { user } = req.session;
 
   try {
     const data = await PostService.likeComment(Number(postId), Number(commentId), user.id);
-    return res.status(OK).json(
+    return res.status(StatusCodes.OK).json(
       new JSONResponse(
         COMMENT_LIKE_SUCCESSFULLY_MSG,
         {
@@ -578,42 +454,31 @@ export const likeComment = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    if (msg === COMMENT_NOT_FOUND_MSG) {
-      return res.status(NOT_FOUND).json(COMMENT_NOT_FOUND_RESPONSE);
-    }
-    if (msg === ALREADY_LIKED_COMMENT_MSG) {
-      return res.status(BAD_REQUEST).json(ALREADY_LIKED_COMMENT_RESPONSE);
-    }
-    return res.status(INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        SOMETHING_WENT_WRONG_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
-    );
+    if (msg === COMMENT_NOT_FOUND_MSG) return next(createError(StatusCodes.NOT_FOUND, msg));
+    if (msg === ALREADY_LIKED_COMMENT_MSG) return next(createError(StatusCodes.BAD_REQUEST, msg));
+    return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
   }
 };
 
 // -----------------------------------------------------------------------------------------
-export const unlikeComment = async (req: Request, res: Response) => {
+export const unlikeComment = async (req: Request, res: Response, next: NextFunction) => {
   const { commentId, postId } = req.params;
 
   if (!postId) {
-    return res.status(BAD_REQUEST).json(INVALID_POST_ID_RESPONSE);
+    return next(createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: INVALID_POST_ID_MSG }));
   }
 
   if (!commentId) {
-    return res.status(BAD_REQUEST).json(INVALID_COMMENT_ID_RESPONSE);
+    return next(
+      createError(StatusCodes.BAD_REQUEST, VALIDATION_FAILED_MSG, { reason: INVALID_COMMENT_ID_MSG })
+    );
   }
 
   const { user } = req.session;
 
   try {
     const data = await PostService.unlikeComment(Number(postId), Number(commentId), user.id);
-    return res.status(OK).json(
+    return res.status(StatusCodes.OK).json(
       new JSONResponse(
         COMMENT_UNLIKE_SUCCESSFULLY_MSG,
         {
@@ -626,21 +491,8 @@ export const unlikeComment = async (req: Request, res: Response) => {
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    if (msg === COMMENT_NOT_FOUND_MSG) {
-      return res.status(NOT_FOUND).json(COMMENT_NOT_FOUND_RESPONSE);
-    }
-    if (msg === COMMENT_NOT_LIKED_MSG) {
-      return res.status(BAD_REQUEST).json(COMMENT_NOT_LIKED_RESPONSE);
-    }
-    return res.status(INTERNAL_SERVER_ERROR).json(
-      new JSONResponse(
-        SOMETHING_WENT_WRONG_MSG,
-        null,
-        {
-          message: msg,
-        },
-        false
-      )
-    );
+    if (msg === COMMENT_NOT_FOUND_MSG) return next(createError(StatusCodes.NOT_FOUND, msg));
+    if (msg === COMMENT_NOT_LIKED_MSG) return next(createError(StatusCodes.BAD_REQUEST, msg));
+    return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
   }
 };
