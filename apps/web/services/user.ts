@@ -9,8 +9,6 @@ import type {
   GetMyCommentsResponse,
   GetMyPostsResponse,
   MyDetailsResponse,
-  OnboardingPayload,
-  OnboardingResponse,
   UpdatePostPayload,
   UpdatePostResponse,
   UpdatePostStatusResponse,
@@ -29,15 +27,6 @@ export const checkUsernameAvailability = async (username: string) => {
   const response: AxiosResponse<UsernameAvailableResponse> = await axiosInstance.get(
     `/usernameAvailable?username=${username}`
   );
-  return response.data;
-};
-
-/**
- *
- * @description Onboard a user
- */
-export const onboardUser = async (data: OnboardingPayload) => {
-  const response: AxiosResponse<OnboardingResponse> = await axiosInstance.post("/onboarding", data);
   return response.data;
 };
 

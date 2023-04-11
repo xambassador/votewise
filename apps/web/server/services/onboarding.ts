@@ -7,40 +7,35 @@ import type { OnboardingPayload, OnboardingResponse } from "@votewise/types";
 /**
  *
  * @description Get onboarding status of user
- * @param userId Current logged in user id
  * @param token JWT token
  * @returns
  */
-export const getOnboardingStatus = async (userId: number, token: string) => {
+export const getOnboardingStatus = async (token: string) => {
   const apiEndpoint = `${ONBOARDING_ROUTE_V1}${ONBOARDING_STATUS_V1}`;
   const response: AxiosResponse<{
     success: boolean;
     message: string;
     error: null;
     data: { onboarded: boolean };
-  }> = await getAxiosServerWithAuth(token).get(`${apiEndpoint}`.replace(":userId", userId.toString()));
+  }> = await getAxiosServerWithAuth(token).get(apiEndpoint);
   return response.data.data.onboarded;
 };
 
 /**
  *
  * @description Update user onboarding details.
- * @param userId Current logged in user id
  * @param options
  * @returns
  *
  */
-export const onboardUser = async (
-  userId: number,
-  options: {
-    token: string;
-    payload: OnboardingPayload;
-    headers: AxiosRequestConfig["headers"];
-  }
-) => {
+export const onboardUser = async (options: {
+  token: string;
+  payload: OnboardingPayload;
+  headers: AxiosRequestConfig["headers"];
+}) => {
   const apiEndpoint = `${ONBOARDING_ROUTE_V1}${ONBOARDING_UPDATE_V1}`;
   const response: AxiosResponse<OnboardingResponse> = await getAxiosServerWithAuth(options.token).patch(
-    apiEndpoint.replace(":userId", `${userId}`),
+    apiEndpoint,
     options.payload,
     {
       headers: options.headers,

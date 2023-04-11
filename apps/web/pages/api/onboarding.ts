@@ -1,5 +1,5 @@
 import cookie from "cookie";
-import httpStatusCodes from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -8,6 +8,7 @@ import type { OnboardingPayload } from "@votewise/types";
 
 import { getError } from "server/lib/getError";
 import { getProxyHeaders } from "server/lib/getProxyHeaders";
+import { getProxyResponseHeaders } from "server/lib/getProxyResponseHeaders";
 import { getServerSession } from "server/lib/getServerSession";
 import { UNAUTHORIZED_RESPONSE } from "server/lib/response";
 
@@ -21,19 +22,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const session = await getServerSession({ req, res });
     if (!session) {
-      return res.status(httpStatusCodes.UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
+      return res.status(StatusCodes.UNAUTHORIZED).json(UNAUTHORIZED_RESPONSE);
     }
-    const { userId, accessToken } = session;
-    const response = await onboardUser(userId, {
+    const { accessToken } = session;
+    const response = await onboardUser({
       token: accessToken,
       payload: req.body as OnboardingPayload,
       headers,
     });
     const { headers: responseHeaders, data, status } = response;
-    Object.entries(responseHeaders).forEach((keyArr) => {
-      const [key, value] = keyArr;
-      res.setHeader(key, value);
-    });
+    getProxyResponseHeaders(res, responseHeaders);
+
     res.setHeader("Set-Cookie", [
       cookie.serialize(COOKIE_IS_ONBOARDED_KEY as string, "true", {
         httpOnly: true,

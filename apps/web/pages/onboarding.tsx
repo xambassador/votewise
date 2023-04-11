@@ -21,7 +21,7 @@ import { getCookie } from "server/lib/getCookie";
 import { getServerSession } from "server/lib/getServerSession";
 
 import { getOnboardingStatus } from "server/services/onboarding";
-import { onboardUser } from "services/user";
+import { onboardUser } from "services/onboarding";
 
 import type { NextPageWithLayout } from "./_app";
 
@@ -189,7 +189,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     };
   }
 
-  const onboarded = await getOnboardingStatus(session.userId, session.accessToken);
+  const onboarded = await getOnboardingStatus(session.accessToken);
   if (onboarded) {
     res.setHeader("Set-Cookie", [
       cookie.serialize(COOKIE_IS_ONBOARDED_KEY as string, "true", {

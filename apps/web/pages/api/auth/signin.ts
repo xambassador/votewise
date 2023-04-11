@@ -7,7 +7,6 @@ import { AUTH_ROUTE_V1, LOGIN_USER_V1 } from "@votewise/lib";
 import type { LoginPayload } from "@votewise/types";
 
 import { axiosServerInstance } from "server/lib/axios";
-import { decodeJwt } from "server/lib/decodeJwt";
 import { getError } from "server/lib/getError";
 import { getProxyHeaders } from "server/lib/getProxyHeaders";
 import { getProxyResponseHeaders } from "server/lib/getProxyResponseHeaders";
@@ -45,9 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       headers,
     });
 
-    const session = decodeJwt(response.data.data.accessToken);
-
-    const onboardingStatus = await getOnboardingStatus(session.userId, response.data.data.accessToken);
+    const onboardingStatus = await getOnboardingStatus(response.data.data.accessToken);
 
     const maxAge = rememberMe ? 60 * 60 * 24 * 7 : 60 * 60 * 24;
     res.setHeader("Set-Cookie", [

@@ -4,11 +4,11 @@
  * This is used to make API calls to NextJS API routes.
  */
 import axios from "axios";
-import httpStatusCodes from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 
-import { useRouter } from "next/router";
+import { INVALID_CREDENTIALS_MSG } from "@votewise/lib/constants";
 
-const { UNAUTHORIZED } = httpStatusCodes;
+const { UNAUTHORIZED } = StatusCodes;
 
 /**
  * @description: Axios instance for NextJS client side code. This must be used in client side only.
@@ -26,6 +26,9 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error: any) => {
     if (error.response.status === UNAUTHORIZED) {
+      if (error.response.data.message === INVALID_CREDENTIALS_MSG) {
+        return Promise.reject(error);
+      }
       window.location.href = "/signin";
       return Promise.reject(error);
     }
