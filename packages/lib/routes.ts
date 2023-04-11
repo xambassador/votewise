@@ -21,11 +21,10 @@ export const REVOKE_ACCESS_TOKEN_V1 = "/revoke-access-token";
 
 // Onboarding routes.
 export const ONBOARDING_ROUTE_V1 = "/api/v1/onboarding";
-
-// PATCH /api/v1/onboarding/:userId
-export const ONBOARDING_UPDATE_V1 = "/:userId";
-// GET /api/v1/onboarding/:userId/status
-export const ONBOARDING_STATUS_V1 = "/:userId/status";
+// PATCH /api/v1/onboarding/
+export const ONBOARDING_UPDATE_V1 = "/";
+// GET /api/v1/onboarding/
+export const ONBOARDING_STATUS_V1 = "/";
 
 export const POST_ROUTE_V1 = "/api/v1/posts";
 // GET /api/v1/posts?limit=10&offset=0&sortBy=upvotes&order=desc|asc => Get all posts (public, public groups, friends posts)

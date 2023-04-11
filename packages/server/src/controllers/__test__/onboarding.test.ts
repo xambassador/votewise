@@ -1,5 +1,5 @@
 import http from "http";
-import httpStatusCodes, { StatusCodes } from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 import supertest from "supertest";
 
 import { ONBOARDING_ROUTE_V1, ONBOARDING_UPDATE_V1 } from "@votewise/lib";
@@ -10,7 +10,6 @@ import { createRequest, createResponse, getUser } from "../../__mock__";
 import OnboardingService from "../../services/onboarding";
 import JWT from "../../services/user/jwt";
 import {
-  UNAUTHORIZED_RESPONSE,
   USERNAME_ALREADY_TAKEN_MSG,
   USERNAME_ALREADY_TAKEN_RESPONSE,
   USER_ALREADY_ONBOARDED_RESPONSE,
@@ -50,8 +49,6 @@ const onboaringPayload = {
   cover_image: "https://someimage.com",
 };
 
-const unauthorizedError = UNAUTHORIZED_RESPONSE;
-
 const user = getUser({
   email: "test@gmail.com",
   id: 1,
@@ -69,27 +66,8 @@ describe("Onboarding API", () => {
     server.close(done);
   });
 
-  describe("GET /api/v1/onboarding/:userId/status", () => {
-    test("Should return UNAUTHORIZED if authenticated userId and params userId not match", async () => {
-      const mockRequest = createRequest({
-        params: {
-          userId: "2",
-        },
-        session: {
-          user,
-        },
-      });
-      const mockResponse = createResponse();
-      await onboardingStatus(mockRequest, mockResponse);
-      expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
-      expect(mockResponse.status).toHaveBeenCalledWith(httpStatusCodes.UNAUTHORIZED);
-      expect(mockResponse.status).toHaveBeenCalledTimes(1);
-      expect(mockResponse.status).not.toHaveBeenCalledWith(httpStatusCodes.OK);
-      expect(mockResponse.json).toHaveBeenCalledWith(unauthorizedError);
-      expect(mockResponse.json).toHaveBeenCalledTimes(1);
-    });
-
-    test("Should return OK if request made by same user", async () => {
+  describe("GET /api/v1/onboarding", () => {
+    test("Should return OK if request is valid", async () => {
       const mockRequest = createRequest({
         params: {
           userId: "1",
@@ -100,11 +78,7 @@ describe("Onboarding API", () => {
       });
       const mockResponse = createResponse();
       await onboardingStatus(mockRequest, mockResponse);
-      expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
-      expect(mockResponse.status).toHaveBeenCalledWith(httpStatusCodes.OK);
-      expect(mockResponse.status).toHaveBeenCalledTimes(1);
-      expect(mockResponse.json).not.toHaveBeenCalledWith(unauthorizedError);
-      expect(mockResponse.json).toHaveBeenCalledTimes(1);
+      expect(mockResponse.status).toHaveBeenCalledWith(StatusCodes.OK);
       expect(mockResponse.json).toHaveBeenCalledWith({
         success: true,
         message: "Details fetched successfully",
@@ -116,24 +90,7 @@ describe("Onboarding API", () => {
     });
   });
 
-  describe("PATCH /api/v1/onboarding/:userId", () => {
-    test("Should return UNAUTHORIZED if authenticated userId and params userId not match", async () => {
-      const request = supertest(server);
-      // Trying to onboard user with id 2
-      const url = getOnboardingUpdateUrl("2");
-      // Loged in as user with id 1
-      const token = JWT.generateAccessToken({ userId: 1 });
-      prismaMock.user.findUnique.mockResolvedValue(getUser({ id: 1 }));
-      const response = await request
-        .patch(url)
-        .send(onboaringPayload)
-        .set("Authorization", `Bearer ${token}`);
-
-      expect(response.status).toBe(StatusCodes.UNAUTHORIZED);
-      expect(response.body).toEqual(unauthorizedError);
-      expect(OnboardingService.onboardUser).not.toHaveBeenCalled();
-    });
-
+  describe("PATCH /api/v1/onboarding", () => {
     test("Should return BAD_REQUEST if users is already onboarded", async () => {
       const request = supertest(server);
       const url = getOnboardingUpdateUrl("1");
