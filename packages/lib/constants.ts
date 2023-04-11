@@ -8,6 +8,8 @@ export const INVALID_REFRESHTOKEN_MSG = "Invalid refresh token";
 export const ACCESS_TOKEN_REVOKE_MSG = "Access token revoked successfully";
 export const UNAUTHORIZED_MSG = "Unauthorized";
 export const FORBIDDEN_MSG = "Forbidden";
+export const FORBIDDEN_ERROR_MSG =
+  "You don't have permission to access this resource or perform this action.";
 
 export const EMAIL_SENT_MSG = "Email sent successfully";
 export const EMAIL_QUEUE_MSG = "Request is queued for process. Check your mail box..";
@@ -96,38 +98,11 @@ export const ERROR_ACCEPTING_FRIEND_REQUEST = "Error while accepting friend requ
 export const ERROR_REJECTING_FRIEND_REQUEST = "Error while rejecting friend request";
 export const ERROR_FETCHING_FRIEND_REQUESTS = "Error while fetching friend requests";
 
-export const USER_ALREADY_EXISTS_RESPONSE = {
-  message: USER_ALREADY_EXISTS_MSG,
-  data: null,
-  error: {
-    message: USER_ALREADY_EXISTS_MSG,
-  },
-  success: false,
-};
-
 export const USERNAME_ALREADY_TAKEN_RESPONSE = {
   message: USERNAME_ALREADY_TAKEN_MSG,
   data: null,
   error: {
     message: USERNAME_ALREADY_TAKEN_MSG,
-  },
-  success: false,
-};
-
-export const USERNAME_REQUIRED_RESPONSE = {
-  message: VALIDATION_FAILED_MSG,
-  data: null,
-  error: {
-    message: USERNAME_REQUIRED_MSG,
-  },
-  success: false,
-};
-
-export const USER_NOT_FOUND_RESPONSE = {
-  message: USER_NOT_FOUND_MSG,
-  data: null,
-  error: {
-    message: USER_NOT_FOUND_MSG,
   },
   success: false,
 };
@@ -141,38 +116,11 @@ export const USER_ALREADY_ONBOARDED_RESPONSE = {
   success: false,
 };
 
-export const INVALID_CREDENTIALS_RESPONSE = {
-  message: INVALID_CREDENTIALS_MSG,
-  data: null,
-  error: {
-    message: INVALID_CREDENTIALS_MSG,
-  },
-  success: false,
-};
-
-export const INVALID_REFRESHTOKEN_RESPONSE = {
-  message: INVALID_REFRESHTOKEN_MSG,
-  data: null,
-  error: {
-    message: INVALID_REFRESHTOKEN_MSG,
-  },
-  success: false,
-};
-
 export const UNAUTHORIZED_RESPONSE = {
   message: UNAUTHORIZED_MSG,
   data: null,
   error: {
     message: UNAUTHORIZED_MSG,
-  },
-  success: false,
-};
-
-export const FORBIDDEN_RESPONSE = {
-  message: FORBIDDEN_MSG,
-  data: null,
-  error: {
-    message: `You don't have permission to access this resource or perform this action.`,
   },
   success: false,
 };
@@ -202,139 +150,4 @@ export const EMAIL_SENT_RESPONSE = {
   },
   error: null,
   success: true,
-};
-
-export const EMAIL_REQUIRED_RESPONSE = {
-  message: VALIDATION_FAILED_MSG,
-  data: null,
-  error: {
-    message: EMAIL_REQUIRED_MSG,
-  },
-  success: false,
-};
-
-export const INVALID_EMAIL_RESPONSE = {
-  message: VALIDATION_FAILED_MSG,
-  data: null,
-  error: {
-    message: INVALID_EMAIL_MSG,
-  },
-  success: false,
-};
-
-export const TOKEN_REQUIRED_RESPONSE = {
-  message: VALIDATION_FAILED_MSG,
-  data: null,
-  error: {
-    message: TOKEN_REQUIRED_MSG,
-  },
-  success: false,
-};
-
-export const EMAIL_ALREADY_VERIFIED_RESPONSE = {
-  message: EMAIL_ALREADY_VERIFIED_MSG,
-  data: null,
-  error: {
-    message: EMAIL_ALREADY_VERIFIED_MSG,
-  },
-  success: false,
-};
-
-export const INVALID_POST_ID_RESPONSE = {
-  message: VALIDATION_FAILED_MSG,
-  data: null,
-  error: {
-    message: INVALID_POST_ID_MSG,
-  },
-  success: false,
-};
-
-export const INVALID_COMMENT_ID_RESPONSE = {
-  message: VALIDATION_FAILED_MSG,
-  data: null,
-  error: {
-    message: INVALID_COMMENT_ID_MSG,
-  },
-  success: false,
-};
-
-export const COMMENT_NOT_FOUND_RESPONSE = {
-  message: COMMENT_NOT_FOUND_MSG,
-  data: null,
-  error: {
-    message: COMMENT_NOT_FOUND_MSG,
-  },
-  success: false,
-};
-
-export const COMMENT_NOT_EMPTY_RESPONSE = {
-  message: VALIDATION_FAILED_MSG,
-  data: null,
-  error: {
-    message: ERROR_COMMENT_NOT_EMPTY_MSG,
-  },
-  success: false,
-};
-
-export const COMMENT_NOT_LIKED_RESPONSE = {
-  message: COMMENT_NOT_LIKED_MSG,
-  data: null,
-  error: {
-    message: COMMENT_NOT_LIKED_MSG,
-  },
-  success: false,
-};
-
-export const ALREADY_LIKED_COMMENT_RESPONSE = {
-  message: ALREADY_LIKED_COMMENT_MSG,
-  data: null,
-  error: {
-    message: ALREADY_LIKED_COMMENT_MSG,
-  },
-  success: false,
-};
-
-export const POST_NOT_FOUND_RESPONSE = {
-  message: POST_NOT_FOUND_MSG,
-  data: null,
-  error: {
-    message: POST_NOT_FOUND_MSG,
-  },
-  success: false,
-};
-
-export const COMMENT_POST_CLOSED_RESPONSE = {
-  message: COMMENT_POST_CLOSED_MSG,
-  data: null,
-  error: {
-    message: COMMENT_POST_CLOSED_MSG,
-  },
-  success: false,
-};
-
-export const POST_CLOSED_RESPONSE = {
-  message: POST_CLOSED_MSG,
-  data: null,
-  error: {
-    message: POST_CLOSED_MSG,
-  },
-  success: false,
-};
-
-export const POST_ALREADY_LIKED_RESPONSE = {
-  message: POST_ALREADY_LIKED_MSG,
-  data: null,
-  error: {
-    message: POST_ALREADY_LIKED_MSG,
-  },
-  success: false,
-};
-
-export const POST_NOT_LIKED_RESPONSE = {
-  message: POST_NOT_LIKED_MSG,
-  data: null,
-  error: {
-    message: POST_NOT_LIKED_MSG,
-  },
-  success: false,
 };

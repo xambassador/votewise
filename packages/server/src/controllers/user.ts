@@ -23,6 +23,7 @@ import UserService from "@/src/services/user";
 import {
   ALREADY_FRIENDS_MSG,
   COMMENT_FETCHED_SUCCESSFULLY_MSG,
+  FORBIDDEN_ERROR_MSG,
   FORBIDDEN_MSG,
   FRIEDN_REQUESTS_FETCHED_SUCCESSFULLY_MSG,
   FRIENDS_FETCHED_SUCCESSFULLY_MSG,
@@ -227,16 +228,15 @@ export const updateMyPost = async (req: Request, res: Response, next: NextFuncti
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    if (msg === POST_NOT_FOUND_MSG) {
-      return next(createError(StatusCodes.NOT_FOUND, POST_NOT_FOUND_MSG));
-    }
 
-    if (msg === UNAUTHORIZED_MSG) {
-      return next(createError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED_MSG));
-    }
-
+    if (msg === POST_NOT_FOUND_MSG) return next(createError(StatusCodes.NOT_FOUND, POST_NOT_FOUND_MSG));
+    if (msg === UNAUTHORIZED_MSG) return next(createError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED_MSG));
     if (msg === FORBIDDEN_MSG) {
-      return next(createError(StatusCodes.FORBIDDEN, FORBIDDEN_MSG));
+      return next(
+        createError(StatusCodes.FORBIDDEN, FORBIDDEN_MSG, {
+          reason: FORBIDDEN_ERROR_MSG,
+        })
+      );
     }
 
     return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
@@ -271,14 +271,15 @@ export const deleteMyPost = async (req: Request, res: Response, next: NextFuncti
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    if (msg === POST_NOT_FOUND_MSG) {
-      return next(createError(StatusCodes.NOT_FOUND, POST_NOT_FOUND_MSG));
-    }
-    if (msg === UNAUTHORIZED_MSG) {
-      return next(createError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED_MSG));
-    }
+
+    if (msg === POST_NOT_FOUND_MSG) return next(createError(StatusCodes.NOT_FOUND, POST_NOT_FOUND_MSG));
+    if (msg === UNAUTHORIZED_MSG) return next(createError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED_MSG));
     if (msg === FORBIDDEN_MSG) {
-      return next(createError(StatusCodes.FORBIDDEN, FORBIDDEN_MSG));
+      return next(
+        createError(StatusCodes.FORBIDDEN, FORBIDDEN_MSG, {
+          reason: FORBIDDEN_ERROR_MSG,
+        })
+      );
     }
 
     return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
@@ -311,16 +312,11 @@ export const updateStatus = async (req: Request, res: Response, next: NextFuncti
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    if (msg === POST_NOT_FOUND_MSG) {
-      return next(createError(StatusCodes.NOT_FOUND, POST_NOT_FOUND_MSG));
-    }
 
-    if (msg === UNAUTHORIZED_MSG) {
-      return next(createError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED_MSG));
-    }
-
+    if (msg === POST_NOT_FOUND_MSG) return next(createError(StatusCodes.NOT_FOUND, POST_NOT_FOUND_MSG));
+    if (msg === UNAUTHORIZED_MSG) return next(createError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED_MSG));
     if (msg === FORBIDDEN_MSG) {
-      return next(createError(StatusCodes.FORBIDDEN, FORBIDDEN_MSG));
+      return next(createError(StatusCodes.FORBIDDEN, FORBIDDEN_MSG, { reason: FORBIDDEN_ERROR_MSG }));
     }
 
     return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
@@ -611,10 +607,7 @@ export const startFollowing = async (req: Request, res: Response, next: NextFunc
     );
   } catch (err) {
     const msg = getErrorReason(err) || SOMETHING_WENT_WRONG_MSG;
-    if (msg === "Already following") {
-      return next(createError(StatusCodes.BAD_REQUEST, msg));
-    }
-
+    if (msg === "Already following") return next(createError(StatusCodes.BAD_REQUEST, msg));
     return next(
       createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, {
         reason: msg,
