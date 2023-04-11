@@ -53,7 +53,7 @@ const router = Router();
 
 router.get(CHECK_USERNAME_AVAILABILITY_V1, checkUsernameAvailability);
 router.get(USER_GET_POSTS_V1, authorizationMiddleware, onboardedMiddleware, getMyPosts);
-router.get(GET_ME_V1, authorizationMiddleware, onboardedMiddleware, getMyDetails);
+router.get(GET_ME_V1, authorizationMiddleware, getMyDetails);
 router.get(USER_GET_COMMENTS_V1, authorizationMiddleware, onboardedMiddleware, getMyComments);
 router.get(USER_GET_FRIENDS_V1, authorizationMiddleware, onboardedMiddleware, getMyFriends);
 router.get(USER_GET_FRIEND_REQUESTS_V1, authorizationMiddleware, onboardedMiddleware, getMyFriendRequests);
