@@ -1,7 +1,10 @@
 /* eslint-disable no-underscore-dangle */
 import type { NextApiRequest, NextApiResponse } from "next";
 
-type ControllerFunction = <T>(req: NextApiRequest, res: NextApiResponse) => Promise<T> | T | void;
+type ControllerFunction = <T>(
+  req: NextApiRequest,
+  res: NextApiResponse
+) => Promise<T> | T | void | Promise<void>;
 type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "OPTIONS" | "HEAD" | "CONNECT" | "TRACE";
 type Route = {
   path: string;

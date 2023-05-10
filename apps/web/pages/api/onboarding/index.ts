@@ -1,4 +1,4 @@
-import router from "@/routes/usernameAvailable";
+import router from "@/routes/onboarding";
 
 import type { NextApiRequest, NextApiResponse } from "next";
 

@@ -1,9 +1,11 @@
-import pingController from "@/server/controllers/ping";
+import { PING } from "@/config/routes";
 
-import Router from "./Router";
+import Router from "@votewise/router";
+
+import pingController from "@/server/controllers/ping";
 
 const router = new Router();
 
-router.get("/api/ping", pingController);
+router.get(PING, pingController);
 
 export default router;

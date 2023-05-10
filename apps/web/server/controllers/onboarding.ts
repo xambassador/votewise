@@ -1,18 +1,15 @@
 import cookie from "cookie";
 import { StatusCodes } from "http-status-codes";
-
 import type { NextApiRequest, NextApiResponse } from "next";
-
-import { logger } from "@votewise/lib/logger";
-import type { OnboardingPayload } from "@votewise/types";
-
 import { getError } from "server/lib/getError";
 import { getProxyHeaders } from "server/lib/getProxyHeaders";
 import { getProxyResponseHeaders } from "server/lib/getProxyResponseHeaders";
 import { getServerSession } from "server/lib/getServerSession";
 import { UNAUTHORIZED_RESPONSE } from "server/lib/response";
-
 import { onboardUser } from "server/services/onboarding";
+
+import { logger } from "@votewise/lib/logger";
+import type { OnboardingPayload } from "@votewise/types";
 
 const { COOKIE_IS_ONBOARDED_KEY } = process.env;
 

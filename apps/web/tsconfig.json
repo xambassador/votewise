@@ -6,12 +6,14 @@
       "@/components/*": ["components/*"],
       "@/assets/*": ["assets/*"],
       "@/styles/*": ["styles/*"],
-      "@/hooks/*": ["hooks/*"],
+      "@/hooks/*": ["lib/hooks/*"],
       "@/routes/*": ["routes/*"],
-      "@/store/*": ["store/*"],
+      "@/store/*": ["lib/store/*"],
       "@/services/*": ["services/*"],
       "@/server/*": ["server/*"],
       "@/types/*": ["types/*"],
+      "@/lib/*": ["lib/*"],
+      "@/config/*": ["config/*"],
       "@votewise/ui/*": ["@votewise/ui/*"]
     }
   },
