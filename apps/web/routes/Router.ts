@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import type { NextApiRequest, NextApiResponse } from "next";
 
-type ControllerFunction = <T>(req: NextApiRequest, res: NextApiResponse) => Promise<T>;
+type ControllerFunction = <T>(req: NextApiRequest, res: NextApiResponse) => Promise<T> | T | void;
 type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "OPTIONS" | "HEAD" | "CONNECT" | "TRACE";
 type Route = {
   path: string;
@@ -82,31 +82,45 @@ export default class Router {
     return this._map;
   }
 
-  private _getRoute(method: Method, path: string): Route | undefined {
+  private _getRoute(
+    method: Method,
+    url: string,
+    query: Partial<{
+      [key: string]: string | string[];
+    }>
+  ): Route | undefined {
     const routes = this._map.get(method);
     if (!routes) return undefined;
-    return routes.find((route) => {
-      const isPathContainsParams = route.path.includes(":");
-      if (isPathContainsParams) {
-        const routePath = route.path.split("/");
-        const urlPath = path.split("/");
-        if (routePath.length !== urlPath.length) return false;
-        for (let i = 0; i < routePath.length; i += 1) {
-          // eslint-disable-next-line no-continue
-          if (routePath[i] !== urlPath[i]) continue;
-          // eslint-disable-next-line no-continue
-          if (routePath[i].startsWith(":")) continue;
-          return false;
+
+    if (Object.keys(query).length === 0) {
+      return routes.find((route) => route.path === url.split("?")[0]);
+    }
+
+    let route: Route | undefined;
+
+    for (let i = 0; i < routes.length; i += 1) {
+      const currentRoute = routes[i];
+      const params = Object.keys(query);
+      const currentUrl = url.split("?")[0];
+
+      for (let j = 0; j < params.length; j += 1) {
+        const param = params[j];
+        const value = query[param];
+        const regex = new RegExp(`:${param}`, "g");
+        const newPath = currentRoute.path.replace(regex, value as string);
+
+        if (newPath === currentUrl) {
+          return currentRoute;
         }
-        return true;
       }
-      return route.path === path;
-    });
+    }
+
+    return route;
   }
 
   public async handleRequest(req: NextApiRequest, res: NextApiResponse) {
-    const { method, url } = req;
-    const route = this._getRoute(method as Method, url as string);
+    const { method, url, query } = req;
+    const route = this._getRoute(method as Method, url as string, query);
     if (!route) {
       return res.status(404).json({
         message: "Not found",

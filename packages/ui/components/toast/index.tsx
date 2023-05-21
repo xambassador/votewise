@@ -9,8 +9,6 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import type { ToastOptions } from "react-hot-toast";
 
-import { classNames } from "@votewise/lib";
-
 type ToastProps = {
   message: string;
   visible: boolean;
