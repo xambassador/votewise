@@ -17,11 +17,11 @@ import { StepOne, StepTwo } from "components/onboarding";
 import { AvatarPicker } from "components/onboarding/AvatarPicker";
 import { CoverPicker } from "components/onboarding/CoverPicker";
 
-import { getCookie } from "server/lib/getCookie";
-import { getServerSession } from "server/lib/getServerSession";
-
 import { getOnboardingStatus } from "server/services/onboarding";
 import { onboardUser } from "services/onboarding";
+
+import { getCookie } from "server/lib/getCookie";
+import { getServerSession } from "server/lib/getServerSession";
 
 import type { NextPageWithLayout } from "./_app";
 
@@ -47,6 +47,7 @@ const Page: NextPageWithLayout = () => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
   const [status, setStatus] = useState<"idle" | "pending" | "resolved" | "rejected">("idle");
 
   const methods = useForm<FormValues>();
@@ -100,6 +101,10 @@ const Page: NextPageWithLayout = () => {
     setValue("cover_image", url);
   };
 
+  const handleOnError = useCallback((isErr: boolean) => {
+    setIsError(isErr);
+  }, []);
+
   return (
     <>
       <div className="flex flex-1 flex-col items-center justify-center">
@@ -131,7 +136,9 @@ const Page: NextPageWithLayout = () => {
                   </div>
 
                   <div className="flex flex-col gap-5">
-                    {currentStep === 1 && <StepOne onFetchingUsername={handleOnFetchingUsername} />}
+                    {currentStep === 1 && (
+                      <StepOne onFetchingUsername={handleOnFetchingUsername} onError={handleOnError} />
+                    )}
                     {currentStep === 2 && <StepTwo />}
                   </div>
                 </div>
@@ -140,7 +147,7 @@ const Page: NextPageWithLayout = () => {
                   <Button
                     type="submit"
                     isLoading={status === "pending"}
-                    disabled={isLoading || status === "pending"}
+                    disabled={isLoading || isError || status === "pending"}
                   >
                     {currentStep === TOTAL_STEPS ? "Finish" : "Next"}
                   </Button>

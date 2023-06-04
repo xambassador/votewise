@@ -1,4 +1,5 @@
 import type { AxiosResponse } from "axios";
+import { axiosInstance } from "lib/axios";
 
 import type {
   CreateCommentResponse,
@@ -14,8 +15,6 @@ import type {
   UnLikePostResponse,
   UpdateCommentResponse,
 } from "@votewise/types";
-
-import { axiosInstance } from "lib/axios";
 
 /**
  * @description Get all posts

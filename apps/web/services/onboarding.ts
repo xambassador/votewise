@@ -1,8 +1,7 @@
 import type { AxiosResponse } from "axios";
+import { axiosInstance } from "lib/axios";
 
 import type { OnboardingPayload, OnboardingResponse } from "@votewise/types";
-
-import { axiosInstance } from "lib/axios";
 
 /**
  *

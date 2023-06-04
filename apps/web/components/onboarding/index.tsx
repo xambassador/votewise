@@ -1,4 +1,5 @@
 import type { AxiosError } from "axios";
+import { useDebounce } from "lib/hooks/useDebounce";
 
 import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
@@ -6,8 +7,6 @@ import { useQuery } from "react-query";
 
 import type { ErrorResponse } from "@votewise/types";
 import { Loader, SelectField, TextAreaField, TextField } from "@votewise/ui";
-
-import { useDebounce } from "lib/hooks/useDebounce";
 
 import { checkUsernameAvailability } from "services/user";
 
@@ -17,17 +16,33 @@ const options = [
   { value: "OTHER", label: "Other" },
 ];
 
-export function StepOne({ onFetchingUsername }: { onFetchingUsername: (isLoading: boolean) => void }) {
+export function StepOne({
+  onFetchingUsername,
+  onError,
+}: {
+  onFetchingUsername: (isLoading: boolean) => void;
+  onError: (isError: boolean) => void;
+}) {
   const { register, control, watch } = useFormContext();
   const debouncedUsername = useDebounce(watch("username"), 500);
   const { data, isLoading, isSuccess, isError, error } = useQuery<
     Awaited<ReturnType<typeof checkUsernameAvailability>>,
     AxiosError<ErrorResponse>
-  >(["checkUsernameAvailability", debouncedUsername], () => checkUsernameAvailability(debouncedUsername), {
-    refetchOnWindowFocus: false,
-    enabled: !!debouncedUsername,
-    retry: false,
-  });
+  >(
+    ["checkUsernameAvailability", debouncedUsername],
+    () => {
+      onError(false);
+      return checkUsernameAvailability(debouncedUsername);
+    },
+    {
+      refetchOnWindowFocus: false,
+      enabled: !!debouncedUsername,
+      retry: false,
+      onError: () => {
+        onError(true);
+      },
+    }
+  );
 
   useEffect(() => {
     onFetchingUsername(isLoading);
