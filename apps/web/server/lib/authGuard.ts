@@ -12,7 +12,6 @@ import { setAuthCookies } from "./setAuthCookies";
 /**
  * @description Decode access token
  * @param token Access token
- * @returns
  */
 export const decodeToken = (token: string) => {
   try {
@@ -32,9 +31,7 @@ export const decodeToken = (token: string) => {
 };
 
 /**
- *
  * @param getServerSidePropsCallBack GetServerSideProps Function
- * @returns
  */
 export const authGuard =
   (getServerSidePropsCallBack: GetServerSideProps) => async (context: GetServerSidePropsContext) => {

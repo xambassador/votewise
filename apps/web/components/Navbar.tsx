@@ -39,6 +39,39 @@ import { JoinGroupNotification } from "./notification/JoinGroupNotification";
 import { UpvotePostNotification } from "./notification/UpvotePostNotification";
 import { UserPillSkeleton } from "./skeletons/UserInfoSkeleton";
 
+const links = [
+  {
+    name: "Home",
+    href: "/",
+    icon: Home,
+  },
+  {
+    name: "Groups",
+    href: "/groups",
+    icon: Group,
+  },
+  {
+    name: "Explore",
+    href: "/explore",
+    icon: Trending,
+  },
+];
+
+const userLinks = [
+  {
+    name: "Profile",
+    href: "/profile",
+  },
+  {
+    name: "Settings",
+    href: "/settings",
+  },
+  {
+    name: "Privacy",
+    href: "/privacy",
+  },
+];
+
 function Notifications() {
   return (
     <NotificationContainer>
@@ -155,15 +188,15 @@ function UserInfoBox() {
                   <div className="w-full rounded-full border border-gray-200" />
                 </DropdownMenuItemsGroup>
                 <DropdownMenuItemsGroup>
-                  <DropdownMenuItem>
-                    <Link href="/profile">Profile</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href="/settings">Settings</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href="/privacy">Privacy</Link>
-                  </DropdownMenuItem>
+                  {userLinks.map((link) => (
+                    <DropdownMenuItem key={link.name}>
+                      {({ close }) => (
+                        <Link href={link.href} onClick={() => close()}>
+                          {link.name}
+                        </Link>
+                      )}
+                    </DropdownMenuItem>
+                  ))}
                   <DropdownMenuItem>
                     <SignoutButton />
                   </DropdownMenuItem>
@@ -176,24 +209,6 @@ function UserInfoBox() {
     </>
   );
 }
-
-const links = [
-  {
-    name: "Home",
-    href: "/",
-    icon: Home,
-  },
-  {
-    name: "Groups",
-    href: "/groups",
-    icon: Group,
-  },
-  {
-    name: "Explore",
-    href: "/explore",
-    icon: Trending,
-  },
-];
 
 export function Navbar() {
   const router = useRouter();

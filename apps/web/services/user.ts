@@ -1,5 +1,4 @@
 import type { AxiosResponse } from "axios";
-import { axiosInstance } from "lib/axios";
 import type { OrderBy, PostStatus } from "types/post";
 
 import type {
@@ -15,6 +14,8 @@ import type {
   UpdatePostStatusResponse,
   UsernameAvailableResponse,
 } from "@votewise/types";
+
+import { axiosInstance } from "lib/axios";
 
 /**
  *

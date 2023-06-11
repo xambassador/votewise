@@ -164,6 +164,7 @@ export default function Page(props: PageProps) {
   return <PostDetails user={user} postId={postId} />;
 }
 
+// TODO: Replace with auth guard
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const { req, res, params } = context;
   const session = await getServerSession({ req, res });

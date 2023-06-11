@@ -206,6 +206,7 @@ export default function Home() {
   );
 }
 
+// TODO: Replace with auth guard
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const { req, res } = context;
   const session = await getServerSession({ req, res });

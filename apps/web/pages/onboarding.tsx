@@ -17,11 +17,11 @@ import { StepOne, StepTwo } from "components/onboarding";
 import { AvatarPicker } from "components/onboarding/AvatarPicker";
 import { CoverPicker } from "components/onboarding/CoverPicker";
 
-import { getOnboardingStatus } from "server/services/onboarding";
-import { onboardUser } from "services/onboarding";
-
 import { getCookie } from "server/lib/getCookie";
 import { getServerSession } from "server/lib/getServerSession";
+
+import { getOnboardingStatus } from "server/services/onboarding";
+import { onboardUser } from "services/onboarding";
 
 import type { NextPageWithLayout } from "./_app";
 
@@ -173,6 +173,7 @@ Page.getLayout = (page) => <AuthScreenLayout>{page}</AuthScreenLayout>;
 
 export default Page;
 
+// TODO: Replace with auth guard
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const { req, res } = context;
   const session = await getServerSession({ req, res });
