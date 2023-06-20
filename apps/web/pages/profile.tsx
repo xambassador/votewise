@@ -10,7 +10,14 @@ import { classNames } from "@votewise/lib";
 import { parseHashTags } from "@votewise/lib/hashtags";
 import type { GetMyPostsResponse } from "@votewise/types";
 import { Avatar, Badge, Button, Modal, Spinner, makeToast } from "@votewise/ui";
-import { FiMessageCircle as Message, Planet, FiSend as Sent, FiThumbsUp as Upvote } from "@votewise/ui/icons";
+import {
+  FiMapPin,
+  FiUserX,
+  FiMessageCircle as Message,
+  Planet,
+  FiSend as Sent,
+  FiThumbsUp as Upvote,
+} from "@votewise/ui/icons";
 
 import { FilterDropdown } from "components/Dropdowns/FilterDropdown";
 import { PostOptionsDropdown } from "components/Dropdowns/PostOptionsDropdown";
@@ -409,6 +416,41 @@ function Archived(props: Props) {
   );
 }
 
+// TODO: Make this component dynamic
+function FriendCard() {
+  return (
+    <div className="flex flex-col gap-3 rounded-lg border border-gray-200 py-4 px-3">
+      <div className="flex items-center gap-3">
+        <Avatar
+          src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?"
+          alt="User Avatar"
+          className="h-[calc((68/16)*1rem)]  w-[calc((68/16)*1rem)]"
+          width={68}
+          height={68}
+        />
+        <div className="flex flex-col items-center gap-1">
+          <h4 className="font-medium text-gray-600">Selma Knight</h4>
+          <span className="text-xs text-gray-500">@selma_knight</span>
+        </div>
+      </div>
+
+      <p className="text-sm text-gray-600">
+        The chair sat in the corner where it had been for over 25 years.
+      </p>
+
+      <div className="flex items-center gap-1">
+        <FiMapPin className="h-5 w-5 text-gray-500" />
+        <span className="text-gray-600">Japan</span>
+      </div>
+
+      <Button className="gap-2 bg-red-100">
+        <FiUserX className="h-5 w-5 text-red-800" />
+        <span className="text-sm text-red-800">Remove</span>
+      </Button>
+    </div>
+  );
+}
+
 function Friends() {
   const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } = useGetMyFriends();
 
@@ -435,11 +477,11 @@ function Friends() {
         data?.pages.map((page, i) => (
           // eslint-disable-next-line react/no-array-index-key
           <React.Fragment key={i}>
-            {page.data.friends.map((friend) => (
-              <div key={friend.friend_id}>
-                <p>{friend.name}</p>
-              </div>
-            ))}
+            <div className="grid max-w-[calc((774/16)*1rem)] grid-cols-2 gap-7">
+              {page.data.friends.map((friend) => (
+                <FriendCard key={friend.friend_id} />
+              ))}
+            </div>
           </React.Fragment>
         ))}
 
