@@ -9,8 +9,9 @@ import { QueryClient, dehydrate, useQueryClient } from "react-query";
 import { classNames } from "@votewise/lib";
 import { parseHashTags } from "@votewise/lib/hashtags";
 import type { GetMyPostsResponse } from "@votewise/types";
-import { Avatar, Badge, Button, Modal, Spinner, makeToast } from "@votewise/ui";
+import { Avatar, AvatarStack, Badge, Button, Modal, Spinner, makeToast } from "@votewise/ui";
 import {
+  FiLogOut,
   FiMapPin,
   FiUserX,
   FiMessageCircle as Message,
@@ -498,6 +499,108 @@ function Friends() {
   );
 }
 
+function GroupCard() {
+  return (
+    <div className="flex flex-col gap-6 rounded-lg border border-gray-200 py-7 px-9">
+      <div className="flex items-center justify-between">
+        <span className="text-2xl font-semibold text-gray-600">Naomi&apos;s Room</span>
+        <span className="flex items-center gap-[2px] rounded-full bg-green-200 py-[2px] px-[10px]">
+          <svg width="6" height="7" viewBox="0 0 6 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="3" cy="3.5" r="3" fill="#2B8A3E" />
+          </svg>
+          <span className="text-sm text-green-900">Active</span>
+        </span>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <Avatar
+          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb"
+          alt="User Avatar"
+          rounded
+        />
+
+        <div className="flex flex-col">
+          <span className="font-medium text-gray-600">Naomi Yoshida</span>
+          <span className="text-xs text-gray-600">naomiy@gmail.com</span>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-9">
+        <div className="flex flex-col text-center">
+          <span className="text-sm text-gray-600">Type</span>
+          <span className="font-medium text-gray-800">Public</span>
+        </div>
+        <div className="flex flex-col text-center">
+          <span className="text-sm text-gray-600">Created</span>
+          <span className="font-medium text-gray-800">3 Months ago</span>
+        </div>
+      </div>
+
+      <AvatarStack
+        className="-space-x-2"
+        avatars={[
+          {
+            src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+            alt: "User Avatar",
+            width: 28,
+            height: 28,
+          },
+          {
+            src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+            alt: "User Avatar",
+            width: 28,
+            height: 28,
+          },
+          {
+            src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+            alt: "User Avatar",
+            width: 28,
+            height: 28,
+          },
+          {
+            src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+            alt: "User Avatar",
+            width: 28,
+            height: 28,
+          },
+          {
+            src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+            alt: "User Avatar",
+            width: 28,
+            height: 28,
+          },
+          {
+            src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+            alt: "User Avatar",
+            width: 28,
+            height: 28,
+          },
+        ]}
+      />
+
+      <Button className="gap-1">
+        <span>
+          <FiLogOut className="h-5 w-5 text-blue-50" />
+        </span>
+        <span className="text-blue-50">Leave</span>
+      </Button>
+    </div>
+  );
+}
+
+function Groups() {
+  return (
+    <div className="flex flex-col gap-8">
+      <div className="grid grid-cols-2 gap-7">
+        <GroupCard />
+        <GroupCard />
+        <GroupCard />
+        <GroupCard />
+      </div>
+    </div>
+  );
+}
+
 type TabsValues = "POST" | "COMMENTS" | "ARCHIVED" | "FRIENDS" | "GROUPS";
 type Tab = { label: string; value: TabsValues };
 
@@ -551,6 +654,7 @@ export default function Page() {
       {selectedTab === "COMMENTS" && <Comments orderBy={orderBy} postStatus={postStatus} />}
       {selectedTab === "ARCHIVED" && <Archived orderBy={orderBy} postStatus="archived" />}
       {selectedTab === "FRIENDS" && <Friends />}
+      {selectedTab === "GROUPS" && <Groups />}
     </div>
   );
 }
