@@ -51,8 +51,8 @@ const links = [
     icon: Group,
   },
   {
-    name: "Explore",
-    href: "/explore",
+    name: "Trending",
+    href: "/trending",
     icon: Trending,
   },
 ];

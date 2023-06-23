@@ -540,37 +540,37 @@ function GroupCard() {
         className="-space-x-2"
         avatars={[
           {
-            src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+            src: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde",
             alt: "User Avatar",
             width: 28,
             height: 28,
           },
           {
-            src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+            src: "https://images.unsplash.com/photo-1527980965255-d3b416303d12",
             alt: "User Avatar",
             width: 28,
             height: 28,
           },
           {
-            src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+            src: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
             alt: "User Avatar",
             width: 28,
             height: 28,
           },
           {
-            src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+            src: "https://images.unsplash.com/photo-1544725176-7c40e5a71c5e",
             alt: "User Avatar",
             width: 28,
             height: 28,
           },
           {
-            src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+            src: "https://images.unsplash.com/photo-1608889175123-8ee362201f81",
             alt: "User Avatar",
             width: 28,
             height: 28,
           },
           {
-            src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+            src: "https://images.unsplash.com/photo-1640951613773-54706e06851d",
             alt: "User Avatar",
             width: 28,
             height: 28,
