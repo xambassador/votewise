@@ -37,7 +37,7 @@ function getThemeClasses(theme: "primary" | "secondary" | "tritertiary" | "dark"
   }
 
   if (theme === "dark") {
-    classnames += " bg-gray-800 py-3 text-gray-50 disabled:bg-gray-800";
+    classnames += " bg-gray-800 py-4 text-gray-50 disabled:bg-gray-800";
   }
 
   return classnames;

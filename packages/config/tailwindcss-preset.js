@@ -100,6 +100,7 @@ module.exports = {
         "notification-container":
           "0px 20px 25px -5px rgba(0, 0, 0, 0.1), 0px 10px 10px -5px rgba(0, 0, 0, 0.04);",
         dropdown: "0px 4px 12px rgba(0, 0, 0, 0.05), 0px 20px 25px -5px rgba(0, 0, 0, 0.1);",
+        modal: "0px 10px 10px -5px rgba(0, 0, 0, 0.04), 0px 20px 25px -5px rgba(0, 0, 0, 0.10)",
       },
       width: {
         15: "3.75rem",
@@ -108,6 +109,9 @@ module.exports = {
     fontSize: {
       ...require("tailwindcss/defaultTheme").fontSize,
       "3xl": "1.75rem",
+    },
+    transitionTimingFunction: {
+      "ease-out-expo": "cubic-bezier(0.19, 1, 0.22, 1)",
     },
   },
   plugins: [

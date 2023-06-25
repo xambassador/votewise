@@ -45,17 +45,24 @@ export function AvatarStack(props: { avatars: StackImage[]; className?: string; 
   const imageHeight = avatars[0].height || 28;
 
   return (
-    <div className={classNames("flex -space-x-1 overflow-hidden", wrapperClasses)}>
+    <div className={classNames("group flex -space-x-1 ", wrapperClasses)}>
       {avatars.map((avatar, index) => {
         const { className, ...rest } = avatar;
         const imageClassName = classNames("inline-block rounded-full ring-2 ring-white", className);
         // eslint-disable-next-line react/no-array-index-key
-        return <Image key={index} className={imageClassName} {...rest} />;
+        return (
+          <Image
+            key={index}
+            className={imageClassName}
+            wrapperClassName="transition-all duration-500 ease-ease-out-expo hover:scale-110"
+            {...rest}
+          />
+        );
       })}
 
       {showRemaining && (
         <div
-          className="z-50 flex flex-col items-center justify-center overflow-hidden rounded-full bg-blue-500 ring-2 ring-white"
+          className="z-10 flex flex-col items-center justify-center overflow-hidden rounded-full bg-blue-500 ring-2 ring-white"
           style={{ width: imageWidth, height: imageHeight }}
         >
           <span className="inline-block text-sm text-white">+{total}</span>

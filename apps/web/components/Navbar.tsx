@@ -158,6 +158,10 @@ function SignoutButton() {
   );
 }
 
+function getEmail(email: string) {
+  return email.length > 20 ? `${email.substring(0, 16)}...` : email;
+}
+
 function UserInfoBox() {
   const { status, data } = useMyDetails();
 
@@ -181,7 +185,7 @@ function UserInfoBox() {
               <DropdownMenuItems>
                 <DropdownMenuItemsGroup>
                   <DropdownMenuItem>
-                    <span>{data.data.user.email}</span>
+                    <span title={data.data.user.email}>{getEmail(data.data.user.email)}</span>
                   </DropdownMenuItem>
                 </DropdownMenuItemsGroup>
                 <DropdownMenuItemsGroup>
