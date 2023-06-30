@@ -4,8 +4,7 @@ import React from "react";
 
 export default function Document() {
   return (
-    // NOTE: Add a scrollbar class. Only way to fix layout shift issue when Modal is going to close.
-    <Html lang="en" className="scrollbar h-full">
+    <Html lang="en">
       <Head />
       <body className="h-full bg-gray-50 font-sans">
         <Main />
