@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 
 import { Popover, Transition } from "@headlessui/react";
-import React, { Fragment } from "react";
+import React, { Fragment, forwardRef } from "react";
 
 import { classNames } from "@votewise/lib";
 import {
@@ -214,10 +214,10 @@ function UserInfoBox() {
   );
 }
 
-export function Navbar() {
+export const Navbar = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>((props, ref) => {
   const router = useRouter();
   return (
-    <nav className="fixed top-0 left-0 right-0 z-10 bg-white py-5 shadow-sm">
+    <nav className="fixed top-0 left-0 right-0 z-10 bg-white py-5 shadow-sm" ref={ref}>
       <div className="container mx-auto flex items-center justify-between gap-[calc((155/16)*1rem)]">
         <Logo />
 
@@ -263,4 +263,4 @@ export function Navbar() {
       </div>
     </nav>
   );
-}
+});

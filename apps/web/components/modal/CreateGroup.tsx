@@ -12,7 +12,7 @@ export function CreateGroup() {
       <div className="flex shrink-0 flex-col items-start justify-start gap-3">
         <span className="font-medium text-gray-600">Admin / Creator</span>
 
-        <div className="relative flex shrink-0 flex-row items-center justify-start gap-4 rounded-lg bg-[#ffffff] p-2">
+        <div className="relative flex shrink-0 flex-row items-center justify-start gap-4 rounded-lg bg-white p-2">
           <Avatar
             src="https://images.unsplash.com/photo-1580489944761-15a19d654956"
             alt="Naomi Yoshida"
