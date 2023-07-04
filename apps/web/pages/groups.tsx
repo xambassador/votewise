@@ -261,7 +261,7 @@ export default function Groups() {
       </div>
 
       <Modal open={open} setOpen={setOpen}>
-        <CreateGroup />
+        <CreateGroup onClose={() => setOpen(false)} />
       </Modal>
     </>
   );
