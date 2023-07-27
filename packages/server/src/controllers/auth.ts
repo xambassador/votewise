@@ -1,16 +1,12 @@
-/**
- * @file: auth.ts
- * @description: Auth controller
- */
-// -----------------------------------------------------------------------------------------
 import bcrypt from "bcrypt";
 import type { NextFunction, Request, Response } from "express";
 import createError from "http-errors";
 import { StatusCodes } from "http-status-codes";
 
+/* ----------------------------------------------------------------------------------------------- */
 import dotenv from "dotenv";
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 import type {
   ForgotPasswordPayload,
   LoginPayload,
@@ -22,6 +18,7 @@ import type {
   VerifyEmailQuery,
 } from "@votewise/types";
 
+/* ----------------------------------------------------------------------------------------------- */
 import { JSONResponse } from "@/src/lib";
 import EmailService from "@/src/services/email";
 import UserService from "@/src/services/user";
@@ -51,9 +48,14 @@ import { isEmail } from "@/src/zodValidation/auth";
 
 dotenv.config();
 
+/* -----------------------------------------------------------------------------------------------
+ * Global Variables & Constants
+ * -----------------------------------------------------------------------------------------------*/
 const { FRONTEND_URL } = process.env;
 
-// -----------------------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------------------------
+ * @function: register
+ * -----------------------------------------------------------------------------------------------*/
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   const payload: RegisterUserPayload = req.body;
   const isValid = UserService.isValidRegisterPayload(payload);
@@ -118,7 +120,9 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------------------------
+ * @function: login
+ * -----------------------------------------------------------------------------------------------*/
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   const payload = req.body as LoginPayload;
   const isValid = UserService.isValidLoginPayload(payload);
@@ -155,7 +159,9 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------------------------
+ * @function: refreshAccessToken
+ * -----------------------------------------------------------------------------------------------*/
 export const refreshAccessToken = async (req: Request, res: Response, next: NextFunction) => {
   const { refreshToken } = req.body as RevokeAccessTokenPayload;
 
@@ -201,7 +207,9 @@ export const refreshAccessToken = async (req: Request, res: Response, next: Next
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------------------------
+ * @function: forgotPassword
+ * -----------------------------------------------------------------------------------------------*/
 export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
   const payload = req.body as ForgotPasswordPayload;
 
@@ -240,7 +248,9 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------------------------
+ * @function: resetPassword
+ * -----------------------------------------------------------------------------------------------*/
 export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
   const { password } = req.body as ResetPasswordPayload;
   const { token, email } = req.query as ResetPasswordQuery;
@@ -300,7 +310,9 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------------------------
+ * @function: verifyEmail
+ * -----------------------------------------------------------------------------------------------*/
 export const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
   const { token } = req.query as VerifyEmailQuery;
 
@@ -319,7 +331,9 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------------------------
+ * @function: resendEmailVerification
+ * -----------------------------------------------------------------------------------------------*/
 export const resendEmailVerification = async (req: Request, res: Response, next: NextFunction) => {
   const { email } = req.body as ResendEmailVerificationPayload;
 
