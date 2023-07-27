@@ -217,50 +217,52 @@ function UserInfoBox() {
 export const Navbar = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>((props, ref) => {
   const router = useRouter();
   return (
-    <nav className="fixed top-0 left-0 right-0 z-10 bg-white py-5 shadow-sm" ref={ref}>
-      <div className="container mx-auto flex items-center justify-between gap-[calc((155/16)*1rem)]">
-        <Logo />
+    <div className="fixed top-0 left-0 right-0 z-10 bg-white py-5 shadow-sm" ref={ref}>
+      <header className="relative">
+        <div className="container mx-auto flex items-center justify-between gap-[calc((155/16)*1rem)]">
+          <Logo />
 
-        <div className="flex gap-14">
-          <ul className="flex items-center gap-4">
-            {links.map((link) => (
-              <li key={link.name}>
-                <Link
-                  href={link.href}
-                  className={classNames(
-                    router.pathname === link.href &&
-                      "bg-black-900 flex items-center gap-2 rounded-full p-3 text-gray-50",
-                    router.pathname !== link.href &&
-                      "inline-block rounded-full p-3 transition-colors duration-200 ease-in-out hover:bg-gray-200"
-                  )}
-                >
-                  <span>
-                    {link.icon({
-                      className: classNames(
-                        "h-6 w-6",
-                        router.pathname === link.href ? "text-gray-50" : "text-gray-800"
-                      ),
-                    })}
-                  </span>
-                  {router.pathname === link.href && (
-                    <span className="font-medium text-gray-50">{link.name}</span>
-                  )}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div className="flex gap-14">
+            <ul className="flex items-center gap-4">
+              {links.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className={classNames(
+                      router.pathname === link.href &&
+                        "bg-black-900 flex items-center gap-2 rounded-full p-3 text-gray-50",
+                      router.pathname !== link.href &&
+                        "inline-block rounded-full p-3 transition-colors duration-200 ease-in-out hover:bg-gray-200"
+                    )}
+                  >
+                    <span>
+                      {link.icon({
+                        className: classNames(
+                          "h-6 w-6",
+                          router.pathname === link.href ? "text-gray-50" : "text-gray-800"
+                        ),
+                      })}
+                    </span>
+                    {router.pathname === link.href && (
+                      <span className="font-medium text-gray-50">{link.name}</span>
+                    )}
+                  </Link>
+                </li>
+              ))}
+            </ul>
 
-          <SearchField
-            name="search-query"
-            placeholder="Search posts, user or group"
-            className="w-[calc((500/16)*1rem)]"
-          />
+            <SearchField
+              name="search-query"
+              placeholder="Search posts, user or group"
+              className="w-[calc((500/16)*1rem)]"
+            />
+          </div>
+
+          <div className="flex items-center gap-4">
+            <UserInfoBox />
+          </div>
         </div>
-
-        <div className="flex items-center gap-4">
-          <UserInfoBox />
-        </div>
-      </div>
-    </nav>
+      </header>
+    </div>
   );
 });
