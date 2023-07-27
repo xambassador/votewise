@@ -95,4 +95,13 @@ apps/auth
 lerna-debug.log
 lerna-debug.log.*
 
+# ignore all images from packages/static-server
+packages/static-server/public/**/*.png
+packages/static-server/public/**/*.jpg
+packages/static-server/public/**/*.jpeg
+packages/static-server/public/**/*.gif
+packages/static-server/public/**/*.svg
+packages/static-server/public/**/*.ico
+
+
 todo.txt

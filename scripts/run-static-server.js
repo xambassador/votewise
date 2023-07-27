@@ -3,8 +3,10 @@ const path = require("path");
 
 const filePath = path.join(__dirname, "../static-server.sh");
 const cmdFilePath = path.join(__dirname, "../static-server.cmd");
+const macFilePath = path.join(__dirname, "../static-server-mac.sh");
 
 const isWin = process.platform === "win32";
+const isMac = process.platform === "darwin";
 
 if (isWin) {
   const command = `start /wait /b cmd.exe /c "${cmdFilePath}"`;
@@ -32,7 +34,8 @@ if (isWin) {
     process.exit();
   });
 } else {
-  const child = spawn("bash", [filePath], {
+  const shellScript = isMac ? macFilePath : filePath;
+  const child = spawn("bash", [shellScript], {
     detached: true,
     shell: true,
     stdout: "inherit",
