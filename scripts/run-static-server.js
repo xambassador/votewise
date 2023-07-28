@@ -44,11 +44,7 @@ function executeWindowsScript() {
  * -----------------------------------------------------------------------------------------------*/
 function executeLinuxScript() {
   const shellScript = isMac ? macFilePath : filePath;
-  const child = spawn("bash", [shellScript], {
-    detached: true,
-    shell: true,
-    stdout: "inherit",
-  });
+  const child = spawn("bash", [shellScript]);
 
   child.stdout.on("data", (data) => {
     console.log(`stdout: ${data}`);
@@ -67,6 +63,11 @@ function executeLinuxScript() {
     console.log("SIGINT received, killing child process");
     child.kill("SIGINT");
     process.exit();
+  });
+
+  process.on("exit", () => {
+    console.log("exiting");
+    child.kill("SIGINT");
   });
 }
 
