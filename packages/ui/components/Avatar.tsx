@@ -13,7 +13,7 @@ type ImageProps = {
   width?: number;
   height?: number;
 } & {
-  imageProps?: React.ComponentProps<typeof Image>;
+  imageProps?: Omit<React.ComponentProps<typeof Image>, "src">;
 };
 
 export function Avatar(props: ImageProps) {

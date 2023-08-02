@@ -1,12 +1,14 @@
 {
   "extends": "@votewise/tsconfig/node.json",
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "./dist",
     "baseUrl": ".",
-    "isolatedModules": true,
     "paths": {
       "@/src/*": ["src/*"],
-      "@/test/*": ["test/*"]
+      "@/test/*": ["test/*"],
+      "@votewise/lib/logger": ["../lib/logger"],
+      "@votewise/lib": ["../lib/*"],
+      "@votewise/prisma": ["../prisma/*"]
     }
   },
   "include": ["src/**/*", "test/**/*"],

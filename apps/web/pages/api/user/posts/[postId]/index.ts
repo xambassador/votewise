@@ -51,7 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       success: false,
       message: `The ${method} is not exists on this route`,
     });
-  } catch (err: any) {
+  } catch (err) {
     const { status, data } = getError(err);
     return res.status(status).json(data);
   }

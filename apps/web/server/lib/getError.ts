@@ -1,12 +1,39 @@
-export const getError = (error: any) => {
-  const status = error.response.status || 500;
-  const data = error.response.data || {
-    message: "Something went wrong",
+import { AxiosError } from "axios";
+
+export const getError = (error: unknown) => {
+  if (error instanceof Error) {
+    return {
+      status: 500,
+      data: {
+        message: error.message,
+        error: {
+          message: error.message,
+        },
+        data: null,
+        success: false,
+      },
+    };
+  }
+
+  if (error instanceof AxiosError) {
+    const status = error?.response?.status || 500;
+    const data = error?.response?.data || {
+      message: "Something went wrong",
+      error: {
+        message: error.message,
+      },
+      data: null,
+      success: false,
+    };
+    return { status, data };
+  }
+
+  return {
+    status: 500,
     error: {
-      message: error.message,
+      message: "Something went wrong",
     },
-    data: null,
     success: false,
+    data: null,
   };
-  return { status, data };
 };

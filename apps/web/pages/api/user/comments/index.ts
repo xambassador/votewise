@@ -39,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     getProxyResponseHeaders(res, responseHeaders);
 
     return res.status(status).json(data);
-  } catch (err: any) {
+  } catch (err) {
     const { status, data } = getError(err);
     return res.status(status).json(data);
   }

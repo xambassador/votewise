@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { useStore } from "zustand";
 
 import type { GetServerSidePropsContext } from "next";
@@ -54,9 +55,19 @@ function PostDetails(props: Props) {
     refetchOnMount: false,
   });
 
-  function handleError(err: any) {
-    const message = err?.response.data.error.message || "Something went wrong";
-    makeToast(message, "error");
+  function handleError(err: unknown) {
+    if (err instanceof Error) {
+      makeToast(err.message, "error");
+      return;
+    }
+
+    if (err instanceof AxiosError) {
+      const message = err?.response?.data.error.message || "Something went wrong";
+      makeToast(message, "error");
+      return;
+    }
+
+    makeToast("Something went wrong", "error");
   }
 
   const likeMutation = useLikeMutation(queryClient, user as User, {

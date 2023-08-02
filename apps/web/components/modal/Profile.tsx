@@ -87,7 +87,7 @@ export function Profile({ setOpen }: { setOpen: (open: boolean) => void }) {
     },
   });
 
-  const handleOnSubmit = (data: Form) => {
+  const handleOnSubmit = () => {
     // TODO: Update user profile
   };
 

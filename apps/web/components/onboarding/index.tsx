@@ -1,5 +1,4 @@
 import type { AxiosError } from "axios";
-import { useDebounce } from "lib/hooks/useDebounce";
 
 import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
@@ -7,6 +6,8 @@ import { useQuery } from "react-query";
 
 import type { ErrorResponse } from "@votewise/types";
 import { Loader, SelectField, TextAreaField, TextField } from "@votewise/ui";
+
+import { useDebounce } from "lib/hooks/useDebounce";
 
 import { checkUsernameAvailability } from "services/user";
 

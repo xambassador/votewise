@@ -4,9 +4,9 @@
     "sideEffects": false,
     "version": "0.0.0",
     "scripts": {
-        "start": "npm run build && node dist/index.js",
+        "start": "npm run build && node dist/src/index.js",
         "dev": "nodemon",
-        "build": "rimraf ./dist && tsc",
+        "build": "tsc --lib DOM,ES6",
         "test": "NODE_ENV=test jest --silent --forceExit",
         "test:watch": "NODE_ENV=test jest --runInBand --silent --forceExit --watch"
     },
