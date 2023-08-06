@@ -2,9 +2,10 @@
   "name": "@votewise/static-server",
   "version": "0.0.0",
   "scripts": {
-    "start": "npm run build && node dist/index.js",
-    "build": "rimraf ./dist && tsc",
-    "dev": "nodemon"
+    "start": "node dist/server.js",
+    "build": "rimraf dist && tsc && node ./esbuild.config.js",
+    "dev": "nodemon",
+    "clean": "rimraf dist"
   },
   "dependencies": {
     "@votewise/lib": "*",
@@ -19,6 +20,8 @@
     "@types/node": "^20.4.8",
     "@votewise/config": "*",
     "@votewise/tsconfig": "*",
+    "esbuild": "^0.18.18",
+    "esbuild-plugin-copy": "^2.1.1",
     "nodemon": "^2.0.20",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^3.14.2",

@@ -11,12 +11,11 @@ import http from "http";
 import { promisify } from "util";
 import { v4 } from "uuid";
 
-import { logger } from "@votewise/lib/logger";
-
 dotenv.config();
 
 // ----------
 const getFileInfo = promisify(fs.stat);
+const log = console.log;
 
 // ----------
 const port = process.env.STATIC_UPLOAD_SERVER_PORT || 8001;
@@ -117,8 +116,7 @@ app.post("/upload", async (req, res) => {
 
   const bb = busboy({ headers: req.headers });
 
-  bb.on("error", (e) => {
-    logger(`Failed to read file :===> ${e}`, "error");
+  bb.on("error", () => {
     return res.sendStatus(500);
   });
 
@@ -134,11 +132,9 @@ app.post("/upload", async (req, res) => {
         return res.status(400).json({ message: "Bad Chunk Starting Byte" });
       }
       file.pipe(fs.createWriteStream(filepath, { flags: "a" })).on("error", () => {
-        logger("Failed to upload file", "error");
         return res.status(500).json({ message: "Something is wrong", success: false });
       });
     } catch (error) {
-      logger(`Failed to get file details :===> ${error}`, "error");
       return res.status(404).json({
         message: "No file found with provided credentials",
         credentials: {
@@ -155,7 +151,7 @@ app.post("/upload", async (req, res) => {
       message: "File uploaded successfully",
       success: true,
       data: {
-        // We delegate the serving of the file to the client to rust static-web-server, which is running on port 8787
+        // Generating url with static-web-server port.
         url: `${req.protocol}://${req.hostname}:${staticServerPort}/upload-${token}-${fileName}`,
       },
     });
@@ -183,8 +179,7 @@ app.get("/upload-status", (req, res) => {
         totalChunkUploaded: stats.size,
       });
     })
-    .catch((error) => {
-      logger(`Failed to get file details ===> ${error}`, "error");
+    .catch(() => {
       return res.status(404).json({
         message: "No file found with provided credentials",
         credentials: {
@@ -235,18 +230,18 @@ app.get("/heartbeat", (req, res) => {
 
 // ----------
 httpServer.listen(port, () => {
-  logger(`Static Server is on fire 🔥🔥🔥 on ${port}`, "info");
+  log(`Static Server is on fire 🔥🔥🔥 on ${port}`);
 });
 
 // ----------
 // Handle graceful shutdown
 process.on("SIGTERM", () => {
-  logger("🚨 SIGTERM signal received: closing HTTP server");
+  log("🚨 SIGTERM signal received: closing HTTP server");
   httpServer.close(() => {
-    logger(`🚨🚨🚨 💤Server is going to shutdown .....`);
+    log(`🚨🚨🚨 💤Server is going to shutdown .....`);
 
     // Gracefully exit the process
-    logger(`💤💤💤Server is shutdown .....`);
+    log(`💤💤💤Server is shutdown .....`);
     process.exit(0);
   });
 });

@@ -2,9 +2,11 @@
 
 const packages = require("./package.json");
 const esbuild = require("esbuild");
+const fs = require("fs");
+const fsExtra = require("fs-extra");
 const { copy } = require("esbuild-plugin-copy");
 
-const external = [];
+const external = ["prisma"];
 Object.keys(packages.dependencies || {}).forEach((key) => {
   if (key.startsWith("@votewise")) return;
   return external.push(key);
@@ -32,4 +34,20 @@ esbuild
       }),
     ],
   })
-  .catch(() => process.exit(1));
+  .then(() => {
+    fsExtra.copySync("../../node_modules/.prisma/client", "./dist", {
+      filter: (src) => {
+        if (src.endsWith(".js") || src.endsWith(".ts") || src.endsWith(".json") || src.endsWith(".prisma")) {
+          return false;
+        }
+        return true;
+      },
+    });
+    console.log(`[${packages.name}] ✨ Build successfull`);
+    process.exit(0);
+  })
+  .catch((e) => {
+    console.error(`[${packages.name}] ❌ Build failed`);
+    console.error(e);
+    process.exit(1);
+  });
