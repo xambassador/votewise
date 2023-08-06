@@ -8,7 +8,7 @@ import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import React from "react";
 import { QueryClient, dehydrate, useQuery, useQueryClient } from "react-query";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 import { parseHashTags } from "@votewise/lib/hashtags";
 import { Spinner, makeToast } from "@votewise/ui";
 import { FiMessageCircle as Message, FiSend as Sent, FiThumbsUp as Upvote } from "@votewise/ui/icons";

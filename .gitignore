@@ -103,5 +103,6 @@ packages/static-server/public/**/*.gif
 packages/static-server/public/**/*.svg
 packages/static-server/public/**/*.ico
 
+.prisma/
 
 todo.txt

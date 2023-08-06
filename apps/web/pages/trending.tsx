@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import React from "react";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 import { FiMessageCircle as Message, FiSend as Sent, FiThumbsUp as Upvote } from "@votewise/ui/icons";
 
 import {

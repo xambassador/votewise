@@ -2,7 +2,7 @@ import React from "react";
 import type { ReactNode } from "react";
 import SimpleBar from "simplebar-react";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 import { Avatar, Button } from "@votewise/ui";
 
 type NotificationContainerProps = {

@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 import { Avatar, Button, Image, Modal } from "@votewise/ui";
 import { FiEdit as Edit, FiFacebook, FiInstagram, FiTwitter, FiMapPin as Map } from "@votewise/ui/icons";
 

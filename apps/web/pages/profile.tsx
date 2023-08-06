@@ -6,7 +6,7 @@ import Link from "next/link";
 import React, { useRef, useState } from "react";
 import { QueryClient, dehydrate, useQueryClient } from "react-query";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 import { parseHashTags } from "@votewise/lib/hashtags";
 import type { GetMyPostsResponse } from "@votewise/types";
 import { Avatar, AvatarStack, Badge, Button, Modal, Spinner, makeToast } from "@votewise/ui";

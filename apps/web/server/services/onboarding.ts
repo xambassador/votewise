@@ -1,7 +1,7 @@
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
 import { getAxiosServerWithAuth } from "server/lib/axios";
 
-import { ONBOARDING_ROUTE_V1, ONBOARDING_STATUS_V1, ONBOARDING_UPDATE_V1 } from "@votewise/lib";
+import { ONBOARDING_ROUTE_V1, ONBOARDING_STATUS_V1, ONBOARDING_UPDATE_V1 } from "@votewise/lib/routes";
 import type { OnboardingPayload, OnboardingResponse } from "@votewise/types";
 
 /**

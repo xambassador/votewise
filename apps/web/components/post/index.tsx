@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import React from "react";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 import { Avatar, Badge, Image, Input, Loader } from "@votewise/ui";
 import { FiClock as Clock, FiSend, FiMapPin as MapPin } from "@votewise/ui/icons";
 

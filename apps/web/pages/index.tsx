@@ -7,7 +7,7 @@ import React from "react";
 import { QueryClient, dehydrate, useMutation, useQueryClient } from "react-query";
 import type { InfiniteData } from "react-query";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 import { parseHashTags } from "@votewise/lib/hashtags";
 import type { GetPostsResponse } from "@votewise/types";
 import { Button, makeToast } from "@votewise/ui";

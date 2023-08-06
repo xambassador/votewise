@@ -1,7 +1,7 @@
 import React, { useId } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 import { ModalTitle, Spinner, TextArea, Thumbnail, UnstyledSelect } from "@votewise/ui";
 import { FiGlobe } from "@votewise/ui/icons";
 

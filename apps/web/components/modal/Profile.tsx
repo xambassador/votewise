@@ -3,7 +3,7 @@ import { useStore } from "zustand";
 import React, { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 import { Avatar, Button, EmailField, Image, Input, InputField, TextAreaField } from "@votewise/ui";
 import { FiFacebook, FiInstagram, FiTwitter } from "@votewise/ui/icons";
 

@@ -11,7 +11,7 @@ import {
   USER_GET_POSTS_V1,
   USER_ROUTE_V1,
   USER_UPDATE_POST_V1,
-} from "@votewise/lib";
+} from "@votewise/lib/routes";
 import type {
   CreatePostPayload,
   CreatePostResponse,

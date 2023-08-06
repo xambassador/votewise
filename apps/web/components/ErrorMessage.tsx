@@ -1,7 +1,7 @@
 import React from "react";
 import type { ReactNode } from "react";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 import { FiX as CloseIcon } from "@votewise/ui/icons";
 
 type ErrorMessageProps = {

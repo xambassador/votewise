@@ -1,6 +1,6 @@
 import React from "react";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 import { Avatar } from "@votewise/ui";
 
 type Props = {

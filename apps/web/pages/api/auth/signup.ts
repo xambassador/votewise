@@ -3,7 +3,7 @@ import cookie from "cookie";
 
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import { AUTH_ROUTE_V1, REGISTER_USER_V1 } from "@votewise/lib";
+import { AUTH_ROUTE_V1, REGISTER_USER_V1 } from "@votewise/lib/routes";
 import type { RegisterUserPayload } from "@votewise/types";
 
 import { axiosServerInstance } from "server/lib/axios";

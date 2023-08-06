@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import React from "react";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 import { FiMessageCircle as Message, FiThumbsUp as Upvote } from "@votewise/ui/icons";
 
 import { ButtonGroup } from ".";
