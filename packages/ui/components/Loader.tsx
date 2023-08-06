@@ -1,6 +1,6 @@
 import React from "react";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 
 function LoaderIcon({ height = "h-4", width = "w-4", color = "currentColor", className = "" }) {
   return (

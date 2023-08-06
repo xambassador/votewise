@@ -3,7 +3,7 @@ import { useFormContext } from "react-hook-form";
 import type { GroupBase, InputProps, Props } from "react-select";
 import ReactSelect, { components } from "react-select";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 
 import { Label } from "./fields";
 

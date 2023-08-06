@@ -1,7 +1,7 @@
 import { Switch } from "@headlessui/react";
 import React, { useId } from "react";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 
 type Props = React.ComponentProps<typeof Switch> & {
   label?: string;

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import React, { forwardRef, useId } from "react";
 import { useFormContext } from "react-hook-form";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 
 import { FiSearch as SearchIcon } from "../../icons";
 

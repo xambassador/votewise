@@ -7,7 +7,7 @@ import {
 import React from "react";
 import type { ReactNode } from "react";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 
 type AlertProps = {
   children: ReactNode;

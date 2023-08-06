@@ -2,7 +2,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import React, { Fragment, useRef } from "react";
 import type { ReactNode, RefObject } from "react";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 
 type ModalTitleProps = React.ComponentProps<typeof Dialog.Title>;
 export function ModalTitle(props: ModalTitleProps) {

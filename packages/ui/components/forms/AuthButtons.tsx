@@ -1,7 +1,7 @@
 import React from "react";
 import type { ReactNode } from "react";
 
-import { classNames } from "@votewise/lib";
+import classNames from "@votewise/lib/classnames";
 
 import { Facebook } from "../../icons/Facebook";
 import { Google } from "../../icons/Google";
