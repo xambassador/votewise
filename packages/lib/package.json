@@ -8,10 +8,13 @@
         "lint:fix": "eslint . --ext .ts,.js,.tsx,.jsx --fix"
     },
     "dependencies": {
+        "chalk": "4.1.2",
         "dotenv": "^16.0.3",
+        "lodash": "^4.17.21",
         "pino": "^8.11.0",
         "pino-pretty": "^9.4.0",
-        "tailwind-merge": "^1.10.0"
+        "tailwind-merge": "^1.10.0",
+        "winston": "^3.10.0"
     },
     "devDependencies": {
         "@types/node": "18.14.1",

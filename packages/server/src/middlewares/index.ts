@@ -8,10 +8,10 @@ import type { Application } from "express";
 import express, { json } from "express";
 import helmet from "helmet";
 
-import { logger } from "@votewise/lib/logger";
+import Logger from "@votewise/lib/logger";
 
 const registerMiddlewares = (app: Application) => {
-  logger("▶️ Registering middlewares....");
+  Logger.info("LIFECYCLE", `🚀 Middlewares onboarding... System checking... Destination: Calculating...`);
   app.use(compression());
   app.use(
     cors({
@@ -31,7 +31,10 @@ const registerMiddlewares = (app: Application) => {
     }
     next();
   });
-  logger("✅ Middlewares registered....");
+  Logger.info(
+    "LIFECYCLE",
+    `🚀 Middlewares on Board! Systems check complete. Destination: Success, with registered middlewares!`
+  );
 };
 
 export { registerMiddlewares };

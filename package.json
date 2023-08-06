@@ -31,7 +31,8 @@
     "dev:window": "lerna run dev --parallel --stream --no-bail --scope @votewise/web --scope @votewise/server --scope @votewise/static-server",
     "static-server": "node ./scripts/run-static-server.js",
     "predev": "dotenv-checker --schema .env.example --env .env",
-    "postinstall": "yarn run db:migrate && yarn run db:seed"
+    "postinstall": "yarn run db:migrate && yarn run db:seed",
+    "graph": "nx graph"
   },
   "devDependencies": {
     "@types/jest": "^29.4.0",

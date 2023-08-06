@@ -5,7 +5,7 @@
 import type { Application } from "express";
 
 // -----------------------------------------------------------------------------------------
-import { logger } from "@votewise/lib/logger";
+import Logger, { logger } from "@votewise/lib/logger";
 import {
   AUTH_ROUTE_V1,
   GROUPS_ROUTE_V1,
@@ -26,7 +26,7 @@ import userRouter from "@/src/routes/user";
 
 // Register routes
 const registerRoutes = (app: Application) => {
-  logger("▶️ Registering routes...");
+  Logger.info("LIFECYCLE", `🚀 Launching Navigation....`);
 
   app.use(HEALTH_ROUTE, healthCheckRouter);
   app.use(AUTH_ROUTE_V1, authRouter);
@@ -37,7 +37,7 @@ const registerRoutes = (app: Application) => {
   app.use("*", notFoundRouter);
   app.use(errorMiddleware);
 
-  logger("✅ Routes registered...");
+  Logger.info("LIFECYCLE", `🚀 Launching Navigation done! Routes in position.`);
 };
 
 export { registerRoutes };
