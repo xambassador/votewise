@@ -17,7 +17,7 @@ import {
   UNLIKE_COMMENT_ON_POST_V1,
   UNLIKE_POST_V1,
   UPDATE_COMMENT_ON_POST_V1,
-} from "@votewise/lib";
+} from "@votewise/lib/routes";
 
 import {
   commentOnPost,

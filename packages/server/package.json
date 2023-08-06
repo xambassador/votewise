@@ -3,12 +3,14 @@
     "private": true,
     "sideEffects": false,
     "version": "0.0.0",
+    "main": "dist/index.js",
     "scripts": {
-        "start": "npm run build && node dist/src/index.js",
+        "start": "node dist/index.js",
         "dev": "nodemon",
-        "build": "tsc --lib DOM,ES6",
+        "build": "rimraf dist && tsc --noEmit && node ./esbuild.config.js",
         "test": "NODE_ENV=test jest --silent --forceExit",
-        "test:watch": "NODE_ENV=test jest --runInBand --silent --forceExit --watch"
+        "test:watch": "NODE_ENV=test jest --runInBand --silent --forceExit --watch",
+        "clean": "rimraf dist"
     },
     "dependencies": {
         "@votewise/lib": "*",
@@ -53,6 +55,8 @@
         "@types/supertest": "^2.0.12",
         "@votewise/config": "*",
         "@votewise/tsconfig": "*",
+        "esbuild": "^0.18.18",
+        "esbuild-plugin-copy": "^2.1.1",
         "eslint": "^8.34.0",
         "jest": "^29.4.3",
         "jest-mock-extended": "^3.0.2",

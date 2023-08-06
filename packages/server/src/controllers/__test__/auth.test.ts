@@ -14,7 +14,7 @@ import {
   REGISTER_USER_V1,
   RESET_PASSWORD_V1,
   REVOKE_ACCESS_TOKEN_V1,
-} from "@votewise/lib";
+} from "@votewise/lib/routes";
 
 import app from "../..";
 import prismaMock from "../../../test/__mock__/prisma";

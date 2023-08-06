@@ -2,7 +2,7 @@ import http from "http";
 import { StatusCodes } from "http-status-codes";
 import supertest from "supertest";
 
-import { CHECK_USERNAME_AVAILABILITY_V1, USER_ROUTE_V1 } from "@votewise/lib";
+import { CHECK_USERNAME_AVAILABILITY_V1, USER_ROUTE_V1 } from "@votewise/lib/routes";
 
 import app from "../..";
 import prismaMock from "../../../test/__mock__/prisma";

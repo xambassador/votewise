@@ -3,8 +3,6 @@
     "private": true,
     "version": "0.0.0",
     "sideEffects": false,
-    "main": "./index.ts",
-    "types": "./index.ts",
     "scripts": {
         "lint": "eslint . --ext .ts,.js,.tsx,.jsx",
         "lint:fix": "eslint . --ext .ts,.js,.tsx,.jsx --fix"

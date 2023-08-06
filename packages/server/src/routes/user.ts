@@ -24,7 +24,7 @@ import {
   USER_UNFOLLOW_USER_V1,
   USER_UPDATE_POST_V1,
   USER_UPDATE_PROFILE_V1,
-} from "@votewise/lib";
+} from "@votewise/lib/routes";
 
 import {
   acceptOrRejectFriendRequest,

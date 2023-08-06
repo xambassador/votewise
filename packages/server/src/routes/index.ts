@@ -5,6 +5,7 @@
 import type { Application } from "express";
 
 // -----------------------------------------------------------------------------------------
+import { logger } from "@votewise/lib/logger";
 import {
   AUTH_ROUTE_V1,
   GROUPS_ROUTE_V1,
@@ -12,8 +13,7 @@ import {
   ONBOARDING_ROUTE_V1,
   POST_ROUTE_V1,
   USER_ROUTE_V1,
-} from "@votewise/lib";
-import { logger } from "@votewise/lib/logger";
+} from "@votewise/lib/routes";
 
 import { errorMiddleware } from "@/src/middlewares/error";
 import authRouter from "@/src/routes/auth";

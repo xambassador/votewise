@@ -5,7 +5,7 @@
 import type { Request, Response } from "express";
 import { Router } from "express";
 
-import { HEALTH_CHECK, PING } from "@votewise/lib";
+import { HEALTH_CHECK, PING } from "@votewise/lib/routes";
 
 import { JSONResponse } from "@/src/lib";
 
