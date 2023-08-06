@@ -1,5 +1,7 @@
-// This is minimal server for add support for file uploads
-// As of now, static-web-server doesn't support file uploads
+/* -----------------------------------------------------------------------------------------------
+ * This is minimal server for add support for file uploads
+ * As of now, static-web-server doesn't support file uploads
+ * -----------------------------------------------------------------------------------------------*/
 import busboy from "busboy";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -19,6 +21,8 @@ const getFileInfo = promisify(fs.stat);
 // ----------
 const port = process.env.STATIC_UPLOAD_SERVER_PORT || 8001;
 const staticServerPort = process.env.STATIC_WEB_SERVER_PORT || 8787;
+
+import("./scripts/launch-static-server");
 
 // ----------
 const app = express();
