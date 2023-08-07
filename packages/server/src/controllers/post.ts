@@ -1,7 +1,3 @@
-/**
- * @file: post.ts
- * @description: Contains all posts related controllers
- */
 import type { NextFunction, Request, Response } from "express";
 import createError from "http-errors";
 import { StatusCodes } from "http-status-codes";

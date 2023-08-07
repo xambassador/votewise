@@ -1,7 +1,3 @@
-/**
- * @file: onboarding.ts
- * @description: Onboarding routes.
- */
 import { Router } from "express";
 
 import { ONBOARDING_STATUS_V1, ONBOARDING_UPDATE_V1 } from "@votewise/lib/routes";

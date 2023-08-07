@@ -1,14 +1,11 @@
-/**
- * @file: auth.ts
- * @description: This file contains all zod schemas for auth routes and controllers
- */
 import { z } from "zod";
 
 import type { LoginPayload, RegisterUserPayload } from "@votewise/types";
 
 import { generateErrorMessage } from "@/src/zodValidation/generateErrorMessage";
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
+
 const registerUserSchema = z.object({
   password: z
     .string({
@@ -96,4 +93,5 @@ const validateLoginSchema = (payload: LoginPayload) => {
   return { success: true, message: null };
 };
 
+/* ----------------------------------------------------------------------------------------------- */
 export { validateRegisterUserSchema, validateLoginSchema };

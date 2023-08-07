@@ -1,7 +1,3 @@
-/**
- * @file: index.ts
- * @description: Onboarding service
- */
 import { ERROR_WHILE_ONBOARDING_USER_MSG, USERNAME_ALREADY_TAKEN_MSG } from "@votewise/lib/constants";
 import { prisma } from "@votewise/prisma";
 import type { OnboardingPayload } from "@votewise/types";

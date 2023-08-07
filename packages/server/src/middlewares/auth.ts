@@ -1,7 +1,3 @@
-/**
- * @file: auth.ts
- * @description: Authentication middleware.
- */
 import type { NextFunction, Request, Response } from "express";
 import httpStatusCodes from "http-status-codes";
 

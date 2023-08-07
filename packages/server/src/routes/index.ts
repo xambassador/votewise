@@ -1,11 +1,7 @@
-/**
- * @file: index.ts
- * @description: Contains all the routes for the application and registers them
- */
 import type { Application } from "express";
 
 // -----------------------------------------------------------------------------------------
-import Logger, { logger } from "@votewise/lib/logger";
+import Logger from "@votewise/lib/logger";
 import {
   AUTH_ROUTE_V1,
   GROUPS_ROUTE_V1,

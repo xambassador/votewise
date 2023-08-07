@@ -1,7 +1,3 @@
-/**
- * @file: index.ts
- * @description: Middlewares for the application
- */
 import compression from "compression";
 import cors from "cors";
 import type { Application } from "express";

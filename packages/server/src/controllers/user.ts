@@ -1,7 +1,3 @@
-/**
- * @file: user.ts
- * @description: Contains all users related controllers
- */
 import type { PostStatus } from "@prisma/client";
 import type { NextFunction, Request, Response } from "express";
 import createError from "http-errors";

@@ -1,7 +1,3 @@
-/**
- * @file: onboarding.ts
- * @description: Onboarding controller
- */
 import type { NextFunction, Request, Response } from "express";
 import createError from "http-errors";
 import { StatusCodes } from "http-status-codes";

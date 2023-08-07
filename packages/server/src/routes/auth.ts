@@ -1,7 +1,3 @@
-/**
- * @file: auth.ts
- * @description: Authentication routes
- */
 import { Router } from "express";
 
 import {

@@ -1,7 +1,3 @@
-/**
- * @file: user.ts
- * @description: Contains all users related routes
- */
 import { Router } from "express";
 
 import {

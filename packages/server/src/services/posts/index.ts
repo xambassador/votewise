@@ -1,7 +1,3 @@
-/**
- * @file: index.ts
- * @description: Contains all posts related services
- */
 // eslint-disable-next-line max-classes-per-file
 import type { PostStatus } from "@prisma/client";
 import { nanoid } from "nanoid";

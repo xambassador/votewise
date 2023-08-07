@@ -1,7 +1,3 @@
-/**
- * @file: onboarding.ts
- * @description: Contains validators for onboarding controller.
- */
 import { z } from "zod";
 
 import type { OnboardingPayload } from "@votewise/types";

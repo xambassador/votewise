@@ -1,7 +1,3 @@
-/**
- * @file: post.ts
- * @description: Contains all posts related routes
- */
 import { Router } from "express";
 
 import {
