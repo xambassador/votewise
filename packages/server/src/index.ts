@@ -92,17 +92,26 @@ process.on("SIGTERM", () => {
     `[🚨] 🚀 Rocket Docking Initiated! SIGTERM received. Engines throttling down for a graceful touchdown.`
   );
 
-  httpServer.close(() => {
-    Logger.info(
-      "LIFECYCLE",
-      `🛑 ✅ Mission Accomplished! Your server is signing off. Until we launch again, over and out!`
-    );
+  httpServer.stop((err, gracefully) => {
+    if (err) {
+      Logger.error("LIFECYCLE", `🚨 Rocket Docking Failed! Unable to stop the server gracefully.`);
+      process.exit(1);
+    }
 
     // Close the database connection
     prisma.$disconnect();
 
-    // Gracefully exit the process
-    process.exit(0);
+    if (gracefully) {
+      Logger.info(
+        "LIFECYCLE",
+        `🛑 ✅ Mission Accomplished! Your server is signing off. Until we launch again, over and out!`
+      );
+    } else {
+      Logger.info(
+        "LIFECYCLE",
+        `🛑 🚨 Mission Aborted! Your server is signing off. Until we launch again, over and out!`
+      );
+    }
   });
 });
 
