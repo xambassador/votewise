@@ -1,8 +1,6 @@
 import type { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from "next";
 import { revokeAccessToken } from "server/services/revokeToken";
 
-import { logger } from "@votewise/lib/logger";
-
 import { clearCookies } from "./clearCookies";
 import { decodeJwt } from "./decodeJwt";
 import { getCookie } from "./getCookie";
@@ -36,7 +34,7 @@ const decodeToken = (token: string) => {
 };
 
 /**
- * @description Check if user is authenticated or not. It will also refresh the token if it is expired
+ * Check if user is authenticated or not. It will also refresh the token if it is expired
  * @param options
  * @returns User id and access token if user is authenticated. Otherwise, null is user is not authenticated or token is expired and cannot be refreshed
  * It will also set the cookies if token is refreshed successfully. Otherwise, it will clear the cookies
@@ -71,7 +69,6 @@ export const getServerSession = async (
     }
 
     try {
-      logger("====> Trying to refresh token");
       const response = await revokeAccessToken(refreshToken);
       setAuthCookies(res, {
         accessToken: response.data.accessToken,
@@ -83,7 +80,6 @@ export const getServerSession = async (
         accessToken: response.data.accessToken,
       };
     } catch (err: any) {
-      logger(`====> Error refreshing token   ${err?.response.data.error.message}`, "error");
       clearCookies(res);
       return null;
     }

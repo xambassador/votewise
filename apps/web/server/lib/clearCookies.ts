@@ -5,7 +5,7 @@ const tokenKey = process.env.COOKIE_ACCESS_TOKEN_KEY;
 const refreshTokenKey = process.env.COOKIE_REFRESH_TOKEN_KEY;
 
 /**
- * @description Clear cookies from response
+ * Clear cookies from response
  */
 export function clearCookies(res: GetServerSidePropsContext["res"] | NextApiResponse) {
   res.setHeader("Set-Cookie", [

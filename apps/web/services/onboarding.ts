@@ -5,8 +5,7 @@ import type { OnboardingPayload, OnboardingResponse } from "@votewise/types";
 import { axiosInstance } from "lib/axios";
 
 /**
- *
- * @description Onboard a user
+ * Onboard a user
  */
 export const onboardUser = async (data: OnboardingPayload) => {
   const response: AxiosResponse<OnboardingResponse> = await axiosInstance.post("/onboarding", data);

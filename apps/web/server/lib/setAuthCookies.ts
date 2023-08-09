@@ -5,7 +5,7 @@ const tokenKey = process.env.COOKIE_ACCESS_TOKEN_KEY;
 const refreshTokenKey = process.env.COOKIE_REFRESH_TOKEN_KEY;
 
 /**
- * @description Set auth cookies to response
+ * Set auth cookies to response
  * @param res NextApiResponse
  */
 export function setAuthCookies(

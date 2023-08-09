@@ -3,7 +3,7 @@ import type { GetServerSidePropsContext, NextApiRequest } from "next";
 const { COOKIE_ACCESS_TOKEN_KEY, COOKIE_REFRESH_TOKEN_KEY, COOKIE_IS_ONBOARDED_KEY } = process.env;
 
 /**
- * @description Get cookie from request
+ * Get cookie from request
  * @param req Request
  * @param key Cookie key. Either ACCESS_TOKEN, REFRESH_TOKEN or IS_ONBOARDED
  * @returns Cookie value

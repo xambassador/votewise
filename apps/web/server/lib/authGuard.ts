@@ -2,15 +2,13 @@ import type { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { getOnboardingStatus } from "server/services/onboarding";
 import { revokeAccessToken } from "server/services/revokeToken";
 
-import { logger } from "@votewise/lib/logger";
-
 import { clearCookies } from "./clearCookies";
 import { decodeJwt } from "./decodeJwt";
 import { getCookie } from "./getCookie";
 import { setAuthCookies } from "./setAuthCookies";
 
 /**
- * @description Decode access token
+ * Decode access token
  * @param token Access token
  */
 export const decodeToken = (token: string) => {
@@ -61,14 +59,12 @@ export const authGuard =
       }
 
       try {
-        logger("====> Trying to refresh token");
         const response = await revokeAccessToken(refreshToken);
         setAuthCookies(context.res, {
           accessToken: response.data.accessToken,
           refreshToken: response.data.refreshToken,
         });
       } catch (err: any) {
-        logger(`====> Error refreshing token   ${err?.response.data.error.message}`, "error");
         clearCookies(context.res);
         return {
           redirect: {

@@ -1,15 +1,7 @@
-/**
- * @file: axios.ts
- * @description: Axios instance for NextJS API routes and server side code. This must be used in server side only.
- * This is used to make API calls to the backend server.
- *
- */
 import axios from "axios";
 
-import { logger } from "@votewise/lib/logger";
-
 /**
- * @description: Axios instance for NextJS API routes and server side code. This must be used in server side only.
+ * Axios instance for NextJS API routes and server side code. This must be used in server side only.
  * This is used to make API calls to the backend server. Don't make API calls to NextJS API routes using this instance.
  */
 export const axiosServerInstance = axios.create({
@@ -21,7 +13,7 @@ export const axiosServerInstance = axios.create({
 });
 
 /**
- * @description: Axios instance for NextJS API routes and server side code. This must be used in server side only.
+ * Axios instance for NextJS API routes and server side code. This must be used in server side only.
  * This is used to make API calls to the backend server. Don't make API calls to NextJS API routes using this instance.
  * @param token JWT token
  * @returns Axios instance with Authorization header set
@@ -32,20 +24,6 @@ export const getAxiosServerWithAuth = (token: string) => {
 };
 
 axiosServerInstance.interceptors.request.use(
-  (config) => {
-    logger("========== Axios Server Instance ==========");
-    logger(`====> Request: ${config.method} ${config.url} Body payload:====> ${JSON.stringify(config.data)}`);
-    return config;
-  },
-  (error) => {
-    logger("========== Axios Server Instance ==========");
-    logger(
-      `====> Request: ${error.config.method} ${error.config.url} Body payload:====> ${JSON.stringify(
-        error.config.data
-      )}`
-    );
-    logger(`====> Error: ${error}`);
-    logger(`====> Error Response Data: ${error?.response.data}`);
-    return Promise.reject(error);
-  }
+  (config) => config,
+  (error) => Promise.reject(error)
 );

@@ -1,9 +1,8 @@
 import type { NextApiRequest } from "next";
 
 /**
- * @description Get headers with X-Forwarded-For, Content-Type, Accept, X-User-Agent and cookie
+ * Get headers with X-Forwarded-For, Content-Type, Accept, X-User-Agent and cookie
  * @param req NextApiRequest
- * @returns
  */
 export function getProxyHeaders(req: NextApiRequest): Record<string, string> {
   return {
