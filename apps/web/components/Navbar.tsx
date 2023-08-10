@@ -214,11 +214,11 @@ function UserInfoBox() {
   );
 }
 
-export const Navbar = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>((props, ref) => {
+export function Navbar() {
   const router = useRouter();
   return (
-    <div className="fixed top-0 left-0 right-0 z-10 bg-white py-5 shadow-sm" ref={ref}>
-      <header className="relative">
+    <div className="fixed left-0 top-0 z-10 w-screen bg-white py-5 shadow-sm">
+      <nav className="relative">
         <div className="container mx-auto flex items-center justify-between gap-[calc((155/16)*1rem)]">
           <Logo />
 
@@ -262,7 +262,7 @@ export const Navbar = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEle
             <UserInfoBox />
           </div>
         </div>
-      </header>
+      </nav>
     </div>
   );
-});
+}

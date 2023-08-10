@@ -19,7 +19,7 @@ export function Modal({
   open: boolean;
   className?: string;
   setOpen: (open: boolean) => void;
-  children: ReactNode | ((cancelButtonRef: RefObject<HTMLButtonElement>) => ReactNode);
+  children: ReactNode | ((cancelButtonRef: RefObject<HTMLElement>) => ReactNode);
 }) {
   const cancelButtonRef = useRef(null);
 

@@ -235,6 +235,8 @@ export function CreatePost({ setOpen }: { setOpen: (open: boolean) => void }) {
                 type="text"
                 className="w-full rounded text-gray-600 placeholder:text-base placeholder:text-gray-400"
                 placeholder="Give the title to your idea."
+                // eslint-disable-next-line jsx-a11y/tabindex-no-positive
+                tabIndex={1}
                 {...register("title", {
                   required: "Title is required",
                   minLength: {

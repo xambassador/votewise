@@ -1,6 +1,6 @@
 import { useStore } from "zustand";
 
-import React, { useState } from "react";
+import React, { forwardRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
 import classNames from "@votewise/lib/classnames";
@@ -76,7 +76,11 @@ function SocialButtonPanel() {
   );
 }
 
-export function Profile({ setOpen }: { setOpen: (open: boolean) => void }) {
+type ProfileProps = {
+  setOpen: (open: boolean) => void;
+};
+export const Profile = forwardRef<HTMLDivElement, ProfileProps>((props) => {
+  const { setOpen } = props;
   const user = useStore(store, (state) => state.user);
   const methods = useForm<Form>({
     defaultValues: {
@@ -157,4 +161,4 @@ export function Profile({ setOpen }: { setOpen: (open: boolean) => void }) {
       </FormProvider>
     </div>
   );
-}
+});
