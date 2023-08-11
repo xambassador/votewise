@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 
 import { Popover, Transition } from "@headlessui/react";
-import React, { Fragment, forwardRef } from "react";
+import React, { Fragment } from "react";
 
 import classNames from "@votewise/lib/classnames";
 import {

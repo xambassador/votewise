@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -36,7 +38,6 @@ type FormValues = {
   apiError: string;
 };
 
-// Separate component for password field to isolate re-rendering
 function Password() {
   const { register } = useFormContext<FormValues>();
   const [toggle, setToggle] = useState(false);
@@ -111,7 +112,11 @@ export function AuthForm(props: AuthFormProps) {
 
   return (
     <FormProvider {...methods}>
-      <form
+      <motion.form
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 20 }}
+        transition={{ duration: 0.3 }}
         className="shadow-auth-form flex flex-col gap-7 rounded-lg bg-white p-10"
         onSubmit={methods.handleSubmit(authenticate)}
       >
@@ -184,7 +189,7 @@ export function AuthForm(props: AuthFormProps) {
           <FacebookAuthButton type="button" />
           <TwitterAuthButton type="button" />
         </div>
-      </form>
+      </motion.form>
     </FormProvider>
   );
 }
