@@ -1,15 +1,19 @@
-import React from "react";
+import React, { forwardRef } from "react";
 
 import { CoverUploader, Loader } from "@votewise/ui";
 
 import { usePicker } from "lib/hooks/usePicker";
 
-export function CoverPicker(props: { onSuccess: (url: string) => void }) {
-  const { onSuccess } = props;
+type CoverPickerProps = {
+  onSuccess: (url: string) => void;
+} & React.HTMLAttributes<HTMLDivElement>;
+
+export const CoverPicker = forwardRef<HTMLDivElement, CoverPickerProps>((props, ref) => {
+  const { onSuccess, ...rest } = props;
   const { handleOnReady, handleOnError, status, error } = usePicker(onSuccess);
 
   return (
-    <>
+    <div ref={ref} {...rest}>
       <CoverUploader
         onReady={handleOnReady}
         onError={handleOnError}
@@ -23,6 +27,6 @@ export function CoverPicker(props: { onSuccess: (url: string) => void }) {
         </div>
       )}
       {error && <p className="text-center text-red-600">{error}</p>}
-    </>
+    </div>
   );
-}
+});

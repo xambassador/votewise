@@ -1,4 +1,4 @@
-import React, { useId } from "react";
+import React, { forwardRef, useId } from "react";
 import { useFormContext } from "react-hook-form";
 import type { GroupBase, InputProps, Props } from "react-select";
 import ReactSelect, { components } from "react-select";

@@ -1,14 +1,18 @@
-import React from "react";
+import React, { forwardRef } from "react";
 
 import { AvatarUploader, Loader } from "@votewise/ui";
 
 import { usePicker } from "lib/hooks/usePicker";
 
-export function AvatarPicker(props: { onSuccess: (url: string) => void }) {
+type AvatarPickerProps = {
+  onSuccess: (url: string) => void;
+};
+
+export const AvatarPicker = forwardRef<HTMLDivElement, AvatarPickerProps>((props, ref) => {
   const { onSuccess } = props;
   const { handleOnReady, handleOnError, status, error } = usePicker(onSuccess);
   return (
-    <>
+    <div>
       <AvatarUploader
         onReady={handleOnReady}
         onError={handleOnError}
@@ -22,6 +26,6 @@ export function AvatarPicker(props: { onSuccess: (url: string) => void }) {
         </div>
       )}
       {error && <p className="text-center text-red-600">{error}</p>}
-    </>
+    </div>
   );
-}
+});

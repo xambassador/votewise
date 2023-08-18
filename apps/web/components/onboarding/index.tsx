@@ -1,6 +1,7 @@
 import type { AxiosError } from "axios";
+import { motion } from "framer-motion";
 
-import React, { useEffect } from "react";
+import React, { forwardRef, useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { useQuery } from "react-query";
 
@@ -17,13 +18,15 @@ const options = [
   { value: "OTHER", label: "Other" },
 ];
 
-export function StepOne({
-  onFetchingUsername,
-  onError,
-}: {
+type StepOneProps = {
   onFetchingUsername: (isLoading: boolean) => void;
   onError: (isError: boolean) => void;
-}) {
+} & {
+  containerProps?: React.HTMLAttributes<HTMLDivElement>;
+};
+
+export const StepOne = forwardRef<HTMLDivElement, StepOneProps>((props, ref) => {
+  const { onFetchingUsername, onError, containerProps } = props;
   const { register, control, watch } = useFormContext();
   const debouncedUsername = useDebounce(watch("username"), 500);
   const { data, isLoading, isSuccess, isError, error } = useQuery<
@@ -50,7 +53,7 @@ export function StepOne({
   }, [isLoading, onFetchingUsername]);
 
   return (
-    <>
+    <div className="flex flex-col gap-5" {...containerProps} ref={ref}>
       <TextField
         label="Username"
         type="text"
@@ -62,14 +65,35 @@ export function StepOne({
         })}
       >
         {isLoading && (
-          <div className="mt-1 flex items-center">
+          <motion.div
+            className="mt-1 flex items-center"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
             <span className="text-sm text-gray-500">Checking username availability...</span>
             <Loader loaderColor="#1763AB" className="ml-2 h-4 w-4" />
-          </div>
+          </motion.div>
         )}
-        {isSuccess && <span className="text-sm text-green-600">{data.data.message}</span>}
+        {isSuccess && (
+          <motion.span
+            className="text-sm text-green-600"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {data.data.message}
+          </motion.span>
+        )}
         {isError && error && (
-          <span className="text-sm text-red-600">{error.response?.data.error.message}</span>
+          <motion.span
+            className="text-sm text-red-600"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {error.response?.data.error.message}
+          </motion.span>
         )}
       </TextField>
 
@@ -119,15 +143,15 @@ export function StepOne({
           },
         })}
       />
-    </>
+    </div>
   );
-}
+});
 
-export function StepTwo() {
+export const StepTwo = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>((props, ref) => {
   const { register } = useFormContext();
 
   return (
-    <>
+    <div className="flex flex-col gap-5" {...props} ref={ref}>
       <TextField
         label="Location"
         type="text"
@@ -165,6 +189,6 @@ export function StepTwo() {
         }}
         {...register("instagram")}
       />
-    </>
+    </div>
   );
-}
+});

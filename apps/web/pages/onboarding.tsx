@@ -123,6 +123,7 @@ const Page: NextPageWithLayout = () => {
                     {errors.apiError && (
                       <ErrorMessage resetErrors={resetErrors}>{errors.apiError.message}</ErrorMessage>
                     )}
+
                     <h2 className="mb-5 text-center text-3xl font-bold text-gray-800">
                       Tell us more about you
                     </h2>
@@ -135,12 +136,10 @@ const Page: NextPageWithLayout = () => {
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-5">
-                    {currentStep === 1 && (
-                      <StepOne onFetchingUsername={handleOnFetchingUsername} onError={handleOnError} />
-                    )}
-                    {currentStep === 2 && <StepTwo />}
-                  </div>
+                  {currentStep === 1 && (
+                    <StepOne onFetchingUsername={handleOnFetchingUsername} onError={handleOnError} />
+                  )}
+                  {currentStep === 2 && <StepTwo />}
                 </div>
 
                 <div>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import type { ReactNode } from "react";
 
 import classNames from "@votewise/lib/classnames";
@@ -13,10 +13,14 @@ type ErrorMessageProps = {
     buttonProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
   };
 
-export function ErrorMessage(props: ErrorMessageProps) {
+export const ErrorMessage = forwardRef<HTMLDivElement, ErrorMessageProps>((props, ref) => {
   const { children, resetErrors, className, errorMessageClassName, buttonProps, ...rest } = props;
   return (
-    <div className={classNames("mb-2 flex items-center justify-center text-red-600", className)} {...rest}>
+    <div
+      className={classNames("mb-2 flex items-center justify-center text-red-600", className)}
+      {...rest}
+      ref={ref}
+    >
       <p className={classNames("text-red-600", errorMessageClassName)}>{children}</p>
       <button
         type="button"
@@ -28,4 +32,4 @@ export function ErrorMessage(props: ErrorMessageProps) {
       </button>
     </div>
   );
-}
+});
