@@ -46,7 +46,8 @@ import {
   getLimitAndOffset,
 } from "@/src/utils";
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
+
 export const checkUsernameAvailability = async (req: Request, res: Response, next: NextFunction) => {
   const { username } = req.query as { username: string };
 
@@ -75,7 +76,7 @@ export const checkUsernameAvailability = async (req: Request, res: Response, nex
   );
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const getMyDetails = async (req: Request, res: Response, next: NextFunction) => {
   const { user } = req.session;
   try {
@@ -101,7 +102,7 @@ export const getMyDetails = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const createPost = async (req: Request, res: Response, next: NextFunction) => {
   const payload = req.body as CreatePostPayload;
 
@@ -140,7 +141,7 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const getMyPosts = async (req: Request, res: Response, next: NextFunction) => {
   const { limit, offset } = getLimitAndOffset(req);
   const { user } = req.session;
@@ -192,7 +193,7 @@ export const getMyPosts = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const updateMyPost = async (req: Request, res: Response, next: NextFunction) => {
   const payload = req.body as UpdatePostPayload;
   const { postId } = req.params;
@@ -239,7 +240,7 @@ export const updateMyPost = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const deleteMyPost = async (req: Request, res: Response, next: NextFunction) => {
   const { postId } = req.params;
 
@@ -282,7 +283,7 @@ export const deleteMyPost = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const updateStatus = async (req: Request, res: Response, next: NextFunction) => {
   const payload = req.body as ChangeStatusPayload;
   const { postId } = req.params;
@@ -319,7 +320,7 @@ export const updateStatus = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const getMyComments = async (req: Request, res: Response, next: NextFunction) => {
   const { limit, offset } = getLimitAndOffset(req);
   const { orderBy, status } = req.query;
@@ -351,7 +352,7 @@ export const getMyComments = async (req: Request, res: Response, next: NextFunct
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const getMyFriends = async (req: Request, res: Response, next: NextFunction) => {
   const { limit, offset } = getLimitAndOffset(req);
   const { user } = req.session;
@@ -380,7 +381,7 @@ export const getMyFriends = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const addFriend = async (req: Request, res: Response, next: NextFunction) => {
   const { friendId } = req.params;
 
@@ -422,7 +423,7 @@ export const addFriend = async (req: Request, res: Response, next: NextFunction)
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const acceptOrRejectFriendRequest = async (req: Request, res: Response, next: NextFunction) => {
   const { friendId } = req.params;
   const payload = req.body as AcceptOrRejectFriendRequestPayload;
@@ -488,7 +489,7 @@ export const acceptOrRejectFriendRequest = async (req: Request, res: Response, n
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const getMyFriendRequests = async (req: Request, res: Response, next: NextFunction) => {
   const { limit, offset } = getLimitAndOffset(req);
   const { user } = req.session;
@@ -517,7 +518,7 @@ export const getMyFriendRequests = async (req: Request, res: Response, next: Nex
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const getMyFollowers = async (req: Request, res: Response, next: NextFunction) => {
   const { limit, offset } = getLimitAndOffset(req);
   const { user } = req.session;
@@ -546,7 +547,7 @@ export const getMyFollowers = async (req: Request, res: Response, next: NextFunc
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const getMyFollowings = async (req: Request, res: Response, next: NextFunction) => {
   const { limit, offset } = getLimitAndOffset(req);
   const { user } = req.session;
@@ -575,7 +576,7 @@ export const getMyFollowings = async (req: Request, res: Response, next: NextFun
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const startFollowing = async (req: Request, res: Response, next: NextFunction) => {
   const { followingId } = req.params;
   const { user } = req.session;
@@ -612,7 +613,7 @@ export const startFollowing = async (req: Request, res: Response, next: NextFunc
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const stopFollowing = async (req: Request, res: Response, next: NextFunction) => {
   const { followingId } = req.params;
   const { user } = req.session;
@@ -652,7 +653,7 @@ export const stopFollowing = async (req: Request, res: Response, next: NextFunct
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const getAllMyGroups = async (req: Request, res: Response, next: NextFunction) => {
   const { limit, offset } = getLimitAndOffset(req);
   const { created, joined } = req.query;
@@ -694,7 +695,7 @@ export const getAllMyGroups = async (req: Request, res: Response, next: NextFunc
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const getRequestedGroups = async (req: Request, res: Response, next: NextFunction) => {
   const { limit, offset } = getLimitAndOffset(req);
   const { user } = req.session;
@@ -735,6 +736,6 @@ export const getRequestedGroups = async (req: Request, res: Response, next: Next
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 // IMPLEMENTME: Implement this
 export const updateMyDetails = async (req: Request, res: Response) => {};

@@ -15,6 +15,8 @@ import {
   getErrorReason,
 } from "@/src/utils";
 
+/* ----------------------------------------------------------------------------------------------- */
+
 export const onboardUser = async (req: Request, res: Response, next: NextFunction) => {
   const payload = req.body as OnboardingPayload;
   const { user } = req.session;
@@ -56,6 +58,7 @@ export const onboardUser = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
+/* ----------------------------------------------------------------------------------------------- */
 export const onboardingStatus = async (req: Request, res: Response) => {
   const { user } = req.session;
   const { onboarded } = user;

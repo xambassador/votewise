@@ -8,7 +8,6 @@ import type {
   UpdateCommentOnPostPayload,
 } from "@votewise/types";
 
-// -----------------------------------------------------------------------------------------
 import { JSONResponse } from "@/src/lib";
 import PostService from "@/src/services/posts";
 import {
@@ -41,7 +40,8 @@ import {
   getLimitAndOffset,
 } from "@/src/utils";
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
+
 export const getPosts = async (req: Request, res: Response, next: NextFunction) => {
   const { user } = req.session;
   const { limit, offset } = getLimitAndOffset(req);
@@ -82,7 +82,7 @@ export const getPosts = async (req: Request, res: Response, next: NextFunction) 
   );
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const getPost = async (req: Request, res: Response, next: NextFunction) => {
   const { postId } = req.params;
   const { user } = req.session;
@@ -118,7 +118,7 @@ export const getPost = async (req: Request, res: Response, next: NextFunction) =
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const getCommentsForPost = async (req: Request, res: Response, next: NextFunction) => {
   const { postId } = req.params;
   const { user } = req.session;
@@ -148,7 +148,7 @@ export const getCommentsForPost = async (req: Request, res: Response, next: Next
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const likePost = async (req: Request, res: Response, next: NextFunction) => {
   const { postId } = req.params;
   const { user } = req.session;
@@ -180,7 +180,7 @@ export const likePost = async (req: Request, res: Response, next: NextFunction) 
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const unlikePost = async (req: Request, res: Response, next: NextFunction) => {
   const { postId } = req.params;
   const { user } = req.session;
@@ -213,7 +213,7 @@ export const unlikePost = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const commentOnPost = async (req: Request, res: Response, next: NextFunction) => {
   const { text } = req.body as CommentOnPostPayload;
   const { postId } = req.params;
@@ -251,7 +251,7 @@ export const commentOnPost = async (req: Request, res: Response, next: NextFunct
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const deleteCommentOnPost = async (req: Request, res: Response, next: NextFunction) => {
   const { postId, commentId } = req.params;
   const { user } = req.session;
@@ -287,7 +287,7 @@ export const deleteCommentOnPost = async (req: Request, res: Response, next: Nex
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const updateCommentOnPost = async (req: Request, res: Response, next: NextFunction) => {
   const { commentId, postId } = req.params;
   const { text } = req.body as UpdateCommentOnPostPayload;
@@ -332,7 +332,7 @@ export const updateCommentOnPost = async (req: Request, res: Response, next: Nex
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const replyToCommentOnPost = async (req: Request, res: Response, next: NextFunction) => {
   const { text } = req.body as ReplyToCommentOnPostPayload;
   const { postId, commentId } = req.params;
@@ -375,7 +375,7 @@ export const replyToCommentOnPost = async (req: Request, res: Response, next: Ne
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const getRepliesToCommentOnPost = async (req: Request, res: Response, next: NextFunction) => {
   const { postId, commentId } = req.params;
   const { user } = req.session;
@@ -419,7 +419,7 @@ export const getRepliesToCommentOnPost = async (req: Request, res: Response, nex
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const likeComment = async (req: Request, res: Response, next: NextFunction) => {
   const { commentId, postId } = req.params;
 
@@ -456,7 +456,7 @@ export const likeComment = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const unlikeComment = async (req: Request, res: Response, next: NextFunction) => {
   const { commentId, postId } = req.params;
 

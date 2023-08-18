@@ -9,9 +9,6 @@ const macFilePath = path.join(__dirname, "../static-server-mac.sh");
 const isWin = process.platform === "win32";
 const isMac = process.platform === "darwin";
 
-/* -----------------------------------------------------------------------------------------------
- * @function: executeWindowsScript
- * -----------------------------------------------------------------------------------------------*/
 function executeWindowsScript() {
   const command = `start /wait /b cmd.exe /c "${cmdFilePath}"`;
   const child = exec(command, (error, stdout, stderr) => {
@@ -39,9 +36,6 @@ function executeWindowsScript() {
   });
 }
 
-/* -----------------------------------------------------------------------------------------------
- * @function: executeLinuxScript
- * -----------------------------------------------------------------------------------------------*/
 function executeLinuxScript() {
   const shellScript = isMac ? macFilePath : filePath;
   const child = spawn("bash", [shellScript]);

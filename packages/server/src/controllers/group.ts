@@ -18,6 +18,8 @@ import {
   getLimitAndOffset,
 } from "@/src/utils";
 
+/* ----------------------------------------------------------------------------------------------- */
+
 export const createGroup = async (req: Request, res: Response, next: NextFunction) => {
   const payload = req.body as CreateGroupPayload;
   const isValid = GroupService.validateCreateGroupPayload(payload);
@@ -47,7 +49,7 @@ export const createGroup = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const joinGroup = async (req: Request, res: Response, next: NextFunction) => {
   const { groupId } = req.params;
   const { user } = req.session;
@@ -84,7 +86,7 @@ export const joinGroup = async (req: Request, res: Response, next: NextFunction)
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const getGroups = async (req: Request, res: Response, next: NextFunction) => {
   const { limit, offset } = getLimitAndOffset(req);
   try {
@@ -107,7 +109,7 @@ export const getGroups = async (req: Request, res: Response, next: NextFunction)
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const getRequests = async (req: Request, res: Response, next: NextFunction) => {
   const { limit, offset } = getLimitAndOffset(req);
   const { user } = req.session;
@@ -137,7 +139,7 @@ export const getRequests = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const acceptOrRejectGroupRequest = async (req: Request, res: Response, next: NextFunction) => {
   const { groupId, userId: requestedUserId } = req.params;
   const { user } = req.session;
@@ -165,7 +167,7 @@ export const acceptOrRejectGroupRequest = async (req: Request, res: Response, ne
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const acceptOrRejectGroupInvitation = async (req: Request, res: Response, next: NextFunction) => {
   const { groupId } = req.params;
   const { user } = req.session;
@@ -199,7 +201,7 @@ export const acceptOrRejectGroupInvitation = async (req: Request, res: Response,
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const leaveGroup = async (req: Request, res: Response, next: NextFunction) => {
   const { user } = req.session;
   const { groupId } = req.params;
@@ -230,7 +232,7 @@ export const leaveGroup = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const removeMemberFromGroup = async (req: Request, res: Response, next: NextFunction) => {
   const { groupId, userId: removingUserId } = req.params;
   const { user } = req.session;
@@ -268,7 +270,7 @@ export const removeMemberFromGroup = async (req: Request, res: Response, next: N
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const getGropMembers = async (req: Request, res: Response, next: NextFunction) => {
   const { groupId } = req.params;
   const { user } = req.session;
@@ -303,7 +305,7 @@ export const getGropMembers = async (req: Request, res: Response, next: NextFunc
   }
 };
 
-// -----------------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------------------------- */
 export const updateGroupDetails = async (req: Request, res: Response, next: NextFunction) => {
   const payload = req.body as UpdateGroupDetailsPayload;
   const isValid = GroupService.validateCreateGroupPayload(payload);
