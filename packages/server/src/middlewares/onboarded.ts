@@ -16,5 +16,16 @@ export default function onboarded(req: Request, res: Response, next: NextFunctio
     });
   }
 
+  if (!user.is_email_verify) {
+    return res.status(httpStatusCodes.BAD_REQUEST).json({
+      message: "Email is not verified",
+      data: null,
+      error: {
+        message: "Email is not verified. Please verify your email to continue.",
+      },
+      success: false,
+    });
+  }
+
   next();
 }

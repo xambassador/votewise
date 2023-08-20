@@ -27,6 +27,10 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
   const { pathname } = router;
   const [queryClient] = useState(() => new QueryClient());
 
+  if (pathname === "/verify-email") {
+    return <Component {...pageProps} />;
+  }
+
   let LayoutComponent;
   if (pathname === "/signin" || pathname === "/signup" || pathname === "/onboarding") {
     LayoutComponent = AuthScreenLayout;

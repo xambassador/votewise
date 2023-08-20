@@ -89,11 +89,13 @@ class Logger {
           : winston.format.combine(
               winston.format.colorize(),
               winston.format.timestamp(),
+              winston.format.json(),
               winston.format.printf((info) => {
                 const { message, level, timestamp, label, ...extra } = info;
-                return `${level} ${chalk.gray("[" + timestamp + "]")} ${chalk.cyanBright(
-                  "[" + label + "]"
-                )} ${message} ${isEmpty(extra) ? "" : extra}`;
+                const colorizedLabel = label === "HTTP" ? chalk.bgBlue.bold("[" + label + "]") : `[${label}]`;
+                return `${level} ${chalk.gray("[" + timestamp + "]")} ${colorizedLabel} ${message} ${
+                  isEmpty(extra) ? "" : JSON.stringify(extra)
+                }`;
               })
             ),
       })

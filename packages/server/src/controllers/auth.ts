@@ -308,7 +308,7 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
   } catch (err) {
     const msg = getErrorReason(err);
     if (msg === "jwt expired" || msg === "invalid token") {
-      return next(createError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED_MSG));
+      return next(createError(StatusCodes.UNAUTHORIZED, "Link expired. Please try again."));
     }
     return next(createError(StatusCodes.INTERNAL_SERVER_ERROR, SOMETHING_WENT_WRONG_MSG, { reason: msg }));
   }

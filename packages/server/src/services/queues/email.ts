@@ -2,7 +2,7 @@ import Queue from "bull";
 
 import dotenv from "dotenv";
 
-import { logger } from "@votewise/lib/logger";
+import Logger from "@votewise/lib/logger";
 
 import { EmailTransporter } from "@/src/services/email/EmailTransporter";
 
@@ -34,17 +34,17 @@ const notificationMailQueue = new Queue<EmailData>("notificationMail", {
 });
 
 passwordResetEmailQueue.on("completed", (job) => {
-  logger(`${job.id} successfullt completed... Removing from Queue`);
+  Logger.info("QUEUE", "Password reset email sent.", { id: job.id });
   job.remove();
 });
 
 registrationEmailQueue.on("completed", (job) => {
-  logger(`${job.id} is completed.... Removing from queue`);
+  Logger.info("QUEUE", "Registration email sent.", { id: job.id });
   job.remove();
 });
 
 notificationMailQueue.on("completed", (job) => {
-  logger(`${job.id} is completed.... Removing from queue`);
+  Logger.info("QUEUE", "Notification email sent.", { id: job.id });
   job.remove();
 });
 
@@ -57,24 +57,24 @@ async function sendMail({ to, subject, html }: { to: string; subject: string; ht
   try {
     await transport.send();
   } catch (err) {
-    logger(`Error sending email: ${err}`, "error");
+    Logger.error("QUEUE", "Error sending email.", { err });
   }
 }
 
 registrationEmailQueue.process(async (job, done) => {
-  logger(`Processing registration email job ${job.id}...`);
+  Logger.info("PROCESSOR", "processing registration email.", { id: job.id });
   await sendMail(job.data);
   done();
 });
 
 passwordResetEmailQueue.process(async (job, done) => {
-  logger(`Processing password reset email job ${job.id}...`);
+  Logger.info("PROCESSOR", "processing password reset email.", { id: job.id });
   await sendMail(job.data);
   done();
 });
 
 notificationMailQueue.process(async (job, done) => {
-  logger(`Processing notification email job ${job.id}...`);
+  Logger.info("PROCESSOR", "processing notification email.", { id: job.id });
   await sendMail(job.data);
   done();
 });

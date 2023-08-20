@@ -20,7 +20,7 @@ dotenv.config();
 
 const app = express();
 const numCPUs = os.cpus().length;
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 
 /* -----------------------------------------------------------------------------------------------
  * The amount of time to wait for connections to close before forcefully
