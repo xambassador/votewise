@@ -3,7 +3,8 @@ import bcrypt from "bcrypt";
 import { prisma } from "@votewise/prisma";
 import type { LoginPayload, RegisterUserPayload } from "@votewise/types";
 
-import { getErrorReason } from "@/src/utils";
+import ServerError from "@/src/classes/ServerError";
+import { DB_ERROR_CODE, getErrorReason } from "@/src/utils";
 import { isEmail, validateLoginSchema, validateRegisterUserSchema } from "@/src/zodValidation";
 
 class UserService {
@@ -13,11 +14,10 @@ class UserService {
   }
 
   // Validate the request body for logging in
-  isValidLoginPayload(user: LoginPayload) {
-    return validateLoginSchema(user);
+  isValidLoginPayload(payload: LoginPayload) {
+    return validateLoginSchema(payload);
   }
 
-  // Check if given user already exists or not
   async checkIfUserExists(key: string | number) {
     if (typeof key === "number") {
       // Key is user id
@@ -29,7 +29,7 @@ class UserService {
         });
         return user;
       } catch (err) {
-        throw new Error("Error while fetching user");
+        throw new ServerError(DB_ERROR_CODE, "Error while fetching user");
       }
     }
     // Key can be a username or email
@@ -44,23 +44,27 @@ class UserService {
         });
         return user;
       } catch (err) {
-        throw new Error("Error while fetching user");
+        throw new ServerError(DB_ERROR_CODE, "Error while fetching user");
       }
     }
+
     const user = await this.checkIfUsernameExists(username);
     return user;
   }
 
-  // Create a new user
   async createUser(user: RegisterUserPayload) {
-    const hashPassword = await bcrypt.hash(user.password, 10);
-    const newUser = await prisma.user.create({
-      data: {
-        email: user.email,
-        password: hashPassword,
-      },
-    });
-    return newUser;
+    try {
+      const hashPassword = await bcrypt.hash(user.password, 10);
+      const newUser = await prisma.user.create({
+        data: {
+          email: user.email,
+          password: hashPassword,
+        },
+      });
+      return newUser;
+    } catch (err) {
+      throw new ServerError(DB_ERROR_CODE, "Error while creating user");
+    }
   }
 
   // Check if given username is already taken or not

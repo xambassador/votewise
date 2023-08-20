@@ -1,8 +1,11 @@
-import jsonwebtoken from "jsonwebtoken";
+import jsonwebtoken, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 
 import dotenv from "dotenv";
 
 import { prisma } from "@votewise/prisma";
+
+import ServerError from "@/src/classes/ServerError";
+import { DB_ERROR_CODE, UNAUTHORIZED_MSG } from "@/src/utils";
 
 dotenv.config();
 
@@ -19,11 +22,37 @@ class JWTService {
   }
 
   verifyAccessToken(token: string) {
-    return jsonwebtoken.verify(token, ACCESS_TOKEN_SECRET as string);
+    try {
+      return jsonwebtoken.verify(token, ACCESS_TOKEN_SECRET as string);
+    } catch (err) {
+      if (err instanceof TokenExpiredError) {
+        throw new ServerError(401, UNAUTHORIZED_MSG);
+      }
+
+      if (err instanceof JsonWebTokenError) {
+        throw new ServerError(401, UNAUTHORIZED_MSG);
+      }
+
+      // If something else, throw unauthorized
+      throw new ServerError(401, UNAUTHORIZED_MSG);
+    }
   }
 
   verifyRefreshToken(token: string) {
-    return jsonwebtoken.verify(token, REFRESH_TOKEN_SECRET as string);
+    try {
+      return jsonwebtoken.verify(token, REFRESH_TOKEN_SECRET as string);
+    } catch (err) {
+      if (err instanceof TokenExpiredError) {
+        throw new ServerError(401, UNAUTHORIZED_MSG);
+      }
+
+      if (err instanceof JsonWebTokenError) {
+        throw new ServerError(401, UNAUTHORIZED_MSG);
+      }
+
+      // If something else, throw unauthorized
+      throw new ServerError(401, UNAUTHORIZED_MSG);
+    }
   }
 
   async saveRefreshToken(userId: number, token: string, isUpdate = false) {
@@ -35,37 +64,49 @@ class JWTService {
   }
 
   private async insertRefreshToken(userId: number, token: string) {
-    await prisma.refreshToken.create({
-      data: {
-        token,
-        user_id: userId,
-      },
-    });
+    try {
+      await prisma.refreshToken.create({
+        data: {
+          token,
+          user_id: userId,
+        },
+      });
+    } catch (err) {
+      throw new ServerError(DB_ERROR_CODE, "Error while inserting refresh token");
+    }
   }
 
   private async updateRefreshToken(userId: number, token: string) {
-    await prisma.refreshToken.update({
-      where: {
-        user_id: userId,
-      },
-      data: {
-        token,
-      },
-    });
+    try {
+      await prisma.refreshToken.update({
+        where: {
+          user_id: userId,
+        },
+        data: {
+          token,
+        },
+      });
+    } catch (err) {
+      throw new ServerError(DB_ERROR_CODE, "Error while updating refresh token");
+    }
   }
 
   async checkIfRefreshTokenExists(userId: number, token: string) {
-    const refreshToken = await prisma.refreshToken.findUnique({
-      where: {
-        user_id: userId,
-      },
-    });
+    try {
+      const refreshToken = await prisma.refreshToken.findUnique({
+        where: {
+          user_id: userId,
+        },
+      });
 
-    if (!refreshToken) {
-      return false;
+      if (!refreshToken) {
+        return false;
+      }
+
+      return refreshToken.token === token;
+    } catch (err) {
+      throw new ServerError(DB_ERROR_CODE, "Error while checking refresh token");
     }
-
-    return refreshToken.token === token;
   }
 }
 

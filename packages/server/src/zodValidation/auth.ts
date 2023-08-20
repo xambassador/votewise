@@ -55,7 +55,7 @@ const validateRegisterUserSchema = (payload: RegisterUserPayload) => {
     const errorMessage = generateErrorMessage(isValid.error.issues);
     return { success: false, message: errorMessage };
   }
-  return { success: true, message: null };
+  return { success: true, message: null } as const;
 };
 
 export const isEmail = (text: string) => {
@@ -66,7 +66,7 @@ export const isEmail = (text: string) => {
 const validateLoginSchema = (payload: LoginPayload) => {
   // Edge case: if username is missing
   if (!payload.username) {
-    return { success: false, message: "Username is required" };
+    return { success: false, message: "Username is required" } as const;
   }
   // check if the username is an email
   const isValidEmail = isEmail(payload.username);
@@ -77,9 +77,9 @@ const validateLoginSchema = (payload: LoginPayload) => {
     });
     if (!isValid.success) {
       const errorMessage = generateErrorMessage(isValid.error.issues);
-      return { success: false, message: errorMessage };
+      return { success: false, message: errorMessage } as const;
     }
-    return { success: true, message: null };
+    return { success: true, message: null } as const;
   }
   // if it's not an email, then it's a username
   const isValid = loginSchema.safeParse({
@@ -88,9 +88,9 @@ const validateLoginSchema = (payload: LoginPayload) => {
   });
   if (!isValid.success) {
     const errorMessage = generateErrorMessage(isValid.error.issues);
-    return { success: false, message: errorMessage };
+    return { success: false, message: errorMessage } as const;
   }
-  return { success: true, message: null };
+  return { success: true, message: null } as const;
 };
 
 /* ----------------------------------------------------------------------------------------------- */

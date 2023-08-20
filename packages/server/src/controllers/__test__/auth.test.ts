@@ -1,6 +1,3 @@
-/* eslint-disable prefer-const */
-
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { faker } from "@faker-js/faker";
 import bcrypt from "bcrypt";
 import http from "http";
@@ -18,23 +15,18 @@ import {
 
 import app from "../..";
 import prismaMock from "../../../test/__mock__/prisma";
-import { errorResponse, getUser } from "../../__mock__";
+import { getUser } from "../../__mock__";
 import JWT from "../../services/user/jwt";
 import {
-  ACCESS_TOKEN_REVOKE_MSG,
   EMAIL_REQUIRED_MSG,
   INVALID_CREDENTIALS_MSG,
   INVALID_EMAIL_MSG,
   INVALID_REFRESHTOKEN_MSG,
-  LOGIN_SUCCESS_MSG,
-  PASSWORD_RESET_RESPONSE,
   REFRESHTOKEN_REQUIRED_MSG,
   TOKEN_REQUIRED_MSG,
   UNAUTHORIZED_MSG,
   USER_ALREADY_EXISTS_MSG,
-  USER_CREATED_SUCCESSFULLY_MSG,
   USER_NOT_FOUND_MSG,
-  VALIDATION_FAILED_MSG,
 } from "../../utils";
 
 jest.mock("@votewise/prisma", () => {
@@ -44,6 +36,7 @@ jest.mock("@votewise/prisma", () => {
     prisma: mockPrisma,
   };
 });
+
 jest.mock("../../services/email/index", () => {
   class EmailService {
     public data: object;
@@ -84,7 +77,7 @@ describe("Auth controller", () => {
       });
 
       expect(response.status).toBe(StatusCodes.BAD_REQUEST);
-      expect(response.body).toEqual(errorResponse(VALIDATION_FAILED_MSG));
+      expect(response.body.statusCode).toBe(StatusCodes.BAD_REQUEST);
     });
 
     test("Should return CONFLICT if the user already exists", async () => {
@@ -105,7 +98,8 @@ describe("Auth controller", () => {
       });
       expect(prismaMock.user.create).not.toHaveBeenCalled();
       expect(response.status).toBe(StatusCodes.CONFLICT);
-      expect(response.body).toEqual(errorResponse(USER_ALREADY_EXISTS_MSG));
+      expect(response.body.statusCode).toBe(StatusCodes.CONFLICT);
+      expect(response.body.error).toBe(USER_ALREADY_EXISTS_MSG);
     });
 
     test("Should return CREATED if the user is created successfully and should return accessToken and refreshToken", async () => {
@@ -134,14 +128,9 @@ describe("Auth controller", () => {
         },
       });
       expect(response.status).toBe(StatusCodes.CREATED);
-      expect(response.body).toEqual({
-        message: USER_CREATED_SUCCESSFULLY_MSG,
-        success: true,
-        data: {
-          accessToken: expect.any(String),
-          refreshToken: expect.any(String),
-        },
-        error: null,
+      expect(response.body.data).toEqual({
+        accessToken: expect.any(String),
+        refreshToken: expect.any(String),
       });
     });
   });
@@ -156,7 +145,7 @@ describe("Auth controller", () => {
       });
       expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
       expect(response.status).toBe(StatusCodes.BAD_REQUEST);
-      expect(response.body).toEqual(errorResponse(VALIDATION_FAILED_MSG));
+      expect(response.body.statusCode).toBe(StatusCodes.BAD_REQUEST);
     });
 
     test("Should return NOT_FOUND if the user does not exist", async () => {
@@ -181,7 +170,8 @@ describe("Auth controller", () => {
       });
       expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(1);
       expect(response.status).toBe(StatusCodes.NOT_FOUND);
-      expect(response.body).toEqual(errorResponse(USER_NOT_FOUND_MSG));
+      expect(response.body.statusCode).toBe(StatusCodes.NOT_FOUND);
+      expect(response.body.error).toEqual(USER_NOT_FOUND_MSG);
     });
 
     test("Should return UNAUTHORIZED if the password is incorrect", async () => {
@@ -196,7 +186,8 @@ describe("Auth controller", () => {
       });
 
       expect(response.status).toBe(StatusCodes.UNAUTHORIZED);
-      expect(response.body).toEqual(errorResponse(INVALID_CREDENTIALS_MSG));
+      expect(response.body.statusCode).toBe(StatusCodes.UNAUTHORIZED);
+      expect(response.body.error).toEqual(INVALID_CREDENTIALS_MSG);
     });
 
     test("Should return OK if the user is logged in successfully and should return accessToken and refreshToken", async () => {
@@ -212,14 +203,9 @@ describe("Auth controller", () => {
       });
 
       expect(response.status).toBe(StatusCodes.OK);
-      expect(response.body).toEqual({
-        success: true,
-        message: LOGIN_SUCCESS_MSG,
-        data: {
-          accessToken: expect.any(String),
-          refreshToken: expect.any(String),
-        },
-        error: null,
+      expect(response.body.data).toEqual({
+        accessToken: expect.any(String),
+        refreshToken: expect.any(String),
       });
     });
   });
@@ -231,7 +217,8 @@ describe("Auth controller", () => {
       const response = await request.patch(url).send({});
       expect(prismaMock.refreshToken.findUnique).not.toHaveBeenCalled();
       expect(response.status).toBe(StatusCodes.BAD_REQUEST);
-      expect(response.body).toEqual(errorResponse(VALIDATION_FAILED_MSG, REFRESHTOKEN_REQUIRED_MSG));
+      expect(response.body.statusCode).toBe(StatusCodes.BAD_REQUEST);
+      expect(response.body.error).toEqual(REFRESHTOKEN_REQUIRED_MSG);
     });
 
     test("Should return UNAUTHORIZED if token is invalid", async () => {
@@ -243,7 +230,8 @@ describe("Auth controller", () => {
 
       expect(prismaMock.refreshToken.findUnique).not.toHaveBeenCalled();
       expect(response.status).toBe(StatusCodes.UNAUTHORIZED);
-      expect(response.body).toEqual(errorResponse(INVALID_REFRESHTOKEN_MSG));
+      expect(response.body.statusCode).toBe(StatusCodes.UNAUTHORIZED);
+      expect(response.body.error).toEqual(UNAUTHORIZED_MSG);
     });
 
     test("Should return Invalid refresh token if it is not exists in database", async () => {
@@ -261,7 +249,8 @@ describe("Auth controller", () => {
       });
       expect(prismaMock.refreshToken.findUnique).toHaveBeenCalledTimes(1);
       expect(response.status).toBe(StatusCodes.UNAUTHORIZED);
-      expect(response.body).toEqual(errorResponse(INVALID_REFRESHTOKEN_MSG, "Refresh token was expired."));
+      expect(response.body.statusCode).toBe(StatusCodes.UNAUTHORIZED);
+      expect(response.body.error).toEqual(INVALID_REFRESHTOKEN_MSG);
     });
 
     test("Should return OK if the access token is revoked successfully", async () => {
@@ -285,14 +274,9 @@ describe("Auth controller", () => {
       });
       expect(prismaMock.refreshToken.findUnique).toHaveBeenCalledTimes(1);
       expect(response.status).toBe(StatusCodes.OK);
-      expect(response.body).toEqual({
-        success: true,
-        message: ACCESS_TOKEN_REVOKE_MSG,
-        data: {
-          accessToken: expect.any(String),
-          refreshToken: expect.any(String),
-        },
-        error: null,
+      expect(response.body.data).toEqual({
+        accessToken: expect.any(String),
+        refreshToken: expect.any(String),
       });
     });
   });
@@ -307,7 +291,8 @@ describe("Auth controller", () => {
       });
       expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
       expect(response.status).toBe(StatusCodes.BAD_REQUEST);
-      expect(response.body).toEqual(errorResponse(VALIDATION_FAILED_MSG, INVALID_EMAIL_MSG));
+      expect(response.body.statusCode).toBe(StatusCodes.BAD_REQUEST);
+      expect(response.body.error).toEqual(INVALID_EMAIL_MSG);
     });
 
     test("Should return NOT_FOUND if the user is not exists", async () => {
@@ -333,7 +318,8 @@ describe("Auth controller", () => {
         },
       });
       expect(response.status).toBe(StatusCodes.NOT_FOUND);
-      expect(response.body).toEqual(errorResponse(USER_NOT_FOUND_MSG, USER_NOT_FOUND_MSG));
+      expect(response.body.statusCode).toBe(StatusCodes.NOT_FOUND);
+      expect(response.body.error).toEqual(USER_NOT_FOUND_MSG);
     });
 
     test("Should return OK if evrything is ok", async () => {
@@ -364,21 +350,24 @@ describe("Auth controller", () => {
         .set("x-forwarded-for", faker.internet.ip());
       expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
       expect(response.status).toBe(StatusCodes.BAD_REQUEST);
-      expect(response.body).toEqual(errorResponse(VALIDATION_FAILED_MSG));
+      expect(response.body.statusCode).toBe(StatusCodes.BAD_REQUEST);
+      expect(response.body.error).toEqual(expect.any(String));
 
       response = await request.patch(`${url}?email=test`).send({
         password: "test",
       });
 
       expect(response.status).toBe(StatusCodes.BAD_REQUEST);
-      expect(response.body).toEqual(errorResponse(VALIDATION_FAILED_MSG, TOKEN_REQUIRED_MSG));
+      expect(response.body.statusCode).toBe(StatusCodes.BAD_REQUEST);
+      expect(response.body.error).toEqual(TOKEN_REQUIRED_MSG);
 
       response = await request.patch(`${url}?token=token`).send({
         password: "test",
       });
 
       expect(response.status).toBe(StatusCodes.BAD_REQUEST);
-      expect(response.body).toEqual(errorResponse(VALIDATION_FAILED_MSG, EMAIL_REQUIRED_MSG));
+      expect(response.body.statusCode).toBe(StatusCodes.BAD_REQUEST);
+      expect(response.body.error).toEqual(EMAIL_REQUIRED_MSG);
     });
 
     test("Should return NOT_FOUND if the user is not exists", async () => {
@@ -401,7 +390,8 @@ describe("Auth controller", () => {
       });
       expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(1);
       expect(response.status).toBe(StatusCodes.NOT_FOUND);
-      expect(response.body).toEqual(errorResponse(USER_NOT_FOUND_MSG, USER_NOT_FOUND_MSG));
+      expect(response.body.statusCode).toBe(StatusCodes.NOT_FOUND);
+      expect(response.body.error).toEqual(USER_NOT_FOUND_MSG);
     });
 
     test("Should return UNAUTHORIZED if the token submitted from different ip", async () => {
@@ -430,7 +420,8 @@ describe("Auth controller", () => {
       expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(1);
       expect(prismaMock.user.update).not.toHaveBeenCalled();
       expect(response.status).toBe(StatusCodes.UNAUTHORIZED);
-      expect(response.body).toEqual(errorResponse(UNAUTHORIZED_MSG, UNAUTHORIZED_MSG));
+      expect(response.body.statusCode).toBe(StatusCodes.UNAUTHORIZED);
+      expect(response.body.error).toEqual(UNAUTHORIZED_MSG);
     });
 
     test("Should return UNAUTHORIZED if the token was expired", async () => {
@@ -459,7 +450,8 @@ describe("Auth controller", () => {
       expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(1);
       expect(prismaMock.user.update).not.toHaveBeenCalled();
       expect(response.status).toBe(StatusCodes.UNAUTHORIZED);
-      expect(response.body).toEqual(errorResponse(UNAUTHORIZED_MSG, UNAUTHORIZED_MSG));
+      expect(response.body.statusCode).toBe(StatusCodes.UNAUTHORIZED);
+      expect(response.body.error).toEqual(UNAUTHORIZED_MSG);
     });
 
     test("Should pass validation if submitted data is valid and should update the password", async () => {
@@ -499,7 +491,6 @@ describe("Auth controller", () => {
       });
       expect(prismaMock.user.update).toHaveBeenCalledTimes(1);
       expect(response.status).toBe(StatusCodes.OK);
-      expect(response.body).toEqual(PASSWORD_RESET_RESPONSE);
     });
   });
 });

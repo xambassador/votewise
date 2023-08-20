@@ -11,7 +11,7 @@ export const FORBIDDEN_MSG = "Forbidden";
 export const FORBIDDEN_ERROR_MSG =
   "You don't have permission to access this resource or perform this action.";
 
-export const EMAIL_SENT_MSG = "Email sent successfully";
+export const EMAIL_SENT_MSG = "Email sent successfully. Check your mail box..";
 export const EMAIL_QUEUE_MSG = "Request is queued for process. Check your mail box..";
 export const PASSWORD_RESET_MSG = "Password reset successfully";
 export const EMAIL_VERIFIED_MSG = "Email verified successfully";
