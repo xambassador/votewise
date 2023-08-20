@@ -106,3 +106,4 @@ packages/static-server/public/**/*.ico
 .prisma/
 
 todo.txt
+TODO

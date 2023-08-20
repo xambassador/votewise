@@ -2922,6 +2922,14 @@ chownr@^2.0.0:
   resolved "https://registry.npmjs.org/chownr/-/chownr-2.0.0.tgz"
   integrity sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==
 
+chrona@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/chrona/-/chrona-1.0.2.tgz#5bed7fc378d3fb03b8ade647f9604f29e0d750b9"
+  integrity sha512-w+GLn0ONDN/clsruS2WgXfiAVpICcRUANfBxNk/PHjqwqSYAj17n+Bu9EJMULrvbnJ+/QB23lURtJz/1Nq2IKQ==
+  dependencies:
+    bytes "^3.1.2"
+    chalk "4.1.2"
+
 ci-info@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/ci-info/-/ci-info-2.0.0.tgz"

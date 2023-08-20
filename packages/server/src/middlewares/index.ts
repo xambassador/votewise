@@ -1,3 +1,4 @@
+import chrona from "chrona";
 import compression from "compression";
 import cors from "cors";
 import type { Application } from "express";
@@ -6,12 +7,10 @@ import helmet from "helmet";
 
 import Logger from "@votewise/lib/logger";
 
-import { prettyLogger } from "../utils/prettyLogger";
-
 const registerMiddlewares = (app: Application) => {
   Logger.info("LIFECYCLE", `🚀 Middlewares onboarding... System checking... Destination: Calculating...`);
 
-  app.use(prettyLogger((str) => Logger.info("HTTP", str)));
+  app.use(chrona(null, (str) => Logger.info("HTTP", str)));
   app.use(compression());
   app.use(
     cors({
