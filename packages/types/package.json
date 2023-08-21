@@ -3,7 +3,8 @@
     "version": "0.0.0",
     "private": true,
     "sideEffects": false,
-    "main": "index.ts",
+    "main": "index.d.ts",
+    "types": "index.d.ts",
     "files": [
         "index.ts"
     ],
