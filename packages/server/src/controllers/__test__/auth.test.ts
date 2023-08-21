@@ -286,13 +286,19 @@ describe("Auth controller", () => {
     test("Should return invalid email, if email is not valid", async () => {
       const request = supertest(app);
       const email = "test";
-      const response = await request.post(url).send({
+      let response = await request.post(url).send({
         email,
       });
       expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
       expect(response.status).toBe(StatusCodes.BAD_REQUEST);
       expect(response.body.statusCode).toBe(StatusCodes.BAD_REQUEST);
       expect(response.body.error).toEqual(INVALID_EMAIL_MSG);
+
+      response = await request.post(url).send({});
+      expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
+      expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+      expect(response.body.statusCode).toBe(StatusCodes.BAD_REQUEST);
+      expect(response.body.error).toEqual(EMAIL_REQUIRED_MSG);
     });
 
     test("Should return NOT_FOUND if the user is not exists", async () => {

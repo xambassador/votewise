@@ -143,7 +143,6 @@ export const refreshAccessToken = async (req: Request, res: Response, next: Next
 
   try {
     const decoded = JWTService.verifyRefreshToken(refreshToken) as { userId: string };
-    if (!decoded) throw new ServerError(StatusCodes.UNAUTHORIZED, INVALID_REFRESHTOKEN_MSG);
 
     const isRefreshTokenExists = await JWTService.checkIfRefreshTokenExists(
       Number(decoded.userId),

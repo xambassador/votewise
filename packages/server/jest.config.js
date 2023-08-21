@@ -10,4 +10,14 @@ module.exports = {
     "^@/src/(.*)$": "<rootDir>/src/$1",
     "^@/test/(.*)$": "<rootDir>/test/$1",
   },
+  coverageDirectory: "<rootDir>/coverage",
+  collectCoverageFrom: [
+    // TODO: Add more files to coverage as we add more tests
+    "./src/controllers/auth.ts",
+    "./src/controllers/user.ts",
+    "./src/controllers/onboarding.ts",
+    "./src/middlewares/auth.ts",
+    "./src/middlewares/onboarded.ts",
+  ],
+  collectCoverage: true,
 };
