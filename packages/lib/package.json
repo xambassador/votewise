@@ -9,6 +9,7 @@
     },
     "dependencies": {
         "chalk": "4.1.2",
+        "clsx": "^2.0.0",
         "dotenv": "^16.0.3",
         "lodash": "^4.17.21",
         "pino": "^8.11.0",

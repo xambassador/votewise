@@ -11,6 +11,7 @@ export const getError = (error: unknown) => {
       data: null,
       success: false,
     };
+
     return { status, data };
   }
 

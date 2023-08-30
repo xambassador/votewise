@@ -28,7 +28,7 @@ module.exports = {
   ],
   importOrderSeparation: true,
   importOrderSortSpecifiers: true,
-  plugins: [require("./merged-prettier-config")],
+  plugins: [require("./merged-prettier-config"), "prettier-plugin-organize-imports"],
   overrides: [
     {
       files: "**/server/**/*.{ts,json,js}",

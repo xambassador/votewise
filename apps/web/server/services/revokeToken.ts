@@ -8,7 +8,6 @@ import type { RevokeAccessTokenResponse } from "@votewise/types";
  *
  * @description Revoke access token
  * @param refreshToken Refresh token
- * @returns
  */
 export const revokeAccessToken = async (refreshToken: string) => {
   const apiEndpoint = `${AUTH_ROUTE_V1}${REVOKE_ACCESS_TOKEN_V1}`;

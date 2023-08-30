@@ -56,18 +56,12 @@ export default class RedisAdapter extends Redis {
     this.setMaxListeners(100);
   }
 
-  /* -----------------------------------------------------------------------------------------------
-   * @method: defaultClient
-   * -----------------------------------------------------------------------------------------------*/
   public static get defaultClient(): RedisAdapter {
     if (this.client) return this.client;
     this.client = new this(process.env.REDIS_URL, { suffix: "client" });
     return this.client;
   }
 
-  /* -----------------------------------------------------------------------------------------------
-   * @method: defaultSubscriber
-   * -----------------------------------------------------------------------------------------------*/
   public static get defaultSubscriber(): RedisAdapter {
     if (this.subscriber) return this.subscriber;
     this.subscriber = new this(process.env.REDIS_URL, { suffix: "subscriber", maxRetriesPerRequest: null });

@@ -10,7 +10,11 @@ import Logger from "@votewise/lib/logger";
 const registerMiddlewares = (app: Application) => {
   Logger.info("LIFECYCLE", `🚀 Middlewares onboarding... System checking... Destination: Calculating...`);
 
-  app.use(chrona(null, (str) => Logger.info("HTTP", str)));
+  app.use(
+    chrona(":date :incoming :method :url :status :response-time :remote-address", (str) =>
+      Logger.info("HTTP", str)
+    )
+  );
   app.use(compression());
   app.use(
     cors({

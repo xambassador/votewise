@@ -22,10 +22,11 @@
         "typescript": "^4.9.5"
     },
     "dependencies": {
-        "@votewise/lib": "*",
         "@formkit/auto-animate": "^1.0.0-beta.6",
         "@headlessui/react": "^1.7.13",
         "@heroicons/react": "^2.0.16",
+        "@votewise/lib": "*",
+        "class-variance-authority": "^0.7.0",
         "framer-motion": "^9.1.4",
         "next": "13.1.6",
         "react": "18.2.0",

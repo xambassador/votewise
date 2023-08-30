@@ -28,9 +28,6 @@ export const decodeToken = (token: string) => {
   }
 };
 
-/**
- * @param getServerSidePropsCallBack GetServerSideProps Function
- */
 export const authGuard =
   (getServerSidePropsCallBack: GetServerSideProps) => async (context: GetServerSidePropsContext) => {
     const token = getCookie(context.req, "ACCESS_TOKEN");

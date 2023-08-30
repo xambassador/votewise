@@ -104,7 +104,7 @@ export function AuthForm(props: AuthFormProps) {
         router.push("/onboarding");
       },
       (err: any) => {
-        const msg = err.response?.data.error.message || "Something went wrong";
+        const msg = err.response?.data.error || "Something went wrong";
         methods.setError("apiError", { message: msg });
       }
     );

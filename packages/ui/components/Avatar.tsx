@@ -49,9 +49,9 @@ export function AvatarStack(props: { avatars: StackImage[]; className?: string; 
       {avatars.map((avatar, index) => {
         const { className, ...rest } = avatar;
         const imageClassName = classNames("inline-block rounded-full ring-2 ring-white", className);
-        // eslint-disable-next-line react/no-array-index-key
         return (
           <Image
+            // eslint-disable-next-line react/no-array-index-key
             key={index}
             className={imageClassName}
             wrapperClassName="transition-all duration-500 ease-ease-out-expo hover:scale-110"

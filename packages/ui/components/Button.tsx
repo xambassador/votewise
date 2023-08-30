@@ -1,12 +1,10 @@
 import React from "react";
 import type { ReactNode } from "react";
 
-// -----------------------------------------------------------------------------------------
 import classNames from "@votewise/lib/classnames";
 
 import { Loader } from "./Loader";
 
-// -----------------------------------------------------------------------------------------
 type ButtonProps = {
   children?: ReactNode;
   primary?: boolean;

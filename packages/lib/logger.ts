@@ -92,10 +92,10 @@ class Logger {
               winston.format.json(),
               winston.format.printf((info) => {
                 const { message, level, timestamp, label, ...extra } = info;
-                const colorizedLabel = label === "HTTP" ? chalk.bgBlue.bold("[" + label + "]") : `[${label}]`;
-                return `${level} ${chalk.gray("[" + timestamp + "]")} ${colorizedLabel} ${message} ${
-                  isEmpty(extra) ? "" : JSON.stringify(extra)
-                }`;
+                const colorizedLabel = label === "HTTP" ? chalk.bgBlue.bold(` ${label} `) : `[${label}]`;
+                return `${level} ${
+                  label === "HTTP" ? "" : chalk.gray("[" + timestamp + "]")
+                } ${colorizedLabel} ${message} ${isEmpty(extra) ? "" : JSON.stringify(extra)}`;
               })
             ),
       })
