@@ -1,5 +1,4 @@
 import Queue from "bull";
-
 import dotenv from "dotenv";
 
 import Logger from "@votewise/lib/logger";

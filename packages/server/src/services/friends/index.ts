@@ -11,10 +11,10 @@ import {
   ERROR_FETCHING_FRIEND_REQUESTS,
   ERROR_REJECTING_FRIEND_REQUEST,
   FRIEND_REQUEST_NOT_FOUND_MSG,
-  SOMETHING_WENT_WRONG_MSG,
-  UNAUTHORIZED_MSG,
   getErrorReason,
   getPagination,
+  SOMETHING_WENT_WRONG_MSG,
+  UNAUTHORIZED_MSG,
 } from "@/src/utils";
 import { validateAcceptOrRejectFriendRequestPayload } from "@/src/zodValidation";
 

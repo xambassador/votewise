@@ -1,8 +1,7 @@
 import bcrypt from "bcrypt";
+import dotenv from "dotenv";
 import type { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-
-import dotenv from "dotenv";
 
 import type {
   ForgotPasswordPayload,
@@ -18,9 +17,11 @@ import type {
 import ServerError from "@/src/classes/ServerError";
 import Success from "@/src/classes/Success";
 import ValidationError from "@/src/classes/ValidationError";
+
 import EmailService from "@/src/services/email";
 import UserService from "@/src/services/user";
 import JWTService from "@/src/services/user/jwt";
+
 import {
   ACCESS_TOKEN_REVOKE_MSG,
   EMAIL_ALREADY_VERIFIED_MSG,
@@ -39,6 +40,7 @@ import {
   USER_CREATED_SUCCESSFULLY_MSG,
   USER_NOT_FOUND_MSG,
 } from "@/src/utils";
+
 import { isEmail } from "@/src/zodValidation/auth";
 
 /* ----------------------------------------------------------------------------------------------- */
@@ -59,10 +61,10 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
     const newUser = await UserService.createUser(payload);
 
-    const accessToken = JWTService.generateAccessToken({ userId: newUser.id });
+    const accessToken = JWTService.generateAccessToken({ userId: newUser.id, onboarded: false });
     const refreshToken = JWTService.generateRefreshToken({ userId: newUser.id });
     await JWTService.saveRefreshToken(newUser.id, refreshToken);
-    UserService.updateLastLogin(newUser.id).catch();
+    await UserService.updateLastLogin(newUser.id);
 
     const verifyToken = JWTService.generateAccessToken(
       { userId: newUser.id },

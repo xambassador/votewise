@@ -1,6 +1,5 @@
-import jsonwebtoken, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
-
 import dotenv from "dotenv";
+import jsonwebtoken, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 
 import { prisma } from "@votewise/prisma";
 

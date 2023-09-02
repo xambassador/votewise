@@ -26,7 +26,11 @@ const onboardingPayloadSchema = z.object({
   }),
 });
 
-export const validateOnboardingPayload = (payload: OnboardingPayload) => {
+type Response<TSuccess extends boolean> = TSuccess extends true
+  ? { success: true; message: null }
+  : { success: false; message: string };
+
+export const validateOnboardingPayload = (payload: OnboardingPayload): Response<boolean> => {
   const isValid = onboardingPayloadSchema.safeParse(payload);
   if (!isValid.success) {
     const message = generateErrorMessage(isValid.error.issues);

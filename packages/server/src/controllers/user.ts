@@ -1,5 +1,6 @@
 import type { PostStatus } from "@prisma/client";
 import type { NextFunction, Request, Response } from "express";
+
 import createError from "http-errors";
 import { StatusCodes } from "http-status-codes";
 
@@ -27,6 +28,8 @@ import {
   FRIEND_REQUEST_NOT_FOUND_MSG,
   FRIEND_REQUEST_REJECTED_SUCCESSFULLY_MSG,
   FRIEND_REQUEST_SENT_SUCCESSFULLY_MSG,
+  getErrorReason,
+  getLimitAndOffset,
   INVALID_FRIEND_ID,
   INVALID_POST_ID_MSG,
   POSTS_FETCHED_SUCCESSFULLY_MSG,
@@ -42,8 +45,6 @@ import {
   USERNAME_REQUIRED_MSG,
   USER_DETAILS_FETCHED_SUCCESSFULLY_MSG,
   VALIDATION_FAILED_MSG,
-  getErrorReason,
-  getLimitAndOffset,
 } from "@/src/utils";
 
 /* ----------------------------------------------------------------------------------------------- */

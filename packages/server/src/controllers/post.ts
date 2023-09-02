@@ -22,6 +22,8 @@ import {
   COMMENT_UPDATED_SUCCESSFULLY_MSG,
   ERROR_COMMENT_NOT_EMPTY_MSG,
   FORBIDDEN_MSG,
+  getErrorReason,
+  getLimitAndOffset,
   GETTING_REPLIES_FROM_COMMENT_MSG,
   INVALID_COMMENT_ID_MSG,
   INVALID_POST_ID_MSG,
@@ -36,8 +38,6 @@ import {
   SOMETHING_WENT_WRONG_MSG,
   UNAUTHORIZED_MSG,
   VALIDATION_FAILED_MSG,
-  getErrorReason,
-  getLimitAndOffset,
 } from "@/src/utils";
 
 /* ----------------------------------------------------------------------------------------------- */

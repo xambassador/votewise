@@ -1,6 +1,5 @@
 import type { Application } from "express";
 
-// -----------------------------------------------------------------------------------------
 import Logger from "@votewise/lib/logger";
 import {
   AUTH_ROUTE_V1,

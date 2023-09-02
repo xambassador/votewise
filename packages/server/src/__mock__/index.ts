@@ -17,10 +17,10 @@ const getUser = (props: object) => ({
   location: "",
   onboarded: false,
   gender: null,
-  is_email_verify: false,
+  is_email_verify: true,
   last_login: new Date(),
   ...props,
 });
 
-export { getUser };
 export * from "./generator";
+export { getUser };

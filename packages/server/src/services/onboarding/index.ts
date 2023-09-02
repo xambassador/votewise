@@ -1,9 +1,10 @@
-import { ERROR_WHILE_ONBOARDING_USER_MSG, USERNAME_ALREADY_TAKEN_MSG } from "@votewise/lib/constants";
+import { USERNAME_ALREADY_TAKEN_MSG } from "@votewise/lib/constants";
 import { prisma } from "@votewise/prisma";
 import type { OnboardingPayload } from "@votewise/types";
 
+import ServerError from "@/src/classes/ServerError";
 import UserService from "@/src/services/user";
-import { getErrorReason } from "@/src/utils";
+import { DB_ERROR_CODE } from "@/src/utils";
 import { validateOnboardingPayload } from "@/src/zodValidation";
 
 class OnboardingService {
@@ -14,9 +15,7 @@ class OnboardingService {
   async onboardUser(payload: OnboardingPayload, userId: number) {
     try {
       const isUsernameAlreadyTaken = await UserService.checkIfUsernameExists(payload.username);
-      if (isUsernameAlreadyTaken) {
-        throw new Error(USERNAME_ALREADY_TAKEN_MSG);
-      }
+      if (isUsernameAlreadyTaken) throw new Error(USERNAME_ALREADY_TAKEN_MSG);
       const user = await prisma.user.update({
         where: {
           id: userId,
@@ -45,8 +44,7 @@ class OnboardingService {
       });
       return user;
     } catch (err) {
-      const reason = getErrorReason(err) || ERROR_WHILE_ONBOARDING_USER_MSG;
-      throw new Error(reason);
+      throw new ServerError(DB_ERROR_CODE, "Error while onboarding user");
     }
   }
 }

@@ -4,7 +4,7 @@ import { prisma } from "@votewise/prisma";
 import type { LoginPayload, RegisterUserPayload } from "@votewise/types";
 
 import ServerError from "@/src/classes/ServerError";
-import { DB_ERROR_CODE, getErrorReason } from "@/src/utils";
+import { DB_ERROR_CODE } from "@/src/utils";
 import { isEmail, validateLoginSchema, validateRegisterUserSchema } from "@/src/zodValidation";
 
 class UserService {
@@ -77,8 +77,7 @@ class UserService {
       });
       return user;
     } catch (err) {
-      const msg = getErrorReason(err) || "Error while fetching user";
-      throw new Error(msg);
+      throw new ServerError(DB_ERROR_CODE, "Error while fetching user");
     }
   }
 
