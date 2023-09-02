@@ -14,17 +14,11 @@ export default function onboarded(req: Request, res: Response, next: NextFunctio
     return res.status(httpStatusCodes.BAD_REQUEST).json(response);
   }
 
-  // TODO: Uncomment this
-  //   if (!user.is_email_verify) {
-  //     return res.status(httpStatusCodes.BAD_REQUEST).json({
-  //       message: "Email is not verified",
-  //       data: null,
-  //       error: {
-  //         message: "Email is not verified. Please verify your email to continue.",
-  //       },
-  //       success: false,
-  //     });
-  //   }
+  if (!user.is_email_verify) {
+    const message = "Email is not verified";
+    const response = new ErrorResponse(message, message, httpStatusCodes.BAD_REQUEST);
+    return res.status(httpStatusCodes.BAD_REQUEST).json(response);
+  }
 
   next();
 }

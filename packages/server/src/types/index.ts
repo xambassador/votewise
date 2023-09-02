@@ -47,6 +47,12 @@ const envSchema = z.object({
   REDIS_HOST: z.string(),
   REDIS_PORT: z.string(),
   REDIS_URL: z.string(),
+  CONCURRENCY: z.string(),
+  SSL_KEY: z.string(),
+  SSL_CERT: z.string(),
+  REQUEST_TIMEOUT: z.string(),
+  LOG_LEVEL: z.string(),
+  DEBUG: z.string(),
 });
 
 declare global {

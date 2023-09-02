@@ -3,7 +3,6 @@ import Redis from "ioredis";
 import { defaults } from "lodash";
 
 import Logger from "@votewise/lib/logger";
-
 /* ----------------------------------------------------------------------------------------------- */
 
 type AdapterOptions = RedisOptions & {
@@ -14,7 +13,7 @@ const DEFAULT_OPTIONS: RedisOptions = {
   maxRetriesPerRequest: 3,
   enableReadyCheck: true,
   retryStrategy: (times) => {
-    Logger.warn("DATABASE", `Retrying Redis connection ${times} times`);
+    Logger.warn("DATABASE", { message: `Retrying Redis connection ${times} times` });
     return Math.min(times * 50, 2000); // Retry after 50ms, 100ms, 150ms, 200ms, 2000ms
   },
 };

@@ -1,3 +1,6 @@
+/**
+ * @deprecated
+ */
 class JSONResponse {
   public message: string;
 
