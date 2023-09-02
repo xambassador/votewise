@@ -2,7 +2,6 @@
 
 const packages = require("./package.json");
 const esbuild = require("esbuild");
-const fs = require("fs");
 const fsExtra = require("fs-extra");
 const { copy } = require("esbuild-plugin-copy");
 

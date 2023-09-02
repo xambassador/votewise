@@ -110,8 +110,14 @@ class Logger {
     this.output.debug(message, { label, ...extra });
   }
 
-  public warn(label: LogCategory, message: string, extra?: Extra) {
-    this.output.warn(message, { label, ...extra });
+  public warn(message: string, extra?: Extra) {
+    if (isProduction) {
+      this.output.warn(message, this.sanitize(extra));
+    } else if (extra) {
+      console.warn(message, extra);
+    } else {
+      console.warn(message);
+    }
   }
 
   public error(label: LogCategory, message: string, extra?: Extra) {
