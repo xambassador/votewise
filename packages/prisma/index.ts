@@ -13,7 +13,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 if (process.env.NODE_ENV === "development" && process.env.DEBUG) {
-  prismaOptions.log = ["query", "error", "info", "warn"];
+  prismaOptions.log = ["error"];
 }
 
 // https://www.prisma.io/docs/concepts/components/prisma-client/working-with-prismaclient/instantiate-prisma-client#the-number-of-prismaclient-instances-matters
