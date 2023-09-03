@@ -13,9 +13,8 @@ import {
   REVOKE_ACCESS_TOKEN_V1,
 } from "@votewise/lib/routes";
 
-import app from "../..";
+import app from "../../../test/express-app";
 import prismaMock from "../../../test/__mock__/prisma";
-import { getUser } from "../../__mock__";
 import JWT from "../../services/user/jwt";
 import {
   EMAIL_REQUIRED_MSG,
@@ -28,6 +27,7 @@ import {
   USER_ALREADY_EXISTS_MSG,
   USER_NOT_FOUND_MSG,
 } from "../../utils";
+import { getUser } from "../../__mock__";
 
 jest.mock("@votewise/prisma", () => {
   // eslint-disable-next-line global-require

@@ -4,18 +4,20 @@ import supertest from "supertest";
 
 import { ONBOARDING_ROUTE_V1, ONBOARDING_UPDATE_V1 } from "@votewise/lib/routes";
 
-import app from "../..";
+import app from "../../../test/express-app";
 import prismaMock from "../../../test/__mock__/prisma";
-import { createRequest, createResponse, getUser } from "../../__mock__";
+import ErrorResponse from "../../classes/ErrorResponse";
+import ServerError from "../../classes/ServerError";
+import Success from "../../classes/Success";
 import OnboardingService from "../../services/onboarding";
 import JWT from "../../services/user/jwt";
 import {
   USERNAME_ALREADY_TAKEN_MSG,
-  USERNAME_ALREADY_TAKEN_RESPONSE,
-  USER_ALREADY_ONBOARDED_RESPONSE,
+  USER_ALREADY_ONBOARDED_MSG,
   USER_ONBOARDED_SUCCESSFULLY_MSG,
   VALIDATION_FAILED_MSG,
 } from "../../utils";
+import { createRequest, createResponse, getUser } from "../../__mock__";
 import { onboardingStatus } from "../onboarding";
 
 // https://stackoverflow.com/questions/65554910/jest-referenceerror-cannot-access-before-initialization
@@ -79,14 +81,9 @@ describe("Onboarding API", () => {
       const mockResponse = createResponse();
       await onboardingStatus(mockRequest, mockResponse);
       expect(mockResponse.status).toHaveBeenCalledWith(StatusCodes.OK);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        success: true,
-        message: "Details fetched successfully",
-        data: {
-          onboarded: user.onboarded,
-        },
-        error: null,
-      });
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        new Success("Details fetched successfully", { onboarded: false })
+      );
     });
   });
 
@@ -102,7 +99,9 @@ describe("Onboarding API", () => {
         .set("Authorization", `Bearer ${token}`);
 
       expect(response.status).toBe(StatusCodes.BAD_REQUEST);
-      expect(response.body).toEqual(USER_ALREADY_ONBOARDED_RESPONSE);
+      expect(response.body).toEqual(
+        new ErrorResponse(USER_ALREADY_ONBOARDED_MSG, USER_ALREADY_ONBOARDED_MSG, StatusCodes.BAD_REQUEST)
+      );
       expect(OnboardingService.onboardUser).not.toHaveBeenCalled();
     });
 
@@ -116,11 +115,8 @@ describe("Onboarding API", () => {
       expect(response.status).toBe(StatusCodes.BAD_REQUEST);
       expect(response.body).toEqual({
         message: VALIDATION_FAILED_MSG,
-        data: null,
-        error: {
-          message: expect.any(String),
-        },
-        success: false,
+        error: expect.any(String),
+        statusCode: StatusCodes.BAD_REQUEST,
       });
       expect(OnboardingService.onboardUser).not.toHaveBeenCalled();
     });
@@ -131,7 +127,7 @@ describe("Onboarding API", () => {
       const token = JWT.generateAccessToken({ userId: 1 });
       prismaMock.user.findUnique.mockResolvedValue(getUser({ id: 1, onboarded: false }));
       jest.spyOn(OnboardingService, "onboardUser").mockImplementation(() => {
-        throw new Error(USERNAME_ALREADY_TAKEN_MSG);
+        throw new ServerError(StatusCodes.BAD_REQUEST, USERNAME_ALREADY_TAKEN_MSG);
       });
       const response = await request
         .patch(url)
@@ -139,7 +135,11 @@ describe("Onboarding API", () => {
         .set("Authorization", `Bearer ${token}`);
 
       expect(response.status).toBe(StatusCodes.BAD_REQUEST);
-      expect(response.body).toEqual(USERNAME_ALREADY_TAKEN_RESPONSE);
+      expect(response.body).toEqual({
+        message: USERNAME_ALREADY_TAKEN_MSG,
+        error: USERNAME_ALREADY_TAKEN_MSG,
+        statusCode: StatusCodes.BAD_REQUEST,
+      });
       expect(OnboardingService.onboardUser).toHaveBeenCalledTimes(1);
       expect(OnboardingService.onboardUser).toHaveBeenCalledWith(onboaringPayload, 1);
     });
@@ -156,14 +156,9 @@ describe("Onboarding API", () => {
         .set("Authorization", `Bearer ${token}`);
 
       expect(response.status).toBe(StatusCodes.OK);
-      expect(response.body).toEqual({
-        message: USER_ONBOARDED_SUCCESSFULLY_MSG,
-        data: {
-          user: expect.any(Object),
-        },
-        error: null,
-        success: true,
-      });
+      expect(response.body).toEqual(
+        new Success(USER_ONBOARDED_SUCCESSFULLY_MSG, { user: expect.any(Object) })
+      );
       expect(OnboardingService.onboardUser).toHaveBeenCalledTimes(1);
       expect(OnboardingService.onboardUser).toHaveBeenCalledWith(onboaringPayload, 1);
     });

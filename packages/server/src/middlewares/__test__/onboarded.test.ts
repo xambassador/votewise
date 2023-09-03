@@ -1,19 +1,15 @@
 import type { NextFunction } from "express";
 import httpSatatusCodes from "http-status-codes";
 
+import ErrorResponse from "../../classes/ErrorResponse";
+import { ONBOARDING_ERROR_CODE } from "../../utils/constants";
 import { createRequest, createResponse, getUser } from "../../__mock__";
 import onboardedMiddleware from "../onboarded";
 
 const { BAD_REQUEST } = httpSatatusCodes;
 
-const notOnboardeResponse = {
-  message: "User is not onboarded",
-  data: null,
-  error: {
-    message: "User is not onboarded",
-  },
-  success: false,
-};
+const message = "User is not onboarded";
+const notOnboardeResponse = new ErrorResponse(message, message, ONBOARDING_ERROR_CODE);
 
 describe("Onboarded middleware", () => {
   test("Should return BAD_REQUEST if user is not onboarded.", async () => {

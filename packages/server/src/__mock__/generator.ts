@@ -19,10 +19,7 @@ const errorResponse = (message: string, reason?: string) => {
   return {
     success: false,
     message,
-    error: {
-      message: reason || expect.any(String),
-    },
-    data: null,
+    error: reason || expect.any(String),
   };
 };
 
