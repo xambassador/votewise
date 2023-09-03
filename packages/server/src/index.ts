@@ -132,5 +132,5 @@ async function start(_: number, disconnect: () => void) {
 taskforce({
   master,
   worker: start,
-  count: 1,
+  count: env.CONCURRENCY,
 });

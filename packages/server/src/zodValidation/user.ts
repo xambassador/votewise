@@ -28,7 +28,11 @@ const CreatePostSchema = z.object({
   groupId: z.number().optional(),
 });
 
-export const validateCreatePostPayload = (payload: CreatePostPayload) => {
+type Response<TSuccess extends boolean> = TSuccess extends true
+  ? { success: true; message: null }
+  : { success: false; message: string };
+
+export const validateCreatePostPayload = (payload: CreatePostPayload): Response<boolean> => {
   const isValid = CreatePostSchema.safeParse(payload);
 
   if (!isValid.success) {

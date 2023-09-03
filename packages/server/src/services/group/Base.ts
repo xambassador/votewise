@@ -1,36 +1,25 @@
-import { prisma } from "@votewise/prisma";
 import type { Group } from "@votewise/prisma/client";
 
-import { getErrorReason } from "@/src/utils";
+import { prisma } from "@votewise/prisma";
 
 class BaseGroup {
   async isGroupExists(groupId: number) {
-    try {
-      const group = await prisma.group.findUnique({
-        where: {
-          id: groupId,
-        },
-      });
-      return group;
-    } catch (err) {
-      const msg = getErrorReason(err) || "Error while checking for group existence";
-      throw new Error(msg);
-    }
+    const group = await prisma.group.findUnique({
+      where: {
+        id: groupId,
+      },
+    });
+    return group;
   }
 
   async isUserAlreadyMember(userId: number, groupId: number) {
-    try {
-      const groupMember = await prisma.groupMember.findFirst({
-        where: {
-          user_id: userId,
-          group_id: groupId,
-        },
-      });
-      return groupMember;
-    } catch (err) {
-      const msg = getErrorReason(err) || "Error while checking for group existence";
-      throw new Error(msg);
-    }
+    const groupMember = await prisma.groupMember.findFirst({
+      where: {
+        user_id: userId,
+        group_id: groupId,
+      },
+    });
+    return groupMember;
   }
 
   getInviteStatus(group: Group) {
@@ -78,19 +67,14 @@ class BaseGroup {
   }
 
   async isUserAdmin(userId: number, groupId: number) {
-    try {
-      const user = await prisma.groupMember.findFirst({
-        where: {
-          user_id: userId,
-          group_id: groupId,
-          role: "ADMIN",
-        },
-      });
-      return user;
-    } catch (err) {
-      const msg = getErrorReason(err) || "Error while checking for user admin";
-      throw new Error(msg);
-    }
+    const user = await prisma.groupMember.findFirst({
+      where: {
+        user_id: userId,
+        group_id: groupId,
+        role: "ADMIN",
+      },
+    });
+    return user;
   }
 
   async isGroupInvitaionExists(
@@ -99,38 +83,28 @@ class BaseGroup {
     type: "JOIN" | "INVITE" = "JOIN",
     status?: "PENDING" | "ACCEPTED" | "REJECTED"
   ) {
-    try {
-      const invitation = await await prisma.groupInvitation.findFirst({
-        where: {
-          user_id: userId,
-          group_id: groupId,
-          status,
-          type,
-        },
-      });
+    const invitation = await await prisma.groupInvitation.findFirst({
+      where: {
+        user_id: userId,
+        group_id: groupId,
+        status,
+        type,
+      },
+    });
 
-      return invitation;
-    } catch (err) {
-      const msg = getErrorReason(err) || "Error while checking for group invitation request exists or not";
-      throw new Error(msg);
-    }
+    return invitation;
   }
 
   async isMemberExists(userId: number, groupId: number) {
-    try {
-      const user = await prisma.groupMember.findFirst({
-        where: {
-          user_id: userId,
-          group_id: groupId,
-          role: "MEMBER",
-        },
-      });
+    const user = await prisma.groupMember.findFirst({
+      where: {
+        user_id: userId,
+        group_id: groupId,
+        role: "MEMBER",
+      },
+    });
 
-      return user;
-    } catch (err) {
-      const msg = getErrorReason(err) || "Error while checking for user is memeber of group or not";
-      throw new Error(msg);
-    }
+    return user;
   }
 }
 

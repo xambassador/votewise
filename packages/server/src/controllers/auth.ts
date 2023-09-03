@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt";
-import dotenv from "dotenv";
 import type { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 
@@ -43,10 +42,9 @@ import {
 
 import { isEmail } from "@/src/zodValidation/auth";
 
-/* ----------------------------------------------------------------------------------------------- */
-dotenv.config();
+import env from "@/src/env";
 
-const { FRONTEND_URL } = process.env;
+const { FRONTEND_URL } = env;
 
 /* ----------------------------------------------------------------------------------------------- */
 export const register = async (req: Request, res: Response, next: NextFunction) => {
@@ -146,10 +144,7 @@ export const refreshAccessToken = async (req: Request, res: Response, next: Next
   try {
     const decoded = JWTService.verifyRefreshToken(refreshToken) as { userId: string };
 
-    const isRefreshTokenExists = await JWTService.checkIfRefreshTokenExists(
-      Number(decoded.userId),
-      refreshToken
-    );
+    const isRefreshTokenExists = await JWTService.isRefreshTokenExists(Number(decoded.userId), refreshToken);
 
     if (!isRefreshTokenExists) {
       throw new ServerError(StatusCodes.UNAUTHORIZED, INVALID_REFRESHTOKEN_MSG);

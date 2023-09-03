@@ -1,21 +1,17 @@
-import dotenv from "dotenv";
-import nodemailer from "nodemailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
 
-import { logger } from "@votewise/lib/logger";
+import nodemailer from "nodemailer";
 
-dotenv.config();
+import Logger from "@votewise/lib/logger";
 
-const host = process.env.SMTP_HOST;
-const port = process.env.SMTP_PORT;
-const username = process.env.SMTP_USERNAME;
-const password = process.env.SMTP_PASSWORD;
-const from = process.env.SMTP_FROM;
-const fromMail = process.env.SMTP_FROM_EMAIL || "help.votewise@gmail.com";
+import env from "@/src/env";
 
-if (!host || !port || !username || !password || !from) {
-  throw new Error("Missing SMTP configuration");
-}
+const host = env.SMTP_HOST;
+const port = env.SMTP_PORT;
+const username = env.SMTP_USERNAME;
+const password = env.SMTP_PASSWORD;
+const from = env.SMTP_FROM;
+const fromMail = env.SMTP_FROM_EMAIL;
 
 interface EmailOptions {
   from?: string;
@@ -56,7 +52,8 @@ export class EmailTransporter {
     try {
       await this.transporter.sendMail(this.mailOptions);
     } catch (err) {
-      logger(`Failed to send email: ${err}`, "error");
+      const message = err instanceof Error ? err.message : "Failed to send email";
+      Logger.error("EMAIL", message, { error: err });
       throw new Error("Failed to send email");
     }
   }

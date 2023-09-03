@@ -15,7 +15,13 @@ const schema = z.object({
   }),
 });
 
-export const validateAcceptOrRejectFriendRequestPayload = (payload: AcceptOrRejectFriendRequestPayload) => {
+type Response<TSuccess extends boolean> = TSuccess extends true
+  ? { success: true; message: null }
+  : { success: false; message: string };
+
+export const validateAcceptOrRejectFriendRequestPayload = (
+  payload: AcceptOrRejectFriendRequestPayload
+): Response<boolean> => {
   const isValid = schema.safeParse(payload);
 
   if (!isValid.success) {

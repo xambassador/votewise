@@ -1,5 +1,8 @@
+import chalk from "chalk";
 import { IsByteLength, IsIn, IsNotEmpty, IsNumber, IsOptional, IsUrl, validate } from "class-validator";
 import dotenv from "dotenv";
+
+import Logger from "@votewise/lib/logger";
 
 import { CannotUseWithout } from "@/src/utils/decorators";
 
@@ -77,7 +80,12 @@ export class Environment {
    */
   @IsNumber()
   @IsOptional()
-  public CONCURRENCY = this.toOptionalNumber(process.env.WEB_CONCURRENCY);
+  public CONCURRENCY =
+    this.toOptionalNumber(process.env.WEB_CONCURRENCY) ??
+    (() => {
+      Logger.warn(`${chalk.bgGray.bold(" WARN ")} WEB_CONCURRENCY is not set. Defaulting to 1.`);
+      return 1;
+    })();
 
   public REQUEST_TIMEOUT = this.toOptionalNumber(process.env.REQUEST_TIMEOUT) ?? 10 * 1000; // 10 seconds
 

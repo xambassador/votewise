@@ -1,18 +1,13 @@
 import Queue from "bull";
-import dotenv from "dotenv";
 
 import Logger from "@votewise/lib/logger";
 
 import { EmailTransporter } from "@/src/services/email/EmailTransporter";
 
-dotenv.config();
+import env from "@/src/env";
 
-const REDIS_HOST = process.env.REDIS_HOST || "localhost";
-const REDIS_PORT = process.env.REDIS_PORT || 6379;
-const redis = {
-  host: REDIS_HOST,
-  port: Number(REDIS_PORT),
-};
+const { REDIS_URL } = env;
+const redis = REDIS_URL;
 
 type EmailData = {
   to: string;

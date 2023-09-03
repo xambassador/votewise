@@ -10,9 +10,9 @@ import ValidationError from "@/src/classes/ValidationError";
 import OnboardingService from "@/src/services/onboarding";
 
 import { USER_ALREADY_ONBOARDED_MSG, USER_ONBOARDED_SUCCESSFULLY_MSG } from "@/src/utils";
-
 /* ----------------------------------------------------------------------------------------------- */
 
+/** Onboard a user */
 export const onboardUser = async (req: Request, res: Response, next: NextFunction) => {
   const payload = req.body as OnboardingPayload;
   const { user } = req.session;
@@ -36,7 +36,7 @@ export const onboardUser = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-/* ----------------------------------------------------------------------------------------------- */
+/** Get onboarding status of a user */
 export const onboardingStatus = async (req: Request, res: Response) => {
   const { user } = req.session;
   const { onboarded } = user;

@@ -21,16 +21,9 @@ export const errorMiddleware = (err: any, _: Request, res: Response, next: NextF
     return res.status(status).json(response);
   }
 
-  const status = err.status || 500;
-  const message = err.message || "Something went wrong";
-  const errorReason = err.reason || message;
-  const response = {
-    success: false,
-    data: null,
-    error: {
-      message: errorReason,
-    },
-    message,
-  };
+  // If error is unknown.
+  const status = 500;
+  const message = err.message || "Internal Server Error";
+  const response = new ErrorResponse(message, message, status);
   return res.status(status).json(response);
 };

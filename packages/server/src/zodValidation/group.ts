@@ -28,7 +28,11 @@ const schema = z.object({
   }),
 });
 
-const validateCreateGroupPayload = (payload: CreateGroupPayload) => {
+type Response<TSuccess extends boolean> = TSuccess extends true
+  ? { success: true; message: null }
+  : { success: false; message: string };
+
+const validateCreateGroupPayload = (payload: CreateGroupPayload): Response<boolean> => {
   const isValid = schema.safeParse(payload);
 
   if (!isValid.success) {

@@ -1,7 +1,8 @@
+import type { Application } from "express";
+
 import chrona from "chrona";
 import compression from "compression";
 import cors from "cors";
-import type { Application } from "express";
 import express, { json } from "express";
 import helmet from "helmet";
 
@@ -28,7 +29,7 @@ const registerMiddlewares = (app: Application) => {
       limit: "50mb",
     })
   );
-  app.use((req, res, next) => {
+  app.use((req, _, next) => {
     if (req.body && typeof req.body === "object" && !Array.isArray(req.body)) {
       Object.freeze(req.body);
     }

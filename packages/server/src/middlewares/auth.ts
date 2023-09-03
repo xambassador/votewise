@@ -7,9 +7,11 @@ import ErrorResponse from "@/src/classes/ErrorResponse";
 import UserService from "@/src/services/user";
 import JWTService from "@/src/services/user/jwt";
 
+import env from "@/src/env";
+
 dotenv.config();
 
-const COOKIE_KEY = process.env.COOKIE_ACCESS_TOKEN_KEY;
+const COOKIE_KEY = env.COOKIE_ACCESS_TOKEN_KEY;
 
 const { UNAUTHORIZED } = httpStatusCodes;
 const unauthorizedResponse = new ErrorResponse(

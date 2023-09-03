@@ -1,12 +1,20 @@
 import { UNKNOWN_ERROR_CODES } from "@/src/utils";
 
+/**
+ * Custom error class for throwing server errors. It can be known or unknown
+ * errors.
+ */
 export default class ServerError extends Error {
-  // send in response body
+  /** Status code of the response */
   statusCode: number;
 
+  /** Error message */
   message: string;
 
-  // if error is unknown, then send 500 status code
+  /**
+   * Is the error unknown or not. If it is unknown, then it will set to true and
+   * global error handler will handle it as status code 500.
+   */
   isUnknownError: boolean;
 
   constructor(statusCode: number, message: string) {

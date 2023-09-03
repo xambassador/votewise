@@ -22,56 +22,51 @@ class HashTagService {
 
     if (hashtags.length === 0) return Promise.resolve();
 
-    try {
-      const promises = hashtags.map((hashtag) => {
-        const tag = prisma.hashTag.upsert({
-          where: { name: hashtag.name },
-          create: { name: hashtag.name, count: 1 },
-          update: { count: { increment: 1 } },
-          select: { id: true, name: true },
-        });
-        return tag;
+    const promises = hashtags.map((hashtag) => {
+      const tag = prisma.hashTag.upsert({
+        where: { name: hashtag.name },
+        create: { name: hashtag.name, count: 1 },
+        update: { count: { increment: 1 } },
+        select: { id: true, name: true },
       });
-      const newTags = await prisma.$transaction(promises);
+      return tag;
+    });
+    const newTags = await prisma.$transaction(promises);
 
-      const isPostExist = await prisma.postHashTag.findFirst({
-        where: {
-          post_id: postId,
-        },
-      });
+    const isPostExist = await prisma.postHashTag.findFirst({
+      where: {
+        post_id: postId,
+      },
+    });
 
-      if (isPostExist) {
-        const postTags = await prisma.post.update({
-          where: {
-            id: postId,
-          },
-          data: {
-            post_hash_tags: {
-              deleteMany: {},
-              create: newTags.map((tag) => ({ hash_tag_id: tag.id })),
-            },
-          },
-        });
-
-        return postTags;
-      }
-
+    if (isPostExist) {
       const postTags = await prisma.post.update({
         where: {
           id: postId,
         },
         data: {
           post_hash_tags: {
+            deleteMany: {},
             create: newTags.map((tag) => ({ hash_tag_id: tag.id })),
           },
         },
       });
 
       return postTags;
-    } catch (err) {
-      const msg = "Error adding hashtags";
-      throw new Error(msg);
     }
+
+    const postTags = await prisma.post.update({
+      where: {
+        id: postId,
+      },
+      data: {
+        post_hash_tags: {
+          create: newTags.map((tag) => ({ hash_tag_id: tag.id })),
+        },
+      },
+    });
+
+    return postTags;
   }
 }
 
