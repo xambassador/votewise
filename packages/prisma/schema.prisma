@@ -18,10 +18,10 @@ enum Gender {
 }
 
 model User {
-    id                Int               @id @default(autoincrement())
-    email             String            @unique
+    id                Int                @id @default(autoincrement())
+    email             String             @unique
     password          String
-    username          String?           @unique
+    username          String?            @unique
     name              String?
     about             String?
     twitter           String?
@@ -31,23 +31,24 @@ model User {
     cover_image       String?
     location          String?
     gender            Gender?
-    onboarded         Boolean           @default(false)
-    is_email_verify   Boolean           @default(false)
+    onboarded         Boolean            @default(false)
+    is_email_verify   Boolean            @default(false)
     last_login        DateTime?
-    created_at        DateTime          @default(now())
-    updated_at        DateTime          @updatedAt
+    created_at        DateTime           @default(now())
+    updated_at        DateTime           @updatedAt
     posts             Post[]
     upvotes           Upvote[]
     comments          Comment[]
     comment_upvotes   CommentUpvote[]
-    followers         Follow[]          @relation("followers")
-    following         Follow[]          @relation("following")
-    friend1           Friend[]          @relation("user")
-    friend2           Friend[]          @relation("friend")
+    followers         Follow[]           @relation("followers")
+    following         Follow[]           @relation("following")
+    friend1           Friend[]           @relation("user")
+    friend2           Friend[]           @relation("friend")
     group_member      GroupMember[]
     group_invitations GroupInvitation[]
     notification      Notification[]
     refresh_token     RefreshToken[]
+    BlacklistedToken  BlacklistedToken[]
 }
 
 enum PostType {
@@ -272,6 +273,16 @@ model RefreshToken {
     id         Int      @id @default(autoincrement())
     user       User     @relation(fields: [user_id], references: [id])
     user_id    Int      @unique
+    token      String   @db.VarChar(255)
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+// TRL (Token Revocation List) Blacklisted tokens
+model BlacklistedToken {
+    id         Int      @id @default(autoincrement())
+    user       User     @relation(fields: [user_id], references: [id])
+    user_id    Int
     token      String   @db.VarChar(255)
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt

@@ -6,10 +6,12 @@ import { StatusCodes } from "http-status-codes";
 import ServerError from "@/src/classes/ServerError";
 import Success from "@/src/classes/Success";
 import ValidationError from "@/src/classes/ValidationError";
+import JWTService from "@/src/services/user/jwt";
 
 import OnboardingService from "@/src/services/onboarding";
 
 import { USER_ALREADY_ONBOARDED_MSG, USER_ONBOARDED_SUCCESSFULLY_MSG } from "@/src/utils";
+
 /* ----------------------------------------------------------------------------------------------- */
 
 /** Onboard a user */
@@ -27,9 +29,15 @@ export const onboardUser = async (req: Request, res: Response, next: NextFunctio
 
   try {
     const onboardedUser = await OnboardingService.onboardUser(payload, user.id);
+
+    // Issue new access token.
+    const token = JWTService.generateAccessToken({ userId: user.id, onboarded: true });
+
     const response = new Success(USER_ONBOARDED_SUCCESSFULLY_MSG, {
       user: onboardedUser,
+      accessToken: token,
     });
+
     return res.status(StatusCodes.OK).json(response);
   } catch (err) {
     return next(err);

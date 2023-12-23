@@ -67,7 +67,7 @@ describe("Authorization middleware", () => {
   });
 
   test("Should return UNAUTHORIZED if user is not found", async () => {
-    const token = JWTService.generateAccessToken({ userId: 1 });
+    const token = JWTService.generateAccessToken({ userId: 1, onboarded: false });
     const mockRequest: Partial<Request> = {
       headers: {
         authorization: `Bearer ${token}`,
@@ -87,7 +87,7 @@ describe("Authorization middleware", () => {
   });
 
   test("Should call next function if token is valid and user is present in database", async () => {
-    const token = JWTService.generateAccessToken({ userId: 1 });
+    const token = JWTService.generateAccessToken({ userId: 1, onboarded: false });
     const mockRequest: Partial<Request> = {
       headers: {
         authorization: `Bearer ${token}`,

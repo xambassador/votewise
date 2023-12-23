@@ -10,31 +10,47 @@ import env from "@/src/env";
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = env;
 
 class JWTService {
-  generateAccessToken(payload: object, config: jsonwebtoken.SignOptions = { expiresIn: "15m" }) {
+  public generateAccessToken(
+    payload: {
+      userId: number;
+      onboarded: boolean;
+    },
+    config: jsonwebtoken.SignOptions = { expiresIn: "15m" }
+  ) {
     return jsonwebtoken.sign(payload, ACCESS_TOKEN_SECRET, config);
   }
 
-  generateRefreshToken(payload: object, config: jsonwebtoken.SignOptions = { expiresIn: "7d" }) {
+  public generateRefreshToken(
+    payload: {
+      userId: number;
+    },
+    config: jsonwebtoken.SignOptions = { expiresIn: "7d" }
+  ) {
     return jsonwebtoken.sign(payload, REFRESH_TOKEN_SECRET, config);
   }
 
-  verifyAccessToken(token: string) {
+  public verifyAccessToken(token: string) {
     try {
-      return jsonwebtoken.verify(token, ACCESS_TOKEN_SECRET);
+      return jsonwebtoken.verify(token, ACCESS_TOKEN_SECRET) as {
+        userId: number;
+        onboarded: boolean;
+      };
     } catch (err) {
       throw new ServerError(401, UNAUTHORIZED_MSG);
     }
   }
 
-  verifyRefreshToken(token: string) {
+  public verifyRefreshToken(token: string) {
     try {
-      return jsonwebtoken.verify(token, REFRESH_TOKEN_SECRET);
+      return jsonwebtoken.verify(token, REFRESH_TOKEN_SECRET) as {
+        userId: number;
+      };
     } catch (err) {
       throw new ServerError(401, UNAUTHORIZED_MSG);
     }
   }
 
-  async saveRefreshToken(userId: number, token: string, isUpdate = false) {
+  public async saveRefreshToken(userId: number, token: string, isUpdate = false) {
     if (isUpdate) {
       await this.updateRefreshToken(userId, token);
     } else {
@@ -62,7 +78,7 @@ class JWTService {
     });
   }
 
-  async isRefreshTokenExists(userId: number, token: string) {
+  public async isRefreshTokenExists(userId: number, token: string) {
     const refreshToken = await prisma.refreshToken.findUnique({
       where: {
         user_id: userId,
@@ -71,6 +87,22 @@ class JWTService {
 
     if (!refreshToken) return false;
     return refreshToken.token === token;
+  }
+
+  public generateRidToken(data: { rid: string }, config: jsonwebtoken.SignOptions = { expiresIn: 300 }) {
+    // TODO: Change access token secret to new rid token secret
+    return jsonwebtoken.sign(data, ACCESS_TOKEN_SECRET, config);
+  }
+
+  public verifyRidToken(token: string) {
+    try {
+      // TODO: Change access token secret to new rid token secret
+      return jsonwebtoken.verify(token, ACCESS_TOKEN_SECRET) as {
+        rid: string;
+      };
+    } catch (err) {
+      throw new ServerError(401, UNAUTHORIZED_MSG);
+    }
   }
 }
 

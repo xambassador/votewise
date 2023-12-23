@@ -27,6 +27,7 @@ type LoginResponse = {
 
 type RevokeAccessTokenPayload = {
   refreshToken: string;
+  accessToken: string;
 };
 
 type RevokeAccessTokenResponse = {

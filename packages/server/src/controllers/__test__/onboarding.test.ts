@@ -91,7 +91,7 @@ describe("Onboarding API", () => {
     test("Should return BAD_REQUEST if users is already onboarded", async () => {
       const request = supertest(server);
       const url = getOnboardingUpdateUrl("1");
-      const token = JWT.generateAccessToken({ userId: 1 });
+      const token = JWT.generateAccessToken({ userId: 1, onboarded: false });
       prismaMock.user.findUnique.mockResolvedValue(getUser({ id: 1, onboarded: true }));
       const response = await request
         .patch(url)
@@ -108,7 +108,7 @@ describe("Onboarding API", () => {
     test("Should return BAD_REQUEST if payload is invalid", async () => {
       const request = supertest(server);
       const url = getOnboardingUpdateUrl("1");
-      const token = JWT.generateAccessToken({ userId: 1 });
+      const token = JWT.generateAccessToken({ userId: 1, onboarded: false });
       prismaMock.user.findUnique.mockResolvedValue(getUser({ id: 1, onboarded: false }));
       const response = await request.patch(url).send().set("Authorization", `Bearer ${token}`);
 
@@ -124,7 +124,7 @@ describe("Onboarding API", () => {
     test("Should return BAD_REQUEST if username is already taken", async () => {
       const request = supertest(server);
       const url = getOnboardingUpdateUrl("1");
-      const token = JWT.generateAccessToken({ userId: 1 });
+      const token = JWT.generateAccessToken({ userId: 1, onboarded: false });
       prismaMock.user.findUnique.mockResolvedValue(getUser({ id: 1, onboarded: false }));
       jest.spyOn(OnboardingService, "onboardUser").mockImplementation(() => {
         throw new ServerError(StatusCodes.BAD_REQUEST, USERNAME_ALREADY_TAKEN_MSG);
@@ -147,7 +147,7 @@ describe("Onboarding API", () => {
     test("Should return OK if payload is valid and user is valid", async () => {
       const request = supertest(server);
       const url = getOnboardingUpdateUrl("1");
-      const token = JWT.generateAccessToken({ userId: 1 });
+      const token = JWT.generateAccessToken({ userId: 1, onboarded: false });
       prismaMock.user.findUnique.mockResolvedValue(getUser({ id: 1, onboarded: false }));
       jest.spyOn(OnboardingService, "onboardUser").mockResolvedValue(getUser({ id: 1, onboarded: true }));
       const response = await request
@@ -157,7 +157,10 @@ describe("Onboarding API", () => {
 
       expect(response.status).toBe(StatusCodes.OK);
       expect(response.body).toEqual(
-        new Success(USER_ONBOARDED_SUCCESSFULLY_MSG, { user: expect.any(Object) })
+        new Success(USER_ONBOARDED_SUCCESSFULLY_MSG, {
+          user: expect.any(Object),
+          accessToken: expect.any(String),
+        })
       );
       expect(OnboardingService.onboardUser).toHaveBeenCalledTimes(1);
       expect(OnboardingService.onboardUser).toHaveBeenCalledWith(onboaringPayload, 1);

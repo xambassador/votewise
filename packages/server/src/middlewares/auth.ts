@@ -1,7 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 
-import dotenv from "dotenv";
-import httpStatusCodes from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 
 import ErrorResponse from "@/src/classes/ErrorResponse";
 import UserService from "@/src/services/user";
@@ -9,11 +8,9 @@ import JWTService from "@/src/services/user/jwt";
 
 import env from "@/src/env";
 
-dotenv.config();
-
 const COOKIE_KEY = env.COOKIE_ACCESS_TOKEN_KEY;
 
-const { UNAUTHORIZED } = httpStatusCodes;
+const { UNAUTHORIZED } = StatusCodes;
 const unauthorizedResponse = new ErrorResponse(
   "Unauthorized",
   "You are not authorized to access this resource",
@@ -38,8 +35,7 @@ export default async function authorizationMiddleware(req: Request, res: Respons
   }
 
   try {
-    // TODO: Move jwt payload type to @votewise/types
-    const { userId } = JWTService.verifyAccessToken(token) as { userId: number };
+    const { userId } = JWTService.verifyAccessToken(token);
     const user = await UserService.checkIfUserExists(userId);
     if (!user) {
       return res.status(UNAUTHORIZED).json(unauthorizedResponse);

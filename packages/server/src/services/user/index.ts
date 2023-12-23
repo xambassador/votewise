@@ -63,7 +63,6 @@ class UserService {
     return user;
   }
 
-  // Check if password is correct or not
   async validatePassword(password: string, userPassword: string) {
     const isPasswordValid = await bcrypt.compare(password, userPassword);
     return isPasswordValid;

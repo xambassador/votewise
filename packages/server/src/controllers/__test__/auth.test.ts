@@ -408,7 +408,7 @@ describe("Auth controller", () => {
       // Generating the fake token that issue when submit for forgot password and sent to email.
       const ip = faker.internet.ip();
       const rid = await bcrypt.hashSync(`${user.id}${ip}`, 10);
-      const token = JWT.generateAccessToken({ rid }, { expiresIn: 300 });
+      const token = JWT.generateRidToken({ rid }, { expiresIn: 300 });
       const fakeIp = faker.internet.ip();
       prismaMock.user.findUnique.mockResolvedValue(user);
       const response = await request
@@ -439,7 +439,7 @@ describe("Auth controller", () => {
       // forgot password and sent to email.
       const ip = faker.internet.ip();
       const rid = await bcrypt.hashSync(`${user.id}${ip}`, 10);
-      const token = JWT.generateAccessToken({ rid }, { expiresIn: 0 });
+      const token = JWT.generateRidToken({ rid }, { expiresIn: 0 });
       prismaMock.user.findUnique.mockResolvedValue(user);
       const response = await request
         .patch(`${url}?email=${email}&token=${token}`)
@@ -469,7 +469,7 @@ describe("Auth controller", () => {
       // forgot password and sent to email.
       const ip = faker.internet.ip();
       const rid = await bcrypt.hashSync(`${user.id}${ip}`, 10);
-      const token = JWT.generateAccessToken({ rid }, { expiresIn: 300 });
+      const token = JWT.generateRidToken({ rid }, { expiresIn: 300 });
 
       prismaMock.user.findUnique.mockResolvedValue(user);
       prismaMock.user.update.mockResolvedValue(user);
