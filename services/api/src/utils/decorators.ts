@@ -1,0 +1,29 @@
+/* eslint-disable @typescript-eslint/ban-types */
+
+import type { ValidationArguments, ValidationOptions } from "class-validator";
+
+import { registerDecorator } from "class-validator";
+
+export function CannotUseWithout(property: string, validationOptions?: ValidationOptions) {
+  return (object: Object, propertyName: string) => {
+    registerDecorator({
+      name: "cannotUseWithout",
+      target: object.constructor,
+      propertyName,
+      constraints: [property],
+      options: validationOptions,
+      validator: {
+        validate<T>(value: T, args: ValidationArguments) {
+          const obj = args.object as unknown as T;
+          const required = args.constraints[0] as string;
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          return obj[required] !== undefined;
+        },
+        defaultMessage(args: ValidationArguments) {
+          return `${propertyName} cannot be used without ${args.constraints[0]}.`;
+        },
+      },
+    });
+  };
+}

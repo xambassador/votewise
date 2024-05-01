@@ -1,0 +1,30 @@
+{
+  "extends": "@votewise/tsconfig/node.json",
+  "ts-node": {
+    "require": ["tsconfig-paths/register"],
+  },
+  "compilerOptions": {
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "experimentalDecorators": true,
+    "paths": {
+      "@/*": ["src/*"],
+      "@/configs/*": ["src/configs/*"],
+      "@/emails/*": ["src/emails/*"],
+      "@/http/*": ["src/http/*"],
+      "@/infra/*": ["src/infra/*"],
+      "@/modules/*": ["src/modules/*"],
+      "@/services/*": ["src/services/*"],
+      "@/types/*": ["src/types/*"],
+      "@/utils/*": ["src/utils/*"],
+      // Modules
+      "@/auth/*": ["src/modules/auth/*"],
+      "@/user/*": ["src/modules/user/*"],
+      "@/post/*": ["src/modules/post/*"],
+      "@/comment/*": ["src/modules/comment/*"],
+      "@/group/*": ["src/modules/group/*"],
+    },
+  },
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules", "dist", "**/node_modules/*"],
+}
