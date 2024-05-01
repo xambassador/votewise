@@ -3,8 +3,10 @@
 /* eslint-disable no-await-in-loop */
 
 /* eslint-disable no-console */
-import { faker } from "@faker-js/faker";
+
 import type { Comment, Post, User } from "@prisma/client";
+
+import { faker } from "@faker-js/faker";
 import { PrismaClient } from "@prisma/client";
 import chalk from "chalk";
 import ora from "ora";
