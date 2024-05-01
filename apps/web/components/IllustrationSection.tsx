@@ -1,8 +1,6 @@
-import { motion } from "framer-motion";
-
-import Image from "next/image";
-
 import React from "react";
+import Image from "next/image";
+import { motion } from "framer-motion";
 
 const variants = {
   hidden: { opacity: 0, y: 20 },

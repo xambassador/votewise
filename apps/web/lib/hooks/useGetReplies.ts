@@ -1,5 +1,4 @@
 import { useInfiniteQuery } from "react-query";
-
 import { getReplies } from "services/post";
 
 /**

@@ -1,8 +1,8 @@
+import usernameAvailable from "@/server/controllers/usernameAvailable";
+
 import { USERNAME_AVAILABLE } from "@/config/routes";
 
 import Router from "@votewise/router";
-
-import usernameAvailable from "@/server/controllers/usernameAvailable";
 
 const router = new Router();
 

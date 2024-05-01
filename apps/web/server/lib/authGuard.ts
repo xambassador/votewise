@@ -1,4 +1,5 @@
 import type { GetServerSideProps, GetServerSidePropsContext } from "next";
+
 import { getOnboardingStatus } from "server/services/onboarding";
 import { revokeAccessToken } from "server/services/revokeToken";
 

@@ -1,9 +1,10 @@
+import type { User } from "lib/store";
+
 import React from "react";
 
 import { Button, Spinner } from "@votewise/ui";
 
 import { useGetReplies } from "lib/hooks/useGetReplies";
-import type { User } from "lib/store";
 
 import { CommentReply } from "./reply";
 

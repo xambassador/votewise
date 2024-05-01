@@ -1,5 +1,4 @@
 import { useInfiniteQuery } from "react-query";
-
 import { getMyFriends } from "services/user";
 
 export function useGetMyFriends() {

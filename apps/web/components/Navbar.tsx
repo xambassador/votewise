@@ -1,8 +1,8 @@
+import React, { Fragment } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-
 import { Popover, Transition } from "@headlessui/react";
-import React, { Fragment } from "react";
+import { signout } from "services/auth";
 
 import classNames from "@votewise/lib/classnames";
 import {
@@ -25,8 +25,6 @@ import {
 
 import { useAsync } from "lib/hooks/useAsync";
 import { useMyDetails } from "lib/hooks/useMyDetails";
-
-import { signout } from "services/auth";
 
 import { Logo } from "./Logo";
 import { Notification, NotificationActionPanel, NotificationContainer } from "./notification";

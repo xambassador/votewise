@@ -1,10 +1,8 @@
-import { useMutation } from "react-query";
+import type { GetPostResponse, UnLikePostResponse } from "@votewise/types";
+import type { User } from "lib/store";
 import type { QueryClient } from "react-query";
 
-import type { GetPostResponse, UnLikePostResponse } from "@votewise/types";
-
-import type { User } from "lib/store";
-
+import { useMutation } from "react-query";
 import { unlikePost } from "services/post";
 
 type Options = {

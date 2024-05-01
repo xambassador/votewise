@@ -1,8 +1,9 @@
+import type { RevokeAccessTokenResponse } from "@votewise/types";
 import type { AxiosResponse } from "axios";
+
 import { axiosServerInstance } from "server/lib/axios";
 
 import { AUTH_ROUTE_V1, REVOKE_ACCESS_TOKEN_V1 } from "@votewise/lib/routes";
-import type { RevokeAccessTokenResponse } from "@votewise/types";
 
 /**
  *

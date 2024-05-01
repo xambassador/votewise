@@ -1,7 +1,7 @@
 import type { PostStatus } from "types/post";
 
-import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import React from "react";
+import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 
 import {
   DropdownButton,

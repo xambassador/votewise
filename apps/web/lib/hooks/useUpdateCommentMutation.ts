@@ -1,8 +1,7 @@
-import { useMutation } from "react-query";
+import type { GetPostCommentsResponse, UpdateCommentResponse } from "@votewise/types";
 import type { InfiniteData, QueryClient } from "react-query";
 
-import type { GetPostCommentsResponse, UpdateCommentResponse } from "@votewise/types";
-
+import { useMutation } from "react-query";
 import { updateComment } from "services/post";
 
 type Variables = {

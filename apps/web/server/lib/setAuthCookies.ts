@@ -1,5 +1,6 @@
-import cookie from "cookie";
 import type { GetServerSidePropsContext, NextApiResponse } from "next";
+
+import cookie from "cookie";
 
 const tokenKey = process.env.COOKIE_ACCESS_TOKEN_KEY;
 const refreshTokenKey = process.env.COOKIE_REFRESH_TOKEN_KEY;

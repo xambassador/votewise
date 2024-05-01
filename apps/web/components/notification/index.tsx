@@ -1,5 +1,6 @@
-import React from "react";
 import type { ReactNode } from "react";
+
+import React from "react";
 import SimpleBar from "simplebar-react";
 
 import classNames from "@votewise/lib/classnames";

@@ -1,17 +1,3 @@
-import type { AxiosRequestConfig, AxiosResponse } from "axios";
-import { getAxiosServerWithAuth } from "server/lib/axios";
-
-import {
-  DELETE_POST_V1,
-  GET_ME_V1,
-  UPDATE_POST_STATUS_V1,
-  USER_CREATE_POST_V1,
-  USER_GET_COMMENTS_V1,
-  USER_GET_FRIENDS_V1,
-  USER_GET_POSTS_V1,
-  USER_ROUTE_V1,
-  USER_UPDATE_POST_V1,
-} from "@votewise/lib/routes";
 import type {
   CreatePostPayload,
   CreatePostResponse,
@@ -25,6 +11,21 @@ import type {
   UpdatePostResponse,
   UpdatePostStatusResponse,
 } from "@votewise/types";
+import type { AxiosRequestConfig, AxiosResponse } from "axios";
+
+import { getAxiosServerWithAuth } from "server/lib/axios";
+
+import {
+  DELETE_POST_V1,
+  GET_ME_V1,
+  UPDATE_POST_STATUS_V1,
+  USER_CREATE_POST_V1,
+  USER_GET_COMMENTS_V1,
+  USER_GET_FRIENDS_V1,
+  USER_GET_POSTS_V1,
+  USER_ROUTE_V1,
+  USER_UPDATE_POST_V1,
+} from "@votewise/lib/routes";
 
 /**
  * @description Get details of the logged in user

@@ -1,7 +1,6 @@
 import type { OrderBy, PostStatus } from "types/post";
 
 import { useInfiniteQuery } from "react-query";
-
 import { getMyPosts } from "services/user";
 
 /**

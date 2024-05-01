@@ -1,4 +1,5 @@
 import type { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from "next";
+
 import { revokeAccessToken } from "server/services/revokeToken";
 
 import { clearCookies } from "./clearCookies";

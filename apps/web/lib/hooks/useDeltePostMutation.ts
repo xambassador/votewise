@@ -1,10 +1,8 @@
+import type { DeletePostResponse, GetMyPostsResponse } from "@votewise/types";
+import type { InfiniteData, QueryClient } from "react-query";
 import type { OrderBy, PostStatus } from "types/post";
 
 import { useMutation } from "react-query";
-import type { InfiniteData, QueryClient } from "react-query";
-
-import type { DeletePostResponse, GetMyPostsResponse } from "@votewise/types";
-
 import { deletePost } from "services/user";
 
 type Variables = {

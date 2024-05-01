@@ -1,28 +1,25 @@
-import { useStore } from "zustand";
-
-import { useRouter } from "next/router";
+import type { MyDetailsResponse } from "@votewise/types";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { ErrorMessage } from "components/ErrorMessage";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
+import { createPost } from "services/user";
+import { useStore } from "zustand";
 
-import type { MyDetailsResponse } from "@votewise/types";
 import { Avatar, Button, Image, Input, makeToast } from "@votewise/ui";
 import { Picture } from "@votewise/ui/icons";
 
-import { ErrorMessage } from "components/ErrorMessage";
-
 import { usePicker } from "lib/hooks/usePicker";
 import store from "lib/store";
-
-import { createPost } from "services/user";
 
 import {
   PostModalContainer,
   PostModalContent,
   PostModalEditor,
-  PostModalFileUploaderInput,
   PostModalFilesContainer,
+  PostModalFileUploaderInput,
   PostModalForm,
   PostModalImagePreview,
   PostModalLoader,

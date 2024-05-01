@@ -1,16 +1,15 @@
+import type { ErrorResponse } from "@votewise/types";
 import type { AxiosError } from "axios";
-import { motion } from "framer-motion";
 
 import React, { forwardRef, useEffect } from "react";
+import { motion } from "framer-motion";
 import { Controller, useFormContext } from "react-hook-form";
 import { useQuery } from "react-query";
+import { checkUsernameAvailability } from "services/user";
 
-import type { ErrorResponse } from "@votewise/types";
 import { Loader, SelectField, TextAreaField, TextField } from "@votewise/ui";
 
 import { useDebounce } from "lib/hooks/useDebounce";
-
-import { checkUsernameAvailability } from "services/user";
 
 const options = [
   { value: "MALE", label: "Male" },

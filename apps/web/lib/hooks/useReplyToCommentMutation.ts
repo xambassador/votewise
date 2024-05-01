@@ -1,8 +1,7 @@
-import { useMutation } from "react-query";
+import type { ReplyToCommentResponse } from "@votewise/types";
 import type { QueryClient } from "react-query";
 
-import type { ReplyToCommentResponse } from "@votewise/types";
-
+import { useMutation } from "react-query";
 import { replyToComment } from "services/post";
 
 type Variables = {

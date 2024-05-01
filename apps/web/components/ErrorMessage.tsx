@@ -1,5 +1,6 @@
-import React, { forwardRef } from "react";
 import type { ReactNode } from "react";
+
+import React, { forwardRef } from "react";
 
 import classNames from "@votewise/lib/classnames";
 import { FiX as CloseIcon } from "@votewise/ui/icons";

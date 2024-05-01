@@ -1,8 +1,8 @@
+import onboarding from "@/server/controllers/onboarding";
+
 import { ONBOARDING } from "@/config/routes";
 
 import Router from "@votewise/router";
-
-import onboarding from "@/server/controllers/onboarding";
 
 const router = new Router();
 

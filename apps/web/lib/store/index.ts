@@ -1,6 +1,6 @@
-import { createStore } from "zustand";
-
 import type { MyDetailsResponse } from "@votewise/types";
+
+import { createStore } from "zustand";
 
 export type User = MyDetailsResponse["data"]["user"];
 

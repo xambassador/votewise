@@ -1,7 +1,6 @@
-import { useStore } from "zustand";
-
 import React, { forwardRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { useStore } from "zustand";
 
 import classNames from "@votewise/lib/classnames";
 import { Avatar, Button, EmailField, Image, Input, InputField, TextAreaField } from "@votewise/ui";

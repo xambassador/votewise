@@ -1,10 +1,8 @@
-import { useMutation } from "react-query";
+import type { GetPostCommentsResponse, UnLikeCommentResponse } from "@votewise/types";
+import type { User } from "lib/store";
 import type { InfiniteData, QueryClient } from "react-query";
 
-import type { GetPostCommentsResponse, UnLikeCommentResponse } from "@votewise/types";
-
-import type { User } from "lib/store";
-
+import { useMutation } from "react-query";
 import { unlikeComment } from "services/post";
 
 type Variables = {

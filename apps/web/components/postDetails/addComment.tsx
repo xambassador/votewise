@@ -1,14 +1,14 @@
+import type { GetPostResponse } from "@votewise/types";
+import type { User } from "lib/store";
+
 import React from "react";
+import { PostAddCommentInput } from "components/post";
 import { useForm } from "react-hook-form";
 import { useQueryClient } from "react-query";
 
-import type { GetPostResponse } from "@votewise/types";
 import { Avatar, makeToast } from "@votewise/ui";
 
-import { PostAddCommentInput } from "components/post";
-
 import { useCommentMutation } from "lib/hooks/useCommentMutation";
-import type { User } from "lib/store";
 
 type PostAddCommentProps = {
   user: User | null;

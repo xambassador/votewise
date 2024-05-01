@@ -1,9 +1,8 @@
-import { useStore } from "zustand";
-
-import { useRouter } from "next/router";
+import type { ReactNode } from "react";
 
 import React, { useEffect, useState } from "react";
-import type { ReactNode } from "react";
+import { useRouter } from "next/router";
+import { useStore } from "zustand";
 
 import classNames from "@votewise/lib/classnames";
 import { Avatar, Button, Image, Modal } from "@votewise/ui";

@@ -1,8 +1,7 @@
-import { useMutation } from "react-query";
+import type { GetMyPostsResponse, UpdatePostStatusResponse } from "@votewise/types";
 import type { InfiniteData, QueryClient } from "react-query";
 
-import type { GetMyPostsResponse, UpdatePostStatusResponse } from "@votewise/types";
-
+import { useMutation } from "react-query";
 import { updatePostStatus } from "services/user";
 
 type Status = "open" | "closed" | "archived" | "inprogress";

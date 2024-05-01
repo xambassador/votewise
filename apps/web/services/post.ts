@@ -1,5 +1,3 @@
-import type { AxiosResponse } from "axios";
-
 import type {
   CreateCommentResponse,
   DeleteCommentResponse,
@@ -14,6 +12,7 @@ import type {
   UnLikePostResponse,
   UpdateCommentResponse,
 } from "@votewise/types";
+import type { AxiosResponse } from "axios";
 
 import { axiosInstance } from "lib/axios";
 

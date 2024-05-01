@@ -1,13 +1,11 @@
+import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { signout } from "services/auth";
 
-import React from "react";
-
-import { Spinner, makeToast } from "@votewise/ui";
+import { makeToast, Spinner } from "@votewise/ui";
 
 import { useAsync } from "lib/hooks/useAsync";
-
-import { signout } from "services/auth";
 
 export function UnAuthCard() {
   const router = useRouter();

@@ -1,4 +1,5 @@
 import type { AxiosRequestConfig } from "axios";
+
 import { AxiosError } from "axios";
 
 import { AUTH_ROUTE_V1, VERIFY_EMAIL_V1 } from "@votewise/lib/routes";

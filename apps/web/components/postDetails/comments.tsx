@@ -1,11 +1,11 @@
+import type { User } from "lib/store";
+
 import React from "react";
+import { CommentsWrapper } from "components/post/comments";
 
 import { AnimatedList, Button } from "@votewise/ui";
 
-import { CommentsWrapper } from "components/post/comments";
-
 import { useGetComments } from "lib/hooks/useGetComments";
-import type { User } from "lib/store";
 
 import { PostComment } from "./comment";
 

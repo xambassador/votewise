@@ -3,6 +3,7 @@
  * @description: Axios instance for NextJS client side code. This must be used in client side only.
  * This is used to make API calls to NextJS API routes.
  */
+
 import axios from "axios";
 import { StatusCodes } from "http-status-codes";
 

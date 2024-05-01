@@ -1,20 +1,20 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { useQueryClient } from "react-query";
+import type { GetPostCommentsResponse, GetRepliesResponse } from "@votewise/types";
+import type { User } from "lib/store";
 import type { InfiniteData } from "react-query";
 
-import type { GetPostCommentsResponse, GetRepliesResponse } from "@votewise/types";
-import { Avatar, Spinner, makeToast } from "@votewise/ui";
-import { FiXCircle as XCircle } from "@votewise/ui/icons";
-
+import React, { useState } from "react";
 import { ButtonGroup } from "components";
 import { PostAddCommentInput } from "components/post";
 import { Comment, CommentBody, CommentHeader, CommentSeparator, CommentText } from "components/post/comments";
+import { useForm } from "react-hook-form";
+import { useQueryClient } from "react-query";
+
+import { Avatar, makeToast, Spinner } from "@votewise/ui";
+import { FiXCircle as XCircle } from "@votewise/ui/icons";
 
 import { timeAgo } from "lib/date";
 import { useDeleteCommentMutation } from "lib/hooks/useDeleteCommentMutation";
 import { useUpdateCommentMutation } from "lib/hooks/useUpdateCommentMutation";
-import type { User } from "lib/store";
 
 import { DropDown } from "./dropDown";
 

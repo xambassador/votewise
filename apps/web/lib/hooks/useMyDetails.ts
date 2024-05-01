@@ -1,9 +1,7 @@
+import type { ErrorResponse } from "@votewise/types";
 import type { AxiosError } from "axios";
 
 import { useQuery } from "react-query";
-
-import type { ErrorResponse } from "@votewise/types";
-
 import { getMyDetails } from "services/user";
 
 const fetcher = () => getMyDetails();

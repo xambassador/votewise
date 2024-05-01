@@ -1,27 +1,25 @@
-import { useStore } from "zustand";
-
-import React, { useEffect, useRef, useState } from "react";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
-import { useMutation, useQueryClient } from "react-query";
+import type { GetMyPostsResponse, PostStatus } from "@votewise/types";
 import type { InfiniteData } from "react-query";
 
-import type { GetMyPostsResponse, PostStatus } from "@votewise/types";
+import React, { useEffect, useRef, useState } from "react";
+import { ErrorMessage } from "components/ErrorMessage";
+import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { useMutation, useQueryClient } from "react-query";
+import { updatePost } from "services/user";
+import { useStore } from "zustand";
+
 import { Avatar, Button, Image, Input } from "@votewise/ui";
 import { Picture } from "@votewise/ui/icons";
 
-import { ErrorMessage } from "components/ErrorMessage";
-
 import { usePicker } from "lib/hooks/usePicker";
 import store from "lib/store";
-
-import { updatePost } from "services/user";
 
 import {
   PostModalContainer,
   PostModalContent,
   PostModalEditor,
-  PostModalFileUploaderInput,
   PostModalFilesContainer,
+  PostModalFileUploaderInput,
   PostModalForm,
   PostModalImagePreview,
   PostModalLoader,

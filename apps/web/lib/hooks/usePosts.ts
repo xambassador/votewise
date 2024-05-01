@@ -1,5 +1,4 @@
 import { useInfiniteQuery } from "react-query";
-
 import { getPosts } from "services/post";
 
 const fetchPosts = async ({ pageParam = 0 }) => {
