@@ -10,7 +10,8 @@ function removeHashtags(text: string): string {
 }
 
 /**
- * @description Extracts hashtags from a string. It is case insensitive and removes duplicates.
+ * Extracts hashtags from a string. It is case insensitive and removes duplicates.
+ *
  * @param content String that contains hashtags
  * @returns Object with hashtags and text without hashtags
  */
@@ -22,7 +23,8 @@ export function parseHashTags(content: string) {
 }
 
 /**
- * @description Extracts hashtags from a string
+ * Extracts hashtags from a string
+ *
  * @param text String that contains hashtags
  * @returns Array of hashtags
  */
