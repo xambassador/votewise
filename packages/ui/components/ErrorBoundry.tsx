@@ -1,4 +1,5 @@
 import type { ErrorInfo } from "react";
+
 import React from "react";
 
 class ErrorBoundary extends React.Component<

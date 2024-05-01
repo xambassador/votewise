@@ -1,3 +1,6 @@
+import type { ToastOptions } from "react-hot-toast";
+
+import React, { useEffect, useState } from "react";
 import { Transition } from "@headlessui/react";
 import {
   CheckCircleIcon,
@@ -5,9 +8,7 @@ import {
   InformationCircleIcon,
   XCircleIcon,
 } from "@heroicons/react/24/solid";
-import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import type { ToastOptions } from "react-hot-toast";
 
 type ToastProps = {
   message: string;

@@ -1,11 +1,12 @@
+import type { ReactNode } from "react";
+
+import React from "react";
 import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
   InformationCircleIcon,
   XCircleIcon,
 } from "@heroicons/react/24/solid";
-import React from "react";
-import type { ReactNode } from "react";
 
 import classNames from "@votewise/lib/classnames";
 

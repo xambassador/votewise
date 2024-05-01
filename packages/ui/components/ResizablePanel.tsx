@@ -1,9 +1,9 @@
 import type { Transition } from "framer-motion";
-import { motion } from "framer-motion";
+import type { ReactNode } from "react";
 
 // -----------------------------------------------------------------------------------------
 import React from "react";
-import type { ReactNode } from "react";
+import { motion } from "framer-motion";
 import useMeasure from "react-use-measure";
 
 // -----------------------------------------------------------------------------------------

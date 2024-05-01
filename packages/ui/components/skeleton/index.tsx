@@ -33,8 +33,8 @@ type SkeletonProps<T> = {
 } & (T extends React.FC<infer P>
   ? P
   : T extends keyof JSX.IntrinsicElements
-  ? JSX.IntrinsicElements[T]
-  : never);
+    ? JSX.IntrinsicElements[T]
+    : never);
 
 export const Skeleton = <T extends keyof JSX.IntrinsicElements | React.FC>({
   as,

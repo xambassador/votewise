@@ -1,6 +1,7 @@
+import type { GroupBase, InputProps, Props } from "react-select";
+
 import React, { forwardRef, useId } from "react";
 import { useFormContext } from "react-hook-form";
-import type { GroupBase, InputProps, Props } from "react-select";
 import ReactSelect, { components } from "react-select";
 
 import classNames from "@votewise/lib/classnames";
@@ -10,7 +11,7 @@ import { Label } from "./fields";
 export type SelectProps<
   Option,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 > = Props<Option, IsMulti, Group>;
 
 export function InputComponent<Option, IsMulti extends boolean, Group extends GroupBase<Option>>({
@@ -28,7 +29,7 @@ export function InputComponent<Option, IsMulti extends boolean, Group extends Gr
 function Select<
   Option,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 >({ className, ...props }: SelectProps<Option, IsMulti, Group>) {
   return (
     <ReactSelect
@@ -88,7 +89,7 @@ function Select<
 type SelectFieldProps<
   Option,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 > = {
   label?: string;
   name: string;
@@ -99,7 +100,7 @@ type SelectFieldProps<
 export function SelectField<
   Option,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 >({ className, ...props }: SelectFieldProps<Option, IsMulti, Group>) {
   const id = useId();
   const methods = useFormContext();
@@ -125,7 +126,7 @@ export default Select;
 export function UnstyledSelect<
   Option,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 >({ className, ...props }: SelectProps<Option, IsMulti, Group>) {
   return (
     <ReactSelect

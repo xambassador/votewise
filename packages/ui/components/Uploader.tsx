@@ -1,7 +1,7 @@
-import Image from "next/image";
+import type { ReactNode } from "react";
 
 import React, { useEffect, useId, useState } from "react";
-import type { ReactNode } from "react";
+import Image from "next/image";
 
 export function Thumbnail({
   file,

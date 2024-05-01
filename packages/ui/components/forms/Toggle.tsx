@@ -1,5 +1,5 @@
-import { Switch } from "@headlessui/react";
 import React, { useId } from "react";
+import { Switch } from "@headlessui/react";
 
 import classNames from "@votewise/lib/classnames";
 

@@ -1,6 +1,7 @@
-import { Dialog, Transition } from "@headlessui/react";
-import React, { Fragment, useRef } from "react";
 import type { ReactNode, RefObject } from "react";
+
+import React, { Fragment, useRef } from "react";
+import { Dialog, Transition } from "@headlessui/react";
 
 import classNames from "@votewise/lib/classnames";
 

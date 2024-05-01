@@ -1,6 +1,5 @@
-import { motion } from "framer-motion";
-
 import React from "react";
+import { motion } from "framer-motion";
 
 type Props = React.ComponentProps<typeof motion.div>;
 
