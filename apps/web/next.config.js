@@ -1,5 +1,3 @@
-require("dotenv").config({ path: "../../.env " });
-
 /** @type {import('next').NextConfig} */
 
 const plugins = [];
@@ -14,7 +12,8 @@ if (process.env.ANALYZE === "true" && process.env.NODE_ENV === "production") {
 const nextConfig = {
   reactStrictMode: true,
   // https://nextjs.org/blog/next-13-1#built-in-module-transpilation-stable
-  transpilePackages: ["@votewise/ui"],
+  transpilePackages: ["ui"],
+  output: "standalone",
 };
 
 module.exports = nextConfig;

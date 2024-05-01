@@ -1,12 +1,16 @@
 {
-    "name": "@votewise/types",
-    "version": "0.0.0",
-    "private": true,
-    "sideEffects": false,
-    "main": "index.d.ts",
-    "types": "index.d.ts",
-    "files": [
-        "index.ts"
-    ],
-    "scripts": {}
+  "name": "@votewise/types",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "main": "index.d.ts",
+  "types": "index.d.ts",
+  "files": [
+    "index.ts",
+    "api",
+    "schemas"
+  ],
+  "dependencies": {
+    "zod": "^3.22.4"
+  }
 }

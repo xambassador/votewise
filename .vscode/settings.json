@@ -1,11 +1,6 @@
 {
-"todo-tree.tree.scanMode": "workspace",
-"spellright.language": [
-    "en"
-],
-"spellright.documentTypes": [
-    "markdown",
-    "latex",
-    "plaintext"
-]
+  "todo-tree.tree.scanMode": "workspace",
+  "spellright.language": ["en"],
+  "spellright.documentTypes": ["markdown", "latex", "plaintext"],
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

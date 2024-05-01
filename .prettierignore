@@ -10,9 +10,9 @@ public
 
 .gitignore
 .npmignore
-.prettierignore
 .DS_Store
 .eslintignore
 packages/prisma/zod
 
 **/jest.setup.ts
+.yarn/*
