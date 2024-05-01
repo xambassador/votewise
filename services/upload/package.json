@@ -1,0 +1,30 @@
+{
+  "name": "@votewise/upload",
+  "version": "0.0.0",
+  "scripts": {
+    "start": "node dist/server.js",
+    "build": "rimraf dist && tsc && node ./esbuild.config.js",
+    "dev": "nodemon",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@votewise/lib": "*",
+    "busboy": "^1.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/busboy": "^1.5.3",
+    "@types/node": "^20.11.16",
+    "@votewise/config": "*",
+    "@votewise/tsconfig": "*",
+    "esbuild": "^0.20.0",
+    "esbuild-plugin-copy": "^2.1.1",
+    "nodemon": "^3.0.3",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.3.3"
+  }
+}
