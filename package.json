@@ -24,6 +24,7 @@
     "db:studio": "lerna exec --scope @votewise/prisma -- yarn run db:studio",
     "db:seed": "lerna exec --scope @votewise/prisma -- yarn run db:seed",
     "db:clean": "lerna exec --scope @votewise/prisma -- yarn run db:clean",
+    "db:setup": "docker-compose -f docker-compose-development.yml up -d && yarn run db:deploy && yarn run db:generate && yarn run db:migrate && yarn run db:seed",
     "clean": "lerna clean --yes && rm -rf node_modules && rm -rf ./apps/web/.next",
     "dev": "lerna run dev --parallel --stream --no-bail --scope @votewise/web --scope @votewise/server --scope @votewise/static-server & wait",
     "start": "lerna run start --parallel --stream --no-bail --scope @votewise/web --scope @votewise/server --scope @votewise/static-server & npm run static-server & wait",

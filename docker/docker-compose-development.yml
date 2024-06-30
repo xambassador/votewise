@@ -1,0 +1,46 @@
+version: "3.6"
+services:
+  postgres:
+    image: postgres:16
+    ports:
+      - "5450:5432" # expose pg on port 5450 to not collide with pg from elswhere
+    restart: always
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      PGUSER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  postgres_is_ready:
+    image: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+  redis:
+    image: redis # use latest official redis image
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - "6380:6379" # expose redis on port 6380 to not collide with redis from elswhere
+    restart: always
+    volumes:
+      - redis_data:/data
+  mailhog:
+    image: mailhog/mailhog
+    # network_mode: service:app
+    logging:
+      driver: "none"
+    ports:
+      - 8025:8025 # web ui
+      - 1025:1025 # smtp server
+volumes:
+  db_data:
+  redis_data:
+    driver: local
