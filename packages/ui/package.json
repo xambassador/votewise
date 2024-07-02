@@ -15,29 +15,29 @@
     "lint:report": "eslint . --format json --output-file ../../lint-results/ui.json"
   },
   "devDependencies": {
-    "@types/react": "^18.2.51",
-    "@types/react-lazy-load-image-component": "^1.6.3",
+    "@types/react": "^18.3.3",
+    "@types/react-lazy-load-image-component": "^1.6.4",
     "@votewise/config": "*",
     "@votewise/tsconfig": "*",
-    "typescript": "^5.3.3"
+    "typescript": "^5.5.3"
   },
   "dependencies": {
-    "@formkit/auto-animate": "^0.8.1",
-    "@headlessui/react": "^1.7.18",
-    "@heroicons/react": "^2.1.1",
+    "@formkit/auto-animate": "^0.8.2",
+    "@headlessui/react": "^2.1.1",
+    "@heroicons/react": "^2.1.4",
     "@votewise/lib": "*",
     "class-variance-authority": "^0.7.0",
-    "framer-motion": "^11.0.3",
-    "next": "14.1.0",
-    "react": "18.2.0",
+    "framer-motion": "^11.2.12",
+    "next": "14.2.4",
+    "react": "18.3.1",
     "react-feather": "^2.0.10",
-    "react-hook-form": "^7.50.0",
+    "react-hook-form": "^7.52.1",
     "react-hot-toast": "^2.4.1",
-    "react-icons": "^5.0.1",
-    "react-lazy-load-image-component": "^1.6.0",
+    "react-icons": "^5.2.1",
+    "react-lazy-load-image-component": "^1.6.2",
     "react-select": "^5.8.0",
-    "react-tooltip": "^5.26.0",
+    "react-tooltip": "^5.27.0",
     "react-use-measure": "^2.1.1",
-    "tailwind-merge": "^2.2.1"
+    "tailwind-merge": "^2.3.0"
   }
 }

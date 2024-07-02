@@ -1,19 +1,29 @@
 /** @type {import('next').NextConfig} */
 
-const plugins = [];
-if (process.env.ANALYZE === "true" && process.env.NODE_ENV === "production") {
-  const withBundleAnalyzer = require("@next/bundle-analyzer")({
-    enabled: process.env.ANALYZE === "true",
-    openAnalyzer: false,
-  });
-  plugins.push(withBundleAnalyzer);
-}
+import withBundleAnalyzer from "@next/bundle-analyzer";
 
-const nextConfig = {
+const bundleAnalyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
+
+const nextConfig = bundleAnalyzer({
   reactStrictMode: true,
-  // https://nextjs.org/blog/next-13-1#built-in-module-transpilation-stable
-  transpilePackages: ["ui"],
   output: "standalone",
-};
+  eslint: { dirs: ["."] },
+  poweredByHeader: false,
+  transpilePackages: ["ui", "@votewise/ui"],
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
+  webpack: (config, context) => {
+    config.externals.push({
+      bufferutil: "bufferutil",
+      "utf-8-validate": "utf-8-validate",
+    });
+    return config;
+  },
+});
 
 module.exports = nextConfig;
