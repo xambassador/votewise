@@ -4,9 +4,9 @@ module.exports = {
   bracketSameLine: false,
   singleQuote: false,
   jsxSingleQuote: false,
-  trailingComma: "es5",
+  trailingComma: "none",
   semi: true,
-  printWidth: 110,
+  printWidth: 120,
   arrowParens: "always",
   endOfLine: "auto",
   importOrder: [
@@ -57,7 +57,7 @@ module.exports = {
     "",
     "@/env(.*)$",
     "",
-    "^[./]",
+    "^[./]"
   ],
   importOrderTypeScriptVersion: "5.3.3",
   importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"],
@@ -134,9 +134,9 @@ module.exports = {
           "",
           "@/env(.*)$",
           "",
-          "^[./]",
-        ],
-      },
-    },
-  ],
+          "^[./]"
+        ]
+      }
+    }
+  ]
 };

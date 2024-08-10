@@ -20,18 +20,10 @@ esbuild
     target: "node16",
     outfile: "./dist/server.js",
     tsconfig: "./tsconfig.json",
-    external,
+    external
   })
   .then(() => {
-    fs.readdirSync("./scripts").forEach((file) => {
-      if (file.endsWith(".sh") || file.endsWith(".cmd")) {
-        fs.copyFileSync(`./scripts/${file}`, `./dist/${file}`);
-      }
-      fs.copyFileSync(`./static-web-server`, `./dist/static-web-server`);
-      fs.copyFileSync(`./static-web-server-mac`, `./dist/static-web-server-mac`);
-      fs.copyFileSync(`./static-web-server.exe`, `./dist/static-web-server.exe`);
-      console.log(`[${packages.name}] ✨ Build successfull`);
-      process.exit(0);
-    });
+    console.log(`[${packages.name}] ✨ Build successfull`);
+    process.exit(0);
   })
   .catch(() => process.exit(1));

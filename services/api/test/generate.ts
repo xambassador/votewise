@@ -1,15 +1,17 @@
+import type { Request, Response } from "express";
+
 function buildReq({ ...overrides } = {}) {
   const req = { body: {}, params: {}, ...overrides };
-  return req;
+  return req as Request;
 }
 
 function buildRes(overrides = {}) {
   const res: unknown = {
     json: jest.fn(() => res).mockName("json"),
     status: jest.fn(() => res).mockName("status"),
-    ...overrides,
+    ...overrides
   };
-  return res;
+  return res as Response;
 }
 
 function buildNext(impl: () => void) {

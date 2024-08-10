@@ -14,5 +14,5 @@ export const localStorage = {
       // Either storage limit reached or Third Party Context in Chrome Incognito mode.
       return;
     }
-  },
+  }
 };

@@ -14,3 +14,6 @@ build/
 
 # Ignore JSON files
 *.json
+
+commitlint.config.js
+commitlint.config.ts

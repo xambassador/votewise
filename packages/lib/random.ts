@@ -1,4 +1,4 @@
-export const randomString = function (length = 12) {
+export function randomString(length = 12) {
   let result = "";
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const charactersLength = characters.length;
@@ -6,4 +6,4 @@ export const randomString = function (length = 12) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
-};
+}

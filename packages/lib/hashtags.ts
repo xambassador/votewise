@@ -1,12 +1,13 @@
 function removeHashtags(text: string): string {
   const hashtags = text.match(/#[a-zA-Z0-9_]+/g);
+  let removedText = text;
   if (hashtags) {
     hashtags.forEach((hashtag) => {
-      text = text.replace(hashtag, "");
+      removedText = text.replace(hashtag, "");
     });
   }
 
-  return text.trim();
+  return removedText.trim();
 }
 
 /**
@@ -18,7 +19,7 @@ function removeHashtags(text: string): string {
 export function parseHashTags(content: string) {
   return {
     hashtags: extractHashtags(content),
-    text: removeHashtags(content),
+    text: removeHashtags(content)
   };
 }
 

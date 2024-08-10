@@ -28,10 +28,10 @@ esbuild
         resolveFrom: "cwd",
         assets: {
           from: "../prisma/schema.prisma",
-          to: "./dist/schema.prisma",
-        },
-      }),
-    ],
+          to: "./dist/schema.prisma"
+        }
+      })
+    ]
   })
   .then(() => {
     fsExtra.copySync("../../node_modules/.prisma/client", "./dist", {
@@ -40,7 +40,7 @@ esbuild
           return false;
         }
         return true;
-      },
+      }
     });
     console.log(`[${packages.name}] ✨ Build successfull`);
     process.exit(0);

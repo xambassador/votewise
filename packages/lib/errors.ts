@@ -19,9 +19,10 @@ class ResourceNotFoundError extends Error {
  */
 class InvalidInputError extends Error {
   statusCode = 400;
-  constructor(message: string) {
+  constructor(message: string, code?: number) {
     super(message);
     this.name = "InvalidInputError";
+    if (code) this.statusCode = code;
   }
 }
 
@@ -36,6 +37,20 @@ class ValidationError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "ValidationError";
+  }
+}
+
+/**
+ * Throw this error when the doing a validation. Alias of InvalidInputError
+ *
+ * @class BadRequestError
+ * @alias InvalidInputError
+ */
+class BadRequestError extends Error {
+  statusCode = 400;
+  constructor(message: string) {
+    super(message);
+    this.name = "BadRequestError";
   }
 }
 
@@ -126,4 +141,5 @@ export {
   AuthorizationError,
   OperationNotAllowedError,
   InternalServerError,
+  BadRequestError
 };

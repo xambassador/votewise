@@ -1,23 +1,79 @@
-/**
- * Application settings
- */
-export const APP_SETTINGS = {
-  CONNECTION_GRACE_TIMEOUT: 5 * 1000,
-  WORKER_GRACE_TIMEOUT: 5 * 1000, // 5 seconds
-  DEFAULT_PORT: 5001,
-  FORCE_QUIT_TIMEOUT: 60 * 1000, // 60 seconds
-  REDIS: {
-    MAX_RETRIES_PER_REQUEST: 3,
-    MAX_LISTENERS: 100,
-    CLIENT_SUFFIX: "client",
-    SUBSCRIBER_SUFFIX: "subscriber",
-  },
-  API: {
-    DEFAULT_LIMIT: 50,
-    DEFAULT_OFFSET: 0,
-  },
-  JWT: {
-    ACCESS_TOKEN_EXPIRATION: "15m",
-    REFRESH_TOKEN_EXPIRATION: "7d",
-  },
-};
+export class ServerSecrets {
+  public jwtSecret: string;
+  public jwtRefreshSecret: string;
+  public cronSecret: string;
+
+  constructor(cfg: ServerSecrets) {
+    this.jwtSecret = cfg.jwtSecret;
+    this.jwtRefreshSecret = cfg.jwtRefreshSecret;
+    this.cronSecret = cfg.cronSecret;
+  }
+}
+
+export class Cors {
+  public origin?: string;
+  public methods?: string;
+  public allowedHeaders?: string;
+  public exposedHeaders?: string;
+  public credentials?: boolean;
+  public maxAge?: number;
+
+  constructor(cfg: Cors) {
+    this.origin = cfg.origin;
+    this.methods = cfg.methods;
+    this.allowedHeaders = cfg.allowedHeaders;
+    this.exposedHeaders = cfg.exposedHeaders;
+    this.credentials = cfg.credentials;
+    this.maxAge = cfg.maxAge;
+  }
+}
+
+export class SSL {
+  public key: string;
+  public cert: string;
+
+  constructor(cfg: SSL) {
+    this.key = cfg.key;
+    this.cert = cfg.cert;
+  }
+}
+
+export class JWT {
+  public accessTokenExpiration: string;
+  public refreshTokenExpiration: string;
+
+  constructor(cfg: JWT) {
+    this.accessTokenExpiration = cfg.accessTokenExpiration;
+    this.refreshTokenExpiration = cfg.refreshTokenExpiration;
+  }
+}
+
+export class ServerConfig {
+  public port: number;
+  public hostname: string;
+  public publicUrl: string;
+  public version?: string;
+  public blobUploadLimit: number;
+  public devMode: boolean;
+  public connectionGraceTimeout?: number;
+  public workerGraceTimeout?: number;
+  public forceQuitTimeout?: number;
+  public cors?: Cors;
+  public ssl?: SSL;
+  public jwt: JWT;
+
+  constructor(cfg: ServerConfig) {
+    this.port = cfg.port;
+    this.hostname = cfg.hostname;
+    this.publicUrl = cfg.publicUrl;
+    this.version = cfg.version;
+    this.blobUploadLimit = cfg.blobUploadLimit;
+    this.devMode = cfg.devMode;
+    this.connectionGraceTimeout = cfg.connectionGraceTimeout;
+    this.workerGraceTimeout = cfg.workerGraceTimeout;
+    this.forceQuitTimeout = cfg.forceQuitTimeout;
+    this.cors = cfg.cors;
+    this.ssl = cfg.ssl;
+    this.jwt = cfg.jwt;
+  }
+}

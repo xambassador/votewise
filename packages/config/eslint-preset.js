@@ -6,22 +6,22 @@ module.exports = {
     "plugin:prettier/recommended",
     "plugin:import/recommended",
     "plugin:import/errors",
-    "plugin:import/warnings",
+    "plugin:import/warnings"
   ],
   globals: {
     // eslint show errors when refrencing NodeJS namespace types because it is global and eslint has no idea about it.
     // https://eslint.org/docs/latest/use/configure/language-options#specifying-globals
     NodeJS: "readonly",
-    jest: "readonly",
+    jest: "readonly"
   },
   plugins: ["import", "unused-imports"],
   parserOptions: {
     tsconfigRootDir: __dirname,
-    project: ["./apps/*/tsconfig.json", "./packages/*/tsconfig.json", "./services/*/tsconfig.json"],
+    project: ["./apps/*/tsconfig.json", "./packages/*/tsconfig.json", "./services/*/tsconfig.json"]
   },
   settings: {
     "import/parsers": {
-      "@typescript-eslint/parser": [".ts", ".tsx"],
+      "@typescript-eslint/parser": [".ts", ".tsx"]
     },
     /** https://github.com/import-js/eslint-import-resolver-typescript#configuration */
     "import/resolver": {
@@ -36,9 +36,9 @@ module.exports = {
          * use an array : "project": [ "packages/module-a/tsconfig.json", "packages/module-b/tsconfig.json"],
          * use an array of glob patterns
          * -----------------------------------------------------------------------------------------------*/
-        project: ["apps/*/tsconfig.json", "packages/*/tsconfig.json", "services/*/tsconfig.json"],
-      },
-    },
+        project: ["apps/*/tsconfig.json", "packages/*/tsconfig.json", "services/*/tsconfig.json"]
+      }
+    }
   },
   rules: {
     "arrow-body-style": ["error", "as-needed"],
@@ -64,9 +64,9 @@ module.exports = {
     "no-restricted-imports": [
       "error",
       {
-        patterns: [".*"],
-      },
-    ],
+        patterns: [".*"]
+      }
+    ]
   },
   overrides: [
     {
@@ -77,7 +77,7 @@ module.exports = {
         "plugin:import/recommended",
         "plugin:import/errors",
         "plugin:import/warnings",
-        "plugin:import/typescript",
+        "plugin:import/typescript"
       ],
       plugins: ["@typescript-eslint"],
       parser: "@typescript-eslint/parser",
@@ -110,11 +110,11 @@ module.exports = {
           {
             prefer: "type-imports",
             fixStyle: "separate-type-imports",
-            disallowTypeAnnotations: false,
-          },
-        ],
-      },
-    },
+            disallowTypeAnnotations: false
+          }
+        ]
+      }
+    }
   ],
-  ignorePatterns: ["**/*.js", "node_modules", "dist", "coverage", "packages/config"],
+  ignorePatterns: ["**/*.js", "node_modules", "dist", "coverage", "packages/config"]
 };

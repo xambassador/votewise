@@ -1,8 +1,0 @@
-{
-  "extends": "@votewise/tsconfig/nextjs.json",
-  "compilerOptions": {
-    "resolveJsonModule": true,
-  },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["dist", "build", "node_modules"],
-}

@@ -10,13 +10,13 @@ module.exports = {
   root: true,
   env: {
     node: true,
-    browser: true,
+    browser: true
   },
   globals: {
     // eslint show errors when refrencing NodeJS namespace types because it is global and eslint has no idea about it.
     // https://eslint.org/docs/latest/use/configure/language-options#specifying-globals
     NodeJS: "readonly",
-    jest: "readonly",
+    jest: "readonly"
   },
   extends: [
     "eslint:recommended",
@@ -29,30 +29,30 @@ module.exports = {
     "plugin:import/errors",
     "plugin:import/warnings",
     "plugin:import/typescript",
-    "prettier",
+    "prettier"
   ],
   // https://typescript-eslint.io/getting-started#step-2-configuration
   parser: "@typescript-eslint/parser",
   plugins: ["@typescript-eslint", "import", "unused-imports", "eslint-plugin-react"],
   parserOptions: {
     project: ["./apps/*/tsconfig.json", "./packages/*/tsconfig.json"],
-    tsconfigRootDir: __dirname,
+    tsconfigRootDir: __dirname
   },
   settings: {
     next: {
       // https://nextjs.org/docs/app/building-your-application/configuring/eslint#rootdir
-      rootDir: ["apps/web/"],
+      rootDir: ["apps/web/"]
     },
     "import/parsers": {
-      "@typescript-eslint/parser": [".ts", ".tsx"],
+      "@typescript-eslint/parser": [".ts", ".tsx"]
     },
     // https://github.com/import-js/eslint-import-resolver-typescript#configuration
     "import/resolver": {
       typescript: {
         alwaysTryTypes: true,
-        project: ["apps/*/tsconfig.json", "packages/*/tsconfig.json"],
-      },
-    },
+        project: ["apps/*/tsconfig.json", "packages/*/tsconfig.json"]
+      }
+    }
   },
   rules: {
     "arrow-body-style": ["error", "as-needed"],
@@ -89,18 +89,18 @@ module.exports = {
     "no-restricted-imports": [
       "error",
       {
-        patterns: [".*"],
-      },
+        patterns: [".*"]
+      }
     ],
-    "@next/next/no-html-link-for-pages": "off",
+    "@next/next/no-html-link-for-pages": "off"
   },
   overrides: [
     {
       files: ["**/index.ts"],
       rules: {
-        "no-restricted-imports": "off",
-      },
-    },
+        "no-restricted-imports": "off"
+      }
+    }
   ],
-  ignorePatterns: ["**/*.js", "**/*.json", "node_modules", "public", "styles", ".next", "coverage", "dist"],
+  ignorePatterns: ["**/*.js", "**/*.mjs", "**/*.json", "node_modules", "public", "styles", ".next", "coverage", "dist"]
 };

@@ -9,7 +9,7 @@ type Props = {
 
 export const metadata: Metadata = {
   title: "Welcome to Votewise",
-  description: "Share your ideas and vote on others",
+  description: "Share your ideas with the world"
 };
 
 export default function RootLayout(props: Props) {

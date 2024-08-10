@@ -2,326 +2,342 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider      = "prisma-client-js"
-    binaryTargets = ["native"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native"]
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator zod {
-    provider      = "zod-prisma"
-    output        = "./zod"
-    relationModel = "default"
+  provider      = "zod-prisma"
+  output        = "./zod"
+  relationModel = "default"
 }
 
 enum Gender {
-    MALE
-    FEMALE
-    OTHER
+  MALE
+  FEMALE
+  OTHER
 }
 
 enum PostType {
-    PUBLIC
-    GROUP_ONLY
+  PUBLIC
+  GROUP_ONLY
 }
 
 enum PostStatus {
-    OPEN
-    CLOSED
-    ARCHIVED
-    INPROGRESS
+  OPEN
+  CLOSED
+  ARCHIVED
+  INPROGRESS
 }
 
 enum FriendType {
-    FRIENDS
-    PENDING_USER_TO_FRIEND_REQUEST
-    PENDING_FRIEND_TO_USER_REQUEST
+  FRIENDS
+  PENDING_USER_TO_FRIEND_REQUEST
+  PENDING_FRIEND_TO_USER_REQUEST
 }
 
 enum GroupType {
-    PUBLIC
-    PRIVATE
+  PUBLIC
+  PRIVATE
 }
 
 enum GroupStatus {
-    OPEN
-    CLOSED
-    INACTIVE
+  OPEN
+  CLOSED
+  INACTIVE
 }
 
 enum GroupMemberRole {
-    ADMIN
-    MODERATOR
-    MEMBER
+  ADMIN
+  MODERATOR
+  MEMBER
 }
 
 enum GroupInvitationType {
-    JOIN
-    INVITE
+  JOIN
+  INVITE
 }
 
 enum NotificationType {
-    PUBLIC_POST_UPVOTE
-    GROUP_POST_UPVOTE
-    PUBLIC_POST_COMMENT_UPVOTE
-    GROUP_POST_COMMENT_UPVOTE
-    PUBLIC_POST_COMMENT
-    GROUP_POST_COMMENT
-    START_FOLLOWING
-    FRIEND_REQUEST
-    FRIEND_REQUEST_ACCEPTED
-    GROUP_INVITATION
-    GROUP_INVITATION_ACCEPTED
-    JOIN_GROUP_REQUEST
+  PUBLIC_POST_UPVOTE
+  GROUP_POST_UPVOTE
+  PUBLIC_POST_COMMENT_UPVOTE
+  GROUP_POST_COMMENT_UPVOTE
+  PUBLIC_POST_COMMENT
+  GROUP_POST_COMMENT
+  START_FOLLOWING
+  FRIEND_REQUEST
+  FRIEND_REQUEST_ACCEPTED
+  GROUP_INVITATION
+  GROUP_INVITATION_ACCEPTED
+  JOIN_GROUP_REQUEST
 }
 
 model User {
-    id              String    @id @default(cuid())
-    email           String    @unique
-    password        String
-    first_name      String
-    last_name       String
-    user_name       String?   @unique
-    about           String?
-    twitter         String?
-    facebook        String?
-    instagram       String?
-    github          String?
-    profile_image   String?
-    cover_image     String?
-    location        String?
-    gender          Gender?
-    is_onboarded    Boolean   @default(false)
-    is_email_verify Boolean   @default(false)
-    last_login      DateTime?
+  id                    String    @id @default(cuid())
+  email                 String    @unique
+  user_name             String    @unique
+  password              String
+  first_name            String
+  last_name             String
+  about                 String?
+  twitter_profile_url   String?
+  facebook_profile_url  String?
+  instagram_profile_url String?
+  github_profile_url    String?
+  avatar_url            String?
+  cover_image_url       String?
+  location              String?
+  gender                Gender?
+  last_login            DateTime?
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+  is_onboarded    Boolean @default(false)
+  is_email_verify Boolean @default(false)
 
-    posts             Post[]
-    upvotes           Upvote[]
-    comments          Comment[]
-    commentUpvotes    CommentUpvote[]
-    followers         Follow[]           @relation("followers")
-    following         Follow[]           @relation("following")
-    friend1           Friend[]           @relation("user")
-    friend2           Friend[]           @relation("friend")
-    groupMembers      GroupMember[]
-    groupInvitations  GroupInvitation[]
-    notification      Notification[]
-    refreshTokens     RefreshToken[]
-    blackListedTokens BlacklistedToken[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  posts             Post[]
+  upvotes           Upvote[]
+  comments          Comment[]
+  commentUpvotes    CommentUpvote[]
+  followers         Follow[]           @relation("followers")
+  following         Follow[]           @relation("following")
+  friend1           Friend[]           @relation("user")
+  friend2           Friend[]           @relation("friend")
+  groupMembers      GroupMember[]
+  groupInvitations  GroupInvitation[]
+  notification      Notification[]
+  refreshTokens     RefreshToken[]
+  blackListedTokens BlacklistedToken[]
 }
 
 model Post {
-    id         String     @id @default(cuid())
-    title      String     @db.VarChar(255)
-    content    String     @db.Text
-    slug       String     @unique @db.VarChar(255)
-    type       PostType
-    status     PostStatus
-    created_at DateTime   @default(now())
-    updated_at DateTime   @updatedAt
+  id      String     @id @default(cuid())
+  title   String     @db.VarChar(255)
+  content String     @db.Text
+  slug    String     @unique @db.VarChar(255)
+  type    PostType
+  status  PostStatus
 
-    group_id String?
-    group    Group?  @relation(fields: [group_id], references: [id])
+  group_id String?
+  group    Group?  @relation(fields: [group_id], references: [id])
 
-    author_id String
-    author    User   @relation(fields: [author_id], references: [id])
+  author_id String
+  author    User   @relation(fields: [author_id], references: [id])
 
-    upvotes        Upvote[]
-    comments       Comment[]
-    hashTags       PostHashTag[]
-    assets         PostAsset[]
-    commentUpvotes CommentUpvote[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  upvotes        Upvote[]
+  comments       Comment[]
+  hashTags       PostHashTag[]
+  assets         PostAsset[]
+  commentUpvotes CommentUpvote[]
 }
 
 model PostAsset {
-    id         String   @id @default(cuid())
-    type       String
-    url        String
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+  id   String @id @default(cuid())
+  type String
+  url  String
 
-    post_id String
-    post    Post   @relation(fields: [post_id], references: [id])
+  post_id String
+  post    Post   @relation(fields: [post_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Upvote {
-    id         String   @id @default(cuid())
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+  id String @id @default(cuid())
 
-    post_id String
-    post    Post   @relation(fields: [post_id], references: [id])
+  post_id String
+  post    Post   @relation(fields: [post_id], references: [id])
 
-    user_id String
-    user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Comment {
-    id         String   @id @default(cuid())
-    text       String   @db.Text
-    parent_id  Int? // foreign key referencing the id of the comment that this comment is replying to. This can be NULL if the comment is not a reply to another comment.
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+  id        String @id @default(cuid())
+  text      String @db.Text
+  parent_id Int?
 
-    post_id String
-    post    Post   @relation(fields: [post_id], references: [id])
+  post_id String
+  post    Post   @relation(fields: [post_id], references: [id])
 
-    user_id String
-    user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id])
 
-    upvotes CommentUpvote[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  upvotes CommentUpvote[]
 }
 
 model CommentUpvote {
-    id         String   @id @default(cuid())
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+  id String @id @default(cuid())
 
-    comment_id String
-    comment    Comment @relation(fields: [comment_id], references: [id])
+  comment_id String
+  comment    Comment @relation(fields: [comment_id], references: [id])
 
-    post_id String
-    post    Post   @relation(fields: [post_id], references: [id])
+  post_id String
+  post    Post   @relation(fields: [post_id], references: [id])
 
-    user_id String
-    user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model HashTag {
-    id         String   @id @default(cuid())
-    count      Int      @default(0)
-    name       String   @unique
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+  id    String @id @default(cuid())
+  count Int    @default(0)
+  name  String @unique
 
-    postHashTags PostHashTag[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  postHashTags PostHashTag[]
 }
 
 model PostHashTag {
-    id         String   @id @default(cuid())
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+  id String @id @default(cuid())
 
-    post_id String
-    post    Post   @relation(fields: [post_id], references: [id])
+  post_id String
+  post    Post   @relation(fields: [post_id], references: [id])
 
-    hash_tag_id String
-    hash_tag    HashTag @relation(fields: [hash_tag_id], references: [id])
+  hash_tag_id String
+  hash_tag    HashTag @relation(fields: [hash_tag_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Follow {
-    id         String   @id @default(cuid())
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+  id String @id @default(cuid())
 
-    // foreign key referencing the id of the user who is following
-    follower_id String
-    followers   User   @relation("followers", fields: [follower_id], references: [id])
+  // foreign key referencing the id of the user who is following
+  follower_id String
+  followers   User   @relation("followers", fields: [follower_id], references: [id])
 
-    // foreign key referencing the id of the user who is being followed
-    following_id String
-    following    User   @relation("following", fields: [following_id], references: [id])
+  // foreign key referencing the id of the user who is being followed
+  following_id String
+  following    User   @relation("following", fields: [following_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Friend {
-    id         String     @id @default(cuid())
-    type       FriendType
-    created_at DateTime   @default(now())
-    updated_at DateTime   @updatedAt
+  id   String     @id @default(cuid())
+  type FriendType
 
-    user_id String
-    user    User   @relation("user", fields: [user_id], references: [id])
+  user_id String
+  user    User   @relation("user", fields: [user_id], references: [id])
 
-    friend_id String
-    friend    User   @relation("friend", fields: [friend_id], references: [id])
+  friend_id String
+  friend    User   @relation("friend", fields: [friend_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Group {
-    id                   String      @id @default(cuid())
-    name                 String
-    about                String
-    type                 GroupType
-    status               GroupStatus
-    join_through_request Boolean     @default(false)
-    created_at           DateTime    @default(now())
-    updated_at           DateTime    @updatedAt
+  id                   String      @id @default(cuid())
+  name                 String
+  about                String
+  type                 GroupType
+  status               GroupStatus
+  join_through_request Boolean     @default(false)
 
-    members     GroupMember[]
-    invitations GroupInvitation[]
-    posts       Post[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  members     GroupMember[]
+  invitations GroupInvitation[]
+  posts       Post[]
 }
 
 model GroupMember {
-    id         String          @id @default(cuid())
-    role       GroupMemberRole @default(MEMBER)
-    joined_at  DateTime        @default(now())
-    blocked    Boolean         @default(false)
-    is_removed Boolean         @default(false)
-    created_at DateTime        @default(now())
-    updated_at DateTime        @updatedAt
+  id         String          @id @default(cuid())
+  role       GroupMemberRole @default(MEMBER)
+  joined_at  DateTime        @default(now())
+  blocked    Boolean         @default(false)
+  is_removed Boolean         @default(false)
 
-    user_id String
-    user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id])
 
-    group_id String
-    group    Group  @relation(fields: [group_id], references: [id])
+  group_id String
+  group    Group  @relation(fields: [group_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 enum GroupInvitationStatus {
-    PENDING
-    ACCEPTED
-    REJECTED
+  PENDING
+  ACCEPTED
+  REJECTED
 }
 
 model GroupInvitation {
-    id         String                @id @default(cuid())
-    type       GroupInvitationType
-    status     GroupInvitationStatus
-    sent_at    DateTime              @default(now())
-    created_at DateTime              @default(now())
-    updated_at DateTime              @updatedAt
+  id      String                @id @default(cuid())
+  type    GroupInvitationType
+  status  GroupInvitationStatus
+  sent_at DateTime              @default(now())
 
-    group_id String
-    group    Group  @relation(fields: [group_id], references: [id])
+  group_id String
+  group    Group  @relation(fields: [group_id], references: [id])
 
-    user_id String
-    user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Notification {
-    id         String           @id @default(cuid())
-    event_type NotificationType
-    event_id   Int
-    is_read    Boolean          @default(false)
-    created_at DateTime         @default(now())
-    updated_at DateTime         @updatedAt
+  id         String           @id @default(cuid())
+  event_type NotificationType
+  event_id   Int
+  is_read    Boolean          @default(false)
 
-    user_id String
-    user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model RefreshToken {
-    id         String   @id @default(cuid())
-    token      String   @db.VarChar(255)
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+  id    String @id @default(cuid())
+  token String @db.VarChar(255)
 
-    user_id String @unique
-    user    User   @relation(fields: [user_id], references: [id])
+  user_id String @unique
+  user    User   @relation(fields: [user_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model BlacklistedToken {
-    id         String   @id @default(cuid())
-    token      String   @db.VarChar(255)
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+  id    String @id @default(cuid())
+  token String @db.VarChar(255)
 
-    user_id String
-    user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }

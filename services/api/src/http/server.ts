@@ -1,124 +1,91 @@
 import "@/types";
 
+import type { ServerConfig, ServerSecrets } from "@/configs";
+import type { HttpTerminator } from "http-terminator";
+
 import http from "http";
 import https from "https";
-import express from "express";
-import stoppable from "stoppable";
+import chrona from "chrona";
+import compression from "compression";
+import cors from "cors";
+import express, { json } from "express";
+import helmet from "helmet";
+import { createHttpTerminator } from "http-terminator";
 
-import logger from "@votewise/lib/logger";
-import { prisma } from "@votewise/prisma";
+import { banner } from "@/utils/banner";
+import { getSSL } from "@/utils";
 
-import { APP_SETTINGS } from "@/configs";
-
-import env from "@/infra/env";
-
-import { registerMiddlewares } from "@/http/middlewares";
-import { registerV1Routes } from "@/http/routers";
-
-import { checkEnv, getSSL, ShutdownManager, ShutdownOrder, taskforce } from "@/utils";
+import { AppContext } from "./context";
+import * as error from "./error";
+import { ServerRouter } from "./router";
 
 /* ----------------------------------------------------------------------------------------------- */
 
-const port = process.env.PORT || APP_SETTINGS.DEFAULT_PORT;
+export class Server {
+  public ctx: AppContext;
+  public server?: http.Server;
+  public app: express.Application;
+  private terminator?: HttpTerminator;
 
-/**
- * The amount of time to wait for connections to close before forcefully
- * closing them. This allows for regular HTTP requests to complete but
- * prevents long running requests from blocking shutdown.
- */
-const connectionGraceTimeout = APP_SETTINGS.CONNECTION_GRACE_TIMEOUT;
+  constructor(opts: { app: express.Application; ctx: AppContext }) {
+    this.ctx = opts.ctx;
+    this.app = opts.app;
+  }
 
-async function master() {
-  await checkEnv();
-}
+  static async create(opts: { cfg: ServerConfig; secrets: ServerSecrets; overrides?: Partial<AppContext> }) {
+    const { cfg, secrets, overrides } = opts;
+    const app = express();
+    const ctx = await AppContext.fromConfig(cfg, secrets, overrides);
+    const routers = new ServerRouter(ctx);
+    app.disable("x-powered-by");
+    app.set("trust proxy", true);
+    app.use(chrona(":date :incoming :method :url :status :response-time :remote-address", (l) => ctx.logger.info(l)));
+    app.use(compression());
+    app.use(cors(cfg.cors));
+    app.use(helmet());
+    app.use(express.urlencoded({ extended: true }));
+    app.use(json({ limit: cfg.blobUploadLimit }));
+    app.use(routers.registerAuthRouter());
+    app.use(error.withAppContext(ctx).handler);
+    return new Server({ app, ctx });
+  }
 
-async function start(_: number, disconnect: () => void) {
-  const ssl = getSSL();
-  const useHTTPS = !!ssl.key && !!ssl.cert;
+  public async start(): Promise<http.Server> {
+    const { port, ssl } = this.ctx.config;
+    const sslConfig = getSSL(ssl);
+    const useHTTPs = !!sslConfig.key && !!sslConfig.cert;
+    const server = useHTTPs ? https.createServer(sslConfig, this.app) : http.createServer(this.app);
+    banner();
+    this.app.listen(port, () => this.ctx.logger.info(`Votewise API is running on port ${port}`));
+    this.server = server;
+    this.server.keepAliveTimeout = 61 * 1000;
+    this.terminator = createHttpTerminator({ server });
+    return server;
+  }
 
-  const app = express();
-  const httpServer = stoppable(
-    useHTTPS ? https.createServer(ssl, app) : http.createServer(app),
-    connectionGraceTimeout
-  );
+  public async destroy() {
+    if (!this.terminator) {
+      throw new Error("Server is not running");
+    }
 
-  registerMiddlewares(app);
-  registerV1Routes(app);
+    await this.ctx.db.$disconnect();
+    await this.ctx.cache.disconnect();
+    await this.terminator.terminate();
+    this.server = undefined;
+  }
 
-  httpServer.listen(port, () => {
-    logger.info(
-      `🚀 Server is taking off! You're now cruising on port ${port} under ${
-        useHTTPS ? "https" : "http"
-      }. Have a smooth journey!`
-    );
-  });
-
-  httpServer.setTimeout(env.REQUEST_TIMEOUT);
-
-  httpServer.on("error", (err) => {
-    throw err;
-  });
-
-  ShutdownManager.add("server", ShutdownOrder.last, () => {
-    return new Promise((resolve, reject) => {
-      logger.info(
-        `[🚨] 🚀 Rocket Docking Initiated! SIGTERM received. Engines throttling down for a graceful touchdown.`
-      );
-
-      // Stop the server from accepting new connections and finishes existing connections.
-      httpServer.stop((err, gracefully) => {
-        // Disconnect all the workers
-        disconnect();
-
-        if (err) {
-          logger.error(`🚨 Rocket Docking Failed! Unable to stop the server gracefully.`);
-          reject(err);
-          return;
-        }
-
-        // Close the database connection
-        prisma
-          .$disconnect()
-          .then(() => {
-            logger.info(`🚀 Rocket Docking Successful! Database connection closed.`);
-          })
-          .catch((reason) => {
-            logger.error(`🚨 Rocket Docking Failed! Unable to close the database connection.`, {
-              reason,
-            });
-          });
-
-        resolve(gracefully);
-
-        if (gracefully) {
-          logger.info(
-            `✅ Mission Accomplished! Your server is signing off. Until we launch again, over and out!`
-          );
-        } else {
-          logger.info(
-            `🛑 🚨 Mission Aborted! Your server is signing off. Until we launch again, over and out!`
-          );
-        }
+  public healthCheck() {
+    this.ctx.db
+      .$connect()
+      .then(() => this.ctx.logger.info(`🐘 Postgres is reachable at ${this.ctx.environment.DATABASE_URL}`))
+      .catch(() => {
+        this.ctx.logger.error(`❌ 🐘 Postgres is unreachable at ${this.ctx.environment.DATABASE_URL}`);
+        process.exit(1);
       });
+    this.ctx.cache.onConnect(() => this.ctx.logger.info(`🚀 Redis is reachable at ${this.ctx.environment.REDIS_URL}`));
+    this.ctx.cache.onError(() => {
+      this.ctx.logger.error(`❌ 🚀 Redis is unreachable at ${this.ctx.environment.REDIS_URL}`);
+      process.exit(1);
     });
-  });
-
-  process.once("uncaughtException", (err) => {
-    logger.error(
-      `🚀 Launch Aborted! An unexpected error delays liftoff. We're recalibrating the countdown sequence.`,
-      { error: err }
-    );
-    ShutdownManager.shutdown();
-    process.exit(1);
-  });
-
-  // Handle shutdown signals
-  process.once("SIGTERM", () => ShutdownManager.shutdown());
-  process.once("SIGINT", () => ShutdownManager.shutdown());
+  }
 }
-
-taskforce({
-  master,
-  worker: start,
-  count: env.CONCURRENCY,
-});

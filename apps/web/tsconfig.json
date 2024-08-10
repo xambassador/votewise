@@ -14,9 +14,9 @@
       "@/types/*": ["types/*"],
       "@/lib/*": ["lib/*"],
       "@/config/*": ["config/*"],
-      "@votewise/ui/*": ["@votewise/ui/*"],
-    },
+      "@votewise/ui/*": ["@votewise/ui/*"]
+    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules"]
 }

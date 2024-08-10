@@ -1,7 +1,6 @@
-/* -----------------------------------------------------------------------------------------------
- * This is minimal server for add support for file uploads
- * As of now, static-web-server doesn't support file uploads
- * -----------------------------------------------------------------------------------------------*/
+/**
+ * This is minimal server for add support for file uploads.
+ */
 
 import fs from "fs";
 import http from "http";
@@ -16,13 +15,12 @@ dotenv.config();
 
 // ----------
 const getFileInfo = promisify(fs.stat);
+// eslint-disable-next-line no-console
 const log = console.log;
 
 // ----------
 const port = process.env.STATIC_UPLOAD_SERVER_PORT || 8001;
 const staticServerPort = process.env.STATIC_WEB_SERVER_PORT || 8787;
-
-import("./scripts/launch-static-server");
 
 // ----------
 const app = express();
@@ -30,7 +28,7 @@ const httpServer = http.createServer(app);
 // ----------
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: process.env.FRONTEND_URL
   })
 );
 app.use(express.json());
@@ -45,11 +43,10 @@ const getFilePath = (fileName: string, fileToken: string) => `./public/upload-${
  */
 app.post("/handshake", (req, res) => {
   if (!req.body || !req.body.fileName) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
-      message: "Invalid request. Missing fileName in body.",
+      message: "Invalid request. Missing fileName in body."
     });
-    return;
   }
 
   const fileName = req.body.fileName;
@@ -57,13 +54,13 @@ app.post("/handshake", (req, res) => {
   const fileToken = v4();
   // ----- Creating empty file
   fs.createWriteStream(getFilePath(fileName, fileToken), {
-    flags: "w",
+    flags: "w"
   });
   return res.status(200).json({
     message: "ok",
     token: fileToken,
     fileName,
-    success: true,
+    success: true
   });
 });
 
@@ -73,6 +70,7 @@ app.post("/handshake", (req, res) => {
  * Upload file to server.
  * Need to pass x-file-token and content-range headers. Token can be obtained from /handshake route.
  */
+// eslint-disable-next-line consistent-return
 app.post("/upload", async (req, res) => {
   const contentRange = req.headers["content-range"];
   const token = req.headers["x-file-token"];
@@ -80,14 +78,14 @@ app.post("/upload", async (req, res) => {
   if (!contentRange) {
     return res.status(400).json({
       message: "Missing content-range header",
-      success: false,
+      success: false
     });
   }
 
   if (!token) {
     return res.status(400).json({
       message: "Missing x-file-token header",
-      success: false,
+      success: false
     });
   }
 
@@ -103,15 +101,10 @@ app.post("/upload", async (req, res) => {
   const endingByte = Number(isValidContentRange[2]);
   const fileSize = Number(isValidContentRange[3]);
 
-  if (
-    startingByte >= fileSize ||
-    startingByte >= endingByte ||
-    endingByte <= startingByte ||
-    endingByte > fileSize
-  ) {
+  if (startingByte >= fileSize || startingByte >= endingByte || endingByte <= startingByte || endingByte > fileSize) {
     return res.status(400).json({
       message: "Invalid content-range",
-      success: false,
+      success: false
     });
   }
 
@@ -123,6 +116,7 @@ app.post("/upload", async (req, res) => {
 
   let fileName: string;
 
+  // eslint-disable-next-line consistent-return
   bb.on("file", async (_, file, info) => {
     const { filename } = info;
     fileName = filename;
@@ -140,9 +134,9 @@ app.post("/upload", async (req, res) => {
         message: "No file found with provided credentials",
         credentials: {
           token,
-          filename,
+          filename
         },
-        success: false,
+        success: false
       });
     }
   });
@@ -153,8 +147,8 @@ app.post("/upload", async (req, res) => {
       success: true,
       data: {
         // Generating url with static-web-server port.
-        url: `${req.protocol}://${req.hostname}:${staticServerPort}/upload-${token}-${fileName}`,
-      },
+        url: `${req.protocol}://${req.hostname}:${staticServerPort}/upload-${token}-${fileName}`
+      }
     });
   });
 
@@ -166,18 +160,19 @@ app.post("/upload", async (req, res) => {
  * @route GET /upload-status
  * For performing resume upload functionality.
  */
+// eslint-disable-next-line consistent-return
 app.get("/upload-status", (req, res) => {
   if (!req.query || !req.query.token || !req.query.filename) {
     return res.status(400).json({
       message: "Missing token or fileName in query params",
-      success: false,
+      success: false
     });
   }
   const { token, filename } = req.query;
   getFileInfo(getFilePath(filename as string, token as string))
     .then((stats) => {
       res.status(200).json({
-        totalChunkUploaded: stats.size,
+        totalChunkUploaded: stats.size
       });
     })
     .catch(() => {
@@ -185,9 +180,9 @@ app.get("/upload-status", (req, res) => {
         message: "No file found with provided credentials",
         credentials: {
           token,
-          filename,
+          filename
         },
-        success: false,
+        success: false
       });
     });
 });
@@ -197,11 +192,12 @@ app.get("/upload-status", (req, res) => {
  * @route DELETE /upload
  * Perform cleanup of the file from disk.
  */
+// eslint-disable-next-line consistent-return
 app.delete("/upload", (req, res) => {
   if (!req.query || !req.query.token || !req.query.filename) {
     return res.status(400).json({
       message: "Missing token or fileName in query params",
-      success: false,
+      success: false
     });
   }
 
@@ -212,12 +208,12 @@ app.delete("/upload", (req, res) => {
     if (err) {
       return res.status(500).json({
         message: "Something is wrong",
-        success: false,
+        success: false
       });
     }
     return res.status(200).json({
       message: "File removed successfully",
-      success: false,
+      success: false
     });
   });
 });
@@ -225,7 +221,7 @@ app.delete("/upload", (req, res) => {
 app.get("/heartbeat", (req, res) => {
   res.status(200).json({
     message: "service is running",
-    success: true,
+    success: true
   });
 });
 

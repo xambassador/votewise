@@ -14,16 +14,21 @@ class Logger {
     this.output = pino({
       level: process.env.LOG_LEVEL || "info",
       transport: {
-        target: "pino-pretty",
+        target: "pino-pretty"
       },
       base: null,
       timestamp: false,
-      ...options,
+      ...options
     });
   }
 
+  public log(message: string) {
+    this.output.info(message);
+  }
+
   public info(message: string, extra?: Extra) {
-    this.output.info({ message, ...extra });
+    if (!extra) return this.output.info(message);
+    return this.output.info({ message, ...extra });
   }
 
   public debug(message: string, extra?: Extra) {
@@ -41,7 +46,8 @@ class Logger {
   }
 
   public error(message: string, extra?: Extra) {
-    this.output.error({ message, ...extra });
+    if (!extra) return this.output.error(message);
+    return this.output.error({ message, ...extra });
   }
 
   private sanitize<T>(data: T): T {

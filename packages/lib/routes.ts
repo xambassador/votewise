@@ -1,7 +1,7 @@
 export const HEALTH = {
   BASE_ROUTE: "/api/health",
   HEALTH_CHECK: "/health-check",
-  PING: "/ping",
+  PING: "/ping"
 } as const;
 
 export const AUTH = {
@@ -14,16 +14,16 @@ export const AUTH = {
     RESET_PASSWORD: "/reset-password",
     VERIFY_EMAIL: "/verify-email",
     RESEND_EMAIL_VERIFICATION: "/resend-email-verification",
-    REVOKE_ACCESS_TOKEN: "/revoke-access-token",
-  },
+    REVOKE_ACCESS_TOKEN: "/revoke-access-token"
+  }
 } as const;
 
 export const ONBOARDING = {
   v1: {
     BASE_ROUTE: "/api/v1/onboarding",
     ONBOARDING_UPDATE: "/",
-    ONBOARDING_STATUS: "/",
-  },
+    ONBOARDING_STATUS: "/"
+  }
 };
 
 export const POST_ROUTE_V1 = "/api/v1/posts";
@@ -53,7 +53,7 @@ export const POST = {
   GET_REPLIES_TO_COMMENT_ON_POST: GET_REPLIES_TO_COMMENT_ON_POST_V1,
   DELETE_COMMENT_ON_POST: DELETE_COMMENT_ON_POST_V1,
   LIKE_COMMENT_ON_POST: LIKE_COMMENT_ON_POST_V1,
-  UNLIKE_COMMENT_ON_POST: UNLIKE_COMMENT_ON_POST_V1,
+  UNLIKE_COMMENT_ON_POST: UNLIKE_COMMENT_ON_POST_V1
 } as const;
 
 export const USER_ROUTE_V1 = "/api/v1/user";
@@ -77,7 +77,7 @@ export const USER = {
   USER_UPDATE_POST: USER_UPDATE_POST_V1,
   DELETE_POST: DELETE_POST_V1,
   UPDATE_POST_STATUS: UPDATE_POST_STATUS_V1,
-  USER_GET_COMMENTS: USER_GET_COMMENTS_V1,
+  USER_GET_COMMENTS: USER_GET_COMMENTS_V1
 } as const;
 
 export const USER_GET_FRIENDS_V1 = "/friends";
@@ -90,7 +90,7 @@ export const FRIENDS = {
   GET_FRIENDS: USER_GET_FRIENDS_V1,
   SEND_FRIEND_REQUEST: USER_SEND_FRIEND_REQUEST_V1,
   ACCEPT_REJECT_FRIEND_REQUEST: USER_ACCEPT_REJECT_FRIEND_REQUEST_V1,
-  GET_FRIEND_REQUESTS: USER_GET_FRIEND_REQUESTS_V1,
+  GET_FRIEND_REQUESTS: USER_GET_FRIEND_REQUESTS_V1
 } as const;
 
 export const USER_GET_FOLLOWERS_V1 = "/followers";
@@ -99,7 +99,7 @@ export const USER_FOLLOW_USER_V1 = "/followers/:followingId";
 export const FOLLOWERS = {
   BASE_ROUTE: USER_ROUTE_V1,
   GET_FOLLOWERS: USER_GET_FOLLOWERS_V1,
-  FOLLOW_USER: USER_FOLLOW_USER_V1,
+  FOLLOW_USER: USER_FOLLOW_USER_V1
 } as const;
 
 export const USER_GET_FOLLOWING_V1 = "/following";
@@ -108,7 +108,7 @@ export const USER_UNFOLLOW_USER_V1 = "/following/:followingId";
 export const FOLLOWING = {
   BASE_ROUTE: USER_ROUTE_V1,
   GET_FOLLOWING: USER_GET_FOLLOWING_V1,
-  UNFOLLOW_USER: USER_UNFOLLOW_USER_V1,
+  UNFOLLOW_USER: USER_UNFOLLOW_USER_V1
 } as const;
 
 export const USER_GET_GROUPS_V1 = "/groups";

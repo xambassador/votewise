@@ -2,12 +2,13 @@
 module.exports = {
   env: {
     node: true,
+    jest: true
   },
   globals: {
     // eslint show errors when refrencing NodeJS namespace types because it is global and eslint has no idea about it.
     // https://eslint.org/docs/latest/use/configure/language-options#specifying-globals
     NodeJS: "readonly",
-    jest: "readonly",
+    jest: "readonly"
   },
   extends: [
     "plugin:@typescript-eslint/recommended",
@@ -15,28 +16,28 @@ module.exports = {
     "plugin:import/errors",
     "plugin:import/warnings",
     "plugin:import/typescript",
-    "plugin:prettier/recommended",
+    "plugin:prettier/recommended"
   ],
   plugins: ["@typescript-eslint", "import", "prettier"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     tsconfigRootDir: __dirname,
-    project: ["./apps/*/tsconfig.json", "./packages/*/tsconfig.json", "./services/*/tsconfig.json"],
+    project: ["./apps/*/tsconfig.json", "./packages/*/tsconfig.json", "./services/*/tsconfig.json"]
   },
   settings: {
     "import/parsers": {
-      "@typescript-eslint/parser": [".ts"],
+      "@typescript-eslint/parser": [".ts"]
     },
     "import/resolver": {
       node: {
         extensions: [".js", ".ts"],
-        moduleDirectory: ["node_modules", "src/", "test/"],
+        moduleDirectory: ["node_modules", "src/", "test/"]
       },
       typescript: {
         alwaysTryTypes: true,
-        project: ["apps/*/tsconfig.json", "packages/*/tsconfig.json", "services/*/tsconfig.json"],
-      },
-    },
+        project: ["apps/*/tsconfig.json", "packages/*/tsconfig.json", "services/*/tsconfig.json"]
+      }
+    }
   },
   rules: {
     "arrow-body-style": ["error", "as-needed"],
@@ -65,25 +66,25 @@ module.exports = {
     "no-restricted-imports": [
       "error",
       {
-        patterns: [".*"],
-      },
+        patterns: [".*"]
+      }
     ],
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
         argsIgnorePattern: "^_",
         args: "after-used",
-        ignoreRestSiblings: true,
-      },
-    ],
+        ignoreRestSiblings: true
+      }
+    ]
   },
   overrides: [
     {
       files: ["**/index.ts"],
       rules: {
-        "no-restricted-imports": "off",
-      },
-    },
+        "no-restricted-imports": "off"
+      }
+    }
   ],
-  ignorePatterns: ["**/*.js", "node_modules", "dist", "coverage"],
+  ignorePatterns: ["**/*.js", "node_modules", "dist", "coverage"]
 };
