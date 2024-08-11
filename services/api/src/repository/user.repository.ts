@@ -1,4 +1,4 @@
-import type { AppContext } from "@/http/context";
+import type { AppContext } from "@/context";
 import type { Prisma } from "@votewise/prisma";
 
 type Dependencies = {

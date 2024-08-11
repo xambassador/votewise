@@ -12,7 +12,7 @@ const cfg = new ServerConfig({
   hostname: "",
   jwt,
   cors,
-  publicUrl: "http://localhost:3000",
+  publicUrl: environment.VOTEWISE_API_URL,
   port: environment.VOTEWISE_API_PORT,
   devMode: environment.NODE_ENV === "development",
   blobUploadLimit: 10 * 1024 * 1024 // 10 MB
@@ -25,7 +25,6 @@ const secrets = new ServerSecrets({
 
 async function bootstrap() {
   const server = await Server.create({ cfg, secrets });
-  server.healthCheck();
   await server.start();
 }
 

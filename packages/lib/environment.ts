@@ -150,13 +150,11 @@ envSchema.superRefine((data) => {
 export function validateEnv(env: unknown) {
   try {
     const res = envSchema.parse(env);
-    console.log("✅ Environment variables are valid");
     return res;
   } catch (err) {
     if (err instanceof z.ZodError) {
       const message = err.errors.map((error) => "- " + error.message).join("\n");
-      console.error(`\n🔴 Invalid environment variables\n\n${message}\n\n`);
-      throw new Error("Invalid environment variables");
+      throw new Error(`\n🔴 Invalid environment variables\n\n${message}\n\n`);
     } else {
       throw new Error("Something went wrong while validating environment variables");
     }

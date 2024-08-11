@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import type { Mailer } from "@/emails/mailer";
 import type { Cache } from "@/storage/redis";
-
-import { StatusCodes } from "http-status-codes";
+import type { User } from "@votewise/prisma/client";
 
 import { mockMailer } from "../../../../emails/__mock__/mailer";
 import { mockUserRepository } from "../../../../repository/__mock__/user.repository";
@@ -13,7 +11,6 @@ import { Service } from "../service";
 const service = new Service({
   cache: mockCache as unknown as Cache,
   cryptoService: new CryptoService(),
-  httpStatusCodes: StatusCodes,
   mailer: mockMailer as unknown as Mailer,
   userRepository: mockUserRepository
 });
@@ -32,16 +29,14 @@ beforeEach(() => {
 
 describe("User signup service", () => {
   it("Should throw an error if the email already exists", async () => {
-    // @ts-expect-error
-    mockUserRepository.findByEmail.mockResolvedValueOnce(Promise.resolve({ id: "asasc" }));
+    mockUserRepository.findByEmail.mockResolvedValueOnce(Promise.resolve({ id: "user-id" } as User));
     await expect(service.execute(body)).rejects.toThrow("Email already exists");
     expect(mockUserRepository.create).not.toHaveBeenCalled();
   });
 
   it("Should create a new user", async () => {
     mockUserRepository.findByEmail.mockResolvedValueOnce(Promise.resolve(null));
-    // @ts-expect-error
-    mockUserRepository.create.mockResolvedValueOnce(Promise.resolve({ id: "asasc" }));
+    mockUserRepository.create.mockResolvedValueOnce(Promise.resolve({ id: "user-id" } as User));
     await service.execute(body);
     expect(mockUserRepository.create).toHaveBeenCalled();
     expect(mockUserRepository.create).toHaveBeenCalledWith({

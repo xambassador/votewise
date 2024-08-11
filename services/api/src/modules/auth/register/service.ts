@@ -1,5 +1,7 @@
-import type { AppContext } from "@/http/context";
+import type { AppContext } from "@/context";
 import type { TRegister } from "@votewise/schemas";
+
+import { StatusCodes } from "http-status-codes";
 
 import { InvalidInputError } from "@votewise/lib/errors";
 import { Minute, Second } from "@votewise/lib/times";
@@ -8,20 +10,19 @@ export type Context = {
   userRepository: AppContext["repositories"]["user"];
   cryptoService: AppContext["cryptoService"];
   cache: AppContext["cache"];
-  httpStatusCodes: AppContext["httpStatusCodes"];
   mailer: AppContext["mailer"];
 };
 
 export class Service {
   private readonly ctx: Context;
 
-  constructor(opts: Context) {
-    this.ctx = opts;
+  constructor(ctx: Context) {
+    this.ctx = ctx;
   }
 
   async execute(body: TRegister) {
     const user = await this.ctx.userRepository.findByEmail(body.email);
-    if (user) throw new InvalidInputError("Email already exists", this.ctx.httpStatusCodes.CONFLICT);
+    if (user) throw new InvalidInputError("Email already exists", StatusCodes.CONFLICT);
 
     const newUser = await this.ctx.userRepository.create({
       email: body.email,

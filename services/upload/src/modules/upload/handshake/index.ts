@@ -5,14 +5,9 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { Controller } from "./controller";
 import { Service } from "./service";
 
-export function registerControllerFactory(ctx: AppContext) {
-  const service = new Service({
-    cache: ctx.cache,
-    cryptoService: ctx.cryptoService,
-    userRepository: ctx.repositories.user,
-    mailer: ctx.mailer
-  });
+export function handshakeControllerFactory(ctx: AppContext) {
+  const service = new Service(ctx);
   const controller = new Controller({ service });
-  const exceptionLayer = new ExceptionLayer({ ctx, name: "register" });
+  const exceptionLayer = new ExceptionLayer({ ctx, name: "handshake" });
   return exceptionLayer.catch(controller.handle.bind(controller));
 }

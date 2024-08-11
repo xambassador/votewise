@@ -52,7 +52,7 @@ export class RedisAdapter extends Redis {
 
   public static get defaultClient(): RedisAdapter {
     if (this.client) return this.client;
-    this.client = new this(process.env.REDIS_URL, { suffix: "client", connectTimeout: 5000 });
+    this.client = new this(process.env.REDIS_URL, { suffix: "client", connectTimeout: 5000, lazyConnect: true });
     return this.client;
   }
 
@@ -60,7 +60,8 @@ export class RedisAdapter extends Redis {
     if (this.subscriber) return this.subscriber;
     this.subscriber = new this(process.env.REDIS_URL, {
       suffix: "subscriber",
-      maxRetriesPerRequest: null
+      maxRetriesPerRequest: null,
+      lazyConnect: true
     });
     return this.subscriber;
   }
@@ -68,9 +69,17 @@ export class RedisAdapter extends Redis {
 
 export class Cache {
   private readonly client: RedisAdapter;
+  private isConnected: boolean;
 
   constructor() {
     this.client = RedisAdapter.defaultClient;
+    this.isConnected = false;
+  }
+
+  public async connect() {
+    this.client.connect().then(() => {
+      this.isConnected = true;
+    });
   }
 
   /**
@@ -79,6 +88,7 @@ export class Cache {
    * @param cb - Callback function to run when the client connects
    */
   public onConnect(cb: () => void) {
+    this.isConnected = true;
     this.client.on("connect", cb);
   }
 
@@ -95,7 +105,10 @@ export class Cache {
    * Disconnect the client from the Redis server
    */
   public async disconnect() {
-    return this.client.quit();
+    if (!this.isConnected) {
+      return void 0;
+    }
+    return this.client.disconnect();
   }
 
   /**

@@ -1,9 +1,10 @@
-import type { TRegister } from "@votewise/schemas";
 import type { Request, Response } from "express";
 import type { Service } from "./service";
 
+import { StatusCodes } from "http-status-codes";
+
 import { InvalidInputError } from "@votewise/lib/errors";
-import { ZRegister } from "@votewise/schemas";
+import { ZHandshake } from "@votewise/schemas";
 
 type ControllerOptions = {
   service: Service;
@@ -16,18 +17,17 @@ export class Controller {
     this.service = opts.service;
   }
 
-  private parseBody(body: unknown): TRegister {
-    const validate = ZRegister.safeParse(body);
+  private parseBody(body: unknown) {
+    const validate = ZHandshake.safeParse(body);
     if (!validate.success) {
-      const message = validate.error.errors[0].message;
-      throw new InvalidInputError(message);
+      throw new InvalidInputError(validate.error.errors[0].message);
     }
     return validate.data;
   }
 
-  async handle<P, R, B, Q, L extends Record<string, unknown>>(req: Request<P, R, B, Q, L>, res: Response) {
+  public async handle<P, R, B, Q, L extends Record<string, unknown>>(req: Request<P, R, B, Q, L>, res: Response) {
     const body = this.parseBody(req.body);
     const result = await this.service.execute(body);
-    return res.json(result);
+    return res.status(StatusCodes.OK).json(result);
   }
 }

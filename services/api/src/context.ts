@@ -2,7 +2,6 @@ import type { ServerConfig, ServerSecrets } from "@/configs";
 import type { TEnv } from "@votewise/lib/environment";
 
 import { Cache } from "@/storage/redis";
-import { StatusCodes } from "http-status-codes";
 
 import logger from "@votewise/lib/logger";
 import { prisma } from "@votewise/prisma";
@@ -27,7 +26,6 @@ export type AppContextOptions = {
   logger: typeof logger;
   environment: TEnv;
   cache: Cache;
-  httpStatusCodes?: typeof StatusCodes;
   mailer: Mailer;
   repositories: Repositories;
   jwtSerivce: JWTService;
@@ -43,7 +41,6 @@ export class AppContext {
   public logger: typeof logger;
   public environment: TEnv;
   public cache: Cache;
-  public httpStatusCodes: typeof StatusCodes;
   public jwtService: JWTService;
   public repositories: Repositories;
   public mailer: Mailer;
@@ -56,7 +53,6 @@ export class AppContext {
     this.db = opts.db;
     this.logger = opts.logger;
     this.environment = opts.environment;
-    this.httpStatusCodes = opts.httpStatusCodes ?? StatusCodes;
     this.jwtService = opts.jwtSerivce;
     this.repositories = opts.repositories;
     this.mailer = opts.mailer;

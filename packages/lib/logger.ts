@@ -99,6 +99,24 @@ class Logger {
 
     return data;
   }
+
+  /**
+   * Synchonously log a message
+   *
+   * @param message - Message to log
+   */
+  public logSync(message: string) {
+    console.log(message);
+  }
+
+  /**
+   * Synchonously log an error
+   *
+   * @param error - Error to log
+   */
+  public errorSync(...args: unknown[]) {
+    console.error(args);
+  }
 }
 
 export { Logger };

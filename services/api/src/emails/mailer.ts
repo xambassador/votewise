@@ -1,4 +1,4 @@
-import type { AppContext } from "@/http/context";
+import type { AppContext } from "@/context";
 
 import nodemailer from "nodemailer";
 
@@ -13,16 +13,16 @@ export class Mailer {
   private readonly transporter: nodemailer.Transporter;
   private readonly from: string;
 
-  constructor(cfg: { env: AppContext["environment"] }) {
-    this.from = cfg.env.SMTP_FROM;
+  constructor(opts: { env: AppContext["environment"] }) {
+    this.from = opts.env.SMTP_FROM;
     this.transporter = nodemailer.createTransport({
-      host: cfg.env.SMTP_HOST,
-      port: cfg.env.SMTP_PORT,
+      host: opts.env.SMTP_HOST,
+      port: opts.env.SMTP_PORT,
       auth: {
-        user: cfg.env.SMTP_USERNAME,
-        pass: cfg.env.SMTP_PASSWORD
+        user: opts.env.SMTP_USERNAME,
+        pass: opts.env.SMTP_PASSWORD
       },
-      secure: cfg.env.SMTP_SECURE_ENABLED
+      secure: opts.env.SMTP_SECURE_ENABLED
     });
   }
 

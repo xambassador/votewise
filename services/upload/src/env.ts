@@ -6,7 +6,7 @@ export function checkEnv(env: unknown) {
     return environment;
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     return process.exit(1);
   }
 }

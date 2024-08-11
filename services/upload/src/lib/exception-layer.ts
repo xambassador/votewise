@@ -1,7 +1,7 @@
 import type { AppContext } from "@/context";
-import type { NextFunction, Request, RequestHandler, Response } from "express";
+import type { RequestHandler } from "express";
 
-type TConfig = {
+type ExceptionLayerOptions = {
   ctx: AppContext;
   name: string;
 };
@@ -10,15 +10,17 @@ export class ExceptionLayer {
   private readonly name: string;
   private readonly ctx: AppContext;
 
-  constructor(cfg: TConfig) {
-    this.name = cfg.name.toUpperCase();
-    this.ctx = cfg.ctx;
+  constructor(opts: ExceptionLayerOptions) {
+    this.name = opts.name.toUpperCase();
+    this.ctx = opts.ctx;
   }
 
-  public catch(handler: (...args: Parameters<RequestHandler>) => Promise<unknown>): RequestHandler {
+  public catch<P, R, B, Q, L extends Record<string, unknown>>(
+    handler: (...arg: Parameters<RequestHandler<P, R, B, Q, L>>) => Promise<unknown>
+  ): RequestHandler<P, R, B, Q, L> {
     const ctx = this.ctx;
     const name = this.name;
-    return function routeHandler(req: Request, res: Response, next: NextFunction) {
+    return function routeHandler(req, res, next) {
       const result = handler(req, res, next);
       return Promise.resolve(result).catch((error) => {
         if (ctx.config.devMode) {
