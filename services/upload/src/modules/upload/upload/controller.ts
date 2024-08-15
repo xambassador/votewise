@@ -69,14 +69,14 @@ export class Controller {
     if (!contentRange) {
       throw new InvalidInputError("Missing content-range header");
     }
-    // TODO: Move custom headers to AppContext. So we can use them in other services.
-    const fileToken = req.headers["x-file-token"];
+    const xh = this.ctx.config.appHeaders.fileToken;
+    const fileToken = req.headers[xh];
     if (!fileToken) {
-      throw new InvalidInputError("Missing x-file-token header");
+      throw new InvalidInputError(`Missing ${xh} header`);
     }
 
     if (fileToken && typeof fileToken !== "string") {
-      throw new InvalidInputError("Invalid x-file-token header");
+      throw new InvalidInputError(`Invalid ${xh} header`);
     }
 
     const isValidContentRange = contentRange.match(/bytes=(\d+)-(\d+)\/(\d+)/);

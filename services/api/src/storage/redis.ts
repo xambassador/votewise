@@ -3,6 +3,8 @@ import type { RedisOptions } from "ioredis";
 import Redis from "ioredis";
 import { defaults } from "lodash";
 
+import { Milisecond } from "@votewise/lib/times";
+
 /* ----------------------------------------------------------------------------------------------- */
 
 type AdapterOptions = RedisOptions & {
@@ -50,16 +52,20 @@ export class RedisAdapter extends Redis {
     this.setMaxListeners(100);
   }
 
-  public static get defaultClient(): RedisAdapter {
+  public static get defaultClient() {
     if (this.client) return this.client;
-    this.client = new this(process.env.REDIS_URL, { suffix: "client", connectTimeout: 5000, lazyConnect: true });
+    this.client = new this(process.env.REDIS_URL, {
+      suffix: "votewise-client",
+      connectTimeout: 5000,
+      lazyConnect: true
+    });
     return this.client;
   }
 
-  public static get defaultSubscriber(): RedisAdapter {
+  public static get defaultSubscriber() {
     if (this.subscriber) return this.subscriber;
     this.subscriber = new this(process.env.REDIS_URL, {
-      suffix: "subscriber",
+      suffix: "votewise-subscriber",
       maxRetriesPerRequest: null,
       lazyConnect: true
     });
@@ -77,8 +83,14 @@ export class Cache {
   }
 
   public async connect() {
-    this.client.connect().then(() => {
-      this.isConnected = true;
+    return new Promise((resolve, reject) => {
+      this.client
+        .connect()
+        .then(() => {
+          this.isConnected = true;
+          resolve(true);
+        })
+        .catch((err) => reject(err));
     });
   }
 
@@ -99,6 +111,13 @@ export class Cache {
    */
   public onError(cb: (err: Error) => void) {
     this.client.on("error", cb);
+  }
+
+  public onEnd(cb: () => void) {
+    this.client.on("end", () => {
+      this.isConnected = false;
+      cb();
+    });
   }
 
   /**
@@ -126,11 +145,12 @@ export class Cache {
    *
    * @param {string} key - Cache key
    * @param {string | Buffer | number} value - Cache value
-   * @param {number} expiry - Cache expiry in seconds
+   * @param {number} expiry - Cache expiry in milliseconds
    * @returns {Promise<"Ok">} Redis response
    */
   public async setWithExpiry(key: string, value: string | Buffer | number, expiry: number) {
-    return this.client.set(key, value, "EX", expiry);
+    const seconds = Math.floor(expiry / Milisecond);
+    return this.client.set(key, value, "EX", seconds);
   }
 
   /**

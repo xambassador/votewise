@@ -1,31 +1,32 @@
 import type { AppContext } from "@/context";
 import type { Request, Response } from "express";
+import type { DeleteFilters } from "./filter";
 
 import fs from "node:fs/promises";
+import { StatusCodes } from "http-status-codes";
 
-import { InvalidInputError, ResourceNotFoundError } from "@votewise/lib/errors";
+import { ResourceNotFoundError } from "@votewise/lib/errors";
 
 type ControllerOptions = {
   ctx: AppContext;
+  filters: DeleteFilters;
 };
-type Params = { token: string };
-type QueryParams = { file_name?: string };
 
 export class Controller {
   private readonly ctx: AppContext;
+  private readonly filters: DeleteFilters;
 
   constructor(opts: ControllerOptions) {
     this.ctx = opts.ctx;
+    this.filters = opts.filters;
   }
 
-  public async handle<P extends Params, R, B, Q extends QueryParams, L extends Record<string, unknown>>(
-    req: Request<P, R, B, Q, L>,
-    res: Response
-  ) {
-    const { token, fileName } = this.parseQueryParams(req);
+  public async handle<P, R, B, Q, L extends Record<string, unknown>>(req: Request<P, R, B, Q, L>, res: Response) {
+    const { body } = this.filters.parseRequest(req);
+    const { fileName, token } = body;
     const path = this.ctx.getBlobPath(fileName, token);
     await this.deleteFile(path);
-    return res.status(200).json({ message: "File deleted successfully" });
+    return res.status(StatusCodes.OK).json({ message: "File deleted successfully" });
   }
 
   private async deleteFile(path: string) {
@@ -35,16 +36,5 @@ export class Controller {
     } catch (err) {
       throw new ResourceNotFoundError("File not found");
     }
-  }
-
-  private parseQueryParams<P extends Params, R, B, Q extends QueryParams, L extends Record<string, unknown>>(
-    req: Request<P, R, B, Q, L>
-  ) {
-    const token = req.params.token;
-    const fileName = req.query.file_name;
-    if (!token || !fileName) {
-      throw new InvalidInputError("Missing required parameters");
-    }
-    return { token, fileName };
   }
 }

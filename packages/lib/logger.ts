@@ -115,7 +115,7 @@ class Logger {
    * @param error - Error to log
    */
   public errorSync(...args: unknown[]) {
-    console.error(args);
+    console.error(...args);
   }
 }
 

@@ -30,6 +30,11 @@ export class UserRepository {
     return user;
   }
 
+  async findByUsername(username: string) {
+    const user = await this.db.user.findUnique({ where: { user_name: username } });
+    return user;
+  }
+
   async update() {}
 
   async delete() {}

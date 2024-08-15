@@ -1,33 +1,31 @@
+import type { AppContext } from "@/context";
 import type { Request, Response } from "express";
-import type { Service } from "./service";
+import type { HandshakeFilters } from "./filter";
 
+import fs from "node:fs";
 import { StatusCodes } from "http-status-codes";
-
-import { InvalidInputError } from "@votewise/lib/errors";
-import { ZHandshake } from "@votewise/schemas";
+import { v4 } from "uuid";
 
 type ControllerOptions = {
-  service: Service;
+  ctx: AppContext;
+  filters: HandshakeFilters;
 };
 
 export class Controller {
-  private readonly service: Service;
+  private readonly ctx: AppContext;
+  private readonly filters: HandshakeFilters;
 
   constructor(opts: ControllerOptions) {
-    this.service = opts.service;
-  }
-
-  private parseBody(body: unknown) {
-    const validate = ZHandshake.safeParse(body);
-    if (!validate.success) {
-      throw new InvalidInputError(validate.error.errors[0].message);
-    }
-    return validate.data;
+    this.ctx = opts.ctx;
+    this.filters = opts.filters;
   }
 
   public async handle<P, R, B, Q, L extends Record<string, unknown>>(req: Request<P, R, B, Q, L>, res: Response) {
-    const body = this.parseBody(req.body);
-    const result = await this.service.execute(body);
-    return res.status(StatusCodes.OK).json(result);
+    const { body } = this.filters.parseRequest(req);
+    const fileName = body.file_name;
+    const fileToken = v4();
+    const filePath = this.ctx.getBlobPath(fileName, fileToken);
+    fs.createWriteStream(filePath, { flags: "w" });
+    return res.status(StatusCodes.OK).json({ file_token: fileToken });
   }
 }

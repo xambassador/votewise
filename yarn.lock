@@ -3988,6 +3988,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/pug@npm:^2.0.10":
+  version: 2.0.10
+  resolution: "@types/pug@npm:2.0.10"
+  checksum: 6fac37fd84ad4bcf755061caad274db70591699739070bc30c5c1b5f0aecf98646dc29ec8da11cfca82a2b7cc57d949a3ae50aba2f88bf098751ebdd25d9aaea
+  languageName: node
+  linkType: hard
+
 "@types/qs@npm:*":
   version: 6.9.7
   resolution: "@types/qs@npm:6.9.7"
@@ -4348,6 +4355,7 @@ __metadata:
     "@types/jsonwebtoken": "npm:^9.0.6"
     "@types/node": "npm:^20.14.9"
     "@types/nodemailer": "npm:^6.4.15"
+    "@types/pug": "npm:^2.0.10"
     "@types/request-ip": "npm:^0.0.41"
     "@types/stoppable": "npm:^1.1.3"
     "@types/supertest": "npm:^6.0.2"
@@ -4357,7 +4365,7 @@ __metadata:
     "@votewise/schemas": "npm:*"
     "@votewise/tsconfig": "npm:*"
     bcrypt: "npm:^5.1.1"
-    bull: "npm:^4.15.0"
+    bullmq: "npm:^5.12.6"
     busboy: "npm:^1.6.0"
     bytes: "npm:^3.1.2"
     chalk: "npm:4.1.2"
@@ -5667,18 +5675,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bull@npm:^4.15.0":
-  version: 4.15.0
-  resolution: "bull@npm:4.15.0"
+"bullmq@npm:^5.12.6":
+  version: 5.12.6
+  resolution: "bullmq@npm:5.12.6"
   dependencies:
-    cron-parser: "npm:^4.2.1"
-    get-port: "npm:^5.1.1"
-    ioredis: "npm:^5.3.2"
-    lodash: "npm:^4.17.21"
+    cron-parser: "npm:^4.6.0"
+    ioredis: "npm:^5.4.1"
     msgpackr: "npm:^1.10.1"
-    semver: "npm:^7.5.2"
-    uuid: "npm:^8.3.0"
-  checksum: 153f0b40ce67dac4deef70e564f2627babf27bd2e5362782e4cb6e431f2acffe326d999738d824e27e5a103dd0cb77acde82842e85e637a9b67893897fbebc5d
+    node-abort-controller: "npm:^3.1.1"
+    semver: "npm:^7.5.4"
+    tslib: "npm:^2.0.0"
+    uuid: "npm:^9.0.0"
+  checksum: 6a826893cbaeff905a0fc49c6f4b6b917371fe6b4af7d569c899915401493d076b1ccccca557cc36beb779b94474b9af1cf55625ec2b66f4c56cc90798b3878b
   languageName: node
   linkType: hard
 
@@ -6798,12 +6806,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cron-parser@npm:^4.2.1":
-  version: 4.7.1
-  resolution: "cron-parser@npm:4.7.1"
+"cron-parser@npm:^4.6.0":
+  version: 4.9.0
+  resolution: "cron-parser@npm:4.9.0"
   dependencies:
     luxon: "npm:^3.2.1"
-  checksum: 7d4d9067dc8f90051ad73845ac6f7feba4638734a51df6343da3731d525e0e0de3124c2e00de84d65f26ec597c2b9290a97e1d503234e4279130f48cbe0d7ce7
+  checksum: 348622bdcd1a15695b61fc33af8a60133e5913a85cf99f6344367579e7002896514ba3b0a9d6bb569b02667d6b06836722bf2295fcd101b3de378f71d37bed0b
   languageName: node
   linkType: hard
 
@@ -9229,7 +9237,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"get-port@npm:5.1.1, get-port@npm:^5.1.1":
+"get-port@npm:5.1.1":
   version: 5.1.1
   resolution: "get-port@npm:5.1.1"
   checksum: 2873877a469b24e6d5e0be490724a17edb39fafc795d1d662e7bea951ca649713b4a50117a473f9d162312cb0e946597bd0e049ed2f866e79e576e8e213d3d1c
@@ -10225,23 +10233,6 @@ __metadata:
     from2: "npm:^2.3.0"
     p-is-promise: "npm:^3.0.0"
   checksum: ac6975c0029bf969931781ab1534996b35068f5d51ccd55a00b601e2fc638cf040a42c9fb8e3c8f320509af9a56c9b11da8f1159f76db3ed8096779cce618c95
-  languageName: node
-  linkType: hard
-
-"ioredis@npm:^5.3.2":
-  version: 5.3.2
-  resolution: "ioredis@npm:5.3.2"
-  dependencies:
-    "@ioredis/commands": "npm:^1.1.1"
-    cluster-key-slot: "npm:^1.1.0"
-    debug: "npm:^4.3.4"
-    denque: "npm:^2.1.0"
-    lodash.defaults: "npm:^4.2.0"
-    lodash.isarguments: "npm:^3.1.0"
-    redis-errors: "npm:^1.2.0"
-    redis-parser: "npm:^3.0.0"
-    standard-as-callback: "npm:^2.1.0"
-  checksum: 0dd2b5b8004e891f5b62edf18ac223194f1f5204698ec827c903e789ea05b0b36f73395491749ec63c66470485bdfb228ccdf1714fbf631a0f78f33211f2c883
   languageName: node
   linkType: hard
 
@@ -13269,6 +13260,13 @@ __metadata:
   bin:
     next: dist/bin/next
   checksum: 630c2a197b57c1f29caf4672a0f8fb74dbb048e77e4513f567279467332212f3eebcb68279885f1d525d7aaebbb452f522b02c0b5cd3ca66f385341e4b4eac67
+  languageName: node
+  linkType: hard
+
+"node-abort-controller@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "node-abort-controller@npm:3.1.1"
+  checksum: f7ad0e7a8e33809d4f3a0d1d65036a711c39e9d23e0319d80ebe076b9a3b4432b4d6b86a7fab65521de3f6872ffed36fc35d1327487c48eb88c517803403eda3
   languageName: node
   linkType: hard
 
@@ -18068,6 +18066,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tslib@npm:^2.0.0":
+  version: 2.6.3
+  resolution: "tslib@npm:2.6.3"
+  checksum: 2598aef53d9dbe711af75522464b2104724d6467b26a60f2bdac8297d2b5f1f6b86a71f61717384aa8fd897240467aaa7bcc36a0700a0faf751293d1331db39a
+  languageName: node
+  linkType: hard
+
 "tslib@npm:^2.1.0, tslib@npm:^2.3.0, tslib@npm:^2.4.0, tslib@npm:^2.5.0":
   version: 2.5.0
   resolution: "tslib@npm:2.5.0"
@@ -18569,12 +18574,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^8.3.0":
-  version: 8.3.2
-  resolution: "uuid@npm:8.3.2"
+"uuid@npm:^9.0.0":
+  version: 9.0.1
+  resolution: "uuid@npm:9.0.1"
   bin:
     uuid: dist/bin/uuid
-  checksum: bcbb807a917d374a49f475fae2e87fdca7da5e5530820ef53f65ba1d12131bd81a92ecf259cc7ce317cbe0f289e7d79fdfebcef9bfa3087c8c8a2fa304c9be54
+  checksum: 1607dd32ac7fc22f2d8f77051e6a64845c9bce5cd3dd8aa0070c074ec73e666a1f63c7b4e0f4bf2bc8b9d59dc85a15e17807446d9d2b17c8485fbc2147b27f9b
   languageName: node
   linkType: hard
 

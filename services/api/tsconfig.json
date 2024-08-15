@@ -8,21 +8,7 @@
     "baseUrl": ".",
     "experimentalDecorators": true,
     "paths": {
-      "@/*": ["src/*"],
-      "@/configs/*": ["src/configs/*"],
-      "@/emails/*": ["src/emails/*"],
-      "@/http/*": ["src/http/*"],
-      "@/infra/*": ["src/infra/*"],
-      "@/modules/*": ["src/modules/*"],
-      "@/services/*": ["src/services/*"],
-      "@/types/*": ["src/types/*"],
-      "@/utils/*": ["src/utils/*"],
-      // Modules
-      "@/auth/*": ["src/modules/auth/*"],
-      "@/user/*": ["src/modules/user/*"],
-      "@/post/*": ["src/modules/post/*"],
-      "@/comment/*": ["src/modules/comment/*"],
-      "@/group/*": ["src/modules/group/*"]
+      "@/*": ["src/*"]
     }
   },
   "include": ["src/**/*", "test/**/*"],

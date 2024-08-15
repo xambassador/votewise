@@ -1,9 +1,8 @@
 import "dotenv/config";
 
-import { AppHeaders, Cors, ServerConfig } from "@/config";
-
 import { environment } from "@votewise/lib/environment";
 
+import { AppHeaders, Cors, ServerConfig } from "@/config";
 import { Server } from "@/http/server";
 
 const cors = new Cors({ origin: "*" });

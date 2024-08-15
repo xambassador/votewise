@@ -1,22 +1,25 @@
 import type { ServerConfig, ServerSecrets } from "@/configs";
 import type { TEnv } from "@votewise/lib/environment";
 
-import { Cache } from "@/storage/redis";
-
+import { Assertions } from "@votewise/lib/errors";
 import logger from "@votewise/lib/logger";
 import { prisma } from "@votewise/prisma";
 
+import { Mailer } from "@/emails/mailer";
 import { UserRepository } from "@/repository/user.repository";
-
 import { CryptoService } from "@/services/crypto.service";
 import { JWTService } from "@/services/jwt.service";
-
+import { Cache } from "@/storage/redis";
 import { checkEnv } from "@/utils";
 
-import { Mailer } from "@/emails/mailer";
+import { TasksQueue } from "./queues";
 
 type Repositories = {
   user: UserRepository;
+};
+
+type Queue = {
+  tasksQueue: TasksQueue;
 };
 
 export type AppContextOptions = {
@@ -30,6 +33,8 @@ export type AppContextOptions = {
   repositories: Repositories;
   jwtSerivce: JWTService;
   cryptoService: CryptoService;
+  queues: Queue;
+  assert: Assertions;
 };
 
 export class AppContext {
@@ -45,6 +50,8 @@ export class AppContext {
   public repositories: Repositories;
   public mailer: Mailer;
   public cryptoService: CryptoService;
+  public queues: Queue;
+  public assert: Assertions;
 
   constructor(opts: AppContextOptions) {
     this.config = opts.config;
@@ -57,6 +64,8 @@ export class AppContext {
     this.repositories = opts.repositories;
     this.mailer = opts.mailer;
     this.cryptoService = opts.cryptoService;
+    this.queues = opts.queues;
+    this.assert = opts.assert;
   }
 
   static async fromConfig(
@@ -64,10 +73,9 @@ export class AppContext {
     secrets: ServerSecrets,
     overrides?: Partial<AppContextOptions>
   ): Promise<AppContext> {
-    if (this._instance) {
-      return this._instance;
-    }
+    if (this._instance) return this._instance;
     const environment = checkEnv(process.env);
+    const assert = new Assertions();
     const cache = new Cache();
     const db = prisma;
     const jwtSerivce = new JWTService({
@@ -77,6 +85,7 @@ export class AppContext {
     const cryptoService = new CryptoService();
     const userRepository = new UserRepository({ db });
     const mailer = new Mailer({ env: environment });
+    const tasksQueue = new TasksQueue({ env: environment });
     const ctx = new AppContext({
       config: cfg,
       secrets,
@@ -87,12 +96,18 @@ export class AppContext {
       jwtSerivce,
       mailer,
       cryptoService,
+      assert,
       repositories: {
         user: userRepository
       },
+      queues: { tasksQueue },
       ...(overrides ?? {})
     });
     this._instance = ctx;
+    cache.onConnect(() => {
+      tasksQueue.init();
+      tasksQueue.initWorker(ctx);
+    });
     return ctx;
   }
 }

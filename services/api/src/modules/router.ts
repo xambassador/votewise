@@ -14,6 +14,7 @@ import { registerControllerFactory } from "./auth/register";
  */
 export function moduleRouterFactory(basePath: string, ctx: AppContext) {
   const router = Router();
-  router.post(basePath + "/register", registerControllerFactory(ctx));
+  const path = basePath + "/v1";
+  router.post(path + "/auth/register", registerControllerFactory(ctx));
   return router;
 }

@@ -1,28 +1,28 @@
 import type { AppContext } from "@/context";
 import type { Request, Response } from "express";
+import type { StatusFilters } from "./filter";
 
 import { StatusCodes } from "http-status-codes";
 
-import { InvalidInputError, ResourceNotFoundError } from "@votewise/lib/errors";
+import { ResourceNotFoundError } from "@votewise/lib/errors";
 
-type QueryParams = { file_name?: string };
-type Params = { token: string };
 type ControllerOptions = {
   ctx: AppContext;
+  filters: StatusFilters;
 };
 
 export class Controller {
   private readonly ctx: AppContext;
+  private readonly filters: StatusFilters;
 
   constructor(opts: ControllerOptions) {
     this.ctx = opts.ctx;
+    this.filters = opts.filters;
   }
 
-  public async handle<P extends Params, R, B, Q extends QueryParams, L extends Record<string, unknown>>(
-    req: Request<P, R, B, Q, L>,
-    res: Response
-  ) {
-    const { token, fileName } = this.parseQueryParams(req);
+  public async handle<P, R, B, Q, L extends Record<string, unknown>>(req: Request<P, R, B, Q, L>, res: Response) {
+    const { body } = this.filters.parseRequest(req);
+    const { fileName, token } = body;
     const path = this.ctx.getBlobPath(fileName, token);
     const stats = await this.getFileInfo(path);
     return res.status(StatusCodes.OK).json({ total_chunk_uploaded: stats.size });
@@ -34,16 +34,5 @@ export class Controller {
     } catch (err) {
       throw new ResourceNotFoundError("No file found with provided credentials");
     }
-  }
-
-  private parseQueryParams<P extends Params, R, B, Q extends QueryParams, L extends Record<string, unknown>>(
-    req: Request<P, R, B, Q, L>
-  ) {
-    const token = req.params.token;
-    const fileName = req.query.file_name;
-    if (!req.query || !token || !fileName) {
-      throw new InvalidInputError("Missing required query parameters");
-    }
-    return { token, fileName };
   }
 }

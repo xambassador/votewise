@@ -3,16 +3,17 @@ import type { AppContext } from "@/context";
 import { ExceptionLayer } from "@/lib/exception-layer";
 
 import { Controller } from "./controller";
-import { Service } from "./service";
+import { RegisterFilters } from "./filter";
 
 export function registerControllerFactory(ctx: AppContext) {
-  const service = new Service({
+  const controller = new Controller({
+    userRepository: ctx.repositories.user,
+    assert: ctx.assert,
+    tasksQueue: ctx.queues.tasksQueue,
     cache: ctx.cache,
     cryptoService: ctx.cryptoService,
-    userRepository: ctx.repositories.user,
-    mailer: ctx.mailer
+    filters: new RegisterFilters()
   });
-  const controller = new Controller({ service });
   const exceptionLayer = new ExceptionLayer({ ctx, name: "register" });
   return exceptionLayer.catch(controller.handle.bind(controller));
 }

@@ -1,12 +1,12 @@
 /**
- * Milisecond constant
+ * Milisecond constant. (1 second)
  */
 export const Milisecond = 1000;
 
 /**
- * Second unit in miliseconds (60 * Milisecond)
+ * Second unit in miliseconds
  */
-export const Second = 60 * Milisecond;
+export const Second = Milisecond;
 
 /**
  * Minute unit in miliseconds (60 * Second)

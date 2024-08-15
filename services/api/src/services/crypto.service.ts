@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import bcrypt from "bcrypt";
 import { nanoid } from "nanoid";
 import { v4 } from "uuid";
 
@@ -52,5 +53,18 @@ export class CryptoService {
     const random = crypto.randomBytes(16).toString("hex");
     const apiKey = id + random;
     return "vot_" + apiKey.replace(/\//g, "_").replace(/\+/g, "-").replace(/_/g, "-").slice(0, 32);
+  }
+
+  public async hashPassword(password: string): Promise<string> {
+    return bcrypt.hash(password, 10);
+  }
+
+  public getOtp(count = 6): number {
+    const digits = "0123456789";
+    let otp = "";
+    for (let i = 0; i <= count; i++) {
+      otp += digits[Math.floor(Math.random() * 10)];
+    }
+    return parseInt(otp, 10);
   }
 }

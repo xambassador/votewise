@@ -3,11 +3,10 @@ import type { AppContext } from "@/context";
 import { ExceptionLayer } from "@/lib/exception-layer";
 
 import { Controller } from "./controller";
-import { Service } from "./service";
+import { HandshakeFilters } from "./filter";
 
 export function handshakeControllerFactory(ctx: AppContext) {
-  const service = new Service(ctx);
-  const controller = new Controller({ service });
+  const controller = new Controller({ ctx, filters: new HandshakeFilters() });
   const exceptionLayer = new ExceptionLayer({ ctx, name: "handshake" });
   return exceptionLayer.catch(controller.handle.bind(controller));
 }

@@ -12,8 +12,8 @@ import express, { json } from "express";
 import helmet from "helmet";
 import { createHttpTerminator } from "http-terminator";
 
-import { banner } from "@/utils/banner";
 import { getSSL } from "@/utils";
+import { banner } from "@/utils/banner";
 
 import { AppContext } from "../context";
 import * as error from "./error";
@@ -111,13 +111,13 @@ export class Server {
 
   private async connectCache() {
     return new Promise((resolve, reject) => {
-      this.ctx.cache
-        .connect()
-        .then(resolve)
-        .catch((err) => {
-          this.ctx.logger.errorSync(`❌ 🚀 Redis is unreachable at ${this.ctx.environment.REDIS_URL}`, err);
-          reject(err);
-        });
+      this.ctx.cache.connect();
+      this.ctx.cache.onError((err) => {
+        this.ctx.logger.errorSync(`❌ 🚀 Redis is unreachable at ${this.ctx.environment.REDIS_URL}`, err);
+        reject(err);
+      });
+      this.ctx.cache.onConnect(() => resolve(true));
+      this.ctx.cache.onEnd(() => reject(false));
     });
   }
 

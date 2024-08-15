@@ -28,20 +28,12 @@ export class Mailer {
 
   async send(options: EmailOptions) {
     const { to, subject, html, text } = options;
-    try {
-      await this.transporter.sendMail({
-        from: this.from,
-        to,
-        subject,
-        html,
-        text
-      });
-    } catch (err) {
-      // Throw an error so the queue can retry
-      if (err instanceof Error) {
-        throw new Error(`Failed to send email: ${err.message}`);
-      }
-      throw new Error(`Failed to send email: Unknown error`);
-    }
+    await this.transporter.sendMail({
+      from: this.from,
+      to,
+      subject,
+      html,
+      text
+    });
   }
 }

@@ -131,6 +131,48 @@ class InternalServerError extends Error {
   }
 }
 
+class Assertions {
+  public invalidInput(condition: boolean, message: string, status = 400) {
+    if (condition) throw new InvalidInputError(message, status);
+  }
+
+  public badRequest(condition: boolean, message: string) {
+    if (condition) throw new BadRequestError(message);
+  }
+
+  public authentication(condition: boolean, message: string) {
+    if (condition) throw new AuthenticationError(message);
+  }
+
+  public authorization(condition: boolean, message: string) {
+    if (condition) throw new AuthorizationError(message);
+  }
+
+  public resourceNotFound(condition: boolean, message: string) {
+    if (condition) throw new ResourceNotFoundError(message);
+  }
+
+  public operationNotAllowed(condition: boolean, message: string) {
+    if (condition) throw new OperationNotAllowedError(message);
+  }
+
+  public database(condition: boolean, message: string) {
+    if (condition) throw new DatabaseError(message);
+  }
+
+  public validation(condition: boolean, message: string) {
+    if (condition) throw new ValidationError(message);
+  }
+
+  public internalServer(condition: boolean, message: string) {
+    if (condition) throw new InternalServerError(message);
+  }
+
+  public unknown(condition: boolean, message: string) {
+    if (condition) throw new UnknowError(message);
+  }
+}
+
 export {
   ResourceNotFoundError,
   InvalidInputError,
@@ -141,5 +183,6 @@ export {
   AuthorizationError,
   OperationNotAllowedError,
   InternalServerError,
-  BadRequestError
+  BadRequestError,
+  Assertions
 };

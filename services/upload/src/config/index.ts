@@ -27,7 +27,7 @@ export class SSL {
 }
 
 export class AppHeaders {
-  public fileToken?: string;
+  public fileToken: string;
 
   constructor(cfg?: AppHeaders) {
     this.fileToken = cfg?.fileToken || "x-file-token";
@@ -46,7 +46,7 @@ export class ServerConfig {
   public forceQuitTimeout?: number;
   public cors?: Cors;
   public ssl?: SSL;
-  public appHeaders?: AppHeaders;
+  public appHeaders: AppHeaders;
 
   constructor(cfg: ServerConfig) {
     this.port = cfg.port;
