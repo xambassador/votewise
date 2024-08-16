@@ -1,18 +1,27 @@
 import { z } from "zod";
 
-export const ZEmail = z.string({ required_error: "Email is required" }).email({ message: "Invalid email address" });
+export const ZEmail = z
+  .string({ required_error: "email is missing", invalid_type_error: "email must be a string" })
+  .email({ message: "Invalid email address" });
 export const ZPassword = z
-  .string({ required_error: "Password is required" })
-  .min(6, { message: "Password must be at least 6 characters" });
+  .string({ required_error: "password is missing", invalid_type_error: "password must be a string" })
+  .min(6, { message: "password must be at least 6 characters" });
 export const ZUsername = z
-  .string({ required_error: "Username is required" })
-  .min(3, { message: "Username must be at least 3 characters" });
+  .string({ required_error: "username is required", invalid_type_error: "username must be a string" })
+  .min(3, { message: "username must be at least 3 characters" });
 export const ZFirstName = z
-  .string({ required_error: "First name is required" })
-  .min(2, { message: "First name must be at least 2 characters" });
+  .string({ required_error: "first_name is required", invalid_type_error: "first_name must be a string" })
+  .min(2, { message: "first_name must be at least 2 characters" });
 export const ZLastName = z
-  .string({ required_error: "Last name is required" })
-  .min(2, { message: "Last name must be at least 2 characters" });
+  .string({ required_error: "last_name is required", invalid_type_error: "last_name must be a string" })
+  .min(2, { message: "last_name must be at least 2 characters" });
+export const ZVerificationCode = z
+  .string({ required_error: "verification_code is missing", invalid_type_error: "verification_code must be a string" })
+  .min(1, { message: "verification_code is missing" });
+export const ZOtp = z.number({ required_error: "otp is missing", invalid_type_error: "otp must be a number" });
+export const ZUserId = z
+  .string({ required_error: "user_id is missing", invalid_type_error: "user_id must be a string" })
+  .min(1, { message: "user_id is missing" });
 
 export const ZRegister = z.object({
   email: ZEmail,
@@ -22,6 +31,35 @@ export const ZRegister = z.object({
   last_name: ZLastName
 });
 
+export const ZVerifyEmail = z.object({
+  email: ZEmail,
+  verification_code: ZVerificationCode,
+  otp: ZOtp,
+  user_id: ZUserId
+});
+
+export const ZSignin = z
+  .object({
+    password: ZPassword,
+    email: ZEmail.optional(),
+    username: ZUsername.optional()
+  })
+  .superRefine((data, ctx) => {
+    if (!data.email && !data.username) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "email or username is required",
+        fatal: true,
+        path: ["email", "username"]
+      });
+      return z.NEVER;
+    }
+
+    return data;
+  });
+
 export type TRegister = z.infer<typeof ZRegister>;
 export type TEmail = z.infer<typeof ZEmail>;
 export type TPassword = z.infer<typeof ZPassword>;
+export type TVerifyEmail = z.infer<typeof ZVerifyEmail>;
+export type TSignin = z.infer<typeof ZSignin>;

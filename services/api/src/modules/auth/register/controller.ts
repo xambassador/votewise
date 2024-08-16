@@ -1,6 +1,6 @@
 import type { AppContext } from "@/context";
 import type { Request, Response } from "express";
-import type { RegisterFilters } from "./filter";
+import type { Filters } from "./filter";
 
 import { StatusCodes } from "http-status-codes";
 
@@ -12,7 +12,7 @@ type ControllerOptions = {
   cache: AppContext["cache"];
   tasksQueue: AppContext["queues"]["tasksQueue"];
   assert: AppContext["assert"];
-  filters: RegisterFilters;
+  filters: Filters;
 };
 
 export class Controller {
@@ -39,10 +39,10 @@ export class Controller {
     });
 
     const otp = this.ctx.cryptoService.getOtp();
-    const verificationWindowToken = this.ctx.cryptoService.generateUUID();
-    const verificationWindowTokenExpiry = 5 * Minute;
+    const verificationCode = this.ctx.cryptoService.generateUUID();
+    const expiresIn = 5 * Minute;
     const data = { userId: createdUser.id, otp };
-    await this.ctx.cache.setWithExpiry(verificationWindowToken, JSON.stringify(data), verificationWindowTokenExpiry);
+    await this.ctx.cache.setWithExpiry(verificationCode, JSON.stringify(data), expiresIn);
 
     this.ctx.tasksQueue.add({
       name: "email",
@@ -58,8 +58,8 @@ export class Controller {
 
     return res.status(StatusCodes.CREATED).json({
       user_id: createdUser.id,
-      verification_token: verificationWindowToken,
-      expires_in: verificationWindowTokenExpiry
+      verification_code: verificationCode,
+      expires_in: expiresIn
     });
   }
 }

@@ -5,15 +5,14 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { Controller } from "./controller";
 import { Filters } from "./filter";
 
-export function registerControllerFactory(ctx: AppContext) {
+export function verifyControllerFactory(ctx: AppContext) {
+  const filters = new Filters();
   const controller = new Controller({
     userRepository: ctx.repositories.user,
-    assert: ctx.assert,
-    tasksQueue: ctx.queues.tasksQueue,
+    filters,
     cache: ctx.cache,
-    cryptoService: ctx.cryptoService,
-    filters: new Filters()
+    assert: ctx.assert
   });
-  const exceptionLayer = new ExceptionLayer({ ctx, name: "register" });
+  const exceptionLayer = new ExceptionLayer({ name: "verify-email", ctx });
   return exceptionLayer.catch(controller.handle.bind(controller));
 }

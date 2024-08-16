@@ -10,6 +10,8 @@ type JWTServiceOptions = {
 type Codes = "TOKEN_EXPIRED" | "MALFORMED_TOKEN";
 type VerifyResult<T> = { success: true; data: T } | { success: false; error: Codes };
 
+export type Payload = { user_id: string; is_email_verified: boolean; email: string; username: string };
+
 export class JWTService {
   private readonly accessTokenSecret: string;
   private readonly refreshTokenSecret: string;
@@ -22,11 +24,11 @@ export class JWTService {
   /**
    * Create new JWT access token from the payload
    *
-   * @param {string | object} payload Payload or data that need to convert into a JSON Web Token string payload
+   * @param {Payload} payload Payload or data that need to convert into a JSON Web Token string payload
    * @param {SignOptions} options Options for the token
    * @returns {string} JSON Web Token string
    */
-  public signAccessToken(payload: string | object, options?: SignOptions): string {
+  public signAccessToken(payload: Payload, options?: SignOptions): string {
     return sign(payload, this.accessTokenSecret, options);
   }
 
@@ -37,7 +39,7 @@ export class JWTService {
    * @param {SignOptions} options Options for the token
    * @returns {string} JSON Web Token string
    */
-  public signRefreshToken(payload: string | object, options?: SignOptions): string {
+  public signRefreshToken(payload: { user_id: string }, options?: SignOptions): string {
     return sign(payload, this.refreshTokenSecret, options);
   }
 

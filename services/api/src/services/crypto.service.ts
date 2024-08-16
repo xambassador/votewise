@@ -59,10 +59,14 @@ export class CryptoService {
     return bcrypt.hash(password, 10);
   }
 
+  public async comparePassword(password: string, hash: string): Promise<boolean> {
+    return bcrypt.compare(password, hash);
+  }
+
   public getOtp(count = 6): number {
     const digits = "0123456789";
     let otp = "";
-    for (let i = 0; i <= count; i++) {
+    for (let i = 0; i < count; i++) {
       otp += digits[Math.floor(Math.random() * 10)];
     }
     return parseInt(otp, 10);

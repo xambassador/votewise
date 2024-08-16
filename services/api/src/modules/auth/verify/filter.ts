@@ -1,7 +1,7 @@
 import type { Request } from "express";
 
 import { InvalidInputError } from "@votewise/lib/errors";
-import { ZRegister } from "@votewise/schemas";
+import { ZVerifyEmail } from "@votewise/schemas";
 
 export class Filters {
   constructor() {}
@@ -10,7 +10,7 @@ export class Filters {
     const body = req.body;
     const query = req.query as null;
     const params = req.params as null;
-    const validate = ZRegister.safeParse(body);
+    const validate = ZVerifyEmail.safeParse(body);
     if (!validate.success) {
       const message = validate.error.errors[0].message;
       throw new InvalidInputError(message);

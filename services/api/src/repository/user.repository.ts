@@ -6,6 +6,7 @@ type Dependencies = {
 };
 
 type TCreate = Prisma.UserCreateInput;
+type TUpdate = Prisma.UserUpdateInput;
 
 export class UserRepository {
   private readonly db: Dependencies["db"];
@@ -23,7 +24,10 @@ export class UserRepository {
 
   async findOne() {}
 
-  async findById() {}
+  async findById(id: string) {
+    const user = await this.db.user.findUnique({ where: { id } });
+    return user;
+  }
 
   async findByEmail(email: string) {
     const user = await this.db.user.findUnique({ where: { email } });
@@ -35,7 +39,10 @@ export class UserRepository {
     return user;
   }
 
-  async update() {}
+  async update(id: string, data: TUpdate) {
+    const user = await this.db.user.update({ where: { id }, data });
+    return user;
+  }
 
   async delete() {}
 }

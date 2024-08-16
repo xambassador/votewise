@@ -3,6 +3,8 @@ import type { AppContext } from "@/context";
 import { Router } from "express";
 
 import { registerControllerFactory } from "./auth/register";
+import { singinControllerFactory } from "./auth/signin";
+import { verifyControllerFactory } from "./auth/verify";
 
 /**
  * This function creates a router for each module in the application and returns a single router instance that
@@ -16,5 +18,7 @@ export function moduleRouterFactory(basePath: string, ctx: AppContext) {
   const router = Router();
   const path = basePath + "/v1";
   router.post(path + "/auth/register", registerControllerFactory(ctx));
+  router.patch(path + "/auth/verify", verifyControllerFactory(ctx));
+  router.post(path + "/auth/signin", singinControllerFactory(ctx));
   return router;
 }

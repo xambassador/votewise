@@ -5,9 +5,8 @@
  */
 class ResourceNotFoundError extends Error {
   statusCode = 404;
-  constructor(resource: string, id?: string | number) {
-    const msg = id ? `${resource} with id ${id} not found` : `${resource} not found`;
-    super(msg);
+  constructor(message: string) {
+    super(message);
     this.name = "ResourceNotFoundError";
   }
 }

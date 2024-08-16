@@ -10,7 +10,7 @@ import { mockCache } from "@/storage/__mock__/redis";
 
 import { buildReq, buildRes, buildUser } from "../../../../test/helpers";
 import { Controller } from "./controller";
-import { RegisterFilters } from "./filter";
+import { Filters } from "./filter";
 
 const user = buildUser();
 const body = {
@@ -27,12 +27,12 @@ const createBody = {
   first_name: body.first_name,
   last_name: body.last_name
 };
-
+const assert = new Assertions();
 const controller = new Controller({
-  assert: new Assertions(),
+  assert,
   cache: mockCache,
   cryptoService: mockeCryptoService,
-  filters: new RegisterFilters(),
+  filters: new Filters(),
   tasksQueue: mockTaskQueue,
   userRepository: mockUserRepository
 });

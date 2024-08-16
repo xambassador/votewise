@@ -141,7 +141,7 @@ export class Cache {
   }
 
   /**
-   * Set a value in the cache with an expiry. Expiry is in seconds.
+   * Set a value in the cache with an expiry.
    *
    * @param {string} key - Cache key
    * @param {string | Buffer | number} value - Cache value
