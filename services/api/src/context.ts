@@ -13,6 +13,7 @@ import { Cache } from "@/storage/redis";
 import { checkEnv } from "@/utils";
 
 import { TasksQueue } from "./queues";
+import { SessionManager } from "./services/session.service";
 
 type Repositories = {
   user: UserRepository;
@@ -31,8 +32,9 @@ export type AppContextOptions = {
   cache: Cache;
   mailer: Mailer;
   repositories: Repositories;
-  jwtSerivce: JWTService;
+  jwtService: JWTService;
   cryptoService: CryptoService;
+  sessionManager: SessionManager;
   queues: Queue;
   assert: Assertions;
 };
@@ -52,6 +54,7 @@ export class AppContext {
   public cryptoService: CryptoService;
   public queues: Queue;
   public assert: Assertions;
+  public sessionManager: SessionManager;
 
   constructor(opts: AppContextOptions) {
     this.config = opts.config;
@@ -60,12 +63,13 @@ export class AppContext {
     this.db = opts.db;
     this.logger = opts.logger;
     this.environment = opts.environment;
-    this.jwtService = opts.jwtSerivce;
+    this.jwtService = opts.jwtService;
     this.repositories = opts.repositories;
     this.mailer = opts.mailer;
     this.cryptoService = opts.cryptoService;
     this.queues = opts.queues;
     this.assert = opts.assert;
+    this.sessionManager = opts.sessionManager;
   }
 
   static async fromConfig(
@@ -78,7 +82,7 @@ export class AppContext {
     const assert = new Assertions();
     const cache = new Cache();
     const db = prisma;
-    const jwtSerivce = new JWTService({
+    const jwtService = new JWTService({
       accessTokenSecret: secrets.jwtSecret,
       refreshTokenSecret: secrets.jwtRefreshSecret
     });
@@ -86,6 +90,7 @@ export class AppContext {
     const userRepository = new UserRepository({ db });
     const mailer = new Mailer({ env: environment });
     const tasksQueue = new TasksQueue({ env: environment });
+    const sessionManager = new SessionManager({ jwtService, cache, assert, cryptoService });
     const ctx = new AppContext({
       config: cfg,
       secrets,
@@ -93,10 +98,11 @@ export class AppContext {
       logger,
       environment,
       cache,
-      jwtSerivce,
+      jwtService,
       mailer,
       cryptoService,
       assert,
+      sessionManager,
       repositories: {
         user: userRepository
       },

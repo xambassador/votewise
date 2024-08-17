@@ -17,7 +17,7 @@ export function singinControllerFactory(ctx: AppContext) {
     jwtService: ctx.jwtService,
     cryptoService: ctx.cryptoService,
     assert: ctx.assert,
-    cache: ctx.cache
+    sessionManager: ctx.sessionManager
   });
   const exceptionLayer = new ExceptionLayer({ name: "signin", ctx });
   return exceptionLayer.catch(controller.handle.bind(controller));

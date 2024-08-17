@@ -1,15 +1,16 @@
 import type { User } from "@votewise/prisma/client";
 import type { Request, Response } from "express";
 
-export function buildReq({ ...overrides } = {}) {
+export function buildReq(overrides: Partial<Request> = {}) {
   const req = { body: {}, query: {}, params: {}, headers: {}, ...overrides };
   return req as Request;
 }
 
-export function buildRes(overrides = {}) {
+export function buildRes(overrides: Partial<Response> = {}) {
   const res: unknown = {
     json: jest.fn(() => res).mockName("json"),
     status: jest.fn(() => res).mockName("status"),
+    locals: {},
     ...overrides
   };
   return res as Response;

@@ -6,8 +6,6 @@ import { StatusCodes } from "http-status-codes";
 
 import { Minute } from "@votewise/lib/times";
 
-import { parseIp } from "@/lib/ip";
-
 type ControllerOptions = {
   userRepository: AppContext["repositories"]["user"];
   cryptoService: AppContext["cryptoService"];
@@ -24,11 +22,9 @@ export class Controller {
     this.ctx = opts;
   }
 
-  async handle<P, R, B, Q, L extends Record<string, unknown>>(req: Request<P, R, B, Q, L>, res: Response) {
-    const { body } = this.ctx.filters.parseRequest(req);
-    // We are behind a proxy. So, we can trust this header
-    const ipAddress = req.headers["x-forwarded-for"] || req.headers["x-real-ip"];
-    this.ctx.assert.invalidInput(!ipAddress, "Looks like you are behind a proxy or VPN");
+  async handle(req: Request, res: Response) {
+    const { body, locals } = this.ctx.filters.parseRequest(req, res);
+    const ip = locals.meta.ip;
 
     const user = await this.ctx.userRepository.findByEmail(body.email);
     this.ctx.assert.invalidInput(!!user, `${body.email} already exists`);
@@ -45,7 +41,6 @@ export class Controller {
       last_name: body.last_name
     });
 
-    const ip = parseIp(ipAddress!);
     const otp = this.ctx.cryptoService.getOtp();
     const verificationCode = this.ctx.cryptoService.generateUUID();
     const expiresIn = 5 * Minute;

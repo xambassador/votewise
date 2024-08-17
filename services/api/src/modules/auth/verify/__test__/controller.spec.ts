@@ -8,7 +8,7 @@ import { Filters } from "../filter";
 import * as helpers from "./helpers";
 
 const body = helpers.body;
-const headers = helpers.headers;
+const locals = helpers.locals;
 const controller = new Controller({
   assert: new Assertions(),
   cache: helpers.mockCache,
@@ -23,7 +23,7 @@ beforeEach(() => {
 describe("Verify Email Controller", () => {
   it("should throw error if body is invalid", async () => {
     const req = buildReq({ body: {} });
-    const res = buildRes();
+    const res = buildRes({ locals });
     helpers.setupHappyPath();
 
     const error = await controller.handle(req, res).catch((e) => e);
@@ -31,21 +31,9 @@ describe("Verify Email Controller", () => {
     expect(error.message).toBe("email is missing");
   });
 
-  it("should throw error if ip is invalid", async () => {
-    const req = buildReq({ body });
-    const res = buildRes();
-    helpers.setupHappyPath();
-
-    const error = await controller.handle(req, res).catch((e) => e);
-    expect(helpers.mockCache.get).not.toHaveBeenCalled();
-    expect(helpers.mockUserRepository.findById).not.toHaveBeenCalled();
-    expect(helpers.mockCache.del).not.toHaveBeenCalled();
-    expect(error.message).toBe("Looks like you are behind a proxy or VPN");
-  });
-
   it("should throw error if verification code is invalid", async () => {
-    const req = buildReq({ body, headers });
-    const res = buildRes();
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
     helpers.setupHappyPath();
     helpers.mockCache.get.mockResolvedValue(null);
 
@@ -57,8 +45,8 @@ describe("Verify Email Controller", () => {
   });
 
   it("should throw error if accessing session from different ip", async () => {
-    const req = buildReq({ body, headers: { "x-forwarded-for": "some-different-ip" } });
-    const res = buildRes();
+    const req = buildReq({ body });
+    const res = buildRes({ locals: { ...locals, meta: { ip: "some-different-ip" } } });
     helpers.setupHappyPath();
 
     const error = await controller.handle(req, res).catch((e) => e);
@@ -68,8 +56,8 @@ describe("Verify Email Controller", () => {
   });
 
   it("should throw error if user id is invalid", async () => {
-    const req = buildReq({ body: { ...body, user_id: "invalid_user_id" }, headers });
-    const res = buildRes();
+    const req = buildReq({ body: { ...body, user_id: "invalid_user_id" } });
+    const res = buildRes({ locals });
     helpers.setupHappyPath();
 
     const error = await controller.handle(req, res).catch((e) => e);
@@ -79,8 +67,8 @@ describe("Verify Email Controller", () => {
   });
 
   it("should throw error if otp is invalid", async () => {
-    const req = buildReq({ body: { ...body, otp: 127272111 }, headers });
-    const res = buildRes();
+    const req = buildReq({ body: { ...body, otp: 127272111 } });
+    const res = buildRes({ locals });
     helpers.setupHappyPath();
 
     const error = await controller.handle(req, res).catch((e) => e);
@@ -90,8 +78,8 @@ describe("Verify Email Controller", () => {
   });
 
   it("should throw error if user not found by it's user_id", async () => {
-    const req = buildReq({ body, headers });
-    const res = buildRes();
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
     helpers.setupHappyPath();
     helpers.mockUserRepository.findById.mockResolvedValue(null);
 
@@ -102,11 +90,8 @@ describe("Verify Email Controller", () => {
   });
 
   it("should throw error if email is invalid", async () => {
-    const req = buildReq({
-      body: { ...body, email: "invalid_email@gmail.com" },
-      headers
-    });
-    const res = buildRes();
+    const req = buildReq({ body: { ...body, email: "invalid_email@gmail.com" } });
+    const res = buildRes({ locals });
     helpers.setupHappyPath();
 
     const error = await controller.handle(req, res).catch((e) => e);
@@ -116,8 +101,8 @@ describe("Verify Email Controller", () => {
   });
 
   it("should throw error if email is already verified", async () => {
-    const req = buildReq({ body, headers });
-    const res = buildRes();
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
     helpers.setupHappyPath();
     helpers.mockUserRepository.findById.mockResolvedValueOnce(helpers.verifiedUser);
 
@@ -128,8 +113,8 @@ describe("Verify Email Controller", () => {
   });
 
   it("should verify email successfully", async () => {
-    const req = buildReq({ body, headers });
-    const res = buildRes();
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
     helpers.setupHappyPath();
 
     await controller.handle(req, res);

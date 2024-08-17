@@ -4,8 +4,6 @@ import type { Filters } from "./filter";
 
 import { StatusCodes } from "http-status-codes";
 
-import { parseIp } from "@/lib/ip";
-
 type ControllerOptions = {
   assert: AppContext["assert"];
   userRepository: AppContext["repositories"]["user"];
@@ -20,17 +18,15 @@ export class Controller {
     this.ctx = opts;
   }
 
-  public async handle<P, R, B, Q, L extends Record<string, unknown>>(req: Request<P, R, B, Q, L>, res: Response) {
-    const { body } = this.ctx.filters.parseRequest(req);
-    const ipAddress = req.headers["x-forwarded-for"] || req.headers["x-real-ip"];
-    this.ctx.assert.invalidInput(!ipAddress, "Looks like you are behind a proxy or VPN");
+  public async handle(req: Request, res: Response) {
+    const { body, locals } = this.ctx.filters.parseRequest(req, res);
+    const ip = locals.meta.ip;
 
     const _session = await this.ctx.cache.get(body.verification_code);
     this.ctx.assert.invalidInput(!_session, "Invalid verification_code");
 
     const session = JSON.parse(_session!) as { userId: string; otp: number; ip: string };
 
-    const ip = parseIp(ipAddress!);
     this.ctx.assert.invalidInput(!(session.ip === ip), "Invalid request");
     this.ctx.assert.invalidInput(!(session.userId === body.user_id), "Invalid user_id");
     this.ctx.assert.invalidInput(!(session.otp === body.otp), "Invalid otp");

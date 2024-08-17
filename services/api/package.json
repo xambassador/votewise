@@ -9,7 +9,7 @@
     "dev": "nodemon",
     "build": "rimraf dist && tsc --noEmit && node ./esbuild.config.js",
     "test": "NODE_ENV=test jest --silent --forceExit --detectOpenHandles",
-    "test:watch": "NODE_ENV=test jest --runInBand --silent --forceExit --watch",
+    "test:watch": "NODE_ENV=test jest --runInBand --forceExit --watch",
     "clean": "rimraf dist"
   },
   "dependencies": {

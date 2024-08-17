@@ -10,7 +10,7 @@ import * as helpers from "./helpers";
 
 const user = buildUser();
 const ip = "192.168.2.45";
-const headers = { "x-forwarded-for": ip };
+const locals = { meta: { ip } };
 const body = {
   email: user.email,
   password: "Johndoe@123",
@@ -34,19 +34,9 @@ beforeEach(() => {
 });
 
 describe("Register Controller", () => {
-  it("should throw error if IP address is invalid", async () => {
-    const req = buildReq({ body, headers: { "x-forwarded-for": "" } });
-    const res = buildRes();
-    helpers.setupHappyPath();
-
-    const error = await controller.handle(req, res).catch((e) => e);
-    expect(helpers.mockUserRepository.findByEmail).not.toHaveBeenCalled();
-    expect(error.message).toBe("Looks like you are behind a proxy or VPN");
-  });
-
   it("should throw error if request is invalid", async () => {
     const req = buildReq({ body: { email: "test" } });
-    const res = buildRes();
+    const res = buildRes({ locals });
     helpers.setupHappyPath();
 
     const error = await controller.handle(req, res).catch((e) => e);
@@ -55,8 +45,8 @@ describe("Register Controller", () => {
   });
 
   it("should throw error email already exists", async () => {
-    const req = buildReq({ body, headers });
-    const res = buildRes();
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
     helpers.setupHappyPath();
     helpers.mockUserRepository.findByEmail.mockResolvedValueOnce(user);
 
@@ -68,8 +58,8 @@ describe("Register Controller", () => {
   });
 
   it("should throw error if username already exists", async () => {
-    const req = buildReq({ body, headers });
-    const res = buildRes();
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
     helpers.setupHappyPath();
     helpers.mockUserRepository.findByUsername.mockResolvedValue(user);
 
@@ -80,8 +70,8 @@ describe("Register Controller", () => {
   });
 
   it("should create user and send verification email", async () => {
-    const req = buildReq({ body, headers });
-    const res = buildRes();
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
     const { otp, uuid: verificationCode } = helpers.setupHappyPath();
     const windowExpiryInMs = 5 * Minute;
     const data = JSON.stringify({ userId: user.id, otp, ip });

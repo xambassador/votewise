@@ -6,7 +6,7 @@ import { buildUser } from "../../../../../test/helpers";
 export const unverifiedUser = buildUser();
 export const verifiedUser = buildUser({ ...unverifiedUser, is_email_verify: true });
 export const ip = "192.12.2.45";
-export const headers = { "x-forwarded-for": ip };
+export const locals = { meta: { ip } };
 export const body = {
   email: unverifiedUser.email,
   user_id: unverifiedUser.id,

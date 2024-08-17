@@ -4,21 +4,26 @@ import type { envBaseSchema } from "@votewise/lib/environment";
 import type { User } from "@votewise/prisma/client";
 import type { z } from "zod";
 
-type RemovePassword<T> = Omit<T, "password">;
-type OriginalUser = RemovePassword<User>;
+export type Locals = {
+  meta: {
+    ip: string;
+  };
+  user: User;
+};
 
 declare global {
   namespace Express {
     interface Request {
-      session: {
-        user: OriginalUser;
-      };
       query: {
         limit?: number;
         offset?: number;
         token?: string;
         email?: string;
       };
+    }
+
+    interface Response {
+      locals: Locals;
     }
   }
 }

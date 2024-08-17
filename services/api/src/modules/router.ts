@@ -2,6 +2,7 @@ import type { AppContext } from "@/context";
 
 import { Router } from "express";
 
+import { refreshControllerFactory } from "./auth/refresh";
 import { registerControllerFactory } from "./auth/register";
 import { singinControllerFactory } from "./auth/signin";
 import { verifyControllerFactory } from "./auth/verify";
@@ -20,5 +21,6 @@ export function moduleRouterFactory(basePath: string, ctx: AppContext) {
   router.post(path + "/auth/register", registerControllerFactory(ctx));
   router.patch(path + "/auth/verify", verifyControllerFactory(ctx));
   router.post(path + "/auth/signin", singinControllerFactory(ctx));
+  router.post(path + "/auth/refresh", refreshControllerFactory(ctx));
   return router;
 }

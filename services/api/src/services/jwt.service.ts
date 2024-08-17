@@ -1,6 +1,6 @@
 import type { SignOptions } from "jsonwebtoken";
 
-import { sign, TokenExpiredError, verify } from "jsonwebtoken";
+import { decode, sign, TokenExpiredError, verify } from "jsonwebtoken";
 
 type JWTServiceOptions = {
   accessTokenSecret: string;
@@ -47,12 +47,12 @@ export class JWTService {
    * Verify the access token
    *
    * @param {string} token JSON Web Token string
-   * @returns {VerifyResult<T>} Result of the verification
+   * @returns {VerifyResult<Payload>} Result of the verification
    * @template T
    */
-  public verifyAccessToken<T>(token: string): VerifyResult<T> {
+  public verifyAccessToken(token: string): VerifyResult<Payload> {
     try {
-      const data = verify(token, this.accessTokenSecret) as T;
+      const data = verify(token, this.accessTokenSecret) as Payload;
       return { success: true, data };
     } catch (err) {
       return { success: false, error: this.handleError(err) };
@@ -63,16 +63,20 @@ export class JWTService {
    * Verify the refresh token
    *
    * @param {string} token JSON Web Token string
-   * @returns {VerifyResult<T>} Result of the verification
+   * @returns {VerifyResult<{user_id: string}>} Result of the verification
    * @template T
    */
-  public verifyRefreshToken<T>(token: string): VerifyResult<T> {
+  public verifyRefreshToken(token: string): VerifyResult<{ user_id: string }> {
     try {
-      const data = verify(token, this.refreshTokenSecret) as T;
+      const data = verify(token, this.refreshTokenSecret) as { user_id: string };
       return { success: true, data };
     } catch (err) {
       return { success: false, error: this.handleError(err) };
     }
+  }
+
+  public decodeAccessToken(token: string): Payload {
+    return decode(token) as Payload;
   }
 
   private handleError(err: unknown): Codes {

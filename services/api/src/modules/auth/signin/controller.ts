@@ -7,15 +7,13 @@ import { StatusCodes } from "http-status-codes";
 
 import { Minute } from "@votewise/lib/times";
 
-import { parseIp } from "@/lib/ip";
-
 type ControllerOptions = {
   filters: Filters;
   cryptoService: AppContext["cryptoService"];
   jwtService: AppContext["jwtService"];
   assert: AppContext["assert"];
-  cache: AppContext["cache"];
   strategies: Record<"email" | "username", Strategy>;
+  sessionManager: AppContext["sessionManager"];
 };
 
 export class Controller {
@@ -24,13 +22,10 @@ export class Controller {
     this.ctx = opts;
   }
 
-  public async handle<P, R, B, Q, L extends Record<string, unknown>>(req: Request<P, R, B, Q, L>, res: Response) {
-    const { body } = this.ctx.filters.parseRequest(req);
+  public async handle(req: Request, res: Response) {
+    const { body, locals } = this.ctx.filters.parseRequest(req, res);
     const { password, username, email } = body;
-
-    const ipAddress = req.headers["x-forwarded-for"] || req.headers["x-real-ip"];
-    this.ctx.assert.invalidInput(!ipAddress, "Looks like you are behind a proxy or VPN");
-    const ip = parseIp(ipAddress!);
+    const ip = locals.meta.ip;
 
     const { strategy, value, type } = this.getStrategy(email, username);
     const _user = await strategy.handle(value);
@@ -40,21 +35,13 @@ export class Controller {
     const isValid = await this.ctx.cryptoService.comparePassword(password, user.password);
     this.ctx.assert.invalidInput(!isValid, "Invalid password");
 
-    const sessionKeyPattern = `session:${user.id}:*`;
-    const sessionKeys = await this.ctx.cache.keys(sessionKeyPattern);
-    this.ctx.assert.badRequest(sessionKeys.length >= 3, `You have 3 active sessions, please logout from one of them`);
-
-    const sessionId = this.ctx.cryptoService.generateUUID();
-    const tokenData = { user_id: user.id, is_email_verified: user.is_email_verify, session_id: sessionId };
-    const accessToken = this.ctx.jwtService.signAccessToken(tokenData, { expiresIn: "15m" });
-    const refreshToken = this.ctx.jwtService.signRefreshToken({ user_id: user.id }, { expiresIn: "7d" });
-
-    const session = { ip, user_agent: req.headers["user-agent"] };
-    const key = `session:${user.id}:${sessionId}`;
-
-    // Setting expiry for 20 minutes, so client can refresh the token
-    await this.ctx.cache.hset(key, session);
-    await this.ctx.cache.expire(key, 20 * Minute);
+    await this.ctx.sessionManager.enforceSessionLimit(user.id);
+    const { accessToken, refreshToken } = await this.ctx.sessionManager.create({
+      userId: user.id,
+      ip,
+      isEmailVerified: user.is_email_verify,
+      userAgent: req.headers["user-agent"]
+    });
 
     return res
       .status(StatusCodes.OK)

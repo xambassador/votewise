@@ -22,6 +22,18 @@ export const ZOtp = z.number({ required_error: "otp is missing", invalid_type_er
 export const ZUserId = z
   .string({ required_error: "user_id is missing", invalid_type_error: "user_id must be a string" })
   .min(1, { message: "user_id is missing" });
+export const ZAccessToken = z
+  .string({
+    required_error: "access_token is missing",
+    invalid_type_error: "access_token must be a string"
+  })
+  .min(1, { message: "access_token is missing" });
+export const ZRefreshToken = z
+  .string({
+    required_error: "refresh_token is missing",
+    invalid_type_error: "refresh_token must be a string"
+  })
+  .min(1, { message: "refresh_token is missing" });
 
 export const ZRegister = z.object({
   email: ZEmail,
@@ -58,8 +70,14 @@ export const ZSignin = z
     return data;
   });
 
+export const ZRefresh = z.object({
+  access_token: ZAccessToken,
+  refresh_token: ZRefreshToken
+});
+
 export type TRegister = z.infer<typeof ZRegister>;
 export type TEmail = z.infer<typeof ZEmail>;
 export type TPassword = z.infer<typeof ZPassword>;
 export type TVerifyEmail = z.infer<typeof ZVerifyEmail>;
 export type TSignin = z.infer<typeof ZSignin>;
+export type TRefresh = z.infer<typeof ZRefresh>;

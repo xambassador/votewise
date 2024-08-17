@@ -1,4 +1,5 @@
-import type { Request } from "express";
+import type { Locals } from "@/types";
+import type { Request, Response } from "express";
 
 import { InvalidInputError } from "@votewise/lib/errors";
 import { ZRegister } from "@votewise/schemas";
@@ -6,15 +7,14 @@ import { ZRegister } from "@votewise/schemas";
 export class Filters {
   constructor() {}
 
-  public parseRequest<P, R, B, Q, L extends Record<string, unknown>>(req: Request<P, R, B, Q, L>) {
+  public parseRequest(req: Request, res: Response) {
     const body = req.body;
-    const query = req.query as null;
-    const params = req.params as null;
     const validate = ZRegister.safeParse(body);
     if (!validate.success) {
       const message = validate.error.errors[0].message;
       throw new InvalidInputError(message);
     }
-    return { body: validate.data, query, params, locals: null };
+    const locals = res.locals as Locals;
+    return { body: validate.data, query: null, params: null, locals };
   }
 }

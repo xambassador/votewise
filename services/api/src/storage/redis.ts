@@ -192,6 +192,24 @@ export class Cache {
   }
 
   /**
+   * Get the value of a hash field
+   * - _group_: hash
+   * - _complexity_: O(1)
+   */
+  public async hget(key: string, field: string) {
+    return await this.client.hget(key, field);
+  }
+
+  /**
+   * Get all the fields and values in a hash
+   * - _group_: hash
+   * - _complexity_: O(N) where N is the size of the hash.
+   */
+  public async hgetall(key: string) {
+    return await this.client.hgetall(key);
+  }
+
+  /**
    * Set a key's time to live in miliseconds
    * - _group_: generic
    * - _complexity_: O(1)

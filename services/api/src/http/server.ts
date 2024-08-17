@@ -5,11 +5,7 @@ import type { HttpTerminator } from "http-terminator";
 
 import http from "http";
 import https from "https";
-import chrona from "chrona";
-import compression from "compression";
-import cors from "cors";
-import express, { json } from "express";
-import helmet from "helmet";
+import express from "express";
 import { createHttpTerminator } from "http-terminator";
 
 import { getSSL } from "@/utils";
@@ -17,6 +13,7 @@ import { banner } from "@/utils/banner";
 
 import { AppContext } from "../context";
 import * as error from "./error";
+import { AppMiddleware } from "./middleware";
 import { AppRouter } from "./router";
 
 /* ----------------------------------------------------------------------------------------------- */
@@ -37,15 +34,11 @@ export class Server {
     const { cfg, secrets, overrides } = opts;
     const app = express();
     const ctx = await AppContext.fromConfig(cfg, secrets, overrides);
+    const middleware = new AppMiddleware(ctx);
     const routers = new AppRouter({ ctx });
     app.disable("x-powered-by");
     app.set("trust proxy", true);
-    app.use(chrona(":date :incoming :method :url :status :response-time :remote-address", (l) => ctx.logger.info(l)));
-    app.use(compression());
-    app.use(cors(cfg.cors));
-    app.use(helmet());
-    app.use(express.urlencoded({ extended: true }));
-    app.use(json({ limit: cfg.blobUploadLimit }));
+    app.use(middleware.register());
     app.use(routers.register());
     app.use(error.withAppContext(ctx).handler);
     return new Server({ app, ctx });

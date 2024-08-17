@@ -3,6 +3,8 @@ import { StatusCodes } from "http-status-codes";
 import { Assertions } from "@votewise/lib/errors";
 import { Minute } from "@votewise/lib/times";
 
+import { SessionManager } from "@/services/session.service";
+
 import { buildReq, buildRes } from "../../../../../test/helpers";
 import { Controller } from "../controller";
 import { Filters } from "../filter";
@@ -11,16 +13,22 @@ import * as helpers from "./helpers";
 
 const body = { email: "test@gmail.com", password: "password" };
 const userNameBody = { username: "test", password: "password" };
+const ip = "192.34.24.45";
+const locals = { meta: { ip } };
 const user = helpers.user;
-const ip = "192.168.2.45";
-const headers = { "x-forwarded-for": ip };
 
-const controller = new Controller({
+const sessionManager = new SessionManager({
   cache: helpers.mockCache,
+  jwtService: helpers.mockJWTService,
+  cryptoService: helpers.mockCryptoService,
+  assert: new Assertions()
+});
+const controller = new Controller({
   filters: new Filters(),
   cryptoService: helpers.mockCryptoService,
   jwtService: helpers.mockJWTService,
   assert: new Assertions(),
+  sessionManager,
   strategies: {
     email: new EmailStrategy({ userRepository: helpers.mockUserRepository }),
     username: new UsernameStrategy({ userRepository: helpers.mockUserRepository })
@@ -35,25 +43,16 @@ beforeEach(() => {
 describe("Signin Controller", () => {
   it("should throw error if body is invalid", async () => {
     const req = buildReq({ body: { password: "password" } });
-    const res = buildRes();
+    const res = buildRes({ locals });
 
     const error = await controller.handle(req, res).catch((e) => e);
     expect(helpers.mockUserRepository.findByEmail).not.toHaveBeenCalled();
     expect(error.message).toBe("email or username is required");
   });
 
-  it("should throw error if ip is invalid", async () => {
-    const req = buildReq({ body });
-    const res = buildRes();
-
-    const error = await controller.handle(req, res).catch((e) => e);
-    expect(helpers.mockUserRepository.findByEmail).not.toHaveBeenCalled();
-    expect(error.message).toBe("Looks like you are behind a proxy or VPN");
-  });
-
   it("should throw error if user is not found", async () => {
-    let req = buildReq({ body, headers });
-    const res = buildRes();
+    let req = buildReq({ body });
+    const res = buildRes({ locals });
 
     helpers.setupHappyPath();
     helpers.mockUserRepository.findByEmail.mockResolvedValue(null);
@@ -68,7 +67,7 @@ describe("Signin Controller", () => {
     helpers.mockUserRepository.findByEmail.mockClear();
     helpers.mockUserRepository.findByUsername.mockClear();
 
-    req = buildReq({ body: userNameBody, headers });
+    req = buildReq({ body: userNameBody });
     error = await controller.handle(req, res).catch((e) => e);
     expect(helpers.mockCryptoService.comparePassword).not.toHaveBeenCalled();
     expect(helpers.mockUserRepository.findByUsername).toHaveBeenCalledWith(userNameBody.username);
@@ -77,8 +76,8 @@ describe("Signin Controller", () => {
   });
 
   it("should throw error if password is invalid", async () => {
-    const req = buildReq({ body, headers });
-    const res = buildRes();
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
 
     helpers.setupHappyPath();
     helpers.mockCryptoService.comparePassword.mockResolvedValue(false);
@@ -90,8 +89,8 @@ describe("Signin Controller", () => {
   });
 
   it("should throw error if user has more then 3 active sessions", async () => {
-    const req = buildReq({ body, headers });
-    const res = buildRes();
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
 
     helpers.setupHappyPath();
     helpers.mockCache.keys.mockResolvedValue(["session:1:1", "session:1:2", "session:1:3"]);
@@ -103,8 +102,8 @@ describe("Signin Controller", () => {
   });
 
   it("should return access token, refresh token and create session", async () => {
-    const req = buildReq({ body, headers });
-    const res = buildRes();
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
     helpers.setupHappyPath();
 
     const key = `session:${user.id}:session_id`;
@@ -128,17 +127,17 @@ describe("Signin Controller", () => {
 
   describe("Signin strategy", () => {
     const controller = new Controller({
-      cache: helpers.mockCache,
       filters: new Filters(),
       cryptoService: helpers.mockCryptoService,
       jwtService: helpers.mockJWTService,
       assert: new Assertions(),
+      sessionManager,
       strategies: { email: helpers.mockEmailStrategy, username: helpers.mockUsernameStrategy }
     });
 
     it("should pick correct strategy", async () => {
-      const req = buildReq({ body, headers });
-      const res = buildRes();
+      const req = buildReq({ body });
+      const res = buildRes({ locals });
       helpers.setupHappyPath();
 
       await controller.handle(req, res);
