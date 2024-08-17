@@ -6,6 +6,8 @@ import { StatusCodes } from "http-status-codes";
 
 import { Minute } from "@votewise/lib/times";
 
+import { parseIp } from "@/lib/ip";
+
 type ControllerOptions = {
   userRepository: AppContext["repositories"]["user"];
   cryptoService: AppContext["cryptoService"];
@@ -38,10 +40,15 @@ export class Controller {
       last_name: body.last_name
     });
 
+    // We are behind a proxy. So, we can trust this header
+    const ipAddress = req.headers["x-forwarded-for"] || req.headers["x-real-ip"];
+    this.ctx.assert.invalidInput(!ipAddress, "Looks like you are behind a proxy or VPN");
+
+    const ip = parseIp(ipAddress!);
     const otp = this.ctx.cryptoService.getOtp();
     const verificationCode = this.ctx.cryptoService.generateUUID();
     const expiresIn = 5 * Minute;
-    const data = { userId: createdUser.id, otp };
+    const data = { userId: createdUser.id, otp, ip };
     await this.ctx.cache.setWithExpiry(verificationCode, JSON.stringify(data), expiresIn);
 
     this.ctx.tasksQueue.add({
@@ -59,7 +66,8 @@ export class Controller {
     return res.status(StatusCodes.CREATED).json({
       user_id: createdUser.id,
       verification_code: verificationCode,
-      expires_in: expiresIn
+      expires_in: expiresIn,
+      expires_in_unit: "ms"
     });
   }
 }

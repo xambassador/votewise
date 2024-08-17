@@ -2,7 +2,7 @@ import type { User } from "@votewise/prisma/client";
 import type { Request, Response } from "express";
 
 export function buildReq({ ...overrides } = {}) {
-  const req = { body: {}, query: {}, params: {}, ...overrides };
+  const req = { body: {}, query: {}, params: {}, headers: {}, ...overrides };
   return req as Request;
 }
 

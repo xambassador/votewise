@@ -19,7 +19,8 @@ const body = {
   otp: 123456
 };
 
-const session = { userId: body.user_id, otp: body.otp };
+const ip = "192.12.2.45";
+const session = { userId: body.user_id, otp: body.otp, ip };
 
 const controller = new Controller({
   assert: new Assertions(),
@@ -50,8 +51,26 @@ describe("Verify Email Controller", () => {
     expect(mockCache.get).toHaveBeenCalledWith(body.verification_code);
   });
 
+  it("should throw error if ip is invalid", async () => {
+    let req = buildReq({ body });
+    let res = buildRes();
+    mockCache.get.mockResolvedValueOnce(JSON.stringify(session));
+
+    let error = await controller.handle(req, res).catch((e) => e);
+    expect(error.message).toBe("Looks like you are behind a proxy or VPN");
+    expect(mockUserRepository.findById).not.toHaveBeenCalled();
+
+    req = buildReq({ body, headers: { "x-forwarded-for": "192.168.2.22" } });
+    res = buildRes();
+    mockCache.get.mockResolvedValueOnce(JSON.stringify(session));
+
+    error = await controller.handle(req, res).catch((e) => e);
+    expect(error.message).toBe("Invalid request");
+    expect(mockUserRepository.findById).not.toHaveBeenCalled();
+  });
+
   it("should throw error if user id is invalid", async () => {
-    const req = buildReq({ body: { ...body, user_id: "invalid_user_id" } });
+    const req = buildReq({ body: { ...body, user_id: "invalid_user_id" }, headers: { "x-forwarded-for": ip } });
     const res = buildRes();
     mockCache.get.mockResolvedValueOnce(JSON.stringify(session));
 
@@ -60,7 +79,7 @@ describe("Verify Email Controller", () => {
   });
 
   it("should throw error if otp is invalid", async () => {
-    const req = buildReq({ body: { ...body, otp: 127272111 } });
+    const req = buildReq({ body: { ...body, otp: 127272111 }, headers: { "x-forwarded-for": ip } });
     const res = buildRes();
     mockCache.get.mockResolvedValueOnce(JSON.stringify(session));
 
@@ -69,7 +88,7 @@ describe("Verify Email Controller", () => {
   });
 
   it("should throw error if user not found by it's user_id", async () => {
-    const req = buildReq({ body });
+    const req = buildReq({ body, headers: { "x-forwarded-for": ip } });
     const res = buildRes();
     mockCache.get.mockResolvedValueOnce(JSON.stringify(session));
     mockUserRepository.findById.mockResolvedValueOnce(null);
@@ -79,7 +98,7 @@ describe("Verify Email Controller", () => {
   });
 
   it("should throw error if email is invalid", async () => {
-    const req = buildReq({ body: { ...body, email: "invalid_email@gmail.com" } });
+    const req = buildReq({ body: { ...body, email: "invalid_email@gmail.com" }, headers: { "x-forwarded-for": ip } });
     const res = buildRes();
     mockCache.get.mockResolvedValueOnce(JSON.stringify(session));
     mockUserRepository.findById.mockResolvedValueOnce(unverifiedUser);
@@ -92,7 +111,7 @@ describe("Verify Email Controller", () => {
   });
 
   it("should throw error if email is already verified", async () => {
-    const req = buildReq({ body });
+    const req = buildReq({ body, headers: { "x-forwarded-for": ip } });
     const res = buildRes();
     mockCache.get.mockResolvedValueOnce(JSON.stringify(session));
     mockUserRepository.findById.mockResolvedValueOnce(verifiedUser);
@@ -104,7 +123,7 @@ describe("Verify Email Controller", () => {
   });
 
   it("should verify email successfully", async () => {
-    const req = buildReq({ body });
+    const req = buildReq({ body, headers: { "x-forwarded-for": ip } });
     const res = buildRes();
     mockCache.get.mockResolvedValueOnce(JSON.stringify(session));
     mockUserRepository.findById.mockResolvedValueOnce(unverifiedUser);
@@ -113,5 +132,10 @@ describe("Verify Email Controller", () => {
     expect(mockUserRepository.update).toHaveBeenCalledWith(body.user_id, { is_email_verify: true });
     expect(mockCache.del).toHaveBeenCalledWith(body.verification_code);
     expect(res.status).toHaveBeenCalledWith(StatusCodes.OK);
+    expect(res.json).toHaveBeenCalledWith({
+      user_id: unverifiedUser.id,
+      email: unverifiedUser.email,
+      is_email_verify: true
+    });
   });
 });

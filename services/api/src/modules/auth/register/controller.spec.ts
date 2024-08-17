@@ -67,12 +67,24 @@ describe("Register Controller", () => {
     expect(error.message).toBe(`Username ${body.username} already exists`);
   });
 
+  it("should throw error if IP address is invalid", async () => {
+    const req = buildReq({ body, headers: { "x-forwarded-for": "" } });
+    const res = buildRes();
+    mockUserRepository.findByEmail.mockResolvedValueOnce(null);
+    mockUserRepository.findByUsername.mockResolvedValueOnce(null);
+    mockUserRepository.create.mockResolvedValueOnce(user);
+    mockeCryptoService.hashPassword.mockResolvedValueOnce("hashed-password");
+
+    const error = await controller.handle(req, res).catch((e) => e);
+    expect(error.message).toBe("Looks like you are behind a proxy or VPN");
+  });
+
   it("should create user and send verification email", async () => {
-    const req = buildReq({ body });
+    const req = buildReq({ body, headers: { "x-forwarded-for": "192.168.2.43" } });
     const res = buildRes();
     const verificationWindowToken = "some-random-token";
     const windowExpiryInMs = 5 * Minute;
-    const data = JSON.stringify({ userId: user.id, otp: 123456 });
+    const data = JSON.stringify({ userId: user.id, otp: 123456, ip: "192.168.2.43" });
 
     mockUserRepository.findByEmail.mockResolvedValueOnce(null);
     mockUserRepository.findByUsername.mockResolvedValueOnce(null);
@@ -99,5 +111,11 @@ describe("Register Controller", () => {
       }
     });
     expect(res.status).toHaveBeenCalledWith(StatusCodes.CREATED);
+    expect(res.json).toHaveBeenCalledWith({
+      user_id: user.id,
+      verification_code: verificationWindowToken,
+      expires_in: windowExpiryInMs,
+      expires_in_unit: "ms"
+    });
   });
 });
