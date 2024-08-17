@@ -192,11 +192,12 @@ export class Cache {
   }
 
   /**
-   * Set a key's time to live in seconds
+   * Set a key's time to live in miliseconds
    * - _group_: generic
    * - _complexity_: O(1)
    */
-  public async expire(key: string, seconds: number) {
+  public async expire(key: string, ms: number) {
+    const seconds = Math.floor(ms / Milisecond);
     return await this.client.expire(key, seconds);
   }
 

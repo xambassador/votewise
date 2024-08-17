@@ -4,15 +4,16 @@ import type { AppContext } from "../context";
 import * as Errors from "@votewise/lib/errors";
 
 const errorTypes = [
+  Errors.ResourceNotFoundError,
+  Errors.InvalidInputError,
+  Errors.ValidationError,
+  Errors.BadRequestError,
+  Errors.UnknowError,
+  Errors.DatabaseError,
+  Errors.OperationNotAllowedError,
   Errors.AuthenticationError,
   Errors.AuthorizationError,
-  Errors.DatabaseError,
-  Errors.InternalServerError,
-  Errors.InvalidInputError,
-  Errors.OperationNotAllowedError,
-  Errors.ResourceNotFoundError,
-  Errors.ValidationError,
-  Errors.UnknowError
+  Errors.InternalServerError
 ];
 
 const INTERNAL_SERVER_ERROR = "InternalServerError";
