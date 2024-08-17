@@ -131,7 +131,9 @@ export class Cache {
   }
 
   /**
-   * Set a value in the cache
+   * Get the value of a key
+   * - _group_: string
+   * - _complexity_: O(1)
    *
    * @param {string} key - Cache key
    * @returns {Promise<string | null>} Cached value or null
@@ -141,7 +143,9 @@ export class Cache {
   }
 
   /**
-   * Set a value in the cache with an expiry.
+   * Set the string value of a key with an expiry
+   * - _group_: string
+   * - _complexity_: O(1)
    *
    * @param {string} key - Cache key
    * @param {string | Buffer | number} value - Cache value
@@ -154,7 +158,9 @@ export class Cache {
   }
 
   /**
-   * Set a value in the cache.
+   * Set the string value of a key
+   * - _group_: string
+   * - _complexity_: O(1)
    *
    * @param {string} key - Cache key
    * @param {string | Buffer | number} value - Cache value
@@ -165,12 +171,41 @@ export class Cache {
   }
 
   /**
-   * Delete a key from the cache
+   * Delete a key
+   * - _group_: generic
+   * - _complexity_: O(N) where N is the number of keys that will be removed. When a key to remove holds a value other than a string, the individual complexity for this key is O(M) where M is the number of elements in the list, set, sorted set or hash. Removing a single key that holds a string value is O(1).
    *
    * @param {string} key - Cache key
    * @returns {Promise<number>} Number of keys deleted
    */
   public async del(key: string) {
     return this.client.del(key);
+  }
+
+  /**
+   * Set the string value of a hash field
+   * - _group_: hash
+   * - _complexity_: O(1) for each field/value pair added, so O(N) to add N field/value pairs when the command is called with multiple field/value pairs.
+   */
+  public async hset(key: string, object: object) {
+    return await this.client.hset(key, object);
+  }
+
+  /**
+   * Set a key's time to live in seconds
+   * - _group_: generic
+   * - _complexity_: O(1)
+   */
+  public async expire(key: string, seconds: number) {
+    return await this.client.expire(key, seconds);
+  }
+
+  /**
+   * Find all keys matching the given pattern
+   * - _group_: generic
+   * - _complexity_: O(N) with N being the number of keys in the database, under the assumption that the key names in the database and the given pattern have limited length.
+   */
+  public async keys(pattern: string) {
+    return await this.client.keys(pattern);
   }
 }

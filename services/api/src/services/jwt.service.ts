@@ -10,7 +10,7 @@ type JWTServiceOptions = {
 type Codes = "TOKEN_EXPIRED" | "MALFORMED_TOKEN";
 type VerifyResult<T> = { success: true; data: T } | { success: false; error: Codes };
 
-export type Payload = { user_id: string; is_email_verified: boolean; email: string; username: string };
+export type Payload = { user_id: string; is_email_verified: boolean; session_id: string };
 
 export class JWTService {
   private readonly accessTokenSecret: string;

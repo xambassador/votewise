@@ -6,5 +6,8 @@ export const mockCache = {
   set: jest.fn().mockName("set"),
   get: jest.fn().mockName("get"),
   setWithExpiry: jest.fn().mockName("setWithExpiry"),
-  del: jest.fn().mockName("del")
+  del: jest.fn().mockName("del"),
+  hset: jest.fn().mockName("hset"),
+  expire: jest.fn().mockName("expire"),
+  keys: jest.fn().mockName("keys")
 } as unknown as jest.Mocked<Cache>;

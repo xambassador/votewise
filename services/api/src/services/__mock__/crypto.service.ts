@@ -1,6 +1,6 @@
 import type { CryptoService } from "../crypto.service";
 
-export const mockeCryptoService = {
+export const mockCryptoService = {
   symmetricEncrypt: jest.fn().mockName("cryptoService.symmetricEncrypt"),
   symmetricDecrypt: jest.fn().mockName("cryptoService.symmetricDecrypt"),
   generateRandomKey: jest.fn().mockName("cryptoService.generateRandomKey"),

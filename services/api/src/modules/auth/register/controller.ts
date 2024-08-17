@@ -26,8 +26,13 @@ export class Controller {
 
   async handle<P, R, B, Q, L extends Record<string, unknown>>(req: Request<P, R, B, Q, L>, res: Response) {
     const { body } = this.ctx.filters.parseRequest(req);
+    // We are behind a proxy. So, we can trust this header
+    const ipAddress = req.headers["x-forwarded-for"] || req.headers["x-real-ip"];
+    this.ctx.assert.invalidInput(!ipAddress, "Looks like you are behind a proxy or VPN");
+
     const user = await this.ctx.userRepository.findByEmail(body.email);
-    this.ctx.assert.invalidInput(!!user, "Email already exists");
+    this.ctx.assert.invalidInput(!!user, `${body.email} already exists`);
+
     const username = await this.ctx.userRepository.findByUsername(body.username);
     this.ctx.assert.invalidInput(!!username, `Username ${body.username} already exists`);
 
@@ -39,10 +44,6 @@ export class Controller {
       first_name: body.first_name,
       last_name: body.last_name
     });
-
-    // We are behind a proxy. So, we can trust this header
-    const ipAddress = req.headers["x-forwarded-for"] || req.headers["x-real-ip"];
-    this.ctx.assert.invalidInput(!ipAddress, "Looks like you are behind a proxy or VPN");
 
     const ip = parseIp(ipAddress!);
     const otp = this.ctx.cryptoService.getOtp();
