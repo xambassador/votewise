@@ -27,6 +27,7 @@ export class Controller {
 
     const sessionKey = this.ctx.sessionManager.getSessionKey(access_token.user_id, access_token.session_id);
     const sessionIp = await this.ctx.sessionManager.getFieldFromSession(sessionKey, "ip");
+    this.ctx.assert.badRequest(!sessionIp, "Invalid credentials");
     this.ctx.assert.badRequest(sessionIp !== ip, "Invalid request");
 
     const _user = await this.ctx.useRepository.findById(access_token.user_id);

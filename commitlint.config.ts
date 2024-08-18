@@ -33,7 +33,8 @@ const Configuration: UserConfig = {
         "release",
         "init"
       ]
-    ]
+    ],
+    "body-max-line-length": [2, "always", 500]
   }
 };
 

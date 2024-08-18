@@ -69,6 +69,16 @@ describe("Refresh Controller", () => {
     expect(error.message).toBe("Invalid request");
   });
 
+  it("should throw error if old tokens are used after refresh", async () => {
+    const req = buildReq({ body: { access_token: helpers.accessToken, refresh_token: helpers.refreshToken } });
+    const res = buildRes({ locals: helpers.locals });
+    helpers.setupHappyPath();
+    helpers.mockCache.hget.mockResolvedValue(null);
+    const error = await controller.handle(req, res).catch((e) => e);
+    expect(helpers.mockUserRepository.findById).not.toHaveBeenCalled();
+    expect(error.message).toBe("Invalid credentials");
+  });
+
   it("should throw error if user not found", async () => {
     const req = buildReq({ body: { access_token: helpers.accessToken, refresh_token: helpers.refreshToken } });
     const res = buildRes({ locals: helpers.locals });
