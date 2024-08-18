@@ -79,6 +79,10 @@ export const ZForgotPassword = z.object({
   email: ZEmail
 });
 
+export const ZResetPassword = z.object({
+  password: ZPassword
+});
+
 export type TRegister = z.infer<typeof ZRegister>;
 export type TEmail = z.infer<typeof ZEmail>;
 export type TPassword = z.infer<typeof ZPassword>;
@@ -86,3 +90,4 @@ export type TVerifyEmail = z.infer<typeof ZVerifyEmail>;
 export type TSignin = z.infer<typeof ZSignin>;
 export type TRefresh = z.infer<typeof ZRefresh>;
 export type TForgotPassword = z.infer<typeof ZForgotPassword>;
+export type TResetPassword = z.infer<typeof ZResetPassword>;
