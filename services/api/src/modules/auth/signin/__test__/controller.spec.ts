@@ -109,11 +109,12 @@ describe("Signin Controller", () => {
     const key = `session:${user.id}:session_id`;
     const session = { ip, user_agent: req.headers["user-agent"] };
     const accessToken = { user_id: user.id, is_email_verified: user.is_email_verify, session_id: "session_id" };
+    const refreshToken = { user_id: user.id, session_id: "session_id" };
 
     await controller.handle(req, res);
 
     expect(helpers.mockJWTService.signAccessToken).toHaveBeenCalledWith(accessToken, { expiresIn: "15m" });
-    expect(helpers.mockJWTService.signRefreshToken).toHaveBeenCalledWith({ user_id: user.id }, { expiresIn: "7d" });
+    expect(helpers.mockJWTService.signRefreshToken).toHaveBeenCalledWith(refreshToken, { expiresIn: "7d" });
     expect(helpers.mockCache.hset).toHaveBeenCalledWith(key, session);
     expect(helpers.mockCache.expire).toHaveBeenCalledWith(key, 20 * Minute);
     expect(res.json).toHaveBeenCalledWith({

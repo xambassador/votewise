@@ -22,19 +22,19 @@ export class Controller {
 
   public async handle(req: Request, res: Response) {
     const { body, locals } = this.ctx.filters.parseRequest(req, res);
-    const { access_token } = this.ctx.filters.parseTokens(body);
+    const { refresh_token } = this.ctx.filters.parseTokens(body);
     const ip = locals.meta.ip;
 
-    const sessionKey = this.ctx.sessionManager.getSessionKey(access_token.user_id, access_token.session_id);
+    const sessionKey = this.ctx.sessionManager.getSessionKey(refresh_token.user_id, refresh_token.session_id);
     const sessionIp = await this.ctx.sessionManager.getFieldFromSession(sessionKey, "ip");
     this.ctx.assert.badRequest(!sessionIp, "Invalid credentials");
     this.ctx.assert.badRequest(sessionIp !== ip, "Invalid request");
 
-    const _user = await this.ctx.useRepository.findById(access_token.user_id);
-    this.ctx.assert.resourceNotFound(!_user, `User with id ${access_token.user_id} not found`);
+    const _user = await this.ctx.useRepository.findById(refresh_token.user_id);
+    this.ctx.assert.resourceNotFound(!_user, `User with id ${refresh_token.user_id} not found`);
     const user = _user!;
 
-    await this.ctx.sessionManager.delete(access_token.user_id, access_token.session_id);
+    await this.ctx.sessionManager.delete(refresh_token.user_id, refresh_token.session_id);
     const { accessToken, refreshToken } = await this.ctx.sessionManager.create({
       userId: user.id,
       isEmailVerified: user.is_email_verify,

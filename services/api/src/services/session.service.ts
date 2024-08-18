@@ -36,8 +36,9 @@ export class SessionManager {
     const { userAgent, userId, isEmailVerified, ip } = opts;
     const sessionId = this.ctx.cryptoService.generateUUID();
     const tokenData = { user_id: userId, is_email_verified: isEmailVerified, session_id: sessionId };
+    const refreshTokenData = { user_id: userId, session_id: sessionId };
     const accessToken = this.ctx.jwtService.signAccessToken(tokenData, { expiresIn: "15m" });
-    const refreshToken = this.ctx.jwtService.signRefreshToken({ user_id: userId }, { expiresIn: "7d" });
+    const refreshToken = this.ctx.jwtService.signRefreshToken(refreshTokenData, { expiresIn: "7d" });
 
     const session: SessionData = { ip, user_agent: userAgent };
     const key = this.getSessionKey(userId, sessionId);

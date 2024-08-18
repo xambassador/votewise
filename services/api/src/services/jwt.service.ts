@@ -11,6 +11,7 @@ type Codes = "TOKEN_EXPIRED" | "MALFORMED_TOKEN";
 type VerifyResult<T> = { success: true; data: T } | { success: false; error: Codes };
 
 export type Payload = { user_id: string; is_email_verified: boolean; session_id: string };
+export type RefreshTokenPayload = { user_id: string; session_id: string };
 
 export class JWTService {
   private readonly accessTokenSecret: string;
@@ -39,7 +40,7 @@ export class JWTService {
    * @param {SignOptions} options Options for the token
    * @returns {string} JSON Web Token string
    */
-  public signRefreshToken(payload: { user_id: string }, options?: SignOptions): string {
+  public signRefreshToken(payload: RefreshTokenPayload, options?: SignOptions): string {
     return sign(payload, this.refreshTokenSecret, options);
   }
 
@@ -68,7 +69,7 @@ export class JWTService {
    */
   public verifyRefreshToken(token: string): VerifyResult<{ user_id: string }> {
     try {
-      const data = verify(token, this.refreshTokenSecret) as { user_id: string };
+      const data = verify(token, this.refreshTokenSecret) as RefreshTokenPayload;
       return { success: true, data };
     } catch (err) {
       return { success: false, error: this.handleError(err) };

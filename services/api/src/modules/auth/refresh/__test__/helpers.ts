@@ -12,7 +12,7 @@ export const locals = { meta: { ip } };
 export const jwtService = new JWTService({ accessTokenSecret: "secret", refreshTokenSecret: "secret" });
 const tokenData = { user_id: user.id, session_id: "session_id", is_email_verified: true };
 export const accessToken = jwtService.signAccessToken(tokenData);
-export const refreshToken = jwtService.signRefreshToken({ user_id: user.id });
+export const refreshToken = jwtService.signRefreshToken({ user_id: user.id, session_id: "session_id" });
 
 export function setupHappyPath() {
   mockUserRepository.findById.mockResolvedValue(user);

@@ -108,7 +108,7 @@ describe("Refresh Controller", () => {
       { expiresIn: "15m" }
     );
     expect(helpers.mockJWTService.signRefreshToken).toHaveBeenCalledWith(
-      { user_id: helpers.user.id },
+      { user_id: helpers.user.id, session_id },
       { expiresIn: "7d" }
     );
     expect(helpers.mockCache.hset).toHaveBeenCalledWith(key, {
