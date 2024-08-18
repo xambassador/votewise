@@ -116,3 +116,5 @@ packages/prisma/zod
 !.yarn/versions
 !.yarn/cache
 .pnp.*
+
+diff.txt

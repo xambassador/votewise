@@ -22,7 +22,7 @@ export function buildNext(impl: () => void) {
 
 export function buildUser(overrides: Partial<User> = {}): User {
   return {
-    id: "some-random-id",
+    id: "clzy0090n000013gtnqrebopz",
     email: "johndoe@gmail.com",
     user_name: "john_doe",
     password: "hashed-password",

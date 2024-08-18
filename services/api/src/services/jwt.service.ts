@@ -79,6 +79,19 @@ export class JWTService {
     return decode(token) as Payload;
   }
 
+  public signRid(payload: { verification_code: string; email: string }, options?: SignOptions): string {
+    return sign(payload, this.accessTokenSecret, options);
+  }
+
+  public verifyRid(token: string): VerifyResult<{ verification_code: string; email: string }> {
+    try {
+      const data = verify(token, this.accessTokenSecret) as { verification_code: string; email: string };
+      return { success: true, data };
+    } catch (err) {
+      return { success: false, error: this.handleError(err) };
+    }
+  }
+
   private handleError(err: unknown): Codes {
     if (err instanceof TokenExpiredError) {
       return "TOKEN_EXPIRED";

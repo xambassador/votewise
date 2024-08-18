@@ -71,4 +71,8 @@ export class CryptoService {
     }
     return parseInt(otp, 10);
   }
+
+  public hash(data: string): string {
+    return crypto.createHash("sha256").update(data).digest("hex");
+  }
 }

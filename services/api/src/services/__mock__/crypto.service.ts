@@ -10,5 +10,6 @@ export const mockCryptoService = {
   generateApiKey: jest.fn().mockName("cryptoService.generateApiKey"),
   hashPassword: jest.fn().mockName("cryptoService.hashPassword"),
   getOtp: jest.fn().mockName("cryptoService.getOtp"),
-  comparePassword: jest.fn().mockName("cryptoService.comparePassword")
+  comparePassword: jest.fn().mockName("cryptoService.comparePassword"),
+  hash: jest.fn().mockName("cryptoService.hash")
 } as jest.Mocked<CryptoService>;

@@ -10,7 +10,18 @@ type BaseData = {
 };
 type SignupTemplate = BaseData & { templateName: "signup"; locals: { otp: number } };
 type WelcomeTemplate = BaseData & { templateName: "welcome"; locals: { userName: string } };
-export type EmailJob = SignupTemplate | WelcomeTemplate;
+type ForgotPasswordTemplate = BaseData & {
+  templateName: "forgot-password";
+  locals: {
+    firstName: string;
+    expiresIn: number;
+    expiresInUnit: "hours" | "minutes";
+    clientUrl: string;
+    token: string;
+    ip: string;
+  };
+};
+export type EmailJob = SignupTemplate | WelcomeTemplate | ForgotPasswordTemplate;
 
 type EmailProcessorOptions = {
   logger: AppContext["logger"];

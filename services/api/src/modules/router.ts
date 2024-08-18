@@ -2,6 +2,7 @@ import type { AppContext } from "@/context";
 
 import { Router } from "express";
 
+import { forgotPasswordControllerFactory } from "./auth/forgot-password";
 import { refreshControllerFactory } from "./auth/refresh";
 import { registerControllerFactory } from "./auth/register";
 import { singinControllerFactory } from "./auth/signin";
@@ -22,5 +23,6 @@ export function moduleRouterFactory(basePath: string, ctx: AppContext) {
   router.patch(path + "/auth/verify", verifyControllerFactory(ctx));
   router.post(path + "/auth/signin", singinControllerFactory(ctx));
   router.post(path + "/auth/refresh", refreshControllerFactory(ctx));
+  router.post(path + "/auth/forgot-password", forgotPasswordControllerFactory(ctx));
   return router;
 }

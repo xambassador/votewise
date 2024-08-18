@@ -61,6 +61,8 @@ export class ServerConfig {
   public cors?: Cors;
   public ssl?: SSL;
   public jwt: JWT;
+  public appUrl: string;
+  public bucketUrl: string;
 
   constructor(cfg: ServerConfig) {
     this.port = cfg.port;
@@ -75,5 +77,7 @@ export class ServerConfig {
     this.cors = cfg.cors;
     this.ssl = cfg.ssl;
     this.jwt = cfg.jwt;
+    this.appUrl = cfg.appUrl;
+    this.bucketUrl = cfg.bucketUrl;
   }
 }
