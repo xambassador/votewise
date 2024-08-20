@@ -42,6 +42,7 @@ export function buildUser(overrides: Partial<User> = {}): User {
     gender: "MALE",
     facebook_profile_url: null,
     updated_at: new Date(),
+    secret: "clzy0090n000013gtnqrebopz",
     ...overrides
   };
 }

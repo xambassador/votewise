@@ -31,7 +31,9 @@ export class Controller {
 
     const user = _user!;
     const verificationCode = this.ctx.cryptoService.hash(`${user.id}:${ip}`);
-    const ridToken = this.ctx.jwtService.signRid({ email, verification_code: verificationCode }, { expiresIn: "5m" });
+    const data = { email, verification_code: verificationCode };
+    const key = user.secret;
+    const ridToken = this.ctx.jwtService.signRid(data, key, { expiresIn: "5m" });
     this.ctx.tasksQueue.add({
       name: "email",
       payload: {
@@ -44,7 +46,8 @@ export class Controller {
           expiresInUnit: "minutes",
           expiresIn: 5,
           clientUrl: this.ctx.appUrl,
-          ip
+          ip,
+          email
         }
       }
     });

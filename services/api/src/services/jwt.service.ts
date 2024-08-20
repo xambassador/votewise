@@ -12,6 +12,7 @@ type VerifyResult<T> = { success: true; data: T } | { success: false; error: Cod
 
 export type Payload = { user_id: string; is_email_verified: boolean; session_id: string };
 export type RefreshTokenPayload = { user_id: string; session_id: string };
+export type RidPayload = { verification_code: string; email: string };
 
 export class JWTService {
   private readonly accessTokenSecret: string;
@@ -80,13 +81,13 @@ export class JWTService {
     return decode(token) as Payload;
   }
 
-  public signRid(payload: { verification_code: string; email: string }, options?: SignOptions): string {
-    return sign(payload, this.accessTokenSecret, options);
+  public signRid(payload: RidPayload, key: string, options?: SignOptions): string {
+    return sign(payload, key, options);
   }
 
-  public verifyRid(token: string): VerifyResult<{ verification_code: string; email: string }> {
+  public verifyRid(token: string, key: string): VerifyResult<RidPayload> {
     try {
-      const data = verify(token, this.accessTokenSecret) as { verification_code: string; email: string };
+      const data = verify(token, key) as RidPayload;
       return { success: true, data };
     } catch (err) {
       return { success: false, error: this.handleError(err) };

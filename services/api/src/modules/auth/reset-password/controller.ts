@@ -21,25 +21,32 @@ export class Controller {
 
   public async handle(req: Request, res: Response) {
     const { body, query, locals } = this.ctx.filters.parseRequest(req, res);
-    const { password } = body;
+    const { password, email: unsafeEmail } = body;
     const { token } = query;
     const { ip } = locals.meta;
 
-    const decoded = this.ctx.jwtService.verifyRid(token);
+    const _userFromUnsafeEmail = await this.ctx.userRepository.findByEmail(unsafeEmail);
+    this.ctx.assert.resourceNotFound(!_userFromUnsafeEmail, `User with email ${unsafeEmail} not found`);
+    const userFromUnsafeEmail = _userFromUnsafeEmail!;
+
+    const decoded = this.ctx.jwtService.verifyRid(token, userFromUnsafeEmail.secret);
     if (!decoded.success) {
       return this.ctx.assert.badRequest(true, "Invalid token");
     }
 
     const { email, verification_code } = decoded.data;
-    const _user = await this.ctx.userRepository.findByEmail(email);
-    this.ctx.assert.resourceNotFound(!_user, `User with email ${email} not found`);
-    const user = _user!;
+    this.ctx.assert.badRequest(email !== unsafeEmail, "Invalid email");
+
+    const user = userFromUnsafeEmail!;
 
     const hash = this.ctx.cryptoService.hash(`${user.id}:${ip}`);
     this.ctx.assert.badRequest(hash !== verification_code, "Invalid verification code");
 
     const hashedPassword = await this.ctx.cryptoService.hashPassword(password);
-    await this.ctx.userRepository.update(user.id, { password: hashedPassword });
+    await this.ctx.userRepository.update(user.id, {
+      password: hashedPassword,
+      secret: this.ctx.cryptoService.generateUUID()
+    });
 
     return res.status(StatusCodes.OK).json({ message: "Password updated successfully" });
   }

@@ -19,6 +19,7 @@ type ForgotPasswordTemplate = BaseData & {
     clientUrl: string;
     token: string;
     ip: string;
+    email: string;
   };
 };
 export type EmailJob = SignupTemplate | WelcomeTemplate | ForgotPasswordTemplate;

@@ -80,7 +80,8 @@ export const ZForgotPassword = z.object({
 });
 
 export const ZResetPassword = z.object({
-  password: ZPassword
+  password: ZPassword,
+  email: ZEmail
 });
 
 export type TRegister = z.infer<typeof ZRegister>;

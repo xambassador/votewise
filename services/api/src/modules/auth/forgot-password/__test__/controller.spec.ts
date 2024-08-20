@@ -66,10 +66,13 @@ describe("Forgot Password Controller", () => {
           expiresInUnit: "minutes",
           expiresIn: 5,
           clientUrl: "http://localhost:3000",
-          ip: locals.meta.ip
+          ip: locals.meta.ip,
+          email: user.email
         }
       }
     };
+    const data = { email: user.email, verification_code: verificationCode };
+    const key = user.secret;
 
     mockUserRepository.findByEmail.mockResolvedValueOnce(user);
     mockJWTService.signRid.mockReturnValue(ridToken);
@@ -78,13 +81,7 @@ describe("Forgot Password Controller", () => {
     await controller.handle(req, res);
 
     expect(mockCryptoService.hash).toHaveBeenCalledWith(`${user.id}:${ip}`);
-    expect(mockJWTService.signRid).toHaveBeenCalledWith(
-      {
-        email: user.email,
-        verification_code: verificationCode
-      },
-      { expiresIn: "5m" }
-    );
+    expect(mockJWTService.signRid).toHaveBeenCalledWith(data, key, { expiresIn: "5m" });
     expect(mockTaskQueue.add).toHaveBeenCalledWith(queueData);
   });
 });
