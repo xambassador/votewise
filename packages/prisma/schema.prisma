@@ -85,6 +85,7 @@ model User {
     password              String
     first_name            String
     last_name             String
+    secret                String    @default(uuid())
     about                 String?
     twitter_profile_url   String?
     facebook_profile_url  String?
@@ -113,7 +114,6 @@ model User {
     groupMembers     GroupMember[]
     groupInvitations GroupInvitation[]
     notification     Notification[]
-    refreshTokens    RefreshToken[]
 }
 
 model Post {
@@ -313,17 +313,6 @@ model Notification {
     is_read    Boolean          @default(false)
 
     user_id String
-    user    User   @relation(fields: [user_id], references: [id])
-
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
-}
-
-model RefreshToken {
-    id    String @id @default(cuid())
-    token String @db.VarChar(255)
-
-    user_id String @unique
     user    User   @relation(fields: [user_id], references: [id])
 
     created_at DateTime @default(now())
