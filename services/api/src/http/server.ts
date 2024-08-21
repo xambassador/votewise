@@ -13,7 +13,7 @@ import { banner } from "@/utils/banner";
 
 import { AppContext } from "../context";
 import * as error from "./error";
-import { AppMiddleware } from "./middleware";
+import { AppMiddleware } from "./middlewares";
 import { AppRouter } from "./router";
 
 /* ----------------------------------------------------------------------------------------------- */
