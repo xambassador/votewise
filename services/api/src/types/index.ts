@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 
+import type { Payload as AccessTokenData } from "@/services/jwt.service";
 import type { envBaseSchema } from "@votewise/lib/environment";
-import type { User } from "@votewise/prisma/client";
 import type { z } from "zod";
 
+export type SessionUser = { email: string; username: string };
 export type Locals = {
-  meta: {
-    ip: string;
-  };
-  user: User;
+  meta: { ip: string };
+  session: { user: SessionUser; accessToken: AccessTokenData };
 };
 
 declare global {

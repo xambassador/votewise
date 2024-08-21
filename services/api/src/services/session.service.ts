@@ -15,11 +15,9 @@ type Create = {
   ip: string;
   userAgent?: string;
 };
-type SessionData = {
-  ip: string;
-  user_agent?: string;
-};
+type SessionData = { ip: string; user_agent?: string };
 type SessionFields = "ip" | "user_agent";
+type User = { email: string; username: string };
 
 export class SessionManager {
   private readonly ctx: SessionManagerOptions;
@@ -30,6 +28,10 @@ export class SessionManager {
 
   public getSessionKey(userId: string, sessionId: string) {
     return `session:${userId}:${sessionId}`;
+  }
+
+  public getUserDataKey(userId: string) {
+    return `session:${userId}:data`;
   }
 
   public async create(opts: Create) {
@@ -52,7 +54,8 @@ export class SessionManager {
 
   public async delete(userId: string, sessionId: string) {
     const key = this.getSessionKey(userId, sessionId);
-    await this.ctx.cache.del(key);
+    const userKey = this.getUserDataKey(userId);
+    await Promise.all([this.ctx.cache.del(key), this.ctx.cache.del(userKey)]);
   }
 
   public async deleteAll(userId: string) {
@@ -74,5 +77,16 @@ export class SessionManager {
 
   public async getFieldFromSession(key: string, field: SessionFields) {
     return this.ctx.cache.hget(key, field);
+  }
+
+  public async getUserFromSession(userId: string) {
+    const key = this.getUserDataKey(userId);
+    const data = await this.ctx.cache.get(key);
+    return data ? (JSON.parse(data) as User) : null;
+  }
+
+  public async setUserToSession(userId: string, user: User) {
+    const key = this.getUserDataKey(userId);
+    return this.ctx.cache.set(key, JSON.stringify(user));
   }
 }
