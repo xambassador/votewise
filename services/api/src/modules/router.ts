@@ -11,6 +11,7 @@ import { registerControllerFactory } from "./auth/register";
 import { resetPasswordControllerFactory } from "./auth/reset-password";
 import { singinControllerFactory } from "./auth/signin";
 import { verifyControllerFactory } from "./auth/verify";
+import { listSessionsControllerFactory } from "./user/sessions/list";
 
 /**
  * This function creates a router for each module in the application and returns a single router instance that
@@ -32,5 +33,6 @@ export function moduleRouterFactory(basePath: string, ctx: AppContext) {
   router.post(path + "/auth/forgot-password", forgotPasswordControllerFactory(ctx));
   router.patch(path + "/auth/reset-password", resetPasswordControllerFactory(ctx));
   router.delete(path + "/auth/logout", auth, logoutControllerFactory(ctx));
+  router.get(path + "/user/sessions", auth, listSessionsControllerFactory(ctx));
   return router;
 }

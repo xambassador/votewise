@@ -31,7 +31,7 @@ export class SessionManager {
   }
 
   public getUserDataKey(userId: string) {
-    return `session:${userId}:data`;
+    return `session:data:${userId}`;
   }
 
   public async create(opts: Create) {
@@ -73,6 +73,19 @@ export class SessionManager {
   public async getSession(userId: string, sessionId: string) {
     const key = this.getSessionKey(userId, sessionId);
     return this.ctx.cache.hgetall(key) as Promise<SessionData>;
+  }
+
+  public async getSessions(userId: string) {
+    const sessionKeyPattern = `session:${userId}:*`;
+    const sessionKeys = await this.ctx.cache.keys(sessionKeyPattern);
+    const sessions: ({ id: string } & SessionData)[] = [];
+    for (const key of sessionKeys) {
+      const sessionId = key.split(":")[2];
+      const data = (await this.ctx.cache.hgetall(key)) as SessionData;
+      if (!data || Object.keys(data).length === 0) continue;
+      sessions.push({ id: sessionId, ip: data.ip, user_agent: data.user_agent });
+    }
+    return sessions;
   }
 
   public async getFieldFromSession(key: string, field: SessionFields) {
