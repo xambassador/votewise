@@ -11,7 +11,7 @@ const nextConfig = bundleAnalyzer({
   output: "standalone",
   eslint: { dirs: ["."] },
   poweredByHeader: false,
-  transpilePackages: ["ui", "@votewise/ui"],
+  transpilePackages: ["@votewise/ui"],
   logging: {
     fetches: {
       fullUrl: true

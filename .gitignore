@@ -118,3 +118,7 @@ packages/prisma/zod
 .pnp.*
 
 diff.txt
+
+.nx/cache
+/.nx
+apps/web/app/ui-preview

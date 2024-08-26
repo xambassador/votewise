@@ -1,0 +1,50 @@
+{
+  "targetDefaults": {
+    "dev": {},
+    "build": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/./apps/web/.next"]
+    },
+    "start": {
+      "dependsOn": []
+    },
+    "lint": {
+      "cache": true,
+      "dependsOn": ["^lint"]
+    },
+    "lint:fix": {
+      "dependsOn": []
+    },
+    "db:generate": {
+      "dependsOn": []
+    },
+    "db:migrate": {
+      "dependsOn": []
+    },
+    "db:studio": {
+      "dependsOn": []
+    },
+    "db:seed": {
+      "dependsOn": []
+    },
+    "db:deploy": {
+      "dependsOn": []
+    },
+    "db:clean": {
+      "dependsOn": []
+    },
+    "seed": {
+      "dependsOn": []
+    },
+    "clean": {
+      "dependsOn": []
+    },
+    "test": {
+      "dependsOn": []
+    },
+    "test:watch": {
+      "dependsOn": []
+    }
+  }
+}

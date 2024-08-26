@@ -5,7 +5,8 @@
     "start": "node dist/server.js",
     "build": "rimraf dist && tsc && node ./esbuild.config.js",
     "dev": "nodemon",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist node_modules",
+    "clean:build": "rimraf dist"
   },
   "dependencies": {
     "@votewise/lib": "*",

@@ -65,7 +65,6 @@ module.exports = {
     "no-unmodified-loop-condition": "error",
     "no-unreachable-loop": "error",
     "no-unused-private-class-members": "error",
-    "capitalized-comments": "error",
     "consistent-return": "error",
     "dot-notation": "error",
     "func-style": ["error", "declaration", { allowArrowFunctions: true }],
@@ -86,12 +85,7 @@ module.exports = {
     "react/self-closing-comp": ["error", { component: true, html: true }],
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off", // We use typescript
-    "no-restricted-imports": [
-      "error",
-      {
-        patterns: [".*"]
-      }
-    ],
+    "no-restricted-imports": "off",
     "@next/next/no-html-link-for-pages": "off"
   },
   overrides: [

@@ -10,7 +10,8 @@
     "build": "rimraf dist && tsc --noEmit && node ./esbuild.config.js",
     "test": "NODE_ENV=test jest --silent --forceExit --detectOpenHandles",
     "test:watch": "NODE_ENV=test jest --runInBand --silent --forceExit --watch",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist node_modules",
+    "clean:build": "rimraf dist"
   },
   "dependencies": {
     "@types/crypto-js": "^4.2.2",
