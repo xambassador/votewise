@@ -57,7 +57,7 @@ export function ProgressBar(props: ProgressBarProps) {
   return (
     <circle
       {...props}
-      className={cn("text-blue-500", props.className)}
+      className={cn("text-blue-700", props.className)}
       stroke="currentColor"
       fill="none"
       strokeWidth="8"
