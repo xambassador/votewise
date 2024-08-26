@@ -1,0 +1,68 @@
+"use client";
+
+import { forwardRef, useId } from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { FormProvider, useForm, useFormContext } from "react-hook-form";
+
+import { cn } from "@votewise/lib/classnames";
+
+import { createContext } from "./context";
+import { Label } from "./label";
+
+const [Context, useContext] = createContext<{ id: string; name: string }>("Form");
+
+export { useForm, useFormContext };
+export const Form = FormProvider;
+
+function useFormField(name: string) {
+  const ctx = useContext(name);
+  const { getFieldState, formState } = useFormContext();
+  const fieldState = getFieldState(ctx.name, formState);
+  return { id: ctx.id, name: ctx.name, ...fieldState };
+}
+
+type FormFieldProps = React.HTMLAttributes<HTMLDivElement> & { name: string };
+export const FormField = forwardRef<HTMLDivElement, FormFieldProps>((props, ref) => {
+  const { name, ...rest } = props;
+  const id = useId();
+  return (
+    <Context id={id} name={name}>
+      <div {...rest} className={cn("flex flex-col gap-3", rest.className)} ref={ref} />
+    </Context>
+  );
+});
+FormField.displayName = "FormField";
+
+type FormLabelProps = React.ComponentPropsWithoutRef<typeof Label>;
+type LabelRef = React.ElementRef<typeof Label>;
+export const FormLabel = forwardRef<LabelRef, FormLabelProps>((props, ref) => {
+  const { error, id } = useFormField("FormLabel");
+  return <Label ref={ref} htmlFor={id} {...props} data-is-error={error ? true : false} />;
+});
+FormLabel.displayName = "FormLabel";
+
+type FormControlProps = React.ComponentPropsWithoutRef<typeof Slot>;
+type FormControlRef = React.ElementRef<typeof Slot>;
+export const FormControl = forwardRef<FormControlRef, FormControlProps>((props, ref) => {
+  const { id, error } = useFormField("FormControl");
+  return <Slot {...props} ref={ref} id={id} data-has-error={error ? true : false} aria-invalid={!!error} />;
+});
+FormControl.displayName = "FormControl";
+
+type FormMessageProps = React.HTMLAttributes<HTMLParagraphElement>;
+export const FormMessage = forwardRef<HTMLParagraphElement, FormMessageProps>((props, ref) => {
+  const { error } = useFormField("FormMessage");
+  const message = error ? error.message : null;
+  if (!message) return null;
+  return (
+    <p
+      ref={ref}
+      data-is-error={error ? true : false}
+      {...props}
+      className={cn("text-sm text-red-500", props.className)}
+    >
+      {message}
+    </p>
+  );
+});
+FormMessage.displayName = "FormMessage";

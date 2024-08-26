@@ -1,0 +1,25 @@
+{
+  "name": "@votewise/ui",
+  "version": "1.0.0",
+  "private": true,
+  "sideEffects": false,
+  "exports": {
+    "./*": "./src/*.tsx"
+  },
+  "dependencies": {
+    "@floating-ui/react": "^0.26.23",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@votewise/lib": "*",
+    "class-variance-authority": "^0.7.0",
+    "framer-motion": "^11.3.30",
+    "react": "^18.3.1",
+    "react-hook-form": "^7.53.0"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.4",
+    "@votewise/config": "*",
+    "@votewise/tsconfig": "*",
+    "typescript": "^5.5.4"
+  }
+}
