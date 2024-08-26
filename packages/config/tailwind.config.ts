@@ -50,6 +50,9 @@ const config = {
       height: {
         15: "3.75rem" // 60px
       },
+      width: {
+        15: "3.75rem" // 60px
+      },
       boxShadow: {
         "input-ring": "0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color), 0 0 0 4px var(--tw-ring-color)"
       },
@@ -62,6 +65,15 @@ const config = {
       },
       lineHeight: {
         11: "2.75rem"
+      },
+      keyframes: {
+        "caret-blink": {
+          "0%,70%,100%": { opacity: "1" },
+          "20%,50%": { opacity: "0" }
+        }
+      },
+      animation: {
+        "caret-blink": "caret-blink 1.25s ease-out infinite"
       }
     }
   },
