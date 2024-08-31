@@ -170,6 +170,7 @@ try {
   environment = validateEnv(process.env);
 } catch (err) {
   // Silently fail this error, We will validate environment variables using validateEnv function
+  environment = {} as TEnv;
 }
 
 export { environment };
