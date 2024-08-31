@@ -1,0 +1,71 @@
+{
+  "compilerOptions": {
+    // Base options
+    "esModuleInterop": true,
+    "skipLibCheck": true, // skip all type checks for .d.ts files
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "allowJs": true,
+    "target": "ES2022",
+
+    // Strictness
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": false,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "useUnknownInCatchVariables": true,
+    // Emit
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "checkJs": false,
+    // Interop Constraints
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    // Language and Environment
+    "jsx": "preserve",
+    "useDefineForClassFields": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": false,
+    // Projects
+    "composite": true,
+    "incremental": true
+  },
+  "include": [],
+  "references": [
+    // Backend
+    {
+      "path": "./services/api"
+    },
+    {
+      "path": "./services/upload"
+    },
+    // frontend
+    {
+      "path": "./apps/web"
+    },
+    // shared
+    {
+      "path": "./packages/lib"
+    },
+    {
+      "path": "./packages/ui"
+    },
+    {
+      "path": "./packages/prisma"
+    },
+    {
+      "path": "./packages/schemas"
+    }
+  ],
+  "files": [],
+  "exclude": ["node_modules", "dist"]
+}

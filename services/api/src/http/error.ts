@@ -51,9 +51,6 @@ export const handler: ErrorRequestHandler = (err, req, res, next) => {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const withAppContext = (_ctx: AppContext) => {
-  const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-    return handler(err, req, res, next);
-  };
-
+  const errorHandler: ErrorRequestHandler = (err, req, res, next) => handler(err, req, res, next);
   return { handler: errorHandler };
 };

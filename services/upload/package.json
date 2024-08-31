@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "start": "node dist/server.js",
+    "lint": "eslint ./src --ext .ts",
     "build": "rimraf dist && tsc && node ./esbuild.config.js",
     "dev": "nodemon",
     "clean": "rimraf dist node_modules",

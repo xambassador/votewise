@@ -6,6 +6,6 @@
     "resolveJsonModule": true,
     "lib": ["DOM", "DOM.Iterable"]
   },
-  "include": ["."],
+  "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["dist", "build", "node_modules"]
 }
