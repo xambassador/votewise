@@ -83,6 +83,11 @@ export const ZResetPassword = z.object({
   password: ZPassword,
   email: ZEmail
 });
+export const ZResetPasswordQuery = z.object({
+  token: z
+    .string({ required_error: "token is missing", invalid_type_error: "token must be a string" })
+    .min(1, { message: "token is missing" })
+});
 
 export type TRegister = z.infer<typeof ZRegister>;
 export type TEmail = z.infer<typeof ZEmail>;
@@ -92,3 +97,4 @@ export type TSignin = z.infer<typeof ZSignin>;
 export type TRefresh = z.infer<typeof ZRefresh>;
 export type TForgotPassword = z.infer<typeof ZForgotPassword>;
 export type TResetPassword = z.infer<typeof ZResetPassword>;
+export type TResetPasswordQuery = z.infer<typeof ZResetPasswordQuery>;

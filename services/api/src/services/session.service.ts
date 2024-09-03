@@ -83,7 +83,7 @@ export class SessionManager {
       const sessionId = key.split(":")[2];
       const data = (await this.ctx.cache.hgetall(key)) as SessionData;
       if (!data || Object.keys(data).length === 0) continue;
-      sessions.push({ id: sessionId, ip: data.ip, user_agent: data.user_agent });
+      sessions.push({ id: sessionId!, ip: data.ip, user_agent: data.user_agent });
     }
     return sessions;
   }

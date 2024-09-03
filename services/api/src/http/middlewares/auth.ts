@@ -18,6 +18,10 @@ export function authMiddlewareFactory(ctx: AppContext) {
       throw new AuthenticationError("Invalid authorization header");
     }
 
+    if (!token) {
+      throw new AuthenticationError("Token is missing");
+    }
+
     const validate = ctx.jwtService.verifyAccessToken(token);
     if (!validate.success) {
       throw new AuthenticationError("Unauthorized");

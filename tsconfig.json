@@ -22,19 +22,23 @@
     "noUnusedParameters": true,
     "noPropertyAccessFromIndexSignature": false,
     "useUnknownInCatchVariables": true,
+
     // Emit
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
     "checkJs": false,
+
     // Interop Constraints
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
+
     // Language and Environment
     "jsx": "preserve",
     "useDefineForClassFields": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": false,
+
     // Projects
     "composite": true,
     "incremental": true

@@ -3,7 +3,7 @@ import type { AppContext } from "../context";
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 
-import { moduleRouterFactory } from "@/modules/router";
+import { moduleRouterFactory } from "@/core/router";
 
 type AppRouterOptions = {
   ctx: AppContext;

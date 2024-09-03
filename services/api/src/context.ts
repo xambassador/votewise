@@ -1,5 +1,7 @@
 import type { ServerConfig, ServerSecrets } from "@/configs";
 import type { TEnv } from "@votewise/lib/environment";
+import type { JWTPlugin } from "./plugins/jwt";
+import type { RequestParserPlugin } from "./plugins/request-parser";
 
 import { Assertions } from "@votewise/lib/errors";
 import logger from "@votewise/lib/logger";
@@ -12,6 +14,8 @@ import { JWTService } from "@/services/jwt.service";
 import { Cache } from "@/storage/redis";
 import { checkEnv } from "@/utils";
 
+import { jwtPluginFactory } from "./plugins/jwt";
+import { requestParserPluginFactory } from "./plugins/request-parser";
 import { TasksQueue } from "./queues";
 import { SessionManager } from "./services/session.service";
 
@@ -21,6 +25,11 @@ type Repositories = {
 
 type Queue = {
   tasksQueue: TasksQueue;
+};
+
+type Plugins = {
+  requestParser: RequestParserPlugin;
+  jwt: JWTPlugin;
 };
 
 export type AppContextOptions = {
@@ -37,6 +46,7 @@ export type AppContextOptions = {
   sessionManager: SessionManager;
   queues: Queue;
   assert: Assertions;
+  plugins: Plugins;
 };
 
 export class AppContext {
@@ -55,6 +65,7 @@ export class AppContext {
   public queues: Queue;
   public assert: Assertions;
   public sessionManager: SessionManager;
+  public plugins: Plugins;
 
   constructor(opts: AppContextOptions) {
     this.config = opts.config;
@@ -70,6 +81,7 @@ export class AppContext {
     this.queues = opts.queues;
     this.assert = opts.assert;
     this.sessionManager = opts.sessionManager;
+    this.plugins = opts.plugins;
   }
 
   static async fromConfig(
@@ -91,6 +103,8 @@ export class AppContext {
     const mailer = new Mailer({ env: environment });
     const tasksQueue = new TasksQueue({ env: environment });
     const sessionManager = new SessionManager({ jwtService, cache, assert, cryptoService });
+    const requestParser = requestParserPluginFactory();
+    const jwtPlugin = jwtPluginFactory({ jwtService });
     const ctx = new AppContext({
       config: cfg,
       secrets,
@@ -107,6 +121,7 @@ export class AppContext {
         user: userRepository
       },
       queues: { tasksQueue },
+      plugins: { requestParser, jwt: jwtPlugin },
       ...(overrides ?? {})
     });
     this._instance = ctx;
