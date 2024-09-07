@@ -3,6 +3,7 @@
 import type { TSinginForm } from "../_utils";
 
 import Link from "next/link";
+import { routes } from "@/lib/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@votewise/ui/button";
@@ -37,13 +38,13 @@ export function SignInForm() {
         </FormField>
       </div>
 
-      <Link href="/forgot" className="font-medium text-sm text-gray-500 w-fit">
+      <Link href={routes.auth.forgot()} className="font-medium text-sm text-gray-500 w-fit">
         Forgot?
       </Link>
 
       <div className="flex items-center justify-between">
         <Button asChild variant="secondary">
-          <Link role="button" href="/signup">
+          <Link role="button" href={routes.auth.signUp()}>
             Back
           </Link>
         </Button>
