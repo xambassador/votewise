@@ -18,7 +18,7 @@ export class Controller {
     this.ctx = opts.ctx;
   }
 
-  public async handle<P, R, B, Q, L extends Record<string, unknown>>(req: Request<P, R, B, Q, L>, res: Response) {
+  public async handle(req: Request, res: Response) {
     const { fileToken, startingByte } = this.parseHeaders(req);
     const bb = busboy({ headers: req.headers });
 

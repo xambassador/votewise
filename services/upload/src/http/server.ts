@@ -5,7 +5,7 @@ import http from "http";
 import chrona from "chrona";
 import compression from "compression";
 import cors from "cors";
-import express, { json } from "express";
+import express, { json, urlencoded } from "express";
 import helmet from "helmet";
 import { createHttpTerminator } from "http-terminator";
 
@@ -36,7 +36,7 @@ export class Server {
     app.use(compression());
     app.use(cors(cfg.cors));
     app.use(helmet());
-    app.use(express.urlencoded({ extended: true }));
+    app.use(urlencoded({ extended: true }));
     app.use(json({ limit: cfg.blobUploadLimit }));
     app.use(router.register());
     app.use(error.withAppContext(ctx).handler);

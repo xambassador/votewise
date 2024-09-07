@@ -1,29 +1,32 @@
 import type { AppContext } from "@/context";
 import type { Request, Response } from "express";
-import type { DeleteFilters } from "./filter";
 
 import fs from "node:fs/promises";
 import { StatusCodes } from "http-status-codes";
+import { z } from "zod";
 
 import { ResourceNotFoundError } from "@votewise/lib/errors";
 
 type ControllerOptions = {
   ctx: AppContext;
-  filters: DeleteFilters;
 };
+
+const ZQuery = z.object({
+  file_name: z.string({ required_error: "file_name is missing" }).min(1, { message: "file_name is missing" })
+});
+const ZBody = z.object({}).optional();
 
 export class Controller {
   private readonly ctx: AppContext;
-  private readonly filters: DeleteFilters;
 
   constructor(opts: ControllerOptions) {
     this.ctx = opts.ctx;
-    this.filters = opts.filters;
   }
 
-  public async handle<P, R, B, Q, L extends Record<string, unknown>>(req: Request<P, R, B, Q, L>, res: Response) {
-    const { body } = this.filters.parseRequest(req);
-    const { fileName, token } = body;
+  public async handle(req: Request, res: Response) {
+    const token = req.params.token as string;
+    const { query } = this.ctx.plugins.requestParser.getParser(ZBody, ZQuery).parseRequest(req);
+    const { file_name: fileName } = query;
     const path = this.ctx.getBlobPath(fileName, token);
     await this.deleteFile(path);
     return res.status(StatusCodes.OK).json({ message: "File deleted successfully" });

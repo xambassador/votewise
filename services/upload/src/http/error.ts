@@ -30,7 +30,7 @@ class ErrorResponse {
   }
 }
 
-export const handler: ErrorRequestHandler = (err, req, res, next) => {
+export const handler: ErrorRequestHandler = (err, _req, res, next) => {
   // to avoid sending headers twice
   if (res.headersSent) {
     return next(err);
