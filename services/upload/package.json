@@ -2,9 +2,9 @@
   "name": "@votewise/upload",
   "version": "0.0.0",
   "scripts": {
-    "start": "node dist/server.js",
+    "start": "node dist/src/index.js",
     "lint": "eslint ./src --ext .ts",
-    "build": "rimraf dist && tsc && node ./esbuild.config.js",
+    "build": "rimraf dist && tsc && tsc-alias",
     "dev": "nodemon",
     "clean": "rimraf dist node_modules",
     "clean:build": "rimraf dist"
@@ -31,6 +31,7 @@
     "@votewise/tsconfig": "*",
     "nodemon": "^3.1.4",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.10",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.5.4"
   }
