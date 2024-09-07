@@ -3,11 +3,25 @@
   "private": true,
   "version": "0.0.0",
   "sideEffects": false,
-  "main": "index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "client",
-    "zod"
+    "zod",
+    "dist"
   ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./client/index.d.ts"
+    },
+    "./runtime": {
+      "types": "./runtime/index.d.ts"
+    }
+  },
   "scripts": {
     "db:generate": "prisma generate && prisma format",
     "db:migrate": "yarn prisma migrate dev",
@@ -16,7 +30,10 @@
     "db:deploy": "yarn prisma migrate deploy",
     "db:clean": "ts-node --transpile-only ./cleanDb.ts",
     "seed": "ts-node --transpile-only ./seed.ts",
-    "clean": "rimraf --glob ./dist ./zod ./node_modules"
+    "clean": "rimraf --glob ./dist ./zod ./node_modules",
+    "clean:build": "rm -rf dist",
+    "dev": "rm -rf dist && tsup --watch",
+    "build": "rm -rf ./dist && tsup"
   },
   "devDependencies": {
     "@types/node": "^20.16.1",
@@ -29,6 +46,7 @@
     "slug": "^9.1.0",
     "slugify": "^1.6.6",
     "ts-node": "^10.9.2",
+    "tsup": "^8.2.4",
     "typescript": "^5.5.4"
   },
   "dependencies": {
@@ -39,5 +57,17 @@
   },
   "prisma": {
     "seed": "ts-node --transpile-only ./seed.ts"
+  },
+  "tsup": {
+    "entry": [
+      "./index.ts"
+    ],
+    "format": [
+      "cjs",
+      "esm"
+    ],
+    "sourcemap": true,
+    "dts": true,
+    "clean": true
   }
 }

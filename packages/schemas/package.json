@@ -3,7 +3,31 @@
   "description": "Votewise zod schemas",
   "version": "0.0.0",
   "private": true,
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./auth": {
+      "import": "./dist/auth.mjs",
+      "require": "./dist/auth.js"
+    },
+    "./upload": {
+      "import": "./dist/upload.mjs",
+      "require": "./dist/upload.js"
+    }
+  },
+  "scripts": {
+    "dev": "rm -rf dist && tsup --watch",
+    "build": "tsup",
+    "clean:build": "rm -rf dist",
+    "clean": "rm -rf dist node_modules"
+  },
   "dependencies": {
     "@votewise/config": "*",
     "@votewise/tsconfig": "*",
@@ -11,6 +35,21 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@votewise/config": "*"
+    "@votewise/config": "*",
+    "tsup": "^8.2.4"
+  },
+  "tsup": {
+    "entry": [
+      "./src/index.ts",
+      "./src/auth.ts",
+      "./src/upload.ts"
+    ],
+    "format": [
+      "cjs",
+      "esm"
+    ],
+    "sourcemap": true,
+    "dts": true,
+    "clean": true
   }
 }
