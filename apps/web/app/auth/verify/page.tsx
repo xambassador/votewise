@@ -19,7 +19,7 @@ export default function Page() {
         </InputOTPGroup>
       </InputOTP>
 
-      <Timer time={60000 * 5} />
+      <Timer time={60000 * 1} />
 
       <Button>Submit</Button>
     </div>

@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "web:build": "lerna exec --scope @votewise/web -- yarn build",
+    "web:dev": "lerna exec --scope @votewise/web -- yarn dev",
     "api:start": "lerna exec --scope @votewise/api -- yarn start",
     "api:dev": "lerna exec --stream --parallel --no-sort --scope @votewise/lib --scope @votewise/prisma --scope @votewise/schema --scope @votewise/api -- yarn dev",
     "api:build": "lerna exec --scope @votewise/api -- yarn build",
@@ -25,7 +26,7 @@
     "db:deploy": "lerna exec --scope @votewise/prisma -- yarn run db:deploy",
     "clean": "lerna run clean --parallel",
     "clean:build": "lerna run clean:build --parallel",
-    "dev": "lerna run dev --stream --parallel",
+    "dev": "lerna run dev --stream",
     "start": "lerna run start --stream",
     "build": "lerna run build --stream",
     "graph": "nx graph",
