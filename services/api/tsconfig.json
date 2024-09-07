@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.json",
+  "ts-node": {
+    "files": true,
+    "require": ["tsconfig-paths/register"],
+    "experimentalResolverFeatures": true,
+    "compilerOptions": {
+      "module": "NodeNext",
+      "types": ["node"]
+    }
+  },
+  "compilerOptions": {
+    "verbatimModuleSyntax": false,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules", "dist", "**/node_modules/*"]
+}

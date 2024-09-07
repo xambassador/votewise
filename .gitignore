@@ -34,11 +34,12 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # local env files
+.env
+.env.*
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-.env.*
 !.env.example
 !.env.appStore.example
 
@@ -103,7 +104,21 @@ packages/static-server/public/**/*.gif
 packages/static-server/public/**/*.svg
 packages/static-server/public/**/*.ico
 
+# Prisma generated files
 .prisma/
+packages/prisma/zod
 
-todo.txt
-TODO
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/patches
+!.yarn/sdks
+!.yarn/versions
+!.yarn/cache
+.pnp.*
+
+diff.txt
+
+.nx/cache
+/.nx
+apps/web/app/ui-preview

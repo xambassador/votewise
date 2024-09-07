@@ -3,20 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/components/*": ["components/*"],
-      "@/assets/*": ["assets/*"],
-      "@/styles/*": ["styles/*"],
-      "@/hooks/*": ["lib/hooks/*"],
-      "@/routes/*": ["routes/*"],
-      "@/store/*": ["lib/store/*"],
-      "@/services/*": ["services/*"],
-      "@/server/*": ["server/*"],
-      "@/types/*": ["types/*"],
-      "@/lib/*": ["lib/*"],
-      "@/config/*": ["config/*"],
-      "@votewise/ui/*": ["@votewise/ui/*"]
+      "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }

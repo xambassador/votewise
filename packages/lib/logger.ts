@@ -1,116 +1,38 @@
-import chalk from "chalk";
-import dotenv from "dotenv";
-import { isArray, isEmpty, isObject, isString } from "lodash";
+/* eslint-disable no-console */
+
+import { isArray, isObject, isString } from "lodash";
 import pino from "pino";
-import winston from "winston";
-
-dotenv.config();
-
-const pinoInit = pino({
-  level: process.env.LOG_LEVEL || "info",
-  transport: {
-    target: "pino-pretty",
-    options: {
-      translateTime: "SYS:standard",
-      ignore: "pid,hostname",
-      colorize: true,
-      crlf: true,
-      levelFirst: true,
-      messageFormat: false,
-      messageKey: "message",
-      timestampKey: "time",
-      base: null,
-      search: null,
-    },
-  },
-});
-
-type LoggerLevel = "info" | "error" | "warn" | "debug";
-
-/**
- * @deprecated
- */
-const logger = (text: unknown, level: LoggerLevel = "info") => {
-  const isTestEnv = process.env.NODE_ENV === "test";
-  if (isTestEnv) {
-    return;
-  }
-  switch (level) {
-    case "info":
-      pinoInit.info(text);
-      break;
-    case "error":
-      pinoInit.error(text);
-      break;
-    case "warn":
-      pinoInit.warn(text);
-      break;
-    case "debug":
-      pinoInit.debug(text);
-      break;
-    default:
-      pinoInit.info(text);
-      break;
-  }
-};
-
-export { logger };
 
 const isProduction = process.env.NODE_ENV === "production";
-const logLevel = process.env.LOG_LEVEL || "info";
-
-type LogCategory =
-  | "LIFECYCLE"
-  | "HTTP"
-  | "COMMANDS"
-  | "WORKER"
-  | "TASK"
-  | "PROCESSOR"
-  | "EMAIL"
-  | "QUEUE"
-  | "WEBSOCKETS"
-  | "DATABASE"
-  | "MASTER"
-  | "UTILS";
 
 type Extra = Record<string, unknown>;
 
 class Logger {
-  output: winston.Logger;
+  output: pino.Logger;
 
-  public constructor() {
-    this.output = winston.createLogger({
-      level: ["error", "warn", "info", "http", "verbose", "debug", "silly"].includes(logLevel)
-        ? logLevel
-        : "info",
+  public constructor(options: pino.LoggerOptions = {}) {
+    this.output = pino({
+      level: process.env.LOG_LEVEL || "info",
+      transport: {
+        target: "pino-pretty"
+      },
+      base: null,
+      timestamp: false,
+      ...options
     });
-
-    this.output.add(
-      new winston.transports.Console({
-        format: isProduction
-          ? winston.format.json()
-          : winston.format.combine(
-              winston.format.colorize(),
-              winston.format.timestamp(),
-              winston.format.json(),
-              winston.format.printf((info) => {
-                const { message, level, timestamp, label, ...extra } = info;
-                const colorizedLabel = label === "HTTP" ? chalk.bgBlue.bold(` ${label} `) : `[${label}]`;
-                return `${level} ${
-                  label === "HTTP" ? "" : chalk.gray("[" + timestamp + "]")
-                } ${colorizedLabel} ${message} ${isEmpty(extra) ? "" : JSON.stringify(extra)}`;
-              })
-            ),
-      })
-    );
   }
 
-  public info(label: LogCategory, message: string, extra?: Extra) {
-    this.output.info(message, { label, ...extra });
+  public log(message: string) {
+    this.output.info(message);
   }
 
-  public debug(label: LogCategory, message: string, extra?: Extra) {
-    this.output.debug(message, { label, ...extra });
+  public info(message: string, extra?: Extra) {
+    if (!extra) return this.output.info(message);
+    return this.output.info({ message, ...extra });
+  }
+
+  public debug(message: string, extra?: Extra) {
+    this.output.debug({ message, ...extra });
   }
 
   public warn(message: string, extra?: Extra) {
@@ -123,15 +45,9 @@ class Logger {
     }
   }
 
-  public error(label: LogCategory, message: string, extra?: Extra) {
-    this.output.error(message, { label, ...extra });
-  }
-
-  public errorInfo(message: string, context: string) {
-    const label = "ERROR";
-    const formatedContext = context ? chalk.cyanBright("[" + chalk.redBright(context) + "]") : "";
-    const formatedMessage = `${formatedContext} ${message}`;
-    this.output.error(formatedMessage, { label });
+  public error(message: string, extra?: Extra) {
+    if (!extra) return this.output.error(message);
+    return this.output.error({ message, ...extra });
   }
 
   private sanitize<T>(data: T): T {
@@ -183,6 +99,25 @@ class Logger {
 
     return data;
   }
+
+  /**
+   * Synchonously log a message
+   *
+   * @param message - Message to log
+   */
+  public logSync(message: string) {
+    console.log(message);
+  }
+
+  /**
+   * Synchonously log an error
+   *
+   * @param error - Error to log
+   */
+  public errorSync(...args: unknown[]) {
+    console.error(...args);
+  }
 }
 
+export { Logger };
 export default new Logger();

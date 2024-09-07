@@ -12,12 +12,13 @@ if (!VOTEWISE_TEST_DB_URL) {
 export const prismaTest = new PrismaClient({
   datasources: {
     db: {
-      url: VOTEWISE_TEST_DB_URL,
-    },
-  },
+      url: VOTEWISE_TEST_DB_URL
+    }
+  }
 });
 
 if (process.env.NODE_ENV !== "production") {
+  // eslint-disable-next-line no-undef
   globalThis.prisma = prismaTest;
 }
 

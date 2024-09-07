@@ -1,9 +1,0 @@
-{
-  "extends": "@votewise/tsconfig/nextjs.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": ".",
-    "baseUrl": "."
-  },
-  "include": ["**/*.ts", "**/*.d.ts"]
-}

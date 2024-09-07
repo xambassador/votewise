@@ -3,8 +3,7 @@ export const localStorage = {
     try {
       return window.localStorage.getItem(key);
     } catch (e) {
-      // In case storage is restricted. Possible reasons
-      // 1. Third Party Context in Chrome Incognito mode.
+      // Either storage limit reached or Third Party Context in Chrome Incognito mode.
       return null;
     }
   },
@@ -12,10 +11,8 @@ export const localStorage = {
     try {
       window.localStorage.setItem(key, value);
     } catch (e) {
-      // In case storage is restricted. Possible reasons
-      // 1. Third Party Context in Chrome Incognito mode.
-      // 2. Storage limit reached
+      // Either storage limit reached or Third Party Context in Chrome Incognito mode.
       return;
     }
-  },
+  }
 };

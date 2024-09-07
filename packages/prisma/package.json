@@ -1,40 +1,43 @@
 {
-    "name": "@votewise/prisma",
-    "private": true,
-    "version": "0.0.0",
-    "sideEffects": false,
-    "main": "index.ts",
-    "files": [
-        "client"
-    ],
-    "scripts": {
-        "db:generate": "prisma generate && prisma format",
-        "db:migrate": "yarn prisma migrate dev",
-        "db:studio": "yarn prisma studio",
-        "db:seed": "yarn prisma db seed",
-        "db:clean": "ts-node --transpile-only ./cleanDb.ts",
-        "seed": "ts-node --transpile-only ./seed.ts"
-    },
-    "devDependencies": {
-        "@types/node": "^18.14.1",
-        "@votewise/config": "*",
-        "@votewise/tsconfig": "*",
-        "bcrypt": "^5.1.0",
-        "cli-spinners": "^2.7.0",
-        "ora": "5.4.1",
-        "prisma": "^4.10.1",
-        "slug": "^8.2.2",
-        "slugify": "^1.6.5",
-        "ts-node": "^10.9.1",
-        "typescript": "^4.9.5"
-    },
-    "dependencies": {
-        "@faker-js/faker": "^7.6.0",
-        "@prisma/client": "^4.10.1",
-        "zod": "^3.20.6",
-        "zod-prisma": "^0.5.4"
-    },
-    "prisma": {
-        "seed": "ts-node --transpile-only ./seed.ts"
-    }
+  "name": "@votewise/prisma",
+  "private": true,
+  "version": "0.0.0",
+  "sideEffects": false,
+  "main": "index.ts",
+  "files": [
+    "client",
+    "zod"
+  ],
+  "scripts": {
+    "db:generate": "prisma generate && prisma format",
+    "db:migrate": "yarn prisma migrate dev",
+    "db:studio": "yarn prisma studio",
+    "db:seed": "yarn prisma db seed",
+    "db:deploy": "yarn prisma migrate deploy",
+    "db:clean": "ts-node --transpile-only ./cleanDb.ts",
+    "seed": "ts-node --transpile-only ./seed.ts",
+    "clean": "rimraf --glob ./dist ./zod ./node_modules"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.1",
+    "@votewise/config": "*",
+    "@votewise/tsconfig": "*",
+    "bcrypt": "^5.1.1",
+    "cli-spinners": "^3.1.0",
+    "ora": "8.0.1",
+    "prisma": "^5.18.0",
+    "slug": "^9.1.0",
+    "slugify": "^1.6.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "@prisma/client": "^5.18.0",
+    "zod": "^3.23.8",
+    "zod-prisma": "^0.5.4"
+  },
+  "prisma": {
+    "seed": "ts-node --transpile-only ./seed.ts"
+  }
 }

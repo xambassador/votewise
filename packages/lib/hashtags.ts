@@ -1,28 +1,31 @@
 function removeHashtags(text: string): string {
   const hashtags = text.match(/#[a-zA-Z0-9_]+/g);
+  let removedText = text;
   if (hashtags) {
     hashtags.forEach((hashtag) => {
-      text = text.replace(hashtag, "");
+      removedText = text.replace(hashtag, "");
     });
   }
 
-  return text.trim();
+  return removedText.trim();
 }
 
 /**
- * @description Extracts hashtags from a string. It is case insensitive and removes duplicates.
+ * Extracts hashtags from a string. It is case insensitive and removes duplicates.
+ *
  * @param content String that contains hashtags
  * @returns Object with hashtags and text without hashtags
  */
 export function parseHashTags(content: string) {
   return {
     hashtags: extractHashtags(content),
-    text: removeHashtags(content),
+    text: removeHashtags(content)
   };
 }
 
 /**
- * @description Extracts hashtags from a string
+ * Extracts hashtags from a string
+ *
  * @param text String that contains hashtags
  * @returns Array of hashtags
  */

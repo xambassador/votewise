@@ -1,4 +1,5 @@
 import type { Prisma } from "@prisma/client";
+
 import { PrismaClient } from "@prisma/client";
 
 declare global {
@@ -17,18 +18,14 @@ if (process.env.NODE_ENV === "development" && process.env.DEBUG) {
 }
 
 // https://www.prisma.io/docs/concepts/components/prisma-client/working-with-prismaclient/instantiate-prisma-client#the-number-of-prismaclient-instances-matters
-export const prisma = global.prisma || new PrismaClient(prismaOptions);
+const prisma = global.prisma || new PrismaClient(prismaOptions);
 
-export const customPrisma = (options: Prisma.PrismaClientOptions) =>
-  new PrismaClient({
-    ...prismaOptions,
-    ...options,
-  });
-
-//   https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#prismaclient-in-long-running-applications
+// https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#prismaclient-in-long-running-applications
 if (process.env.NODE_ENV !== "production") {
+  // eslint-disable-next-line no-undef
   globalThis.prisma = prisma;
 }
 
 export default prisma;
-export { PrismaClient };
+export { PrismaClient, prisma };
+export type { Prisma };

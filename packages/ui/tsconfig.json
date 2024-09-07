@@ -1,8 +1,5 @@
 {
-  "extends": "@votewise/tsconfig/nextjs.json",
-  "compilerOptions": {
-    "resolveJsonModule": true
-  },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "extends": "@votewise/tsconfig/react.json",
+  "include": ["."],
   "exclude": ["dist", "build", "node_modules"]
 }

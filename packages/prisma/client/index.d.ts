@@ -1,2 +1,2 @@
-// eslint-disable-next-line import/no-relative-packages
-export * from "../../../node_modules/.prisma/client/index.d";
+// eslint-disable-next-line no-restricted-imports
+export * from "../../../node_modules/@prisma/client";

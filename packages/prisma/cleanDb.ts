@@ -1,8 +1,5 @@
-/* eslint-disable no-restricted-syntax */
-
-/* eslint-disable no-await-in-loop */
-
 /* eslint-disable no-console */
+
 import { PrismaClient } from "@prisma/client";
 import chalk from "chalk";
 import ora from "ora";
