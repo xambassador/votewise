@@ -1,10 +1,10 @@
-import type { AppContext } from "@/context";
-
+import { AppContext } from "@/context";
 import { ExceptionLayer } from "@/lib/exception-layer";
 
 import { Controller } from "./controller";
 
-export function registerControllerFactory(ctx: AppContext) {
+export function registerControllerFactory() {
+  const ctx = AppContext.getInjectionTokens(["repositories", "assert", "queues", "cache", "cryptoService", "plugins"]);
   const controller = new Controller({
     userRepository: ctx.repositories.user,
     assert: ctx.assert,
@@ -13,6 +13,6 @@ export function registerControllerFactory(ctx: AppContext) {
     cryptoService: ctx.cryptoService,
     requestParser: ctx.plugins.requestParser
   });
-  const exceptionLayer = new ExceptionLayer({ ctx, name: "register" });
+  const exceptionLayer = new ExceptionLayer({ name: "register" });
   return exceptionLayer.catch(controller.handle.bind(controller));
 }

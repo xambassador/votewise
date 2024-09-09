@@ -34,8 +34,8 @@ export class Server {
     const { cfg, secrets, overrides } = opts;
     const app = express();
     const ctx = await AppContext.fromConfig(cfg, secrets, overrides);
-    const middleware = new AppMiddleware(ctx);
-    const routers = new AppRouter({ ctx });
+    const middleware = new AppMiddleware();
+    const routers = new AppRouter({});
     app.disable("x-powered-by");
     app.set("trust proxy", true);
     app.use(middleware.register());

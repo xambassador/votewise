@@ -131,4 +131,23 @@ export class AppContext {
     });
     return ctx;
   }
+
+  static get instance(): AppContext {
+    if (!this._instance) throw new Error("AppContext is not initialized");
+    return this._instance;
+  }
+
+  static getInjectionToken<T extends keyof AppContext>(key: T): AppContext[T] {
+    return this.instance[key];
+  }
+
+  static getInjectionTokens<T extends keyof AppContext>(keys: T[]): Pick<AppContext, T> {
+    return keys.reduce(
+      (acc, key) => {
+        acc[key] = this.instance[key];
+        return acc;
+      },
+      {} as Pick<AppContext, T>
+    );
+  }
 }

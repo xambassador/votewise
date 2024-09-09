@@ -1,6 +1,7 @@
 import type { AppContext } from "@/context";
+import type { Transporter } from "nodemailer";
 
-import nodemailer from "nodemailer";
+import { createTransport } from "nodemailer";
 
 type EmailOptions = {
   to: string;
@@ -10,12 +11,12 @@ type EmailOptions = {
 };
 
 export class Mailer {
-  private readonly transporter: nodemailer.Transporter;
+  private readonly transporter: Transporter;
   private readonly from: string;
 
   constructor(opts: { env: AppContext["environment"] }) {
     this.from = opts.env.SMTP_FROM;
-    this.transporter = nodemailer.createTransport({
+    this.transporter = createTransport({
       host: opts.env.SMTP_HOST,
       port: opts.env.SMTP_PORT,
       auth: {

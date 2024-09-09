@@ -1,10 +1,18 @@
-import type { AppContext } from "@/context";
-
+import { AppContext } from "@/context";
 import { ExceptionLayer } from "@/lib/exception-layer";
 
 import { Controller } from "./controller";
 
-export function forgotPasswordControllerFactory(ctx: AppContext) {
+export function forgotPasswordControllerFactory() {
+  const ctx = AppContext.getInjectionTokens([
+    "assert",
+    "repositories",
+    "cryptoService",
+    "jwtService",
+    "queues",
+    "config",
+    "plugins"
+  ]);
   const controller = new Controller({
     assert: ctx.assert,
     userRepository: ctx.repositories.user,
@@ -14,6 +22,6 @@ export function forgotPasswordControllerFactory(ctx: AppContext) {
     appUrl: ctx.config.appUrl,
     requestParser: ctx.plugins.requestParser
   });
-  const exceptionLayer = new ExceptionLayer({ name: "forgot-password", ctx });
+  const exceptionLayer = new ExceptionLayer({ name: "forgot-password" });
   return exceptionLayer.catch(controller.handle.bind(controller));
 }

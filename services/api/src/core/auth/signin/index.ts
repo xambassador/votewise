@@ -1,11 +1,18 @@
-import type { AppContext } from "@/context";
-
+import { AppContext } from "@/context";
 import { ExceptionLayer } from "@/lib/exception-layer";
 
 import { Controller } from "./controller";
 import { EmailStrategy, UsernameStrategy } from "./strategies";
 
-export function singinControllerFactory(ctx: AppContext) {
+export function singinControllerFactory() {
+  const ctx = AppContext.getInjectionTokens([
+    "repositories",
+    "assert",
+    "plugins",
+    "jwtService",
+    "cryptoService",
+    "sessionManager"
+  ]);
   const emailStrategy = new EmailStrategy({ userRepository: ctx.repositories.user });
   const usernameStrategy = new UsernameStrategy({ userRepository: ctx.repositories.user });
   const strategies = { email: emailStrategy, username: usernameStrategy };
@@ -17,6 +24,6 @@ export function singinControllerFactory(ctx: AppContext) {
     assert: ctx.assert,
     sessionManager: ctx.sessionManager
   });
-  const exceptionLayer = new ExceptionLayer({ name: "signin", ctx });
+  const exceptionLayer = new ExceptionLayer({ name: "signin" });
   return exceptionLayer.catch(controller.handle.bind(controller));
 }

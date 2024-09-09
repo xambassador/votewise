@@ -1,13 +1,14 @@
-import type { AppContext } from "@/context";
 import type { Locals } from "@/types";
-import type { NextFunction, Request, Response } from "express";
 
 import { AuthenticationError } from "@votewise/lib/errors";
 
+import { AppContext } from "@/context";
 import { ExceptionLayer } from "@/lib/exception-layer";
 
-export function authMiddlewareFactory(ctx: AppContext) {
-  async function auth(req: Request, res: Response, next: NextFunction) {
+export function authMiddlewareFactory() {
+  const ctx = AppContext.getInjectionTokens(["jwtService", "sessionManager", "repositories"]);
+  const exceptionLayer = new ExceptionLayer({ name: "auth-middleware" });
+  return exceptionLayer.catch(async (req, res, next) => {
     const authorization = req.headers.authorization;
     if (!authorization) {
       throw new AuthenticationError("Authorization header is missing");
@@ -52,8 +53,5 @@ export function authMiddlewareFactory(ctx: AppContext) {
     res.locals = locals;
 
     return next();
-  }
-
-  const exceptionLayer = new ExceptionLayer({ ctx, name: "auth-middleware" });
-  return exceptionLayer.catch(auth);
+  });
 }

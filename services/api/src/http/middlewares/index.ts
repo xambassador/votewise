@@ -1,29 +1,26 @@
-import type { AppContext } from "@/context";
-
 import chrona from "chrona";
 import compression from "compression";
 import cors from "cors";
-import express, { json } from "express";
+import { json, urlencoded } from "express";
 import helmet from "helmet";
+
+import { AppContext } from "@/context";
 
 import { extractIpMiddlewareFactory } from "./ip";
 
 export class AppMiddleware {
-  private readonly ctx: AppContext;
-
-  constructor(opts: AppContext) {
-    this.ctx = opts;
-  }
+  constructor() {}
 
   public register() {
     const extractIp = extractIpMiddlewareFactory();
+    const ctx = AppContext.getInjectionTokens(["config", "logger"]);
     return [
-      chrona(":date :incoming :method :url :status :response-time :remote-address", (l) => this.ctx.logger.info(l)),
+      chrona(":date :incoming :method :url :status :response-time :remote-address", (l) => ctx.logger.info(l)),
       compression(),
-      cors(this.ctx.config.cors),
+      cors(ctx.config.cors),
       helmet(),
-      express.urlencoded({ extended: true }),
-      json({ limit: this.ctx.config.blobUploadLimit }),
+      urlencoded({ extended: true }),
+      json({ limit: ctx.config.blobUploadLimit }),
       extractIp
     ];
   }
