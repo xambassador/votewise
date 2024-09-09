@@ -1,5 +1,3 @@
-import type { AppContext } from "@/context";
-
 import { Router } from "express";
 
 import {
@@ -10,18 +8,17 @@ import {
 } from "./upload";
 
 /**
- * This function creates a router for each module in the application and returns a single router instance that
- * contains all the module routers. So, this function is the entry point for every single routes in the application.
+ * Factory function to create an application router for the specified base path.
  *
- * @param {string} basePath - The base path for the router. Default is "/api"
- * @param {AppContext} ctx - The application context
+ * @default basePath "/api"
+ * @param {string} basePath - The base path for the router.
  * @returns {Router} - Express router
  */
-export function moduleRouterFactory(basePath: string, ctx: AppContext) {
+export function moduleRouterFactory(basePath: string): Router {
   const router = Router();
-  router.post(basePath + "/handshake", handshakeControllerFactory(ctx));
-  router.post(basePath + "/upload", uploadControllerFactory(ctx));
-  router.get(basePath + "/upload/:token/status", statusControllerFactory(ctx));
-  router.delete(basePath + "/upload/:token", deleteControllerFactory(ctx));
+  router.post(basePath + "/handshake", handshakeControllerFactory());
+  router.post(basePath + "/upload", uploadControllerFactory());
+  router.get(basePath + "/upload/:token/status", statusControllerFactory());
+  router.delete(basePath + "/upload/:token", deleteControllerFactory());
   return router;
 }

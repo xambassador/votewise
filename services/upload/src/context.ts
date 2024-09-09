@@ -45,6 +45,7 @@ function getFileInfo(filePath: string) {
 }
 
 export class AppContext {
+  private static _instance: AppContext;
   public config: ServerConfig;
   public logger: typeof logger;
   public environment: TEnv;
@@ -64,6 +65,7 @@ export class AppContext {
   }
 
   static async fromConfig(cfg: ServerConfig, overrides?: Partial<AppContextOptions>): Promise<AppContext> {
+    if (this._instance) return this._instance;
     const environment = checkEnv(process.env);
     const assert = new Assertions();
     const requestParser = requestParserPluginFactory();
@@ -75,6 +77,26 @@ export class AppContext {
       plugins: { requestParser },
       ...overrides
     });
+    this._instance = context;
     return context;
+  }
+
+  static get instance(): AppContext {
+    if (!this._instance) throw new Error("AppContext is not initialized");
+    return this._instance;
+  }
+
+  static getInjectionToken<T extends keyof AppContext>(key: T): AppContext[T] {
+    return this.instance[key];
+  }
+
+  static getInjectionTokens<T extends keyof AppContext>(keys: T[]): Pick<AppContext, T> {
+    return keys.reduce(
+      (acc, key) => {
+        acc[key] = this.instance[key];
+        return acc;
+      },
+      {} as Pick<AppContext, T>
+    );
   }
 }

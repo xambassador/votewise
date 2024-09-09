@@ -29,7 +29,7 @@ export class Server {
     const { cfg, overrides } = opts;
     const app = express();
     const ctx = await AppContext.fromConfig(cfg, overrides);
-    const router = new AppRouter({ ctx });
+    const router = new AppRouter({});
     app.disable("x-powered-by");
     app.set("trust proxy", true);
     app.use(chrona(":date :incoming :method :url :status :response-time :remote-address", (l) => ctx.logger.info(l)));
