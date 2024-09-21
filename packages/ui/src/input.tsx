@@ -2,7 +2,7 @@
 
 import { forwardRef } from "react";
 
-import { cn } from "@votewise/lib/classnames";
+import { cn } from "./cn";
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 

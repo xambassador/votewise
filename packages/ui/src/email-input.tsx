@@ -4,8 +4,7 @@ import type { InputProps } from "./input";
 
 import { forwardRef } from "react";
 
-import { cn } from "@votewise/lib/classnames";
-
+import { cn } from "./cn";
 import { Mail } from "./icons/mail";
 import { User } from "./icons/user";
 import { inputWrapper } from "./theme";

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 
-import { Milisecond, Minute } from "@votewise/lib/times";
+import { Milisecond, Minute } from "@votewise/times";
 import { Progress, ProgressBar, ProgressTrack } from "@votewise/ui/progress";
 
 type Props = { time: number };

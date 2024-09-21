@@ -4,7 +4,11 @@
     "build": {
       "cache": true,
       "dependsOn": ["^build"],
-      "outputs": ["{projectRoot}/./apps/web/.next", "{projectRoot}/./apps/api/dist", "{projectRoot}/./apps/upload/dist"]
+      "outputs": [
+        "{projectRoot}/./apps/web/.next",
+        "{projectRoot}/./services/api/dist",
+        "{projectRoot}/./services/upload/dist"
+      ]
     },
     "start": {
       "dependsOn": []

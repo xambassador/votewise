@@ -6,7 +6,7 @@ import { forwardRef } from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
 
-import { cn } from "@votewise/lib/classnames";
+import { cn } from "./cn";
 
 const variants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded text-sm duration-500 text-gray-200 px-5 transition-[colors_transform] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",

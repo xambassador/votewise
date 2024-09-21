@@ -2,7 +2,7 @@
 
 import { forwardRef } from "react";
 
-import { cn } from "@votewise/lib/classnames";
+import { cn } from "./cn";
 
 export function checkStrength(password: string) {
   // - At least 8 characters long

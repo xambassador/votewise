@@ -3,7 +3,7 @@
 import { forwardRef, useContext } from "react";
 import { OTPInput, OTPInputContext } from "input-otp";
 
-import { cn } from "@votewise/lib/classnames";
+import { cn } from "./cn";
 
 export const InputOTP = forwardRef<React.ElementRef<typeof OTPInput>, React.ComponentPropsWithoutRef<typeof OTPInput>>(
   ({ className, containerClassName, ...props }, ref) => (

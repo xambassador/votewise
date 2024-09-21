@@ -1,7 +1,6 @@
 "use client";
 
-import { cn } from "@votewise/lib/classnames";
-
+import { cn } from "./cn";
 import { createContext } from "./context";
 
 type Props = { progress: number; pWidth?: number };

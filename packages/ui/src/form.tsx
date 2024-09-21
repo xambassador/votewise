@@ -4,8 +4,7 @@ import { forwardRef, useId } from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
-import { cn } from "@votewise/lib/classnames";
-
+import { cn } from "./cn";
 import { createContext } from "./context";
 import { Label } from "./label";
 

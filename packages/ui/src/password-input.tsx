@@ -4,8 +4,7 @@ import type { InputProps } from "./input";
 
 import { forwardRef, useState } from "react";
 
-import { cn } from "@votewise/lib/classnames";
-
+import { cn } from "./cn";
 import { Eye } from "./icons/eye";
 import { EyeCross } from "./icons/eye-cross";
 import { Padlock } from "./icons/padlock";

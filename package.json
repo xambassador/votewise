@@ -12,7 +12,7 @@
     "web:build": "lerna exec --scope @votewise/web -- yarn build",
     "web:dev": "lerna exec --scope @votewise/web -- yarn dev",
     "api:start": "lerna exec --scope @votewise/api -- yarn start",
-    "api:dev": "lerna exec --stream --parallel --no-sort --scope @votewise/lib --scope @votewise/prisma --scope @votewise/schema --scope @votewise/api -- yarn dev",
+    "api:dev": "lerna watch --scope='@votewise/api' --include-dependencies -- lerna run dev --scope=\\$LERNA_PACKAGE_NAME",
     "api:build": "lerna exec --scope @votewise/api -- yarn build",
     "api:test": "lerna exec --scope @votewise/api -- yarn test",
     "api:test:watch": "lerna exec --scope @votewise/api -- yarn test:watch",
