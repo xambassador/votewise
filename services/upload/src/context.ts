@@ -1,5 +1,5 @@
 import type { ServerConfig } from "@/config";
-import type { TEnv } from "@votewise/lib/environment";
+import type { TEnv } from "@votewise/env";
 import type { RequestParserPlugin } from "./plugins/request-parser";
 
 import _fs from "node:fs/promises";

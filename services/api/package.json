@@ -19,6 +19,7 @@
     "@votewise/lib": "*",
     "@votewise/prisma": "*",
     "@votewise/schemas": "*",
+    "@votewise/env": "*",
     "bcrypt": "^5.1.1",
     "bullmq": "^5.12.10",
     "busboy": "^1.6.0",

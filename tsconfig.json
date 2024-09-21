@@ -68,6 +68,9 @@
     },
     {
       "path": "./packages/schemas"
+    },
+    {
+      "path": "./packages/common/env"
     }
   ],
   "files": [],

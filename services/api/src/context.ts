@@ -1,5 +1,5 @@
 import type { ServerConfig, ServerSecrets } from "@/configs";
-import type { TEnv } from "@votewise/lib/environment";
+import type { TEnv } from "@votewise/env";
 import type { JWTPlugin } from "./plugins/jwt";
 import type { RequestParserPlugin } from "./plugins/request-parser";
 

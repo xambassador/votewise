@@ -1,10 +1,15 @@
 {
-  "extends": "@votewise/tsconfig/base.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ES6",
     "jsx": "preserve",
+    "composite": false,
     "resolveJsonModule": true,
-    "lib": ["DOM", "DOM.Iterable"]
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext",
+    "verbatimModuleSyntax": false,
+    "lib": ["DOM", "DOM.Iterable"],
+    "incremental": false
   },
   "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["dist", "build", "node_modules"]

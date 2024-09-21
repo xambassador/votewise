@@ -12,6 +12,7 @@
   "dependencies": {
     "@votewise/lib": "*",
     "@votewise/schemas": "*",
+    "@votewise/env": "*",
     "busboy": "^1.6.0",
     "chrona": "^1.0.4",
     "cors": "^2.8.5",

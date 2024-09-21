@@ -1,6 +1,6 @@
 import "dotenv/config";
 
-import { environment } from "@votewise/lib/environment";
+import { environment } from "@votewise/env";
 
 import { AppHeaders, Cors, ServerConfig } from "@/config";
 import { Server } from "@/http/server";

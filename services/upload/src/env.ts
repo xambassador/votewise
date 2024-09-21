@@ -1,4 +1,4 @@
-import { validateEnv } from "@votewise/lib/environment";
+import { validateEnv } from "@votewise/env";
 
 export function checkEnv(env: unknown) {
   try {

@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-import { environment } from "@votewise/lib/environment";
+import { environment } from "@votewise/env";
 
 function safeReadFile(file: string) {
   try {

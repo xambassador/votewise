@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 
 import type { Payload as AccessTokenData } from "@/services/jwt.service";
-import type { envBaseSchema } from "@votewise/lib/environment";
+import type { envBaseSchema } from "@votewise/env";
 import type { z } from "zod";
 
 export type SessionUser = { email: string; username: string };
