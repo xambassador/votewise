@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 
-import { Assertions } from "@votewise/lib/errors";
+import { Assertions } from "@votewise/errors";
 
 import { requestParserPluginFactory } from "@/plugins/request-parser";
 

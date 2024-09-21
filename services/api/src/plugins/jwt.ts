@@ -1,6 +1,6 @@
 import type { AppContext } from "@/context";
 
-import { InvalidInputError } from "@votewise/lib/errors";
+import { InvalidInputError } from "@votewise/errors";
 
 type JWTPluginOptions = {
   jwtService: AppContext["jwtService"];

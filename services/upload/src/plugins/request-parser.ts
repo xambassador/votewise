@@ -1,7 +1,7 @@
 import type { Request } from "express";
 import type { ZodSchema } from "zod";
 
-import { InvalidInputError } from "@votewise/lib/errors";
+import { InvalidInputError } from "@votewise/errors";
 
 type RequestParserPluginOptions<Body, Query> = {
   bodySchema: ZodSchema<Body>;

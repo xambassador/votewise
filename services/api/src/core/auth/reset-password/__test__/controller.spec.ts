@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 
-import { Assertions, BadRequestError, InvalidInputError, ResourceNotFoundError } from "@votewise/lib/errors";
+import { Assertions, BadRequestError, InvalidInputError, ResourceNotFoundError } from "@votewise/errors";
 
 import { requestParserPluginFactory } from "@/plugins/request-parser";
 

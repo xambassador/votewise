@@ -6,8 +6,8 @@ import _fs from "node:fs/promises";
 import path from "node:path";
 import { ensureDirSync } from "fs-extra";
 
-import { Assertions } from "@votewise/lib/errors";
-import logger from "@votewise/lib/logger";
+import { Assertions } from "@votewise/errors";
+import logger from "@votewise/log";
 
 import { checkEnv } from "@/env";
 

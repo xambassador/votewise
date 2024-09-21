@@ -4,8 +4,8 @@ import type { Strategy } from "./strategies";
 
 import { StatusCodes } from "http-status-codes";
 
-import { Minute } from "@votewise/lib/times";
 import { ZSignin } from "@votewise/schemas";
+import { Minute } from "@votewise/times";
 
 type ControllerOptions = {
   requestParser: AppContext["plugins"]["requestParser"];

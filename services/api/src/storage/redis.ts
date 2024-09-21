@@ -1,9 +1,9 @@
 import type { RedisOptions } from "ioredis";
 
-import Redis from "ioredis";
+import { Redis } from "ioredis";
 import { defaults } from "lodash";
 
-import { Milisecond } from "@votewise/lib/times";
+import { Milisecond } from "@votewise/times";
 
 /* ----------------------------------------------------------------------------------------------- */
 

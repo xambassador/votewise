@@ -4,7 +4,7 @@ import type { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 
-import { ResourceNotFoundError } from "@votewise/lib/errors";
+import { ResourceNotFoundError } from "@votewise/errors";
 
 type ControllerOptions = {
   ctx: AppContext;

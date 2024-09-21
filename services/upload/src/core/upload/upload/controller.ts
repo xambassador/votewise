@@ -5,7 +5,7 @@ import fs from "node:fs";
 import busboy from "busboy";
 import { StatusCodes } from "http-status-codes";
 
-import { InvalidInputError } from "@votewise/lib/errors";
+import { InvalidInputError } from "@votewise/errors";
 
 type ControllerOptions = {
   ctx: AppContext;

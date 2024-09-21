@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 
-import { Assertions } from "@votewise/lib/errors";
-import { Minute } from "@votewise/lib/times";
+import { Assertions } from "@votewise/errors";
+import { Minute } from "@votewise/times";
 
 import { requestParserPluginFactory } from "@/plugins/request-parser";
 

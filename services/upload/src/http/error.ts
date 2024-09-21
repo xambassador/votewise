@@ -1,7 +1,7 @@
 import type { ErrorRequestHandler } from "express";
 import type { AppContext } from "../context";
 
-import * as Errors from "@votewise/lib/errors";
+import * as Errors from "@votewise/errors";
 
 const errorTypes = [
   Errors.AuthenticationError,

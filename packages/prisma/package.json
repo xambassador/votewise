@@ -32,7 +32,7 @@
     "seed": "ts-node --transpile-only ./seed.ts",
     "clean": "rimraf --glob ./dist ./zod ./node_modules",
     "clean:build": "rm -rf dist",
-    "dev": "rm -rf dist && tsup --watch",
+    "dev": "rm -rf dist && tsup",
     "build": "rm -rf ./dist && tsup"
   },
   "devDependencies": {

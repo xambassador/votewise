@@ -1,6 +1,6 @@
 import type { Locals } from "@/types";
 
-import { AuthenticationError } from "@votewise/lib/errors";
+import { AuthenticationError } from "@votewise/errors";
 
 import { AppContext } from "@/context";
 import { ExceptionLayer } from "@/lib/exception-layer";

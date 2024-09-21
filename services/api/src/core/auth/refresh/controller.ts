@@ -3,8 +3,8 @@ import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
-import { Minute } from "@votewise/lib/times";
 import { ZRefresh } from "@votewise/schemas";
+import { Minute } from "@votewise/times";
 
 type ControllerOptions = {
   sessionManager: AppContext["sessionManager"];

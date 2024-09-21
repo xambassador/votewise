@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 
-import { BadRequestError } from "@votewise/lib/errors";
+import { BadRequestError } from "@votewise/errors";
 
 import { parseIp } from "@/lib/ip";
 

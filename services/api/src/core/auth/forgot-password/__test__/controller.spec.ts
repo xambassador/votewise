@@ -1,4 +1,4 @@
-import { Assertions, InvalidInputError, ResourceNotFoundError } from "@votewise/lib/errors";
+import { Assertions, InvalidInputError, ResourceNotFoundError } from "@votewise/errors";
 
 import { requestParserPluginFactory } from "@/plugins/request-parser";
 import { mockTaskQueue } from "@/queues/__mock__";

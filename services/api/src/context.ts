@@ -3,8 +3,8 @@ import type { TEnv } from "@votewise/env";
 import type { JWTPlugin } from "./plugins/jwt";
 import type { RequestParserPlugin } from "./plugins/request-parser";
 
-import { Assertions } from "@votewise/lib/errors";
-import logger from "@votewise/lib/logger";
+import { Assertions } from "@votewise/errors";
+import logger from "@votewise/log";
 import { prisma } from "@votewise/prisma";
 
 import { Mailer } from "@/emails/mailer";

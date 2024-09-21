@@ -1,6 +1,6 @@
 import type { AppContext } from "@/context";
 
-import { Minute } from "@votewise/lib/times";
+import { Minute } from "@votewise/times";
 
 type SessionManagerOptions = {
   cache: AppContext["cache"];
