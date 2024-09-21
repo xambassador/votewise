@@ -1,5 +1,5 @@
 {
-  "name": "@votewise/env",
+  "name": "@votewise/log",
   "version": "0.0.0",
   "private": true,
   "sideEffects": false,
@@ -21,8 +21,9 @@
     "clean:build": "rm -rf dist",
     "clean": "rm -rf dist node_modules"
   },
-  "peerDependencies": {
-    "zod": "^3.23.8"
+  "dependencies": {
+    "pino": "^9.3.2",
+    "pino-pretty": "^11.2.2"
   },
   "devDependencies": {
     "tsup": "^8.2.4",
@@ -38,9 +39,6 @@
     ],
     "sourcemap": true,
     "dts": true,
-    "clean": true,
-    "external": [
-      "zod"
-    ]
+    "clean": true
   }
 }

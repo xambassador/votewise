@@ -1,5 +1,5 @@
 {
-  "name": "@votewise/env",
+  "name": "@votewise/text",
   "version": "0.0.0",
   "private": true,
   "sideEffects": false,
@@ -11,6 +11,14 @@
     ".": {
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./truncate": {
+      "import": "./dist/truncate.mjs",
+      "require": "./dist/truncate.js"
+    },
+    "./truncate-on-word": {
+      "import": "./dist/truncate-on-word.mjs",
+      "require": "./dist/truncate-on-word.js"
     }
   },
   "scripts": {
@@ -20,9 +28,6 @@
     "dev": "rm -rf dist && tsup",
     "clean:build": "rm -rf dist",
     "clean": "rm -rf dist node_modules"
-  },
-  "peerDependencies": {
-    "zod": "^3.23.8"
   },
   "devDependencies": {
     "tsup": "^8.2.4",
@@ -38,9 +43,6 @@
     ],
     "sourcemap": true,
     "dts": true,
-    "clean": true,
-    "external": [
-      "zod"
-    ]
+    "clean": true
   }
 }

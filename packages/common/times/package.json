@@ -1,5 +1,5 @@
 {
-  "name": "@votewise/env",
+  "name": "@votewise/times",
   "version": "0.0.0",
   "private": true,
   "sideEffects": false,
@@ -21,9 +21,6 @@
     "clean:build": "rm -rf dist",
     "clean": "rm -rf dist node_modules"
   },
-  "peerDependencies": {
-    "zod": "^3.23.8"
-  },
   "devDependencies": {
     "tsup": "^8.2.4",
     "typescript": "^5.5.4"
@@ -38,9 +35,6 @@
     ],
     "sourcemap": true,
     "dts": true,
-    "clean": true,
-    "external": [
-      "zod"
-    ]
+    "clean": true
   }
 }
