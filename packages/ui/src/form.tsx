@@ -2,7 +2,7 @@
 
 import { forwardRef, useId } from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
 
 import { cn } from "./cn";
 import { createContext } from "./context";
@@ -12,6 +12,7 @@ const [Context, useContext] = createContext<{ id: string; name: string }>("Form"
 
 export { useForm, useFormContext };
 export const Form = FormProvider;
+export const FieldController = Controller;
 
 function useFormField(name: string) {
   const ctx = useContext(name);
@@ -40,11 +41,25 @@ export const FormLabel = forwardRef<LabelRef, FormLabelProps>((props, ref) => {
 });
 FormLabel.displayName = "FormLabel";
 
-type FormControlProps = React.ComponentPropsWithoutRef<typeof Slot>;
+type FormControlProps = Omit<React.ComponentPropsWithoutRef<typeof Slot>, "children"> & {
+  children:
+    | React.ComponentPropsWithoutRef<typeof Slot>["children"]
+    | ((props: { id: string; hasError: boolean }) => React.ReactNode);
+};
 type FormControlRef = React.ElementRef<typeof Slot>;
 export const FormControl = forwardRef<FormControlRef, FormControlProps>((props, ref) => {
   const { id, error } = useFormField("FormControl");
-  return <Slot {...props} ref={ref} id={id} data-has-error={error ? true : false} aria-invalid={!!error} />;
+  const { children, ...rest } = props;
+
+  if (typeof children === "function") {
+    return children({ id, hasError: !!error });
+  }
+
+  return (
+    <Slot {...rest} ref={ref} id={id} data-has-error={error ? true : false} aria-invalid={!!error}>
+      {children}
+    </Slot>
+  );
 });
 FormControl.displayName = "FormControl";
 
