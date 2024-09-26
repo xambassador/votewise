@@ -75,7 +75,7 @@ describe("Register Controller", () => {
     const res = buildRes({ locals });
     const { otp, uuid: verificationCode } = helpers.setupHappyPath();
     const windowExpiryInMs = 5 * Minute;
-    const data = JSON.stringify({ userId: user.id, otp, ip });
+    const data = JSON.stringify({ userId: user.id, ip });
     const createBody = {
       email: body.email,
       password: "hashed-password",
