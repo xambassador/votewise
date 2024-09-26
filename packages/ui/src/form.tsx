@@ -1,5 +1,7 @@
 "use client";
 
+import type { FieldValues } from "react-hook-form";
+
 import { forwardRef, useId } from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
@@ -13,6 +15,8 @@ const [Context, useContext] = createContext<{ id: string; name: string }>("Form"
 export { useForm, useFormContext };
 export const Form = FormProvider;
 export const FieldController = Controller;
+export type TFormProps<T extends FieldValues> = React.ComponentProps<typeof FormProvider<T>>;
+export type TFieldControllerProps<T extends FieldValues> = React.ComponentProps<typeof Controller<T>>;
 
 function useFormField(name: string) {
   const ctx = useContext(name);

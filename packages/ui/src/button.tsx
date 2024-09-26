@@ -7,9 +7,10 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
 
 import { cn } from "./cn";
+import { Spinner } from "./ring-spinner";
 
 const variants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded border text-sm duration-500 text-gray-200 px-5 transition-[colors_transform] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+  "inline-flex relative items-center overflow-hidden justify-center whitespace-nowrap rounded border text-sm duration-500 text-gray-200 px-5 transition-[colors_,_transform] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       variant: {
@@ -33,12 +34,25 @@ const variants = cva(
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof variants> {
   asChild?: boolean;
+  loading?: boolean;
+  spinnerProps?: React.ComponentProps<typeof Spinner>;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
-  const { className, variant, size, asChild = false, ...rest } = props;
+  const { className, variant, size, asChild = false, children, loading, disabled, spinnerProps, ...rest } = props;
   const Comp = asChild ? Slot : "button";
-  return <Comp {...rest} ref={ref} className={cn(variants({ variant, size, className }))} />;
+  const isDisabled = disabled || loading;
+
+  return (
+    <Comp {...rest} ref={ref} className={cn(variants({ variant, size, className }))} disabled={isDisabled}>
+      {children}
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-inherit">
+          <Spinner {...spinnerProps} className={cn("size-6", spinnerProps?.className)} />
+        </div>
+      )}
+    </Comp>
+  );
 });
 
 Button.displayName = "Button";

@@ -44,7 +44,8 @@ const config = {
       blue: colors.blue,
       green: colors.green,
       red: colors.red,
-      transparent: "transparent"
+      transparent: "transparent",
+      inherit: "inherit"
     },
     extend: {
       height: {
@@ -70,10 +71,16 @@ const config = {
         "caret-blink": {
           "0%,70%,100%": { opacity: "1" },
           "20%,50%": { opacity: "0" }
+        },
+        rotate: {
+          "100%": {
+            transform: "rotate(360deg)"
+          }
         }
       },
       animation: {
-        "caret-blink": "caret-blink 1.25s ease-out infinite"
+        "caret-blink": "caret-blink 1.25s ease-out infinite",
+        rotate: "rotate 0.8s linear infinite"
       }
     }
   },
