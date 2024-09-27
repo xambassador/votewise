@@ -6,7 +6,7 @@ import Link from "next/link";
 import { routes } from "@/lib/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Button } from "@votewise/ui/button";
+import { Button, variants } from "@votewise/ui/button";
 import { UsernameInput } from "@votewise/ui/email-input";
 import { Form, FormControl, FormField, FormLabel, FormMessage, useForm } from "@votewise/ui/form";
 import { PasswordInput } from "@votewise/ui/password-input";
@@ -43,11 +43,9 @@ export function SignInForm() {
       </Link>
 
       <div className="flex items-center justify-between">
-        <Button asChild variant="secondary">
-          <Link role="button" href={routes.auth.signUp()}>
-            Back
-          </Link>
-        </Button>
+        <Link role="button" className={variants({ variant: "secondary" })} href={routes.auth.signUp()}>
+          Back
+        </Link>
         <Button onClick={onSubmit}>Sign in</Button>
       </div>
     </Form>
