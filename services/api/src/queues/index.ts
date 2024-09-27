@@ -28,7 +28,14 @@ export class TasksQueue {
   public init() {
     this.redis = new RedisAdapter(this.opts.env.REDIS_URL, { maxRetriesPerRequest: null });
     this.queue = new Queue<Tasks>("tasks", {
-      connection: this.redis
+      connection: this.redis,
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+          type: "exponential",
+          delay: 1000
+        }
+      }
     });
   }
 

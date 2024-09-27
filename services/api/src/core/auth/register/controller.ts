@@ -41,10 +41,10 @@ export class Controller {
       last_name: body.last_name
     });
 
-    const otp = this.ctx.cryptoService.getOtp();
+    const otp = this.ctx.cryptoService.getOtp(createdUser.secret);
     const verificationCode = this.ctx.cryptoService.generateUUID();
     const expiresIn = 5 * Minute;
-    const data = { userId: createdUser.id, otp, ip };
+    const data = { userId: createdUser.id, ip };
     await this.ctx.cache.setWithExpiry(verificationCode, JSON.stringify(data), expiresIn);
 
     this.ctx.tasksQueue.add({
@@ -54,7 +54,7 @@ export class Controller {
         subject: "Verify your email",
         templateName: "signup",
         locals: {
-          otp: data.otp
+          otp
         }
       }
     });

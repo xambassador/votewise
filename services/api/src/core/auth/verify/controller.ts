@@ -10,6 +10,7 @@ type ControllerOptions = {
   userRepository: AppContext["repositories"]["user"];
   cache: AppContext["cache"];
   requestParser: AppContext["plugins"]["requestParser"];
+  cryptoService: AppContext["cryptoService"];
 };
 
 export class Controller {
@@ -26,11 +27,10 @@ export class Controller {
     const _session = await this.ctx.cache.get(body.verification_code);
     this.ctx.assert.invalidInput(!_session, "Invalid verification_code");
 
-    const session = JSON.parse(_session!) as { userId: string; otp: number; ip: string };
+    const session = JSON.parse(_session!) as { userId: string; ip: string };
 
     this.ctx.assert.invalidInput(!(session.ip === ip), "Invalid request");
     this.ctx.assert.invalidInput(!(session.userId === body.user_id), "Invalid user_id");
-    this.ctx.assert.invalidInput(!(session.otp === body.otp), "Invalid otp");
 
     const _user = await this.ctx.userRepository.findById(body.user_id);
     this.ctx.assert.resourceNotFound(!_user, `User with id ${body.user_id} not found`);
@@ -39,8 +39,15 @@ export class Controller {
     this.ctx.assert.invalidInput(user.email !== body.email, "Invalid email");
     this.ctx.assert.invalidInput(user.is_email_verify, "Email is already verified");
 
+    const secret = user.secret;
+    const isValidOtp = this.ctx.cryptoService.verifyOtp(secret, body.otp);
+    this.ctx.assert.invalidInput(!isValidOtp, "Invalid otp");
+
     await this.ctx.cache.del(body.verification_code);
-    await this.ctx.userRepository.update(body.user_id, { is_email_verify: true });
+    await this.ctx.userRepository.update(body.user_id, {
+      is_email_verify: true,
+      secret: this.ctx.cryptoService.generateUUID()
+    });
 
     return res.status(StatusCodes.OK).json({ user_id: user.id, email: user.email, is_email_verify: true });
   }

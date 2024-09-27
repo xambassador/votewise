@@ -18,7 +18,7 @@ export const ZLastName = z
 export const ZVerificationCode = z
   .string({ required_error: "verification_code is missing", invalid_type_error: "verification_code must be a string" })
   .min(1, { message: "verification_code is missing" });
-export const ZOtp = z.number({ required_error: "otp is missing", invalid_type_error: "otp must be a number" });
+export const ZOtp = z.string({ required_error: "otp is missing", invalid_type_error: "otp must be a string" });
 export const ZUserId = z
   .string({ required_error: "user_id is missing", invalid_type_error: "user_id must be a string" })
   .min(1, { message: "user_id is missing" });

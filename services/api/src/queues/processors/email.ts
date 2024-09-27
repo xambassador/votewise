@@ -8,7 +8,7 @@ type BaseData = {
   to: string;
   subject: string;
 };
-type SignupTemplate = BaseData & { templateName: "signup"; locals: { otp: number } };
+type SignupTemplate = BaseData & { templateName: "signup"; locals: { otp: string } };
 type WelcomeTemplate = BaseData & { templateName: "welcome"; locals: { userName: string } };
 type ForgotPasswordTemplate = BaseData & {
   templateName: "forgot-password";

@@ -1,6 +1,7 @@
 import crypto from "crypto";
-import bcrypt from "bcrypt";
+import { compare, hash } from "bcrypt";
 import { nanoid } from "nanoid";
+import { totp } from "otplib";
 import { v4 } from "uuid";
 
 const ALGORITHM = "aes256";
@@ -8,6 +9,12 @@ const INPUT_ENCODING = "utf8";
 const OUTPUT_ENCODING = "hex";
 // AES blocksize
 const IV_LENGTH = 16;
+
+enum HashAlgorithms {
+  "SHA1" = "sha1",
+  "SHA256" = "sha256",
+  "SHA512" = "sha512"
+}
 
 export class CryptoService {
   constructor() {}
@@ -56,20 +63,24 @@ export class CryptoService {
   }
 
   public async hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, 10);
+    return hash(password, 10);
   }
 
   public async comparePassword(password: string, hash: string): Promise<boolean> {
-    return bcrypt.compare(password, hash);
+    return compare(password, hash);
   }
 
-  public getOtp(count = 6): number {
-    const digits = "0123456789";
-    let otp = "";
-    for (let i = 0; i < count; i++) {
-      otp += digits[Math.floor(Math.random() * 10)];
-    }
-    return parseInt(otp, 10);
+  public getOtp(secret: string, digits = 6): string {
+    const windowInSeconds = 300;
+    totp.options = { algorithm: HashAlgorithms.SHA256, digits, step: windowInSeconds };
+    const otp = totp.generate(secret);
+    return otp;
+  }
+
+  public verifyOtp(secret: string, otp: string, digits = 6): boolean {
+    const windowInSeconds = 300;
+    totp.options = { algorithm: HashAlgorithms.SHA256, digits, step: windowInSeconds };
+    return totp.check(otp, secret);
   }
 
   public hash(data: string): string {

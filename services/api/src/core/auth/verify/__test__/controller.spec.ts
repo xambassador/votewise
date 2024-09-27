@@ -14,7 +14,8 @@ const controller = new Controller({
   assert: new Assertions(),
   cache: helpers.mockCache,
   requestParser: requestParserPluginFactory(),
-  userRepository: helpers.mockUserRepository
+  userRepository: helpers.mockUserRepository,
+  cryptoService: helpers.mockCryptoService
 });
 
 beforeEach(() => {
@@ -30,6 +31,16 @@ describe("Verify Email Controller", () => {
     const error = await controller.handle(req, res).catch((e) => e);
     expect(helpers.mockCache.get).not.toHaveBeenCalled();
     expect(error.message).toBe("email is missing");
+  });
+
+  it("should throw error if otp is in invalid format", async () => {
+    const req = buildReq({ body: { ...body, otp: 12222 } });
+    const res = buildRes({ locals });
+    helpers.setupHappyPath();
+
+    const error = await controller.handle(req, res).catch((e) => e);
+    expect(helpers.mockCache.get).not.toHaveBeenCalled();
+    expect(error.message).toBe("otp must be a string");
   });
 
   it("should throw error if verification code is invalid", async () => {
@@ -67,17 +78,6 @@ describe("Verify Email Controller", () => {
     expect(error.message).toBe("Invalid user_id");
   });
 
-  it("should throw error if otp is invalid", async () => {
-    const req = buildReq({ body: { ...body, otp: 127272111 } });
-    const res = buildRes({ locals });
-    helpers.setupHappyPath();
-
-    const error = await controller.handle(req, res).catch((e) => e);
-    expect(helpers.mockUserRepository.findById).not.toHaveBeenCalled();
-    expect(helpers.mockCache.del).not.toHaveBeenCalled();
-    expect(error.message).toBe("Invalid otp");
-  });
-
   it("should throw error if user not found by it's user_id", async () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
@@ -99,6 +99,17 @@ describe("Verify Email Controller", () => {
     expect(helpers.mockUserRepository.update).not.toHaveBeenCalled();
     expect(helpers.mockCache.del).not.toHaveBeenCalled();
     expect(error.message).toBe("Invalid email");
+  });
+
+  it("should throw error if otp is invalid", async () => {
+    const req = buildReq({ body: { ...body, otp: "127272111" } });
+    const res = buildRes({ locals });
+    helpers.setupHappyPath();
+    helpers.mockCryptoService.verifyOtp.mockReturnValueOnce(false);
+
+    const error = await controller.handle(req, res).catch((e) => e);
+    expect(helpers.mockCache.del).not.toHaveBeenCalled();
+    expect(error.message).toBe("Invalid otp");
   });
 
   it("should throw error if email is already verified", async () => {
