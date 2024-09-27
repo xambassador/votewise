@@ -9,7 +9,7 @@ import { cva } from "class-variance-authority";
 import { cn } from "./cn";
 import { Spinner } from "./ring-spinner";
 
-const variants = cva(
+export const variants = cva(
   "inline-flex relative items-center overflow-hidden justify-center whitespace-nowrap rounded border text-sm duration-500 text-gray-200 px-5 transition-[colors_,_transform] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
