@@ -105,10 +105,11 @@ describe("Verify Email Controller", () => {
     const req = buildReq({ body: { ...body, otp: "127272111" } });
     const res = buildRes({ locals });
     helpers.setupHappyPath();
-    helpers.mockCryptoService.verifyOtp.mockReturnValueOnce(false);
+    helpers.mockCryptoService.verifyOtp.mockReturnValue(false);
 
     const error = await controller.handle(req, res).catch((e) => e);
     expect(helpers.mockCache.del).not.toHaveBeenCalled();
+    expect(helpers.mockCryptoService.verifyOtp).toHaveBeenCalledWith(helpers.unverifiedUser.secret, "127272111");
     expect(error.message).toBe("Invalid otp");
   });
 
