@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { pathsToModuleNameMapper } = require("ts-jest");
 
 /** @type {import('ts-jest').JestConfigWithTsJest} */
@@ -11,5 +12,6 @@ module.exports = {
   moduleNameMapper: pathsToModuleNameMapper({ "@/*": ["src/*"] }, { prefix: "<rootDir>/" }),
   coverageDirectory: "<rootDir>/coverage",
   collectCoverageFrom: ["src/**/*.ts"],
-  collectCoverage: false
+  collectCoverage: false,
+  modulePathIgnorePatterns: ["<rootDir>/dist/"]
 };
