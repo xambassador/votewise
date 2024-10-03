@@ -34,6 +34,10 @@ export class Controller {
     const user = _user!;
     const isValid = await this.ctx.cryptoService.comparePassword(password, user.password);
     this.ctx.assert.invalidInput(!isValid, "Invalid password");
+    this.ctx.assert.invalidInput(
+      !user.is_email_verify,
+      `Email ${user.email} is not verified. Please verify your email`
+    );
 
     await this.ctx.sessionManager.enforceSessionLimit(user.id);
     const { accessToken, refreshToken } = await this.ctx.sessionManager.create({
