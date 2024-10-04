@@ -88,6 +88,16 @@ describe("Signin Controller", () => {
     expect(error.message).toBe("Invalid password");
   });
 
+  it("should throw error if email is not verified", async () => {
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
+
+    helpers.setupHappyPath({ is_email_verify: false });
+    const error = await controller.handle(req, res).catch((e) => e);
+    expect(helpers.mockJWTService.signAccessToken).not.toHaveBeenCalled();
+    expect(error.message).toBe(`Email ${user.email} is not verified. Please verify your email`);
+  });
+
   it("should throw error if user has more then 3 active sessions", async () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });

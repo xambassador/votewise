@@ -1,3 +1,4 @@
+import type { User } from "../../../../../test/helpers";
 import type { EmailStrategy, UsernameStrategy } from "../strategies";
 
 import { mockUserRepository } from "@/repository/__mock__/user.repository";
@@ -14,13 +15,13 @@ export const mockEmailStrategy = {
   handle: jest.fn().mockName("emailStrategy.handle")
 } as unknown as jest.Mocked<EmailStrategy>;
 
-export const user = buildUser();
+export const user = buildUser({ is_email_verify: true });
 
-export function setupHappyPath() {
-  mockUserRepository.findByEmail.mockResolvedValue(user);
-  mockUserRepository.findByUsername.mockResolvedValue(user);
-  mockEmailStrategy.handle.mockResolvedValue(user);
-  mockUsernameStrategy.handle.mockResolvedValue(user);
+export function setupHappyPath(overrides?: Partial<User>) {
+  mockUserRepository.findByEmail.mockResolvedValue({ ...user, ...overrides });
+  mockUserRepository.findByUsername.mockResolvedValue({ ...user, ...overrides });
+  mockEmailStrategy.handle.mockResolvedValue({ ...user, ...overrides });
+  mockUsernameStrategy.handle.mockResolvedValue({ ...user, ...overrides });
   mockCryptoService.comparePassword.mockResolvedValue(true);
   mockCryptoService.generateUUID.mockReturnValue("session_id");
   mockJWTService.signAccessToken.mockReturnValue("access_token");

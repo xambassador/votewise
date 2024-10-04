@@ -46,3 +46,5 @@ export function buildUser(overrides: Partial<User> = {}): User {
     ...overrides
   };
 }
+
+export type { User };
