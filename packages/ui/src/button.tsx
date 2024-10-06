@@ -10,14 +10,17 @@ import { cn } from "./cn";
 import { Spinner } from "./ring-spinner";
 
 export const variants = cva(
-  "inline-flex relative items-center overflow-hidden justify-center whitespace-nowrap rounded border text-sm duration-500 text-gray-200 px-5 transition-[colors_,_transform] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+  "inline-flex relative items-center overflow-hidden justify-center whitespace-nowrap rounded border text-sm duration-500 text-gray-200 px-5 transition-[colors_,_transform] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:shadow-input-ring focus:ring-offset-1 focus:ring-offset-nobelBlack-200",
   {
     variants: {
       variant: {
-        primary: "bg-blue-800 hover:bg-blue-700 active:scale-95 border-blue-600",
-        secondary: "bg-nobelBlack-100 border border-nobelBlack-200 hover:bg-nobelBlack-200 active:scale-95",
-        danger: "bg-red-700 hover:bg-red-600 active:scale-95 border-red-600",
-        outline: "bg-transparent border border-nobelBlack-200 hover:bg-nobelBlack-200 active:scale-95"
+        primary:
+          "bg-blue-800 hover:bg-blue-700 active:scale-95 border-blue-600 focus:border-blue-500 focus:ring-blue-500/30",
+        secondary:
+          "bg-nobelBlack-100 border border-nobelBlack-200 hover:bg-nobelBlack-100/80 active:scale-95 focus:border-nobelBlack-200 focus:ring-nobelBlack-200/70",
+        danger: "bg-red-700 hover:bg-red-600 active:scale-95 border-red-600 focus:border-red-500 focus:ring-red-500/30",
+        outline:
+          "bg-transparent border border-nobelBlack-200 hover:bg-nobelBlack-200 active:scale-95 focus:border-nobelBlack-200 focus:ring-nobelBlack-200/70"
       },
       size: {
         default: "h-10",
