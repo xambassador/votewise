@@ -1,73 +1,87 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 
 import { cn } from "./cn";
 import { createContext } from "./context";
 import { Cross } from "./icons/cross";
 import { Image as ImgIcon } from "./icons/image";
 
+/* ----------------------------------------------------------------------------------------------- */
+
+const url = "/votewise-bucket/votewise/assets/avatars/avatar_1.png";
+const theme = {
+  imagePicker: "relative size-[calc((200/16)*1rem)] overflow-hidden",
+  img: "size-full object-cover",
+  imagePreview: "rounded-full relative size-full overflow-hidden border-2 border-red-200"
+};
+
 const [Provider, useProvider] = createContext<{
-  preview: string | null;
+  preview: string;
+  isDefault: boolean;
   onPreviewChange: (preview: string | null) => void;
 }>("ImagePicker");
 
-const url = "/votewise-bucket/votewise/assets/avatars/avatar_1.png";
+/* -----------------------------------------------------------------------------------------------
+ * ImagePicker
+ * -----------------------------------------------------------------------------------------------*/
+type ImagePickerProps = React.HTMLAttributes<HTMLDivElement> & { url?: string | null };
 
-export function ImagePicker(
-  props: Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & { children: React.ReactNode }
-) {
-  const [preview, setPreview] = useState<string | null>(null);
+export function ImagePicker(props: ImagePickerProps) {
+  const { url: controlledUrl, ...rest } = props;
+  const [preview, setPreview] = useState<string>(controlledUrl || url);
+  const isDefault = !controlledUrl;
 
-  function onPreviewChange(preview: string | null) {
+  const onPreviewChange = useCallback((preview: string | null) => {
+    if (!preview) {
+      setPreview(url);
+      return;
+    }
     setPreview(preview);
-  }
+  }, []);
+
+  useEffect(() => {
+    setPreview(controlledUrl || url);
+  }, [controlledUrl]);
 
   return (
-    <Provider preview={preview} onPreviewChange={onPreviewChange}>
-      <div {...props} className={cn("relative size-[calc((200/16)*1rem)] overflow-hidden", props?.className)} />
+    <Provider preview={preview} onPreviewChange={onPreviewChange} isDefault={isDefault}>
+      <div {...rest} className={cn(theme.imagePicker, rest?.className)} />
     </Provider>
   );
 }
 
-function Img(props: React.ImgHTMLAttributes<HTMLImageElement>) {
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img {...props} src={props.src} alt={props.alt} className={cn("size-full object-cover", props.className)} />;
-}
-
-type ImageProps = Omit<React.ImgHTMLAttributes<HTMLImageElement>, "children"> & {
+/* -----------------------------------------------------------------------------------------------
+ * ImagePreview
+ * -----------------------------------------------------------------------------------------------*/
+type ImagePreviewProps = Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src"> & {
   imageWrapperProps?: React.HTMLAttributes<HTMLElement>;
   caption?: string;
-  children?: React.ReactNode;
 };
 
-export function ImagePreview(props: ImageProps) {
+export function ImagePreview(props: ImagePreviewProps) {
   const { preview } = useProvider("ImagePreview");
-  const { imageWrapperProps, caption, children, ...rest } = props;
-  const imgUrl = preview || rest.src || url;
+  const { imageWrapperProps, caption = "User avatar", children, ...rest } = props;
 
   return (
-    <figure
-      {...imageWrapperProps}
-      className={cn(
-        "rounded-full relative size-full overflow-hidden border-2 border-red-200",
-        imageWrapperProps?.className
-      )}
-    >
-      <Img {...rest} src={imgUrl} alt={rest.alt} className={rest.className} />
+    <figure {...imageWrapperProps} className={cn(theme.imagePreview, imageWrapperProps?.className)}>
+      <Img {...rest} src={preview} alt={rest.alt || "User avatar"} />
       <figcaption className="sr-only">{caption}</figcaption>
       {children}
     </figure>
   );
 }
 
-export function ImagePickerButton(
-  props: React.HTMLAttributes<HTMLLabelElement> & {
-    isMultiple?: boolean;
-    accept?: string;
-    preventDefaultBehavior?: boolean;
-  }
-) {
+/* -----------------------------------------------------------------------------------------------
+ * ImagePickerButton
+ * -----------------------------------------------------------------------------------------------*/
+type ImagePickerButtonProps = React.HTMLAttributes<HTMLLabelElement> & {
+  isMultiple?: boolean;
+  accept?: string;
+  preventDefaultBehavior?: boolean;
+};
+
+export function ImagePickerButton(props: ImagePickerButtonProps) {
   const { isMultiple = false, accept = "image/*", preventDefaultBehavior = false, ...rest } = props;
   const { onPreviewChange } = useProvider("ImagePickerButton");
   const id = useId();
@@ -97,22 +111,44 @@ export function ImagePickerButton(
   );
 }
 
-export function ResetPreviewButton() {
-  const { preview, onPreviewChange } = useProvider("ResetPreviewButton");
+/* -----------------------------------------------------------------------------------------------
+ * ResetPreviewButton
+ * -----------------------------------------------------------------------------------------------*/
+type ResetPreviewButtonProps = React.HTMLAttributes<HTMLDivElement> & { onReset?: () => void };
+
+export function ResetPreviewButton(props: ResetPreviewButtonProps) {
+  const { onReset, ...rest } = props;
+  const { preview, onPreviewChange, isDefault } = useProvider("ResetPreviewButton");
+
+  function onResetClick() {
+    onPreviewChange(null);
+    onReset?.();
+  }
 
   if (!preview) return null;
+  if (isDefault) return null;
 
   return (
-    <div className="absolute opacity-0 hover:opacity-100 transition-opacity duration-300 inset-0 bg-black-900/40 flex items-center justify-center">
+    <div
+      {...rest}
+      className={cn(
+        "absolute opacity-0 hover:opacity-100 transition-opacity duration-300 inset-0 bg-black-900/40 flex items-center justify-center",
+        "rounded-full overflow-hidden",
+        rest.className
+      )}
+    >
       <button
         type="button"
-        onClick={() => {
-          onPreviewChange(null);
-        }}
+        onClick={onResetClick}
         className="p-2 flex items-center justify-center rounded-full overflow-hidden bg-nobelBlack-100 border border-nobelBlack-200"
       >
         <Cross className="size-4" />
       </button>
     </div>
   );
+}
+
+function Img(props: React.ImgHTMLAttributes<HTMLImageElement>) {
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img {...props} src={props.src} alt={props.alt} className={cn(theme.img, props.className)} />;
 }

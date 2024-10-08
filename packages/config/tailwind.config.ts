@@ -55,7 +55,8 @@ const config = {
         15: "3.75rem" // 60px
       },
       boxShadow: {
-        "input-ring": "0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color), 0 0 0 4px var(--tw-ring-color)"
+        "input-ring": "0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color), 0 0 0 4px var(--tw-ring-color)",
+        "image-card": "0 4px 7px 0px rgba(0, 0, 0, 0.25)"
       },
       fontSize: {
         "3xl": "2rem",
