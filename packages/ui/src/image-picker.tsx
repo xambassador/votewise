@@ -17,8 +17,7 @@ const theme = {
 };
 
 const [Provider, useProvider] = createContext<{
-  preview: string;
-  isDefault: boolean;
+  preview: string | null;
   onPreviewChange: (preview: string | null) => void;
 }>("ImagePicker");
 
@@ -29,23 +28,18 @@ type ImagePickerProps = React.HTMLAttributes<HTMLDivElement> & { url?: string | 
 
 export function ImagePicker(props: ImagePickerProps) {
   const { url: controlledUrl, ...rest } = props;
-  const [preview, setPreview] = useState<string>(controlledUrl || url);
-  const isDefault = !controlledUrl;
+  const [preview, setPreview] = useState<string | null>(null);
 
   const onPreviewChange = useCallback((preview: string | null) => {
-    if (!preview) {
-      setPreview(url);
-      return;
-    }
     setPreview(preview);
   }, []);
 
   useEffect(() => {
-    setPreview(controlledUrl || url);
+    setPreview(controlledUrl as string | null);
   }, [controlledUrl]);
 
   return (
-    <Provider preview={preview} onPreviewChange={onPreviewChange} isDefault={isDefault}>
+    <Provider preview={preview} onPreviewChange={onPreviewChange}>
       <div {...rest} className={cn(theme.imagePicker, rest?.className)} />
     </Provider>
   );
@@ -65,7 +59,7 @@ export function ImagePreview(props: ImagePreviewProps) {
 
   return (
     <figure {...imageWrapperProps} className={cn(theme.imagePreview, imageWrapperProps?.className)}>
-      <Img {...rest} src={preview} alt={rest.alt || "User avatar"} />
+      <Img {...rest} src={preview || url} alt={rest.alt || "User avatar"} />
       <figcaption className="sr-only">{caption}</figcaption>
       {children}
     </figure>
@@ -118,7 +112,7 @@ type ResetPreviewButtonProps = React.HTMLAttributes<HTMLDivElement> & { onReset?
 
 export function ResetPreviewButton(props: ResetPreviewButtonProps) {
   const { onReset, ...rest } = props;
-  const { preview, onPreviewChange, isDefault } = useProvider("ResetPreviewButton");
+  const { preview, onPreviewChange } = useProvider("ResetPreviewButton");
 
   function onResetClick() {
     onPreviewChange(null);
@@ -126,7 +120,6 @@ export function ResetPreviewButton(props: ResetPreviewButtonProps) {
   }
 
   if (!preview) return null;
-  if (isDefault) return null;
 
   return (
     <div
