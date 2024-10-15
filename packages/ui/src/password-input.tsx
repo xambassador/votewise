@@ -1,17 +1,19 @@
 "use client";
 
-import type { InputProps } from "./input";
+import type { InputFieldProps, InputProps, InputRef } from "./input-field";
 
 import { forwardRef, useState } from "react";
 
-import { cn } from "./cn";
 import { Eye } from "./icons/eye";
 import { EyeCross } from "./icons/eye-cross";
 import { Padlock } from "./icons/padlock";
-import { inputWrapper } from "./theme";
+import { Input, InputField } from "./input-field";
 
-type PasswordInputProps = InputProps & { wrapperProps?: React.HTMLAttributes<HTMLDivElement> };
-export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((props, ref) => {
+/* -----------------------------------------------------------------------------------------------
+ * PasswordInput
+ * -----------------------------------------------------------------------------------------------*/
+type PasswordInputProps = InputProps & { wrapperProps?: InputFieldProps };
+export const PasswordInput = forwardRef<InputRef, PasswordInputProps>((props, ref) => {
   const { wrapperProps, ...inputProps } = props;
   const hasError = !!inputProps["data-has-error" as keyof typeof inputProps];
 
@@ -23,14 +25,14 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
   }
 
   return (
-    <div {...wrapperProps} className={cn(inputWrapper.base, wrapperProps?.className, hasError && inputWrapper.error)}>
+    <InputField {...wrapperProps} hasError={hasError}>
       <Padlock className="text-gray-600" />
-      <input {...inputProps} type={type} ref={ref} className={cn(inputWrapper.input, inputProps.className)} />
+      <Input {...inputProps} type={type} ref={ref} />
       <button className="absolute top-1/2 right-2 -translate-y-1/2" onClick={onToggle}>
         {showPassword && <EyeCross className="text-gray-600" />}
         {!showPassword && <Eye className="text-gray-600" />}
       </button>
-    </div>
+    </InputField>
   );
 });
 PasswordInput.displayName = "PasswordInput";

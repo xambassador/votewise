@@ -1,37 +1,42 @@
 "use client";
 
-import type { InputProps } from "./input";
+import type { InputFieldProps, InputProps, InputRef } from "./input-field";
 
 import { forwardRef } from "react";
 
-import { cn } from "./cn";
 import { Mail } from "./icons/mail";
 import { User } from "./icons/user";
-import { inputWrapper } from "./theme";
+import { Input, InputField } from "./input-field";
 
-type EmailInputProps = InputProps & { wrapperProps?: React.HTMLAttributes<HTMLDivElement> };
-export const EmailInput = forwardRef<HTMLInputElement, EmailInputProps>((props, ref) => {
+/* -----------------------------------------------------------------------------------------------
+ * EmailInput
+ * -----------------------------------------------------------------------------------------------*/
+type EmailInputProps = InputProps & { wrapperProps?: InputFieldProps };
+export const EmailInput = forwardRef<InputRef, EmailInputProps>((props, ref) => {
   const { wrapperProps, ...inputProps } = props;
   const hasError = !!inputProps["data-has-error" as keyof typeof inputProps];
   return (
-    <div {...wrapperProps} className={cn(inputWrapper.base, wrapperProps?.className, hasError && inputWrapper.error)}>
+    <InputField {...wrapperProps} hasError={hasError}>
       <Mail className="text-gray-600" />
-      <input type="email" ref={ref} {...inputProps} className={cn(inputWrapper.input, inputProps.className)} />
-    </div>
+      <Input {...inputProps} type="email" ref={ref} />
+    </InputField>
   );
 });
 
 EmailInput.displayName = "EmailInput";
 
-type UsernameInputProps = InputProps & { wrapperProps?: React.HTMLAttributes<HTMLDivElement> };
-export const UsernameInput = forwardRef<HTMLInputElement, UsernameInputProps>((props, ref) => {
+/* -----------------------------------------------------------------------------------------------
+ * UsernameInput
+ * -----------------------------------------------------------------------------------------------*/
+type UsernameInputProps = InputProps & { wrapperProps?: InputFieldProps };
+export const UsernameInput = forwardRef<InputRef, UsernameInputProps>((props, ref) => {
   const { wrapperProps, ...inputProps } = props;
   const hasError = !!inputProps["data-has-error" as keyof typeof inputProps];
   return (
-    <div {...wrapperProps} className={cn(inputWrapper.base, wrapperProps?.className, hasError && inputWrapper.error)}>
+    <InputField {...wrapperProps} hasError={hasError}>
       <User className="text-gray-600" />
-      <input type="email" ref={ref} {...inputProps} className={cn(inputWrapper.input, inputProps.className)} />
-    </div>
+      <Input type="email" ref={ref} {...inputProps} />
+    </InputField>
   );
 });
 
