@@ -15,7 +15,7 @@ const cfg = new ServerConfig({
   publicUrl: environment.VOTEWISE_API_URL,
   port: environment.VOTEWISE_API_PORT,
   devMode: environment.NODE_ENV === "development",
-  blobUploadLimit: 10 * 1024 * 1024, // 10 MB. TODO: Move to env
+  blobUploadLimit: 10 * 1024 * 1024, // TODO: Move to env
   appUrl: environment.VOTEWISE_APP_URL,
   bucketUrl: environment.VOTEWISE_BUCKET_URL
 });

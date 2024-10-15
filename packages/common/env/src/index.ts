@@ -69,6 +69,19 @@ const REQUEST_TIMEOUT = z.string().default("30000");
 const CONCURRENCY = z.string().default("1");
 const SSL_KEY = z.string().optional();
 const SSL_CERT = z.string().optional();
+const MINIO_ACCESS_KEY = z
+  .string({ required_error: "MINIO_ACCESS_KEY is required" })
+  .min(1, { message: "MINIO_ACCESS is required" });
+const MINIO_SECRET_KEY = z
+  .string({ required_error: "MINIO_SECRET_KEY is required" })
+  .min(1, { message: "MINIO_SECRET is required" });
+const MINIO_ENDPOINT = z
+  .string({ required_error: "MINIO_ENDPOINT is required" })
+  .min(1, { message: "MINIO_ENDPOINT is required" });
+const MINIO_PORT = z
+  .string({ required_error: "MINIO_PORT is required" })
+  .min(1, { message: "MINIO_PORT is required" })
+  .transform((val) => parseInt(val, 10));
 
 export const envBaseSchema = z.object({
   ACCESS_TOKEN_SECRET,
@@ -94,7 +107,11 @@ export const envBaseSchema = z.object({
   REQUEST_TIMEOUT,
   CONCURRENCY,
   SSL_KEY,
-  SSL_CERT
+  SSL_CERT,
+  MINIO_ACCESS_KEY,
+  MINIO_SECRET_KEY,
+  MINIO_ENDPOINT,
+  MINIO_PORT
 });
 
 export const envSchema = z.object({
@@ -126,7 +143,11 @@ export const envSchema = z.object({
   REQUEST_TIMEOUT: REQUEST_TIMEOUT.transform((val) => parseInt(val, 10)),
   CONCURRENCY: CONCURRENCY.transform((val) => parseInt(val, 10)),
   SSL_KEY,
-  SSL_CERT
+  SSL_CERT,
+  MINIO_ACCESS_KEY,
+  MINIO_SECRET_KEY,
+  MINIO_ENDPOINT,
+  MINIO_PORT
 });
 
 envSchema.superRefine((data) => {

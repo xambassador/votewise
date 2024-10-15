@@ -5,6 +5,7 @@ import type { RequestParserPlugin } from "./plugins/request-parser";
 import _fs from "node:fs/promises";
 import path from "node:path";
 import { ensureDirSync } from "fs-extra";
+import * as Minio from "minio";
 
 import { Assertions } from "@votewise/errors";
 import logger from "@votewise/log";
@@ -23,6 +24,7 @@ export type AppContextOptions = {
   environment: TEnv;
   assert: Assertions;
   plugins: Plugins;
+  minio: Minio.Client;
 };
 
 const basUploadPath = path.join(__dirname, "../public/uploads");
@@ -54,6 +56,7 @@ export class AppContext {
   public getFileInfo = getFileInfo;
   public getFileName = getFileName;
   public plugins: Plugins;
+  public minio: Minio.Client;
 
   constructor(opts: AppContextOptions) {
     this.config = opts.config;
@@ -61,6 +64,7 @@ export class AppContext {
     this.logger = opts.logger;
     this.assert = opts.assert;
     this.plugins = opts.plugins;
+    this.minio = opts.minio;
     createUploadPath();
   }
 
@@ -69,12 +73,20 @@ export class AppContext {
     const environment = checkEnv(process.env);
     const assert = new Assertions();
     const requestParser = requestParserPluginFactory();
+    const minio = new Minio.Client({
+      endPoint: environment.MINIO_ENDPOINT,
+      port: environment.MINIO_PORT,
+      useSSL: false, // TODO: Get this from env
+      accessKey: environment.MINIO_ACCESS_KEY!,
+      secretKey: environment.MINIO_SECRET_KEY!
+    });
     const context = new AppContext({
       config: cfg,
       logger,
       environment,
       assert,
       plugins: { requestParser },
+      minio,
       ...overrides
     });
     this._instance = context;

@@ -1,5 +1,6 @@
 import { Router } from "express";
 
+import { getAvatarsControllerFactory, getBgControllerFactory } from "./assets";
 import {
   deleteControllerFactory,
   handshakeControllerFactory,
@@ -16,9 +17,11 @@ import {
  */
 export function moduleRouterFactory(basePath: string): Router {
   const router = Router();
-  router.post(basePath + "/handshake", handshakeControllerFactory());
+  router.post(basePath + "/upload/handshake", handshakeControllerFactory());
   router.post(basePath + "/upload", uploadControllerFactory());
   router.get(basePath + "/upload/:token/status", statusControllerFactory());
   router.delete(basePath + "/upload/:token", deleteControllerFactory());
+  router.get(basePath + "/upload/assets/avatars", getAvatarsControllerFactory());
+  router.get(basePath + "/upload/assets/backgrounds", getBgControllerFactory());
   return router;
 }
