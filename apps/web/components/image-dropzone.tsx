@@ -29,7 +29,7 @@ export function ImageDropZone(props: Props) {
       {...rest}
       {...rootProps}
       className={cn(
-        "bg-nobelBlack-200 cursor-pointer h-[calc((250/16)*1rem)] rounded-3xl border-2 border-dashed border-black-400 grid place-items-center",
+        "bg-nobelBlack-200 cursor-pointer h-[calc((250/16)*1rem)] rounded-3xl border-2 border-dashed border-black-400 grid place-items-center p-5",
         isDragActive && "border-blue-200",
         isDragAccept && "border-green-400",
         isDragReject && "border-red-600",

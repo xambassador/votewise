@@ -1,7 +1,5 @@
 "use client";
 
-import type { ButtonProps } from "@votewise/ui/button";
-
 import { Button } from "@votewise/ui/button";
 import { Close, Dialog, DialogContent, DialogDescription, DialogTitle } from "@votewise/ui/dialog";
 import { SeparatorWithLabel } from "@votewise/ui/separator";
@@ -42,22 +40,8 @@ function ChooseAvatarButton() {
 }
 
 function SaveButton() {
-  const { render, getButtonProps } = useSaveButton();
-  return render(<Button {...getButtonProps()}>Save</Button>);
-}
-
-function useSaveButton() {
   const selectedAvatar = useGetSelectedAvatar();
   const save = useSaveAction();
-
-  function getButtonProps(props?: ButtonProps): ButtonProps {
-    return { ...props, disabled: !selectedAvatar, onClick: save };
-  }
-
-  function render(children: React.ReactNode) {
-    if (!selectedAvatar) return null;
-    return children;
-  }
-
-  return { getButtonProps, render };
+  if (!selectedAvatar) return null;
+  return <Button onClick={save}>Save</Button>;
 }

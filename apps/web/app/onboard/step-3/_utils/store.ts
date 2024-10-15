@@ -10,47 +10,49 @@ type DialogProps = React.ComponentProps<typeof Dialog>;
 /* -----------------------------------------------------------------------------------------------
  * Atoms
  * -----------------------------------------------------------------------------------------------*/
-const isDialogOpen = atom(false);
-const isChooseAvtarDialogOpen = atom(false);
-const selectedAvatarAtom = atom<string | null>(null);
-const savedAvatarAtom = atom<string | null>(null);
+const isDialogOpenAtom = atom(false);
+const isChooseBgDialogOpenAtom = atom(false);
+const selectedBgAtom = atom<string | null>(null);
+const savedBgAtom = atom<string | null>(null);
 
 /* -----------------------------------------------------------------------------------------------
  * Derived Atoms
  * -----------------------------------------------------------------------------------------------*/
 const onSaveActionAtom = atom(null, (get, set) => {
-  const selectedAvatar = get(selectedAvatarAtom);
-  if (!selectedAvatar) return;
-  set(savedAvatarAtom, selectedAvatar);
-  set(isDialogOpen, false);
+  const selectedBg = get(selectedBgAtom);
+  if (!selectedBg) return;
+  set(savedBgAtom, selectedBg);
+  set(isDialogOpenAtom, false);
 });
-const onSelectAvatarFromList = atom(null, (_, set, avatar: string) => {
-  set(selectedAvatarAtom, avatar);
-  set(isChooseAvtarDialogOpen, false);
+
+const onSelectBgFromList = atom(null, (_, set, bg: string) => {
+  set(selectedBgAtom, bg);
+  set(isChooseBgDialogOpenAtom, false);
 });
+
 const onFileDropAtom = atom(null, (_, set, files: File[]) => {
   const file = files[0];
   const url = URL.createObjectURL(file);
-  set(selectedAvatarAtom, url);
+  set(selectedBgAtom, url);
 });
 
 /* -----------------------------------------------------------------------------------------------
  * Setters
  * -----------------------------------------------------------------------------------------------*/
 export function useSetDialogOpen() {
-  return useSetAtom(isDialogOpen);
+  return useSetAtom(isDialogOpenAtom);
 }
 
-export function useSetChooseAvtarDialogOpen() {
-  return useSetAtom(isChooseAvtarDialogOpen);
+export function useSetChooseBgDialogOpen() {
+  return useSetAtom(isChooseBgDialogOpenAtom);
 }
 
 export function useSaveAction() {
   return useSetAtom(onSaveActionAtom);
 }
 
-export function useSelectAvatarFromList() {
-  return useSetAtom(onSelectAvatarFromList);
+export function useSelectBgFromList() {
+  return useSetAtom(onSelectBgFromList);
 }
 
 export function useOnFileDropAction() {
@@ -58,11 +60,11 @@ export function useOnFileDropAction() {
 }
 
 export function useResetSelection() {
-  const setSelectedAvatar = useSetAtom(selectedAvatarAtom);
-  const setSavedAvatar = useSetAtom(savedAvatarAtom);
+  const setSelectedBg = useSetAtom(selectedBgAtom);
+  const setSavedBg = useSetAtom(savedBgAtom);
   return () => {
-    setSelectedAvatar(null);
-    setSavedAvatar(null);
+    setSelectedBg(null);
+    setSavedBg(null);
   };
 }
 
@@ -70,25 +72,29 @@ export function useResetSelection() {
  * Getters
  * -----------------------------------------------------------------------------------------------*/
 export function useGetDialogOpen() {
-  return useAtomValue(isDialogOpen);
+  return useAtomValue(isDialogOpenAtom);
 }
 
-export function useGetSelectedAvatar() {
-  return useAtomValue(selectedAvatarAtom);
+export function useGetChooseBgDialogOpen() {
+  return useAtomValue(isChooseBgDialogOpenAtom);
 }
 
-export function useGetSavedAvatar() {
-  return useAtomValue(savedAvatarAtom);
+export function useGetSelectedBg() {
+  return useAtomValue(selectedBgAtom);
+}
+
+export function useGetSavedBg() {
+  return useAtomValue(savedBgAtom);
 }
 
 export function useGetDialogProps(props?: DialogProps): DialogProps {
   const open = useGetDialogOpen();
   const setDialogOpen = useSetDialogOpen();
-  return { ...props, open, onOpenChange: setDialogOpen };
+  return { ...props, open, onOpenChange: () => setDialogOpen(false) };
 }
 
-export function useGetChooseAvtarDialogProps(props?: DialogProps): DialogProps {
-  const open = useAtomValue(isChooseAvtarDialogOpen);
-  const setDialogOpen = useSetChooseAvtarDialogOpen();
-  return { ...props, open, onOpenChange: setDialogOpen };
+export function useGetChooseBgDialogProps(props?: DialogProps): DialogProps {
+  const open = useGetChooseBgDialogOpen();
+  const setDialogOpen = useSetChooseBgDialogOpen();
+  return { ...props, open, onOpenChange: () => setDialogOpen(false) };
 }

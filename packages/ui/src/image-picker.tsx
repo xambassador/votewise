@@ -9,7 +9,9 @@ import { Image as ImgIcon } from "./icons/image";
 
 /* ----------------------------------------------------------------------------------------------- */
 
-const url = "/votewise-bucket/votewise/assets/avatars/avatar_1.png";
+export const defaultAvatarUrl = "/votewise-bucket/votewise/assets/avatars/default_avatar.png";
+export const defaultBgUrl = "/votewise-bucket/votewise/assets/backgrounds/default_bg.jpeg";
+
 const theme = {
   imagePicker: "relative size-[calc((200/16)*1rem)] overflow-hidden",
   img: "size-full object-cover",
@@ -51,15 +53,16 @@ export function ImagePicker(props: ImagePickerProps) {
 type ImagePreviewProps = Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src"> & {
   imageWrapperProps?: React.HTMLAttributes<HTMLElement>;
   caption?: string;
+  defaultUrl?: string;
 };
 
 export function ImagePreview(props: ImagePreviewProps) {
   const { preview } = useProvider("ImagePreview");
-  const { imageWrapperProps, caption = "User avatar", children, ...rest } = props;
+  const { imageWrapperProps, caption = "User avatar", children, defaultUrl = defaultAvatarUrl, ...rest } = props;
 
   return (
     <figure {...imageWrapperProps} className={cn(theme.imagePreview, imageWrapperProps?.className)}>
-      <Img {...rest} src={preview || url} alt={rest.alt || "User avatar"} />
+      <Img {...rest} src={preview || defaultUrl} alt={rest.alt || "User avatar"} />
       <figcaption className="sr-only">{caption}</figcaption>
       {children}
     </figure>
