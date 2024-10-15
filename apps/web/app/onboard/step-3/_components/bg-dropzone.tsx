@@ -10,7 +10,7 @@ export function BackgroundDropzone() {
   const selectedBg = useGetSelectedBg();
   const onFileDropAction = useOnFileDropAction();
   return (
-    <ImageDropZone onFileDrop={onFileDropAction} disabled={!!selectedBg}>
+    <ImageDropZone variant={selectedBg ? "success" : undefined} onFileDrop={onFileDropAction} disabled={!!selectedBg}>
       <BackgroundDropzonePlaceholder />
     </ImageDropZone>
   );

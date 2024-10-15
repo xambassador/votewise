@@ -8,10 +8,11 @@ import { Image as ImageIcon } from "@votewise/ui/icons/image";
 type Props = React.HTMLAttributes<HTMLDivElement> & {
   onFileDrop?: (files: File[]) => void;
   disabled?: boolean;
+  variant?: "success" | "error";
 };
 
 export function ImageDropZone(props: Props) {
-  const { onFileDrop, children, disabled = false, ...rest } = props;
+  const { onFileDrop, children, disabled = false, variant, ...rest } = props;
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
     accept: {
       "image/*": [".jpg", ".jpeg", ".png", ".gif", ".webp"]
@@ -35,6 +36,8 @@ export function ImageDropZone(props: Props) {
         isDragReject && "border-red-600",
         "focus:border-blue-500 focus:ring-blue-500/20 focus:outline-none focus:shadow-input-ring focus:ring-offset-1 focus:ring-offset-nobelBlack-200 transition-shadow",
         disabled && "cursor-not-allowed",
+        variant === "success" && "border-green-300",
+        variant === "error" && "border-red-600",
         rest.className
       )}
     >

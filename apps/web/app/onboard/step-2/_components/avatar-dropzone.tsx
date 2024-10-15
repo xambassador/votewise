@@ -12,7 +12,11 @@ export function AvatarDropZone() {
   const selectedAvatar = useGetSelectedAvatar();
   const onFileDropAction = useOnFileDropAction();
   return (
-    <ImageDropZone onFileDrop={onFileDropAction} disabled={!!selectedAvatar}>
+    <ImageDropZone
+      variant={selectedAvatar ? "success" : undefined}
+      onFileDrop={onFileDropAction}
+      disabled={!!selectedAvatar}
+    >
       <ImageDropZonePlaceholder />
     </ImageDropZone>
   );
