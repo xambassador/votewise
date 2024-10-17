@@ -10,6 +10,7 @@ export const routes = {
     root: () => "/onboard",
     step1: () => "/onboard/step-1",
     step2: () => "/onboard/step-2",
-    step3: () => "/onboard/step-3"
+    step3: () => "/onboard/step-3",
+    step4: () => "/onboard/step-4"
   }
 };

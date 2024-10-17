@@ -9,7 +9,8 @@ export type InputFieldProps = React.HTMLAttributes<HTMLDivElement> & { hasError?
 
 export const InputField = forwardRef<HTMLDivElement, InputFieldProps>((props, ref) => {
   const { hasError, className, ...rest } = props;
-  return <div {...rest} className={cn(inputWrapper.base, className, hasError && inputWrapper.error)} ref={ref} />;
+  const error = hasError || !!rest["data-has-error" as keyof typeof rest];
+  return <div {...rest} className={cn(inputWrapper.base, className, error && inputWrapper.error)} ref={ref} />;
 });
 InputField.displayName = "InputField";
 
