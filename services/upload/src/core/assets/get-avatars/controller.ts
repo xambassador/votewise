@@ -29,7 +29,14 @@ export class Controller {
         });
       })
       .on("error", (err) => {
+        this.ctx.logger.error("Error listing objects", { err });
+        if ("code" in err && UPSTREAM_DOWN_ERROR_CODES.includes(err.code as string)) {
+          res.status(503).json({ error: { message: "Service Unavailable" } });
+          return;
+        }
         res.status(500).json({ error: { message: err.message } });
       });
   }
 }
+
+const UPSTREAM_DOWN_ERROR_CODES = ["ECONNREFUSED", "ECONNRESET", "ETIMEDOUT", "EPIPE", "ENOTFOUND", "EAI_AGAIN"];
