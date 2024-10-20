@@ -5005,19 +5005,7 @@ __metadata:
   resolution: "@votewise/config@workspace:packages/config"
   dependencies:
     "@ianvs/prettier-plugin-sort-imports": "npm:^4.3.1"
-    "@typescript-eslint/eslint-plugin": "npm:^7.15.0"
-    "@typescript-eslint/parser": "npm:^7.15.0"
-    eslint: "npm:^8.57.0"
-    eslint-config-next: "npm:^14.2.6"
-    eslint-config-prettier: "npm:^9.1.0"
-    eslint-import-resolver-typescript: "npm:^3.6.1"
-    eslint-plugin-es: "npm:^4.1.0"
-    eslint-plugin-functional: "npm:^6.6.3"
-    eslint-plugin-import: "npm:^2.29.1"
-    eslint-plugin-prettier: "npm:^5.1.3"
-    eslint-plugin-react: "npm:^7.35.0"
-    eslint-plugin-tailwindcss: "npm:^3.17.4"
-    eslint-plugin-unused-imports: "npm:^4.1.3"
+    mini-svg-data-uri: "npm:^1.4.4"
     prettier: "npm:^3.3.3"
     prettier-plugin-tailwindcss: "npm:^0.6.6"
     tailwindcss: "npm:3.4.10"
@@ -13653,6 +13641,15 @@ __metadata:
   version: 1.0.1
   resolution: "min-indent@npm:1.0.1"
   checksum: 7e207bd5c20401b292de291f02913230cb1163abca162044f7db1d951fa245b174dc00869d40dd9a9f32a885ad6a5f3e767ee104cf278f399cb4e92d3f582d5c
+  languageName: node
+  linkType: hard
+
+"mini-svg-data-uri@npm:^1.4.4":
+  version: 1.4.4
+  resolution: "mini-svg-data-uri@npm:1.4.4"
+  bin:
+    mini-svg-data-uri: cli.js
+  checksum: 24545fa30b5a45449241bf19c25b8bc37594b63ec06401b3d563bd1c2e8a6abb7c18741f8b354e0064baa63c291be214154bf3a66f201ae71dfab3cc1a5e3191
   languageName: node
   linkType: hard
 

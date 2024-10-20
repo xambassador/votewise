@@ -6,7 +6,7 @@ export const ZSingInFormSchema = z.object({
   username: z
     .string({ required_error: "Username or email address is required" })
     .min(1, { message: "Username or email address is required" }),
-  password: z.string({ message: "Password is required" }).email({ message: "Password is required" })
+  password: z.string({ message: "Password is required" }).min(1, { message: "Password is required" })
 });
 
 export type TSinginForm = z.infer<typeof ZSingInFormSchema>;

@@ -1,7 +1,7 @@
 "use client";
 
 import { isServer, QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { domAnimation, LazyMotion, m } from "framer-motion";
+import { domAnimation, LazyMotion } from "framer-motion";
 
 function queryClientFactory() {
   return new QueryClient({
@@ -27,9 +27,5 @@ export default function Providers(props: Props) {
 
 export function MotionProvider(props: Props) {
   const { children } = props;
-  return (
-    <LazyMotion features={domAnimation}>
-      <m.div>{children}</m.div>
-    </LazyMotion>
-  );
+  return <LazyMotion features={domAnimation}>{children}</LazyMotion>;
 }
