@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { routes } from "@/lib/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
@@ -17,6 +19,7 @@ const schema = z.object({
 type Schema = z.infer<typeof schema>;
 
 export function SocialsForm() {
+  const router = useRouter();
   const form = useForm<Schema>({
     resolver: zodResolver(schema)
   });
@@ -69,7 +72,9 @@ export function SocialsForm() {
         </div>
         <div className="flex flex-col gap-5">
           <Button>Next</Button>
-          <Button variant="secondary">Back</Button>
+          <Button type="button" variant="secondary" onClick={() => router.push(routes.onboard.step3())}>
+            Back
+          </Button>
         </div>
       </form>
     </Form>
