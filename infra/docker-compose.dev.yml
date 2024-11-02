@@ -1,4 +1,10 @@
-version: "3.8"
+# Usage
+# Start: docker compose -f docker-compose.dev.yml up -d
+# Stop: docker compose -f docker-compose.dev.yml down
+# Destroy: docker compose -f docker-compose.dev.yml down -v --remove-orphans
+# Remove volumes: docker volume rm votewise_db votewise_redis uploads
+
+name: votewise
 
 x-minio-common: &minio-common
   image: minio/minio:latest

@@ -43,7 +43,10 @@ export class Controller {
       userId: user.id,
       isEmailVerified: user.is_email_verify,
       ip,
-      userAgent: req.headers["user-agent"]
+      userAgent: req.headers["user-agent"],
+      is2FAEnabled: user.is_2fa_enabled,
+      email: user.email,
+      username: user.user_name
     });
 
     return res

@@ -4,10 +4,17 @@ import type { Payload as AccessTokenData } from "@/services/jwt.service";
 import type { envBaseSchema } from "@votewise/env";
 import type { z } from "zod";
 
-export type SessionUser = { email: string; username: string };
+export type AuthenticatedUser = {
+  ip: string;
+  user_agent?: string;
+  is_2fa_enabled: "true" | "false";
+  is_2fa_verified: "true" | "false";
+  email: string;
+  username: string;
+};
 export type Locals = {
   meta: { ip: string };
-  session: { user: SessionUser; accessToken: AccessTokenData };
+  session: { user: AuthenticatedUser; accessToken: AccessTokenData };
 };
 
 declare global {

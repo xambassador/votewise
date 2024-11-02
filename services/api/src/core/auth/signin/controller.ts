@@ -44,12 +44,20 @@ export class Controller {
       userId: user.id,
       ip,
       isEmailVerified: user.is_email_verify,
-      userAgent: req.headers["user-agent"]
+      userAgent: req.headers["user-agent"],
+      is2FAEnabled: user.is_2fa_enabled,
+      email: user.email,
+      username: user.user_name
     });
 
-    return res
-      .status(StatusCodes.OK)
-      .json({ access_token: accessToken, refresh_token: refreshToken, expires_in: 15 * Minute, expires_in_unit: "ms" });
+    const data = {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      expires_in: 15 * Minute,
+      is_2fa_enabled: user.is_2fa_enabled,
+      expires_in_unit: "ms"
+    };
+    return res.status(StatusCodes.OK).json(data);
   }
 
   private getStrategy(email: string | undefined, username: string | undefined) {

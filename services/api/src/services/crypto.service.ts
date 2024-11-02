@@ -1,7 +1,8 @@
 import crypto from "crypto";
 import { compare, hash } from "bcrypt";
 import { nanoid } from "nanoid";
-import { totp } from "otplib";
+import { authenticator, totp } from "otplib";
+import { toDataURL } from "qrcode";
 import { v4 } from "uuid";
 
 const ALGORITHM = "aes256";
@@ -19,8 +20,18 @@ enum HashAlgorithms {
 export class CryptoService {
   constructor() {}
 
+  /**
+   * Encrypts a string using a symmetric key
+   *
+   * @param data - The string to be encrypted
+   * @param key - The key to use for encryption
+   * @returns - The encrypted string
+   */
   public symmetricEncrypt(data: string, key: string): string {
-    const _key = Buffer.from(key, "latin1");
+    if (key.length !== 32) {
+      throw new Error("Key length must be 32 characters");
+    }
+    const _key = Buffer.from(key);
     const iv = crypto.randomBytes(IV_LENGTH);
     const cipher = crypto.createCipheriv(ALGORITHM, _key, iv);
     let encrypted = cipher.update(data, INPUT_ENCODING, OUTPUT_ENCODING);
@@ -28,8 +39,18 @@ export class CryptoService {
     return iv.toString(OUTPUT_ENCODING) + ":" + encrypted;
   }
 
+  /**
+   * Decrypts a string using a symmetric key
+   *
+   * @param data  - The encrypted string to be decrypted
+   * @param key  - The key to use for decryption. Should be the same key used for encryption
+   * @returns - The decrypted string
+   */
   public symmetricDecrypt(data: string, key: string): string {
-    const _key = Buffer.from(key, "latin1");
+    if (key.length !== 32) {
+      throw new Error("Key length must be 32 characters");
+    }
+    const _key = Buffer.from(key);
     const parts = data.split(":");
     const iv = Buffer.from(parts.shift() || "", OUTPUT_ENCODING);
     const encrypted = parts.join(":");
@@ -51,11 +72,11 @@ export class CryptoService {
     return v4();
   }
 
-  public generateHex() {
+  public generateHex(): string {
     return crypto.randomBytes(32).toString("hex");
   }
 
-  public generateApiKey() {
+  public generateApiKey(): string {
     const id = nanoid(16);
     const random = crypto.randomBytes(16).toString("hex");
     const apiKey = id + random;
@@ -85,5 +106,28 @@ export class CryptoService {
 
   public hash(data: string): string {
     return crypto.createHash("sha256").update(data).digest("hex");
+  }
+
+  public generate2FASecret(): string {
+    return authenticator.generateSecret();
+  }
+
+  public verify2FAToken(secret: string, token: string): boolean {
+    authenticator.options = { window: [2, 2] };
+    const delta = authenticator.checkDelta(token, secret);
+    if (!Number.isInteger(delta)) return false;
+    if (delta !== 0) return false;
+    return true;
+  }
+
+  /**
+   * Creates a QR code for the 2FA secret
+   *
+   * @param secret - The secret key used to generate the QR code
+   * @param label - The label to display on the 2FA app
+   * @param issuer - The issuer to display on the 2FA app
+   */
+  public generate2FAQRCode(secret: string, label: string, issuer: string): Promise<string> {
+    return toDataURL(authenticator.keyuri(label, issuer, secret));
   }
 }

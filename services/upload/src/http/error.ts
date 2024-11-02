@@ -5,7 +5,6 @@ import * as Errors from "@votewise/errors";
 
 const errorTypes = [
   Errors.AuthenticationError,
-  Errors.AuthorizationError,
   Errors.DatabaseError,
   Errors.InternalServerError,
   Errors.InvalidInputError,

@@ -12,5 +12,8 @@ export const mockCryptoService = {
   getOtp: jest.fn().mockName("cryptoService.getOtp"),
   comparePassword: jest.fn().mockName("cryptoService.comparePassword"),
   hash: jest.fn().mockName("cryptoService.hash"),
-  verifyOtp: jest.fn().mockName("cryptoService.verifyOtp")
+  verifyOtp: jest.fn().mockName("cryptoService.verifyOtp"),
+  generate2FAQRCode: jest.fn().mockName("cryptoService.generate2FAQRCode"),
+  verify2FAToken: jest.fn().mockName("cryptoService.verify2FAToken"),
+  generate2FASecret: jest.fn().mockName("cryptoService.generate2FASecret")
 } as jest.Mocked<CryptoService>;

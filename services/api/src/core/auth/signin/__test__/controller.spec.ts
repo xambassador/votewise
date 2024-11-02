@@ -131,6 +131,7 @@ describe("Signin Controller", () => {
       access_token: "access_token",
       refresh_token: "refresh_token",
       expires_in: 15 * Minute,
+      is_2fa_enabled: user.is_2fa_enabled,
       expires_in_unit: "ms"
     });
     expect(res.status).toHaveBeenCalledWith(StatusCodes.OK);
