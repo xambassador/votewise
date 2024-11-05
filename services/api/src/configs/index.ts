@@ -63,6 +63,7 @@ export class ServerConfig {
   public jwt: JWT;
   public appUrl: string;
   public bucketUrl: string;
+  public appName?: string;
 
   constructor(cfg: ServerConfig) {
     this.port = cfg.port;
@@ -79,5 +80,6 @@ export class ServerConfig {
     this.jwt = cfg.jwt;
     this.appUrl = cfg.appUrl;
     this.bucketUrl = cfg.bucketUrl;
+    this.appName = cfg.appName;
   }
 }

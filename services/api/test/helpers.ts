@@ -43,6 +43,8 @@ export function buildUser(overrides: Partial<User> = {}): User {
     facebook_profile_url: null,
     updated_at: new Date(),
     secret: "clzy0090n000013gtnqrebopz",
+    is_2fa_enabled: false,
+    totp_secret: null,
     ...overrides
   };
 }

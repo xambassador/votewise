@@ -8,13 +8,12 @@ const errorTypes = [
   Errors.InvalidInputError,
   Errors.ValidationError,
   Errors.BadRequestError,
-  Errors.UnknowError,
-  Errors.DatabaseError,
   Errors.OperationNotAllowedError,
   Errors.AuthenticationError,
-  Errors.AuthorizationError,
   Errors.InternalServerError
 ];
+
+const serverErrors = [Errors.UnknowError, Errors.DatabaseError];
 
 const INTERNAL_SERVER_ERROR = "InternalServerError";
 const INTERNAL_SERVER_ERROR_MSG = "Internal Server Error";
@@ -23,11 +22,13 @@ class ErrorResponse {
   status_code: number;
   message: string;
   name: string;
+  error_code?: number;
 
-  constructor(statusCode: number, message: string, name: string) {
+  constructor(statusCode: number, message: string, name: string, errorCode?: number) {
     this.status_code = statusCode;
     this.message = message;
     this.name = name;
+    this.error_code = errorCode;
   }
 }
 
@@ -38,6 +39,14 @@ export const handler: ErrorRequestHandler = (err, _req, res, next) => {
   }
 
   for (const errorType of errorTypes) {
+    if (err instanceof errorType) {
+      const { statusCode, message, name, errorCode } = err;
+      const response = new ErrorResponse(statusCode, message, name, errorCode);
+      return res.status(statusCode).json({ error: response });
+    }
+  }
+
+  for (const errorType of serverErrors) {
     if (err instanceof errorType) {
       const { statusCode, message, name } = err;
       const response = new ErrorResponse(statusCode, message, name);

@@ -12,12 +12,26 @@ type SessionManagerOptions = {
 type Create = {
   userId: string;
   isEmailVerified: boolean;
+  is2FAEnabled: boolean;
   ip: string;
+  email: string;
+  username: string;
   userAgent?: string;
 };
-type SessionData = { ip: string; user_agent?: string };
+type SessionData =
+  | {
+      ip: string;
+      user_agent?: string;
+      is_2fa_enabled: "true";
+      is_2fa_verified: "true" | "false";
+      email: string;
+      username: string;
+    }
+  | { ip: string; user_agent?: string; is_2fa_enabled: "false"; email: string; username: string };
 type SessionFields = "ip" | "user_agent";
-type User = { email: string; username: string };
+type User =
+  | { email: string; username: string; is_2fa_enabled: "true"; is_2fa_verified: "true" | "false" }
+  | { email: string; username: string; is_2fa_enabled: "false" };
 
 export class SessionManager {
   private readonly ctx: SessionManagerOptions;
@@ -30,23 +44,26 @@ export class SessionManager {
     return `session:${userId}:${sessionId}`;
   }
 
-  public getUserDataKey(userId: string) {
-    return `session:data:${userId}`;
-  }
-
   public async create(opts: Create) {
-    const { userAgent, userId, isEmailVerified, ip } = opts;
+    const { userAgent, userId, isEmailVerified, ip, is2FAEnabled, username, email } = opts;
+
     const sessionId = this.ctx.cryptoService.generateUUID();
-    const tokenData = { user_id: userId, is_email_verified: isEmailVerified, session_id: sessionId };
+    const accessTokenData = { user_id: userId, is_email_verified: isEmailVerified, session_id: sessionId };
     const refreshTokenData = { user_id: userId, session_id: sessionId };
-    const accessToken = this.ctx.jwtService.signAccessToken(tokenData, { expiresIn: "15m" });
+    const accessToken = this.ctx.jwtService.signAccessToken(accessTokenData, { expiresIn: "15m" });
     const refreshToken = this.ctx.jwtService.signRefreshToken(refreshTokenData, { expiresIn: "7d" });
 
-    const session: SessionData = { ip, user_agent: userAgent };
+    let sessionData: SessionData;
+    if (is2FAEnabled) {
+      sessionData = { ip, user_agent: userAgent, is_2fa_enabled: "true", is_2fa_verified: "false", username, email };
+    } else {
+      sessionData = { ip, user_agent: userAgent, is_2fa_enabled: "false", username, email };
+    }
+
     const key = this.getSessionKey(userId, sessionId);
 
     // Setting expiry for 20 minutes, so client can refresh the token
-    await this.ctx.cache.hset(key, session);
+    await this.ctx.cache.hset(key, sessionData);
     await this.ctx.cache.expire(key, 20 * Minute);
 
     return { accessToken, refreshToken, sessionId };
@@ -54,8 +71,7 @@ export class SessionManager {
 
   public async delete(userId: string, sessionId: string) {
     const key = this.getSessionKey(userId, sessionId);
-    const userKey = this.getUserDataKey(userId);
-    await Promise.all([this.ctx.cache.del(key), this.ctx.cache.del(userKey)]);
+    await this.ctx.cache.del(key);
   }
 
   public async deleteAll(userId: string) {
@@ -72,7 +88,7 @@ export class SessionManager {
 
   public async getSession(userId: string, sessionId: string) {
     const key = this.getSessionKey(userId, sessionId);
-    return this.ctx.cache.hgetall(key) as Promise<SessionData>;
+    return this.ctx.cache.hgetall(key) as unknown as Promise<SessionData>;
   }
 
   public async getSessions(userId: string) {
@@ -81,9 +97,28 @@ export class SessionManager {
     const sessions: ({ id: string } & SessionData)[] = [];
     for (const key of sessionKeys) {
       const sessionId = key.split(":")[2];
-      const data = (await this.ctx.cache.hgetall(key)) as SessionData;
+      const data = (await this.ctx.cache.hgetall(key)) as unknown as SessionData;
       if (!data || Object.keys(data).length === 0) continue;
-      sessions.push({ id: sessionId!, ip: data.ip, user_agent: data.user_agent });
+      if (data.is_2fa_enabled === "true") {
+        sessions.push({
+          id: sessionId!,
+          ip: data.ip,
+          user_agent: data.user_agent,
+          is_2fa_enabled: data.is_2fa_enabled,
+          is_2fa_verified: data.is_2fa_verified,
+          email: data.email,
+          username: data.username
+        });
+      } else {
+        sessions.push({
+          id: sessionId!,
+          ip: data.ip,
+          user_agent: data.user_agent,
+          is_2fa_enabled: data.is_2fa_enabled,
+          email: data.email,
+          username: data.username
+        });
+      }
     }
     return sessions;
   }
@@ -92,14 +127,15 @@ export class SessionManager {
     return this.ctx.cache.hget(key, field);
   }
 
-  public async getUserFromSession(userId: string) {
-    const key = this.getUserDataKey(userId);
-    const data = await this.ctx.cache.get(key);
-    return data ? (JSON.parse(data) as User) : null;
+  public async storeUserInSession(userId: string, sessionId: string, user: User) {
+    const key = this.getSessionKey(userId, sessionId);
+    return this.ctx.cache.hset(key, user);
   }
 
-  public async setUserToSession(userId: string, user: User) {
-    const key = this.getUserDataKey(userId);
-    return this.ctx.cache.set(key, JSON.stringify(user));
+  public async updateSessionData(userId: string, sessionId: string, data: Partial<SessionData>) {
+    const key = this.getSessionKey(userId, sessionId);
+    const oldData = this.ctx.cache.hgetall(key);
+    if (!oldData) return;
+    await this.ctx.cache.hset(key, { ...oldData, ...data });
   }
 }

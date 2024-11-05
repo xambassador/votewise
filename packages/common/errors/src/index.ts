@@ -5,9 +5,11 @@
  */
 class ResourceNotFoundError extends Error {
   statusCode = 404;
-  constructor(message: string) {
+  errorCode?: number;
+  constructor(message: string, errorCode?: number) {
     super(message);
     this.name = "ResourceNotFoundError";
+    this.errorCode = errorCode;
   }
 }
 
@@ -18,10 +20,11 @@ class ResourceNotFoundError extends Error {
  */
 class InvalidInputError extends Error {
   statusCode = 400;
-  constructor(message: string, code?: number) {
+  errorCode?: number;
+  constructor(message: string, errorCode?: number) {
     super(message);
     this.name = "InvalidInputError";
-    if (code) this.statusCode = code;
+    this.errorCode = errorCode;
   }
 }
 
@@ -33,9 +36,11 @@ class InvalidInputError extends Error {
  */
 class ValidationError extends Error {
   statusCode = 400;
-  constructor(message: string) {
+  errorCode?: number;
+  constructor(message: string, errorCode?: number) {
     super(message);
     this.name = "ValidationError";
+    this.errorCode = errorCode;
   }
 }
 
@@ -47,9 +52,11 @@ class ValidationError extends Error {
  */
 class BadRequestError extends Error {
   statusCode = 400;
-  constructor(message: string) {
+  errorCode?: number;
+  constructor(message: string, errorCode?: number) {
     super(message);
     this.name = "BadRequestError";
+    this.errorCode = errorCode;
   }
 }
 
@@ -87,12 +94,15 @@ class DatabaseError extends Error {
  * Throw this error when the user is authenticated but does not have the permission to do the operation
  *
  * @class OperationNotAllowedError
+ * @alias ForbiddenError
  */
 class OperationNotAllowedError extends Error {
   statusCode = 403;
-  constructor(message: string) {
+  errorCode?: number;
+  constructor(message: string, errorCode?: number) {
     super(message);
     this.name = "OperationNotAllowedError";
+    this.errorCode = errorCode;
   }
 }
 
@@ -103,72 +113,63 @@ class OperationNotAllowedError extends Error {
  */
 class AuthenticationError extends Error {
   statusCode = 401;
-  constructor(message: string) {
+  errorCode?: number;
+  constructor(message: string, errorCode?: number) {
     super(message);
     this.name = "AuthenticationError";
-  }
-}
-
-/**
- * Throw this error when the user is not authenticated
- *
- * @class AuthorizationError
- */
-class AuthorizationError extends Error {
-  statusCode = 403;
-  constructor(message: string) {
-    super(message);
-    this.name = "AuthorizationError";
+    this.errorCode = errorCode;
   }
 }
 
 class InternalServerError extends Error {
   statusCode = 500;
-  constructor(message: string) {
+  errorCode?: number;
+  constructor(message: string, errorCode?: number) {
     super(message);
     this.name = "InternalServerError";
+    this.errorCode = errorCode;
   }
 }
 
 class Assertions {
-  public invalidInput(condition: boolean, message: string, status = 400) {
-    if (condition) throw new InvalidInputError(message, status);
+  public invalidInput(condition: boolean, message: string, errorCode = 400) {
+    if (condition) throw new InvalidInputError(message, errorCode);
   }
 
-  public badRequest(condition: boolean, message: string) {
-    if (condition) throw new BadRequestError(message);
+  public badRequest(condition: boolean, message: string, errorCode = 400) {
+    if (condition) throw new BadRequestError(message, errorCode);
   }
 
-  public authentication(condition: boolean, message: string) {
-    if (condition) throw new AuthenticationError(message);
+  public authentication(condition: boolean, message: string, errorCode = 401) {
+    if (condition) throw new AuthenticationError(message, errorCode);
   }
 
-  public authorization(condition: boolean, message: string) {
-    if (condition) throw new AuthorizationError(message);
+  public resourceNotFound(condition: boolean, message: string, errorCode = 404) {
+    if (condition) throw new ResourceNotFoundError(message, errorCode);
   }
 
-  public resourceNotFound(condition: boolean, message: string) {
-    if (condition) throw new ResourceNotFoundError(message);
-  }
-
-  public operationNotAllowed(condition: boolean, message: string) {
-    if (condition) throw new OperationNotAllowedError(message);
+  public operationNotAllowed(condition: boolean, message: string, errorCode = 403) {
+    if (condition) throw new OperationNotAllowedError(message, errorCode);
   }
 
   public database(condition: boolean, message: string) {
     if (condition) throw new DatabaseError(message);
   }
 
-  public validation(condition: boolean, message: string) {
-    if (condition) throw new ValidationError(message);
+  public validation(condition: boolean, message: string, errorCode = 400) {
+    if (condition) throw new ValidationError(message, errorCode);
   }
 
-  public internalServer(condition: boolean, message: string) {
-    if (condition) throw new InternalServerError(message);
+  public internalServer(condition: boolean, message: string, errorCode = 500) {
+    if (condition) throw new InternalServerError(message, errorCode);
   }
 
   public unknown(condition: boolean, message: string) {
     if (condition) throw new UnknowError(message);
+  }
+
+  public forbidden(condition: boolean, message: string, errorCode = 403) {
+    if (condition) throw new OperationNotAllowedError(message, errorCode);
   }
 }
 
@@ -179,7 +180,6 @@ export {
   UnknowError,
   DatabaseError,
   AuthenticationError,
-  AuthorizationError,
   OperationNotAllowedError,
   InternalServerError,
   BadRequestError,

@@ -99,6 +99,8 @@ model User {
 
     is_onboarded    Boolean @default(false)
     is_email_verify Boolean @default(false)
+    is_2fa_enabled  Boolean @default(false)
+    totp_secret     String?
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt

@@ -13,6 +13,7 @@ const ACCESS_TOKEN_SECRET = z
 const REFRESH_TOKEN_SECRET = z
   .string({ required_error: "REFRESH_TOKEN is required" })
   .min(1, { message: "REFRESH_TOKEN is required" });
+const APP_SECRET = z.string({ required_error: "APP_SECRET is required" }).min(1, { message: "APP_SECRET is required" });
 const CRON_SECRET = z
   .string({ required_error: "CRON_SECRET is required" })
   .min(1, { message: "CRON_SECRET is required" });
@@ -86,6 +87,7 @@ const MINIO_PORT = z
 export const envBaseSchema = z.object({
   ACCESS_TOKEN_SECRET,
   REFRESH_TOKEN_SECRET,
+  APP_SECRET,
   CRON_SECRET,
   DATABASE_URL,
   REDIS_URL,
@@ -117,6 +119,7 @@ export const envBaseSchema = z.object({
 export const envSchema = z.object({
   ACCESS_TOKEN_SECRET,
   REFRESH_TOKEN_SECRET,
+  APP_SECRET,
   CRON_SECRET,
   DATABASE_URL,
   REDIS_URL,
