@@ -30,10 +30,15 @@ const config = {
           "./apps/web/tsconfig.json",
           "./services/api/tsconfig.json",
           "./services/upload/tsconfig.json",
-          "./packages/lib/tsconfig.json",
           "./packages/prisma/tsconfig.json",
           "./packages/schemas/tsconfig.json",
-          "./packages/ui/tsconfig.json"
+          "./packages/ui/tsconfig.json",
+          "./packages/common/debug/tsconfig.json",
+          "./packages/common/env/tsconfig.json",
+          "./packages/common/errors/tsconfig.json",
+          "./packages/common/log/tsconfig.json",
+          "./packages/common/text/tsconfig.json",
+          "./packages/common/times/tsconfig.json"
         ]
       }
     }
@@ -52,7 +57,7 @@ const config = {
     "plugin:prettier/recommended"
   ],
   parser: "@typescript-eslint/parser",
-  plugins: ["@typescript-eslint", "import", "unused-imports", "eslint-plugin-react"],
+  plugins: ["@typescript-eslint", "import", "unused-imports"],
   parserOptions: {
     ecmaFeatures: {
       globalReturn: false,
@@ -103,7 +108,8 @@ const config = {
         ignoreRestSiblings: true
       }
     ]
-  }
+  },
+  ignorePatterns: [".eslintrc.js", "node_modules", "dist", "build", "out", "coverage", "public"]
 };
 
 module.exports = config;

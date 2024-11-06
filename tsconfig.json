@@ -58,9 +58,6 @@
     },
     // shared
     {
-      "path": "./packages/lib"
-    },
-    {
       "path": "./packages/ui"
     },
     {
@@ -71,6 +68,21 @@
     },
     {
       "path": "./packages/common/env"
+    },
+    {
+      "path": "./packages/common/debug"
+    },
+    {
+      "path": "./packages/common/errors"
+    },
+    {
+      "path": "./packages/common/log"
+    },
+    {
+      "path": "./packages/common/text"
+    },
+    {
+      "path": "./packages/common/times"
     }
   ],
   "files": [],
