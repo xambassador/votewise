@@ -15,9 +15,8 @@ export const mockEmailStrategy = {
   handle: jest.fn().mockName("emailStrategy.handle")
 } as unknown as jest.Mocked<EmailStrategy>;
 
-export const user = buildUser({ is_email_verify: true });
-
 export function setupHappyPath(overrides?: Partial<User>) {
+  const user = buildUser({ is_email_verify: true });
   mockUserRepository.findByEmail.mockResolvedValue({ ...user, ...overrides });
   mockUserRepository.findByUsername.mockResolvedValue({ ...user, ...overrides });
   mockEmailStrategy.handle.mockResolvedValue({ ...user, ...overrides });
@@ -27,6 +26,7 @@ export function setupHappyPath(overrides?: Partial<User>) {
   mockJWTService.signAccessToken.mockReturnValue("access_token");
   mockJWTService.signRefreshToken.mockReturnValue("refresh_token");
   mockCache.keys.mockResolvedValue([]);
+  return { user };
 }
 
 export function clearAllMocks() {

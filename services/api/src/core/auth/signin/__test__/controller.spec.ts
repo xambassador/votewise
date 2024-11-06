@@ -15,7 +15,6 @@ const body = { email: "test@gmail.com", password: "password" };
 const userNameBody = { username: "test", password: "password" };
 const ip = "192.34.24.45";
 const locals = { meta: { ip } };
-const user = helpers.user;
 
 const sessionManager = new SessionManager({
   cache: helpers.mockCache,
@@ -79,7 +78,7 @@ describe("Signin Controller", () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
 
-    helpers.setupHappyPath();
+    const { user } = helpers.setupHappyPath();
     helpers.mockCryptoService.comparePassword.mockResolvedValue(false);
 
     const error = await controller.handle(req, res).catch((e) => e);
@@ -91,8 +90,7 @@ describe("Signin Controller", () => {
   it("should throw error if email is not verified", async () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
-
-    helpers.setupHappyPath({ is_email_verify: false });
+    const { user } = helpers.setupHappyPath({ is_email_verify: false });
     const error = await controller.handle(req, res).catch((e) => e);
     expect(helpers.mockJWTService.signAccessToken).not.toHaveBeenCalled();
     expect(error.message).toBe(`Email ${user.email} is not verified. Please verify your email`);
@@ -102,7 +100,7 @@ describe("Signin Controller", () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
 
-    helpers.setupHappyPath();
+    const { user } = helpers.setupHappyPath();
     helpers.mockCache.keys.mockResolvedValue(["session:1:1", "session:1:2", "session:1:3"]);
 
     const error = await controller.handle(req, res).catch((e) => e);
@@ -114,10 +112,16 @@ describe("Signin Controller", () => {
   it("should return access token, refresh token and create session", async () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
-    helpers.setupHappyPath();
+    const { user } = helpers.setupHappyPath();
 
     const key = `session:${user.id}:session_id`;
-    const session = { ip, user_agent: req.headers["user-agent"] };
+    const session = {
+      ip,
+      user_agent: req.headers["user-agent"],
+      is_2fa_enabled: "false",
+      username: user.user_name,
+      email: user.email
+    };
     const accessToken = { user_id: user.id, is_email_verified: user.is_email_verify, session_id: "session_id" };
     const refreshToken = { user_id: user.id, session_id: "session_id" };
 
@@ -134,6 +138,40 @@ describe("Signin Controller", () => {
       is_2fa_enabled: user.is_2fa_enabled,
       expires_in_unit: "ms"
     });
+    expect(res.status).toHaveBeenCalledWith(StatusCodes.OK);
+  });
+
+  it("should return access token, refresh token and create session and set 2fa key in session if 2fa is enabled", async () => {
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
+    const { user } = helpers.setupHappyPath({ is_2fa_enabled: true });
+    user.is_2fa_enabled = true;
+    const key = `session:${user.id}:session_id`;
+    const session = {
+      ip,
+      user_agent: req.headers["user-agent"],
+      is_2fa_enabled: "true",
+      is_2fa_verified: "false",
+      username: user.user_name,
+      email: user.email
+    };
+    const accessToken = { user_id: user.id, is_email_verified: user.is_email_verify, session_id: "session_id" };
+    const refreshToken = { user_id: user.id, session_id: "session_id" };
+    const response = {
+      access_token: "access_token",
+      refresh_token: "refresh_token",
+      expires_in: 15 * Minute,
+      is_2fa_enabled: user.is_2fa_enabled,
+      expires_in_unit: "ms"
+    };
+
+    await controller.handle(req, res);
+
+    expect(helpers.mockJWTService.signAccessToken).toHaveBeenCalledWith(accessToken, { expiresIn: "15m" });
+    expect(helpers.mockJWTService.signRefreshToken).toHaveBeenCalledWith(refreshToken, { expiresIn: "7d" });
+    expect(helpers.mockCache.hset).toHaveBeenCalledWith(key, session);
+    expect(helpers.mockCache.expire).toHaveBeenCalledWith(key, 20 * Minute);
+    expect(res.json).toHaveBeenCalledWith(response);
     expect(res.status).toHaveBeenCalledWith(StatusCodes.OK);
   });
 

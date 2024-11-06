@@ -98,6 +98,13 @@ describe("Refresh Controller", () => {
     const res = buildRes({ locals: helpers.locals });
     const { session_id } = helpers.setupHappyPath();
     const key = `session:${helpers.user.id}:${session_id}`;
+    const sessionData = {
+      ip: helpers.ip,
+      user_agent: undefined,
+      email: helpers.user.email,
+      is_2fa_enabled: helpers.user.is_2fa_enabled ? "true" : "false",
+      username: helpers.user.user_name
+    };
 
     await controller.handle(req, res);
     expect(helpers.mockCache.del).toHaveBeenCalledWith(`session:${helpers.user.id}:${session_id}`);
@@ -113,10 +120,7 @@ describe("Refresh Controller", () => {
       { user_id: helpers.user.id, session_id },
       { expiresIn: "7d" }
     );
-    expect(helpers.mockCache.hset).toHaveBeenCalledWith(key, {
-      ip: helpers.ip,
-      user_agent: undefined
-    });
+    expect(helpers.mockCache.hset).toHaveBeenCalledWith(key, sessionData);
     expect(helpers.mockCache.expire).toHaveBeenCalledWith(key, 20 * Minute);
     expect(res.status).toHaveBeenCalledWith(StatusCodes.OK);
     expect(res.json).toHaveBeenCalledWith({
