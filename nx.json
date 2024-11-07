@@ -32,6 +32,9 @@
     "db:seed": {
       "dependsOn": []
     },
+    "db:seed:sync": {
+      "dependsOn": []
+    },
     "db:deploy": {
       "dependsOn": []
     },

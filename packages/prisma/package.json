@@ -26,16 +26,19 @@
     "db:generate": "prisma generate && prisma format",
     "db:migrate": "yarn prisma migrate dev",
     "db:studio": "yarn prisma studio",
-    "db:seed": "yarn prisma db seed",
+    "db:seed": "yarn seed",
     "db:deploy": "yarn prisma migrate deploy",
-    "db:clean": "ts-node --transpile-only ./cleanDb.ts",
-    "seed": "ts-node --transpile-only ./seed.ts",
+    "db:clean": "npx tsx seed.ts --clean",
+    "seed": "npx tsx seed.ts",
+    "seed:sync": "npx @snaplet/seed sync",
     "clean": "rimraf --glob ./dist ./zod ./node_modules",
     "clean:build": "rm -rf dist",
     "dev": "rm -rf dist && tsup",
     "build": "rm -rf ./dist && tsup"
   },
   "devDependencies": {
+    "@snaplet/copycat": "^5.1.0",
+    "@snaplet/seed": "0.98.0",
     "@types/node": "^20.16.1",
     "@votewise/config": "*",
     "@votewise/tsconfig": "*",
@@ -54,9 +57,6 @@
     "@prisma/client": "^5.18.0",
     "zod": "^3.23.8",
     "zod-prisma": "^0.5.4"
-  },
-  "prisma": {
-    "seed": "ts-node --transpile-only ./seed.ts"
   },
   "tsup": {
     "entry": [
