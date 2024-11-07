@@ -107,6 +107,9 @@ packages/static-server/public/**/*.ico
 # Prisma generated files
 .prisma/
 packages/prisma/zod
+packages/prisma/.snaplet/dataModel.json
+packages/prisma/.snaplet/dataExamples.json
+
 
 .yarn/*
 !.yarn/releases
