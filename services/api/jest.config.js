@@ -13,5 +13,6 @@ module.exports = {
   coverageDirectory: "<rootDir>/coverage",
   collectCoverageFrom: ["src/**/*.ts"],
   collectCoverage: false,
-  modulePathIgnorePatterns: ["<rootDir>/dist/"]
+  modulePathIgnorePatterns: ["<rootDir>/dist/"],
+  prettierPath: null // https://github.com/jestjs/jest/issues/14305#issuecomment-1627346697
 };

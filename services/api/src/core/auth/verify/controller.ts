@@ -46,6 +46,7 @@ export class Controller {
     await this.ctx.cache.del(body.verification_code);
     await this.ctx.userRepository.update(body.user_id, {
       is_email_verify: true,
+      email_confirmed_at: new Date(),
       secret: this.ctx.cryptoService.generateUUID()
     });
 

@@ -3,23 +3,24 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 
 import { Controller } from "./controller";
 
-export function verify2FAControllerFactory() {
+export function verifyChallangeControllerFactory() {
   const ctx = AppContext.getInjectionTokens([
-    "cryptoService",
-    "repositories",
     "assert",
+    "repositories",
     "plugins",
     "environment",
+    "cryptoService",
     "sessionManager"
   ]);
   const controller = new Controller({
-    userRepository: ctx.repositories.user,
-    cryptoService: ctx.cryptoService,
     assert: ctx.assert,
+    challengeRepository: ctx.repositories.challenge,
     requestParser: ctx.plugins.requestParser,
+    factorRepository: ctx.repositories.factor,
     environment: ctx.environment,
+    cryptoService: ctx.cryptoService,
     sessionManager: ctx.sessionManager
   });
-  const exceptionLayer = new ExceptionLayer({ name: "verify_2FA" });
+  const exceptionLayer = new ExceptionLayer({ name: "verify-challenge" });
   return exceptionLayer.catch(controller.handle.bind(controller));
 }

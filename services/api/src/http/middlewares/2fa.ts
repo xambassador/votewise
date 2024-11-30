@@ -8,12 +8,15 @@ export function twoFactorAuthMiddlewareFactory() {
   const exceptionLayer = new ExceptionLayer({ name: "2fa-middleware" });
   return exceptionLayer.catch(async (_, res, next) => {
     const locals = getAuthenticateLocals(res);
-    const { session } = locals;
-
-    if (session.user.is_2fa_enabled === "true" && session.user.is_2fa_verified === "false") {
-      throw new AuthenticationError("2FA verification is required", codes["2FA_VERIFICATION_REQIURED"]);
+    const { session, payload } = locals;
+    const currentAAL = payload.aal;
+    const nextAAL = session.aal;
+    if (currentAAL !== nextAAL) {
+      throw new AuthenticationError(
+        "Multi factor authentication is required. Please create a new challenge and verify it to continue.",
+        codes["2FA_VERIFICATION_REQIURED"]
+      );
     }
-
     return next();
   });
 }

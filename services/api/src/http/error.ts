@@ -10,7 +10,8 @@ const errorTypes = [
   Errors.BadRequestError,
   Errors.OperationNotAllowedError,
   Errors.AuthenticationError,
-  Errors.InternalServerError
+  Errors.InternalServerError,
+  Errors.UnprocessableEntityError
 ];
 
 const serverErrors = [Errors.UnknowError, Errors.DatabaseError];

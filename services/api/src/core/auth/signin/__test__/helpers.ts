@@ -1,6 +1,9 @@
 import type { User } from "../../../../../test/helpers";
 import type { EmailStrategy, UsernameStrategy } from "../strategies";
 
+import { mockFactorRepository } from "@/repository/__mock__/factor.repository";
+import { mockRefreshTokenRepository } from "@/repository/__mock__/refresh-token.repository";
+import { mockSessionRepository } from "@/repository/__mock__/session.repository";
 import { mockUserRepository } from "@/repository/__mock__/user.repository";
 import { mockCryptoService } from "@/services/__mock__/crypto.service";
 import { mockJWTService } from "@/services/__mock__/jwt.service";
@@ -24,7 +27,6 @@ export function setupHappyPath(overrides?: Partial<User>) {
   mockCryptoService.comparePassword.mockResolvedValue(true);
   mockCryptoService.generateUUID.mockReturnValue("session_id");
   mockJWTService.signAccessToken.mockReturnValue("access_token");
-  mockJWTService.signRefreshToken.mockReturnValue("refresh_token");
   mockCache.keys.mockResolvedValue([]);
   return { user };
 }
@@ -37,8 +39,15 @@ export function clearAllMocks() {
   mockCryptoService.comparePassword.mockClear();
   mockCryptoService.generateUUID.mockClear();
   mockJWTService.signAccessToken.mockClear();
-  mockJWTService.signRefreshToken.mockClear();
   mockCache.keys.mockClear();
 }
 
-export { mockUserRepository, mockCryptoService, mockJWTService, mockCache };
+export {
+  mockUserRepository,
+  mockCryptoService,
+  mockJWTService,
+  mockCache,
+  mockSessionRepository,
+  mockFactorRepository,
+  mockRefreshTokenRepository
+};

@@ -131,6 +131,16 @@ class InternalServerError extends Error {
   }
 }
 
+class UnprocessableEntityError extends Error {
+  statusCode = 422;
+  errorCode?: number;
+  constructor(message: string, errorCode?: number) {
+    super(message);
+    this.name = "UnprocessableEntityError";
+    this.errorCode = errorCode;
+  }
+}
+
 class Assertions {
   public invalidInput(condition: boolean, message: string, errorCode = 400) {
     if (condition) throw new InvalidInputError(message, errorCode);
@@ -171,6 +181,10 @@ class Assertions {
   public forbidden(condition: boolean, message: string, errorCode = 403) {
     if (condition) throw new OperationNotAllowedError(message, errorCode);
   }
+
+  public unprocessableEntity(condition: boolean, message: string, errorCode = 422) {
+    if (condition) throw new UnprocessableEntityError(message, errorCode);
+  }
 }
 
 export {
@@ -183,5 +197,6 @@ export {
   OperationNotAllowedError,
   InternalServerError,
   BadRequestError,
-  Assertions
+  Assertions,
+  UnprocessableEntityError
 };

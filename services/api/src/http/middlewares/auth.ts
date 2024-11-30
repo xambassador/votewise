@@ -13,32 +13,10 @@ export function authMiddlewareFactory() {
     const token = getAuthorizationToken(req);
     const validate = ctx.jwtService.verifyAccessToken(token);
     if (!validate.success) throw new AuthenticationError("Unauthorized");
-
-    const { user_id, session_id } = validate.data;
-    const locals = res.locals as Locals;
-
-    const session = await ctx.sessionManager.getSession(user_id, session_id);
-    if (!session || Object.keys(session).length === 0) {
-      throw new AuthenticationError("Unauthorized");
-    }
-
-    if (session.ip !== locals.meta.ip) {
-      throw new AuthenticationError("Unauthorized");
-    }
-
-    locals.session = {
-      accessToken: validate.data,
-      user: {
-        email: session.email,
-        is_2fa_enabled: session.is_2fa_enabled,
-        ip: session.ip,
-        is_2fa_verified: session.is_2fa_enabled === "true" ? session.is_2fa_verified : "false",
-        username: session.username,
-        user_agent: session.user_agent
-      }
-    };
-    res.locals = locals;
-
+    const payload = validate.data;
+    const session = await ctx.sessionManager.get(payload.session_id);
+    if (!session) throw new AuthenticationError("Unauthorized");
+    res.locals = { ...res.locals, session, payload } as Locals;
     return next();
   });
 }

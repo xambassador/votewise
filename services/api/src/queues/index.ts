@@ -7,6 +7,7 @@ import { RedisAdapter } from "@/storage/redis";
 
 import { EmailProcessor } from "./processors/email";
 
+// Add more job types here
 export type JobType = "email";
 export type Tasks = { name: "email"; payload: EmailJob };
 
@@ -42,7 +43,11 @@ export class TasksQueue {
   public initWorker(ctx: AppContext) {
     if (!this.queue) throw new Error("Queue not initialized");
     if (!this.redis) throw new Error("Redis not initialized");
-    const emailProcessor = new EmailProcessor({ mailer: ctx.mailer, logger: ctx.logger });
+    const emailProcessor = new EmailProcessor({
+      mailer: ctx.mailer,
+      logger: ctx.logger,
+      userRepository: ctx.repositories.user
+    });
     this.strategy = { email: emailProcessor };
     this.worker = new Worker<Tasks>(
       "tasks",

@@ -8,19 +8,27 @@ import logger from "@votewise/log";
 import { prisma } from "@votewise/prisma";
 
 import { Mailer } from "@/emails/mailer";
+import { ChallengeRepository } from "@/repository/challenge.repository";
+import { FactorRepository } from "@/repository/factor.repository";
 import { UserRepository } from "@/repository/user.repository";
 import { CryptoService } from "@/services/crypto.service";
 import { JWTService } from "@/services/jwt.service";
+import { SessionManager } from "@/services/session.service";
 import { Cache } from "@/storage/redis";
 import { checkEnv } from "@/utils";
 
 import { jwtPluginFactory } from "./plugins/jwt";
 import { requestParserPluginFactory } from "./plugins/request-parser";
 import { TasksQueue } from "./queues";
-import { SessionManager } from "./services/session.service";
+import { RefreshTokenRepository } from "./repository/refresh-token.repository";
+import { SessionRepository } from "./repository/session.repository";
 
 type Repositories = {
   user: UserRepository;
+  factor: FactorRepository;
+  challenge: ChallengeRepository;
+  refreshToken: RefreshTokenRepository;
+  session: SessionRepository;
 };
 
 type Queue = {
@@ -95,14 +103,17 @@ export class AppContext {
     const cache = new Cache();
     const db = prisma;
     const jwtService = new JWTService({
-      accessTokenSecret: secrets.jwtSecret,
-      refreshTokenSecret: secrets.jwtRefreshSecret
+      accessTokenSecret: secrets.jwtSecret
     });
     const cryptoService = new CryptoService();
     const userRepository = new UserRepository({ db });
+    const factorRepository = new FactorRepository({ db });
+    const challengeRepository = new ChallengeRepository({ db });
+    const refreshTokenRepository = new RefreshTokenRepository({ db });
+    const sessionRepository = new SessionRepository({ db });
     const mailer = new Mailer({ env: environment });
     const tasksQueue = new TasksQueue({ env: environment });
-    const sessionManager = new SessionManager({ jwtService, cache, assert, cryptoService });
+    const sessionManager = new SessionManager({ jwtService, cache, assert, cryptoService, sessionRepository });
     const requestParser = requestParserPluginFactory();
     const jwtPlugin = jwtPluginFactory({ jwtService });
     const ctx = new AppContext({
@@ -118,7 +129,11 @@ export class AppContext {
       assert,
       sessionManager,
       repositories: {
-        user: userRepository
+        user: userRepository,
+        factor: factorRepository,
+        challenge: challengeRepository,
+        refreshToken: refreshTokenRepository,
+        session: sessionRepository
       },
       queues: { tasksQueue },
       plugins: { requestParser, jwt: jwtPlugin },

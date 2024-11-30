@@ -4,7 +4,7 @@ import type { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 
 import { ZRegister } from "@votewise/schemas";
-import { Minute } from "@votewise/times";
+import { Minute, Second } from "@votewise/times";
 
 type ControllerOptions = {
   userRepository: AppContext["repositories"]["user"];
@@ -42,8 +42,8 @@ export class Controller {
     });
 
     const otp = this.ctx.cryptoService.getOtp(createdUser.secret);
-    const verificationCode = this.ctx.cryptoService.generateUUID();
-    const expiresIn = 5 * Minute;
+    const verificationCode = this.ctx.cryptoService.generateUUID().replace(/-/g, "");
+    const expiresIn = (5 * Minute) / Second;
     const data = { userId: createdUser.id, ip };
     await this.ctx.cache.setWithExpiry(verificationCode, JSON.stringify(data), expiresIn);
 
@@ -62,8 +62,7 @@ export class Controller {
     return res.status(StatusCodes.CREATED).json({
       user_id: createdUser.id,
       verification_code: verificationCode,
-      expires_in: expiresIn,
-      expires_in_unit: "ms"
+      expires_in: expiresIn
     });
   }
 }

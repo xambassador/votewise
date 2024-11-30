@@ -78,6 +78,17 @@ enum NotificationType {
     JOIN_GROUP_REQUEST
 }
 
+enum FactorType {
+    TOTP
+    PHONE
+    WEB_AUTHN
+}
+
+enum FactorStatus {
+    UNVERIFIED
+    VERIFIED
+}
+
 model User {
     id                    String    @id @default(cuid())
     email                 String    @unique
@@ -85,7 +96,7 @@ model User {
     password              String
     first_name            String
     last_name             String
-    secret                String    @default(uuid())
+    secret                String    @default(uuid()) // Encrypted secret to sign JWT
     about                 String?
     twitter_profile_url   String?
     facebook_profile_url  String?
@@ -97,10 +108,11 @@ model User {
     gender                Gender?
     last_login            DateTime?
 
-    is_onboarded    Boolean @default(false)
-    is_email_verify Boolean @default(false)
-    is_2fa_enabled  Boolean @default(false)
-    totp_secret     String?
+    is_onboarded               Boolean   @default(false)
+    is_email_verify            Boolean   @default(false)
+    email_confirmed_at         DateTime?
+    email_confirmation_sent_at DateTime?
+    banned_until               DateTime?
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -116,6 +128,59 @@ model User {
     groupMembers     GroupMember[]
     groupInvitations GroupInvitation[]
     notification     Notification[]
+    factors          Factor[]
+    sessions         Session[]
+    refreshTokens    RefreshToken[]
+}
+
+model Factor {
+    id                 String       @id @default(uuid())
+    friendly_name      String
+    factor_type        FactorType
+    status             FactorStatus
+    secret             String // Encrypted secret for TOTP
+    phone              String? // For phone-based factors
+    last_challenged_at DateTime?
+
+    user_id String
+    user    User   @relation(fields: [user_id], references: [id])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    sessions   Session[] // Sessions authenticated using this factor
+    challanges Challange[] // Challanges for this factor
+
+    @@index([user_id], name: "user_id_index")
+}
+
+model Challange {
+    id       String  @id @default(uuid())
+    ip       String
+    otp_code String?
+
+    factor_id String
+    factor    Factor @relation(fields: [factor_id], references: [id])
+
+    created_at  DateTime  @default(now())
+    verified_at DateTime?
+}
+
+model Session {
+    id         String @id @default(uuid())
+    aal        String @default("aal1") // Authentication Assurance Level
+    ip         String
+    user_agent String
+
+    user_id   String
+    user      User    @relation(fields: [user_id], references: [id])
+    factor_id String? // Optional if the session requires a factor
+    factor    Factor? @relation(fields: [factor_id], references: [id])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    @@index([user_id], name: "user_session_id_index")
 }
 
 model Post {
@@ -316,6 +381,17 @@ model Notification {
 
     user_id String
     user    User   @relation(fields: [user_id], references: [id])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model RefreshToken {
+    id      String  @id @default(cuid())
+    token   String  @unique
+    user_id String
+    user    User    @relation(fields: [user_id], references: [id])
+    revoked Boolean @default(false)
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt

@@ -1,5 +1,4 @@
 import type { AppContext } from "@/context";
-import type { Locals } from "@/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
@@ -16,9 +15,7 @@ export class Controller {
   }
 
   public async handle(_: Request, res: Response) {
-    const locals = res.locals as Locals;
-    const { user_id } = locals.session.accessToken;
-    const sessions = await this.ctx.sessionManager.getSessions(user_id);
-    return res.status(StatusCodes.OK).json({ sessions });
+    this.ctx.sessionManager.getSessionKey("");
+    return res.status(StatusCodes.OK).json({ sessions: [] });
   }
 }

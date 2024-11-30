@@ -9,8 +9,8 @@
     "dev": "NODE_ENV=development nodemon",
     "lint": "eslint ./src --ext .ts",
     "build": "rimraf dist && tsc && tsc-alias && cp -r src/emails/templates dist/src/emails",
-    "test": "NODE_ENV=test jest --silent --forceExit --detectOpenHandles",
-    "test:watch": "NODE_ENV=test jest --runInBand --silent --forceExit --watch",
+    "test": "NODE_ENV=test jest --forceExit --detectOpenHandles",
+    "test:watch": "NODE_ENV=test jest --runInBand --forceExit --watch",
     "clean": "rimraf dist node_modules",
     "clean:build": "rimraf dist"
   },
