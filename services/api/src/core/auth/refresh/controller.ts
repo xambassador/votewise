@@ -4,14 +4,14 @@ import type { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 
 import { ZRefresh } from "@votewise/schemas";
-import { Minute } from "@votewise/times";
 
 type ControllerOptions = {
   sessionManager: AppContext["sessionManager"];
   useRepository: AppContext["repositories"]["user"];
+  refreshTokensRepository: AppContext["repositories"]["refreshToken"];
   assert: AppContext["assert"];
   requestParser: AppContext["plugins"]["requestParser"];
-  jwtPlugin: AppContext["plugins"]["jwt"];
+  jwtService: AppContext["jwtService"];
 };
 
 export class Controller {
@@ -23,34 +23,52 @@ export class Controller {
 
   public async handle(req: Request, res: Response) {
     const { body, locals } = this.ctx.requestParser.getParser(ZRefresh).parseRequest(req, res);
-    const { refresh_token } = this.ctx.jwtPlugin.parse({
-      accessToken: body.access_token,
-      refreshToken: body.refresh_token
-    });
     const ip = locals.meta.ip;
+    const userAgent = req.headers["user-agent"] || "";
 
-    const sessionKey = this.ctx.sessionManager.getSessionKey(refresh_token.user_id, refresh_token.session_id);
-    const sessionIp = await this.ctx.sessionManager.getFieldFromSession(sessionKey, "ip");
-    this.ctx.assert.badRequest(!sessionIp, "Invalid credentials");
-    this.ctx.assert.badRequest(sessionIp !== ip, "Invalid request");
+    const _accessTokenPayload = this.ctx.jwtService.decodeAccessToken(body.access_token);
+    this.ctx.assert.unprocessableEntity(!_accessTokenPayload, "Invalid access token");
 
-    const _user = await this.ctx.useRepository.findById(refresh_token.user_id);
-    this.ctx.assert.resourceNotFound(!_user, `User with id ${refresh_token.user_id} not found`);
+    const accessTokenPayload = _accessTokenPayload!;
+    this.ctx.assert.unprocessableEntity(!accessTokenPayload.session_id, "Invalid access token");
+    this.ctx.assert.unprocessableEntity(!accessTokenPayload.sub, "Invalid access token");
+
+    const _token = await this.ctx.refreshTokensRepository.find(body.refresh_token);
+    const isInvalid = !_token || _token.revoked || _token.user_id !== accessTokenPayload.sub;
+    this.ctx.assert.unprocessableEntity(isInvalid, "Invalid refresh token");
+
+    const token = _token!;
+    const _user = await this.ctx.useRepository.findById(token.user_id);
+    this.ctx.assert.resourceNotFound(!_user, "User not found");
+
     const user = _user!;
 
-    await this.ctx.sessionManager.delete(refresh_token.user_id, refresh_token.session_id);
-    const { accessToken, refreshToken } = await this.ctx.sessionManager.create({
-      userId: user.id,
-      isEmailVerified: user.is_email_verify,
-      ip,
-      userAgent: req.headers["user-agent"],
-      is2FAEnabled: user.is_2fa_enabled,
-      email: user.email,
-      username: user.user_name
-    });
+    await this.ctx.sessionManager.delete(accessTokenPayload.session_id);
+    await this.ctx.refreshTokensRepository.revoke(token.id);
 
-    return res
-      .status(StatusCodes.OK)
-      .json({ access_token: accessToken, refresh_token: refreshToken, expires_in: 15 * Minute, expires_in_unit: "ms" });
+    const session = this.ctx.sessionManager.create({
+      aal: accessTokenPayload.aal, // This need to be accessed from the token payload, because user may completed the MFA
+      amr: accessTokenPayload.amr,
+      email: user.email,
+      role: accessTokenPayload.role,
+      subject: user.id,
+      appMetaData: accessTokenPayload.app_metadata,
+      userMetaData: accessTokenPayload.user_metadata
+    });
+    await this.ctx.sessionManager.save(session.sessionId, {
+      ip,
+      userAgent,
+      aal: accessTokenPayload.aal,
+      userId: user.id
+    });
+    await this.ctx.refreshTokensRepository.create({ token: session.refreshToken, userId: user.id });
+
+    return res.status(StatusCodes.OK).json({
+      access_token: session.accessToken,
+      refresh_token: session.refreshToken,
+      token_type: "Bearer",
+      expires_in: session.expiresInSec,
+      expires_at: session.expiresAt
+    });
   }
 }

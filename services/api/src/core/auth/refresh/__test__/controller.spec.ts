@@ -3,30 +3,31 @@ import { StatusCodes } from "http-status-codes";
 import { Assertions } from "@votewise/errors";
 import { Minute } from "@votewise/times";
 
-import { jwtPluginFactory } from "@/plugins/jwt";
 import { requestParserPluginFactory } from "@/plugins/request-parser";
 import { JWTService } from "@/services/jwt.service";
 import { SessionManager } from "@/services/session.service";
 
-import { buildReq, buildRes } from "../../../../../test/helpers";
+import { buildRefreshToken, buildReq, buildRes } from "../../../../../test/helpers";
 import { Controller } from "../controller";
 import * as helpers from "./helpers";
 
-const jwtService = new JWTService({ accessTokenSecret: "secret", refreshTokenSecret: "secret" });
+const jwtService = new JWTService({ accessTokenSecret: "secret" });
 
 const assert = new Assertions();
 const sessionManager = new SessionManager({
   jwtService: helpers.mockJWTService,
   cryptoService: helpers.mockCryptoService,
   cache: helpers.mockCache,
-  assert
+  assert,
+  sessionRepository: helpers.mockSessionRepository
 });
 const controller = new Controller({
   useRepository: helpers.mockUserRepository,
   sessionManager,
-  jwtPlugin: jwtPluginFactory({ jwtService }),
   assert,
-  requestParser: requestParserPluginFactory()
+  requestParser: requestParserPluginFactory(),
+  refreshTokensRepository: helpers.mockRefreshTokenRepository,
+  jwtService
 });
 
 beforeEach(() => {
@@ -57,28 +58,15 @@ describe("Refresh Controller", () => {
     const req = buildReq({ body: { access_token: helpers.accessToken, refresh_token: "invalid_refresh_token" } });
     const res = buildRes({ locals: helpers.locals });
     helpers.setupHappyPath();
-    const error = await controller.handle(req, res).catch((e) => e);
+    helpers.mockRefreshTokenRepository.find.mockResolvedValue(null);
+    let error = await controller.handle(req, res).catch((e) => e);
     expect(helpers.mockUserRepository.findById).not.toHaveBeenCalledWith();
     expect(error.message).toBe("Invalid refresh token");
-  });
 
-  it("should throw error if session ip is different", async () => {
-    const req = buildReq({ body: { access_token: helpers.accessToken, refresh_token: helpers.refreshToken } });
-    const res = buildRes({ locals: { ...helpers.locals, meta: { ip: "some-different-ip" } } });
-    helpers.setupHappyPath();
-    const error = await controller.handle(req, res).catch((e) => e);
-    expect(helpers.mockUserRepository.findById).not.toHaveBeenCalled();
-    expect(error.message).toBe("Invalid request");
-  });
-
-  it("should throw error if old tokens are used after refresh", async () => {
-    const req = buildReq({ body: { access_token: helpers.accessToken, refresh_token: helpers.refreshToken } });
-    const res = buildRes({ locals: helpers.locals });
-    helpers.setupHappyPath();
-    helpers.mockCache.hget.mockResolvedValue(null);
-    const error = await controller.handle(req, res).catch((e) => e);
-    expect(helpers.mockUserRepository.findById).not.toHaveBeenCalled();
-    expect(error.message).toBe("Invalid credentials");
+    helpers.mockRefreshTokenRepository.find.mockResolvedValue(buildRefreshToken({ revoked: true }));
+    error = await controller.handle(req, res).catch((e) => e);
+    expect(helpers.mockUserRepository.findById).not.toHaveBeenCalledWith();
+    expect(error.message).toBe("Invalid refresh token");
   });
 
   it("should throw error if user not found", async () => {
@@ -90,44 +78,37 @@ describe("Refresh Controller", () => {
     const error = await controller.handle(req, res).catch((e) => e);
     expect(helpers.mockUserRepository.findById).toHaveBeenCalledWith(helpers.user.id);
     expect(helpers.mockCache.del).not.toHaveBeenCalled();
-    expect(error.message).toBe(`User with id ${helpers.user.id} not found`);
+    expect(error.message).toBe(`User not found`);
   });
 
   it("should refresh session", async () => {
     const req = buildReq({ body: { access_token: helpers.accessToken, refresh_token: helpers.refreshToken } });
     const res = buildRes({ locals: helpers.locals });
     const { session_id } = helpers.setupHappyPath();
-    const key = `session:${helpers.user.id}:${session_id}`;
-    const sessionData = {
-      ip: helpers.ip,
-      user_agent: undefined,
-      email: helpers.user.email,
-      is_2fa_enabled: helpers.user.is_2fa_enabled ? "true" : "false",
-      username: helpers.user.user_name
-    };
+    const key = `session:${session_id}`;
+
+    const { refreshToken } = helpers.setupHappyPath();
+    helpers.mockCryptoService.generateUUID.mockReturnValueOnce("new_session_id").mockReturnValue("new_refresh_token");
+    helpers.mockJWTService.signAccessToken.mockReturnValueOnce("new_access_token");
 
     await controller.handle(req, res);
-    expect(helpers.mockCache.del).toHaveBeenCalledWith(`session:${helpers.user.id}:${session_id}`);
+
+    expect(helpers.mockCache.del).toHaveBeenCalledWith(key);
+    expect(helpers.mockSessionRepository.delete).toHaveBeenCalledWith(session_id);
+    expect(helpers.mockRefreshTokenRepository.revoke).toHaveBeenCalledWith(refreshToken.id);
     expect(helpers.mockJWTService.signAccessToken).toHaveBeenCalledWith(
       {
-        user_id: helpers.user.id,
-        is_email_verified: helpers.user.is_email_verify,
-        session_id
+        sub: helpers.user.id,
+        role: "user",
+        email: helpers.user.email,
+        aal: "aal1",
+        amr: helpers.amr,
+        app_metadata: helpers.appMetaData,
+        user_metadata: {},
+        session_id: "new_session_id"
       },
-      { expiresIn: "15m" }
+      { expiresIn: 30 * Minute }
     );
-    expect(helpers.mockJWTService.signRefreshToken).toHaveBeenCalledWith(
-      { user_id: helpers.user.id, session_id },
-      { expiresIn: "7d" }
-    );
-    expect(helpers.mockCache.hset).toHaveBeenCalledWith(key, sessionData);
-    expect(helpers.mockCache.expire).toHaveBeenCalledWith(key, 20 * Minute);
     expect(res.status).toHaveBeenCalledWith(StatusCodes.OK);
-    expect(res.json).toHaveBeenCalledWith({
-      access_token: helpers.accessToken,
-      refresh_token: helpers.refreshToken,
-      expires_in: 15 * Minute,
-      expires_in_unit: "ms"
-    });
   });
 });

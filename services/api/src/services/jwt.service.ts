@@ -1,84 +1,53 @@
+import type { AccessTokenPayload } from "@/types";
 import type { SignOptions } from "jsonwebtoken";
 
 import { decode, sign, TokenExpiredError, verify } from "jsonwebtoken";
 
 type JWTServiceOptions = {
   accessTokenSecret: string;
-  refreshTokenSecret: string;
 };
 
 type Codes = "TOKEN_EXPIRED" | "MALFORMED_TOKEN";
 type VerifyResult<T> = { success: true; data: T } | { success: false; error: Codes };
 
-export type Payload = { user_id: string; is_email_verified: boolean; session_id: string };
-export type RefreshTokenPayload = { user_id: string; session_id: string };
 export type RidPayload = { verification_code: string; email: string };
 
 export class JWTService {
   private readonly accessTokenSecret: string;
-  private readonly refreshTokenSecret: string;
 
   constructor(ots: JWTServiceOptions) {
     this.accessTokenSecret = ots.accessTokenSecret;
-    this.refreshTokenSecret = ots.refreshTokenSecret;
   }
 
   /**
    * Create new JWT access token from the payload
    *
-   * @param {Payload} payload Payload or data that need to convert into a JSON Web Token string payload
+   * @param {AccessTokenPayload} payload Payload or data that need to convert into a JSON Web Token string payload
    * @param {SignOptions} options Options for the token
    * @returns {string} JSON Web Token string
    */
-  public signAccessToken(payload: Payload, options?: SignOptions): string {
+  public signAccessToken(payload: AccessTokenPayload, options?: SignOptions): string {
     return sign(payload, this.accessTokenSecret, options);
-  }
-
-  /**
-   * Create new JWT refresh token from the payload
-   *
-   * @param {string | object} payload Payload or data that need to convert into a JSON Web Token string payload
-   * @param {SignOptions} options Options for the token
-   * @returns {string} JSON Web Token string
-   */
-  public signRefreshToken(payload: RefreshTokenPayload, options?: SignOptions): string {
-    return sign(payload, this.refreshTokenSecret, options);
   }
 
   /**
    * Verify the access token
    *
    * @param {string} token JSON Web Token string
-   * @returns {VerifyResult<Payload>} Result of the verification
+   * @returns {VerifyResult<AccessTokenPayload>} Result of the verification
    * @template T
    */
-  public verifyAccessToken(token: string): VerifyResult<Payload> {
+  public verifyAccessToken(token: string): VerifyResult<AccessTokenPayload> {
     try {
-      const data = verify(token, this.accessTokenSecret) as Payload;
+      const data = verify(token, this.accessTokenSecret) as AccessTokenPayload;
       return { success: true, data };
     } catch (err) {
       return { success: false, error: this.handleError(err) };
     }
   }
 
-  /**
-   * Verify the refresh token
-   *
-   * @param {string} token JSON Web Token string
-   * @returns {VerifyResult<{user_id: string}>} Result of the verification
-   * @template T
-   */
-  public verifyRefreshToken(token: string): VerifyResult<{ user_id: string }> {
-    try {
-      const data = verify(token, this.refreshTokenSecret) as RefreshTokenPayload;
-      return { success: true, data };
-    } catch (err) {
-      return { success: false, error: this.handleError(err) };
-    }
-  }
-
-  public decodeAccessToken(token: string): Payload {
-    return decode(token) as Payload;
+  public decodeAccessToken(token: string): AccessTokenPayload | null {
+    return decode(token) as AccessTokenPayload | null;
   }
 
   public signRid(payload: RidPayload, key: string, options?: SignOptions): string {

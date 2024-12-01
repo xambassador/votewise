@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 
-import type { Payload as AccessTokenData } from "@/services/jwt.service";
 import type { envBaseSchema } from "@votewise/env";
 import type { z } from "zod";
 
@@ -12,9 +11,27 @@ export type AuthenticatedUser = {
   email: string;
   username: string;
 };
+export type AccessTokenPayload = {
+  sub: string;
+  email: string;
+  role: string;
+  app_metadata?: Record<string, unknown>;
+  user_metadata?: Record<string, unknown>;
+  amr: { method: string; timestamp: number }[];
+  aal: "aal1" | "aal2";
+  session_id: string;
+};
+export type TInMemorySession = { ip: string; userAgent: string; aal: "aal1" | "aal2" };
 export type Locals = {
   meta: { ip: string };
-  session: { user: AuthenticatedUser; accessToken: AccessTokenData };
+  /**
+   * The session stored in redis
+   */
+  session: TInMemorySession;
+  /**
+   * Parsed access token payload
+   */
+  payload: AccessTokenPayload;
 };
 
 declare global {

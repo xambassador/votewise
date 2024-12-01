@@ -89,11 +89,17 @@ export const ZResetPasswordQuery = z.object({
     .min(1, { message: "token is missing" })
 });
 
-export const ZVerify2FA = z.object({
+export const ZVerifyChallenge = z.object({
   code: z
     .string({ required_error: "code is missing", invalid_type_error: "code must be a string" })
     .min(6, { message: "code must be at least 6 characters" })
-    .max(6, { message: "code must be at most 6 characters" })
+    .max(6, { message: "code must be at most 6 characters" }),
+  challenge_id: z
+    .string({
+      required_error: "challenge_id is missing",
+      invalid_type_error: "challenge_id must be a string"
+    })
+    .min(1, { message: "challenge_id is missing" })
 });
 
 export type TRegister = z.infer<typeof ZRegister>;
@@ -105,4 +111,4 @@ export type TRefresh = z.infer<typeof ZRefresh>;
 export type TForgotPassword = z.infer<typeof ZForgotPassword>;
 export type TResetPassword = z.infer<typeof ZResetPassword>;
 export type TResetPasswordQuery = z.infer<typeof ZResetPasswordQuery>;
-export type TVerify2FA = z.infer<typeof ZVerify2FA>;
+export type TVerifyChallenge = z.infer<typeof ZVerifyChallenge>;

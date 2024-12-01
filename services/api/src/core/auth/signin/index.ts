@@ -22,7 +22,11 @@ export function singinControllerFactory() {
     jwtService: ctx.jwtService,
     cryptoService: ctx.cryptoService,
     assert: ctx.assert,
-    sessionManager: ctx.sessionManager
+    sessionManager: ctx.sessionManager,
+    refreshTokenRepository: ctx.repositories.refreshToken,
+    userRepository: ctx.repositories.user,
+    sessionRepository: ctx.repositories.session,
+    factorRepository: ctx.repositories.factor
   });
   const exceptionLayer = new ExceptionLayer({ name: "signin" });
   return exceptionLayer.catch(controller.handle.bind(controller));

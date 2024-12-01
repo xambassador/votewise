@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 
 import { Assertions } from "@votewise/errors";
-import { Minute } from "@votewise/times";
+import { Minute, Second } from "@votewise/times";
 
 import { requestParserPluginFactory } from "@/plugins/request-parser";
 import { SessionManager } from "@/services/session.service";
@@ -10,6 +10,8 @@ import { buildReq, buildRes } from "../../../../../test/helpers";
 import { Controller } from "../controller";
 import { EmailStrategy, UsernameStrategy } from "../strategies";
 import * as helpers from "./helpers";
+
+/* ----------------------------------------------------------------------------------------------- */
 
 const body = { email: "test@gmail.com", password: "password" };
 const userNameBody = { username: "test", password: "password" };
@@ -20,7 +22,8 @@ const sessionManager = new SessionManager({
   cache: helpers.mockCache,
   jwtService: helpers.mockJWTService,
   cryptoService: helpers.mockCryptoService,
-  assert: new Assertions()
+  assert: new Assertions(),
+  sessionRepository: helpers.mockSessionRepository
 });
 const controller = new Controller({
   requestParser: requestParserPluginFactory(),
@@ -31,7 +34,11 @@ const controller = new Controller({
   strategies: {
     email: new EmailStrategy({ userRepository: helpers.mockUserRepository }),
     username: new UsernameStrategy({ userRepository: helpers.mockUserRepository })
-  }
+  },
+  userRepository: helpers.mockUserRepository,
+  sessionRepository: helpers.mockSessionRepository,
+  refreshTokenRepository: helpers.mockRefreshTokenRepository,
+  factorRepository: helpers.mockFactorRepository
 });
 
 beforeEach(() => {
@@ -96,83 +103,59 @@ describe("Signin Controller", () => {
     expect(error.message).toBe(`Email ${user.email} is not verified. Please verify your email`);
   });
 
-  it("should throw error if user has more then 3 active sessions", async () => {
-    const req = buildReq({ body });
-    const res = buildRes({ locals });
-
-    const { user } = helpers.setupHappyPath();
-    helpers.mockCache.keys.mockResolvedValue(["session:1:1", "session:1:2", "session:1:3"]);
-
-    const error = await controller.handle(req, res).catch((e) => e);
-    expect(helpers.mockCache.keys).toHaveBeenCalledWith(`session:${user.id}:*`);
-    expect(helpers.mockJWTService.signAccessToken).not.toHaveBeenCalled();
-    expect(error.message).toBe("You have 3 active sessions, please logout from one of them");
-  });
-
-  it("should return access token, refresh token and create session", async () => {
+  it("should create a session and return JWT", async () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
     const { user } = helpers.setupHappyPath();
 
-    const key = `session:${user.id}:session_id`;
-    const session = {
-      ip,
-      user_agent: req.headers["user-agent"],
-      is_2fa_enabled: "false",
-      username: user.user_name,
-      email: user.email
-    };
-    const accessToken = { user_id: user.id, is_email_verified: user.is_email_verify, session_id: "session_id" };
-    const refreshToken = { user_id: user.id, session_id: "session_id" };
+    const accessToken = "access_token";
+    const refreshToken = "refresh_token";
+    const sessionId = "session_id";
+    helpers.mockJWTService.signAccessToken.mockReturnValue(accessToken);
+    helpers.mockCryptoService.generateUUID.mockReturnValueOnce(sessionId).mockReturnValueOnce(refreshToken);
+    helpers.mockFactorRepository.findByUserId.mockResolvedValue([]);
 
     await controller.handle(req, res);
 
-    expect(helpers.mockJWTService.signAccessToken).toHaveBeenCalledWith(accessToken, { expiresIn: "15m" });
-    expect(helpers.mockJWTService.signRefreshToken).toHaveBeenCalledWith(refreshToken, { expiresIn: "7d" });
-    expect(helpers.mockCache.hset).toHaveBeenCalledWith(key, session);
-    expect(helpers.mockCache.expire).toHaveBeenCalledWith(key, 20 * Minute);
-    expect(res.json).toHaveBeenCalledWith({
-      access_token: "access_token",
-      refresh_token: "refresh_token",
-      expires_in: 15 * Minute,
-      is_2fa_enabled: user.is_2fa_enabled,
-      expires_in_unit: "ms"
+    expect(helpers.mockJWTService.signAccessToken).toHaveBeenCalledWith(
+      {
+        sub: user.id,
+        role: "user",
+        email: user.email,
+        aal: "aal1",
+        amr: [{ method: "password", timestamp: expect.any(Number) }],
+        app_metadata: { provider: "email", providers: ["email"] },
+        user_metadata: {},
+        session_id: sessionId
+      },
+      { expiresIn: 30 * Minute }
+    );
+    expect(helpers.mockSessionRepository.create).toHaveBeenCalledWith({
+      id: sessionId,
+      aal: "aal1",
+      ip,
+      userAgent: "",
+      userId: user.id
     });
+    expect(helpers.mockRefreshTokenRepository.create).toHaveBeenCalledWith({ token: "refresh_token", userId: user.id });
+    expect(helpers.mockUserRepository.update).toHaveBeenCalledWith(user.id, { last_login: expect.any(Date) });
     expect(res.status).toHaveBeenCalledWith(StatusCodes.OK);
-  });
-
-  it("should return access token, refresh token and create session and set 2fa key in session if 2fa is enabled", async () => {
-    const req = buildReq({ body });
-    const res = buildRes({ locals });
-    const { user } = helpers.setupHappyPath({ is_2fa_enabled: true });
-    user.is_2fa_enabled = true;
-    const key = `session:${user.id}:session_id`;
-    const session = {
-      ip,
-      user_agent: req.headers["user-agent"],
-      is_2fa_enabled: "true",
-      is_2fa_verified: "false",
-      username: user.user_name,
-      email: user.email
-    };
-    const accessToken = { user_id: user.id, is_email_verified: user.is_email_verify, session_id: "session_id" };
-    const refreshToken = { user_id: user.id, session_id: "session_id" };
-    const response = {
-      access_token: "access_token",
-      refresh_token: "refresh_token",
-      expires_in: 15 * Minute,
-      is_2fa_enabled: user.is_2fa_enabled,
-      expires_in_unit: "ms"
-    };
-
-    await controller.handle(req, res);
-
-    expect(helpers.mockJWTService.signAccessToken).toHaveBeenCalledWith(accessToken, { expiresIn: "15m" });
-    expect(helpers.mockJWTService.signRefreshToken).toHaveBeenCalledWith(refreshToken, { expiresIn: "7d" });
-    expect(helpers.mockCache.hset).toHaveBeenCalledWith(key, session);
-    expect(helpers.mockCache.expire).toHaveBeenCalledWith(key, 20 * Minute);
-    expect(res.json).toHaveBeenCalledWith(response);
-    expect(res.status).toHaveBeenCalledWith(StatusCodes.OK);
+    expect(res.json.mock.calls[0]?.[0]).toEqual({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      token_type: "Bearer",
+      expires_in: (30 * Minute) / Second,
+      expires_at: expect.any(Number),
+      user: {
+        id: user.id,
+        email: user.email,
+        role: "user",
+        email_confirmed_at: user.email_confirmed_at,
+        email_confirmation_sent_at: user.email_confirmation_sent_at,
+        last_sign_in_at: expect.any(Date),
+        factors: []
+      }
+    });
   });
 
   describe("Signin strategy", () => {
@@ -182,7 +165,11 @@ describe("Signin Controller", () => {
       jwtService: helpers.mockJWTService,
       assert: new Assertions(),
       sessionManager,
-      strategies: { email: helpers.mockEmailStrategy, username: helpers.mockUsernameStrategy }
+      strategies: { email: helpers.mockEmailStrategy, username: helpers.mockUsernameStrategy },
+      userRepository: helpers.mockUserRepository,
+      sessionRepository: helpers.mockSessionRepository,
+      refreshTokenRepository: helpers.mockRefreshTokenRepository,
+      factorRepository: helpers.mockFactorRepository
     });
 
     it("should pick correct strategy", async () => {

@@ -1,37 +1,25 @@
 import type { AppContext } from "@/context";
+import type { TInMemorySession } from "@/types";
 
-import { Minute } from "@votewise/times";
+import { Minute, Second } from "@votewise/times";
 
 type SessionManagerOptions = {
   cache: AppContext["cache"];
   cryptoService: AppContext["cryptoService"];
   jwtService: AppContext["jwtService"];
   assert: AppContext["assert"];
+  sessionRepository: AppContext["repositories"]["session"];
 };
-
-type Create = {
-  userId: string;
-  isEmailVerified: boolean;
-  is2FAEnabled: boolean;
-  ip: string;
+type CreateOptions = {
+  subject: string;
   email: string;
-  username: string;
-  userAgent?: string;
+  role: string;
+  appMetaData?: Record<string, unknown>;
+  userMetaData?: Record<string, unknown>;
+  amr: { method: string; timestamp: number }[];
+  aal: "aal1" | "aal2";
+  sessionId?: string; // If need to create a session for existing session ID
 };
-type SessionData =
-  | {
-      ip: string;
-      user_agent?: string;
-      is_2fa_enabled: "true";
-      is_2fa_verified: "true" | "false";
-      email: string;
-      username: string;
-    }
-  | { ip: string; user_agent?: string; is_2fa_enabled: "false"; email: string; username: string };
-type SessionFields = "ip" | "user_agent";
-type User =
-  | { email: string; username: string; is_2fa_enabled: "true"; is_2fa_verified: "true" | "false" }
-  | { email: string; username: string; is_2fa_enabled: "false" };
 
 export class SessionManager {
   private readonly ctx: SessionManagerOptions;
@@ -40,102 +28,119 @@ export class SessionManager {
     this.ctx = opts;
   }
 
-  public getSessionKey(userId: string, sessionId: string) {
-    return `session:${userId}:${sessionId}`;
+  public getSessionKey(sessionId: string) {
+    return `session:${sessionId}`;
   }
 
-  public async create(opts: Create) {
-    const { userAgent, userId, isEmailVerified, ip, is2FAEnabled, username, email } = opts;
-
-    const sessionId = this.ctx.cryptoService.generateUUID();
-    const accessTokenData = { user_id: userId, is_email_verified: isEmailVerified, session_id: sessionId };
-    const refreshTokenData = { user_id: userId, session_id: sessionId };
-    const accessToken = this.ctx.jwtService.signAccessToken(accessTokenData, { expiresIn: "15m" });
-    const refreshToken = this.ctx.jwtService.signRefreshToken(refreshTokenData, { expiresIn: "7d" });
-
-    let sessionData: SessionData;
-    if (is2FAEnabled) {
-      sessionData = { ip, user_agent: userAgent, is_2fa_enabled: "true", is_2fa_verified: "false", username, email };
-    } else {
-      sessionData = { ip, user_agent: userAgent, is_2fa_enabled: "false", username, email };
-    }
-
-    const key = this.getSessionKey(userId, sessionId);
-
-    // Setting expiry for 20 minutes, so client can refresh the token
-    await this.ctx.cache.hset(key, sessionData);
-    await this.ctx.cache.expire(key, 20 * Minute);
-
-    return { accessToken, refreshToken, sessionId };
+  /**
+   * Create a new session in-form of access token and refresh token.
+   *
+   * @param opts - Session creation options
+   */
+  public create(opts: CreateOptions) {
+    const { subject, role, email, aal, amr, appMetaData = {}, userMetaData = {}, sessionId: existingSessionId } = opts;
+    const sessionId = existingSessionId || this.ctx.cryptoService.generateUUID();
+    const refreshToken = this.ctx.cryptoService.generateUUID().replace(/-/g, "");
+    const expiresIn = Minute * 30;
+    const expiresAt = Date.now() + expiresIn;
+    const accessToken = this.ctx.jwtService.signAccessToken(
+      {
+        sub: subject,
+        role,
+        email,
+        aal,
+        amr,
+        app_metadata: appMetaData,
+        user_metadata: userMetaData,
+        session_id: sessionId
+      },
+      { expiresIn }
+    );
+    return {
+      accessToken,
+      refreshToken,
+      sessionId,
+      expiresInMs: expiresIn,
+      expiresAt,
+      expiresInSec: expiresIn / Second
+    };
   }
 
-  public async delete(userId: string, sessionId: string) {
-    const key = this.getSessionKey(userId, sessionId);
+  /**
+   * Save the session into the cache and database
+   *
+   * @param {string} sessionId - Session ID
+   * @param {TSession & { userId: string }} session - Session object
+   */
+  public async save(sessionId: string, session: TInMemorySession & { userId: string }) {
+    const key = this.getSessionKey(sessionId);
+    await this.ctx.cache.set(key, JSON.stringify({ ip: session.ip, userAgent: session.userAgent, aal: session.aal }));
+    await this.ctx.sessionRepository.create({
+      id: sessionId,
+      aal: session.aal,
+      ip: session.ip,
+      userAgent: session.userAgent,
+      userId: session.userId
+    });
+  }
+
+  /**
+   * Get the session from the cache if found else load from database and save in cache
+   *
+   * @param {string} sessionId - Session ID
+   */
+  public async get(sessionId: string) {
+    const key = this.getSessionKey(sessionId);
+    const session = await this.ctx.cache.get(key);
+    if (session) return JSON.parse(session) as TInMemorySession;
+    const sessionData = await this.ctx.sessionRepository.find(sessionId);
+    if (!sessionData) return null;
+    const data = {
+      ip: sessionData.ip,
+      userAgent: sessionData.user_agent,
+      aal: sessionData.aal as "aal1" | "aal2",
+      userId: sessionData.user_id
+    };
+    await this.save(sessionId, data);
+    return data;
+  }
+
+  /**
+   * Delete the session from the cache and database
+   *
+   * @param {string} sessionId - Session ID
+   */
+  public async delete(sessionId: string) {
+    const key = this.getSessionKey(sessionId);
     await this.ctx.cache.del(key);
+    await this.ctx.sessionRepository.delete(sessionId);
   }
 
-  public async deleteAll(userId: string) {
-    const sessionKeyPattern = `session:${userId}:*`;
-    const sessionKeys = await this.ctx.cache.keys(sessionKeyPattern);
-    await Promise.all(sessionKeys.map((key) => this.ctx.cache.del(key)));
-  }
-
-  public async enforceSessionLimit(userId: string) {
-    const sessionKeyPattern = `session:${userId}:*`;
-    const sessionKeys = await this.ctx.cache.keys(sessionKeyPattern);
-    this.ctx.assert.badRequest(sessionKeys.length >= 3, `You have 3 active sessions, please logout from one of them`);
-  }
-
-  public async getSession(userId: string, sessionId: string) {
-    const key = this.getSessionKey(userId, sessionId);
-    return this.ctx.cache.hgetall(key) as unknown as Promise<SessionData>;
-  }
-
-  public async getSessions(userId: string) {
-    const sessionKeyPattern = `session:${userId}:*`;
-    const sessionKeys = await this.ctx.cache.keys(sessionKeyPattern);
-    const sessions: ({ id: string } & SessionData)[] = [];
-    for (const key of sessionKeys) {
-      const sessionId = key.split(":")[2];
-      const data = (await this.ctx.cache.hgetall(key)) as unknown as SessionData;
-      if (!data || Object.keys(data).length === 0) continue;
-      if (data.is_2fa_enabled === "true") {
-        sessions.push({
-          id: sessionId!,
-          ip: data.ip,
-          user_agent: data.user_agent,
-          is_2fa_enabled: data.is_2fa_enabled,
-          is_2fa_verified: data.is_2fa_verified,
-          email: data.email,
-          username: data.username
-        });
-      } else {
-        sessions.push({
-          id: sessionId!,
-          ip: data.ip,
-          user_agent: data.user_agent,
-          is_2fa_enabled: data.is_2fa_enabled,
-          email: data.email,
-          username: data.username
-        });
-      }
-    }
-    return sessions;
-  }
-
-  public async getFieldFromSession(key: string, field: SessionFields) {
-    return this.ctx.cache.hget(key, field);
-  }
-
-  public async storeUserInSession(userId: string, sessionId: string, user: User) {
-    const key = this.getSessionKey(userId, sessionId);
-    return this.ctx.cache.hset(key, user);
-  }
-
-  public async updateSessionData(userId: string, sessionId: string, data: Partial<SessionData>) {
-    const key = this.getSessionKey(userId, sessionId);
-    const oldData = this.ctx.cache.hgetall(key);
-    if (!oldData) return;
-    await this.ctx.cache.hset(key, { ...oldData, ...data });
+  /**
+   * Update the session in the cache and database
+   *
+   * @param sessionId - Session ID
+   * @param data - Data to update
+   */
+  public async update(
+    sessionId: string,
+    data: Partial<{ aal: "aal1" | "aal2"; userAgent: string; ip: string; factorId: string; userId: string }>
+  ) {
+    const key = this.getSessionKey(sessionId);
+    const session = await this.ctx.cache.get(key);
+    const sessionFromDatabase = await this.ctx.sessionRepository.find(sessionId);
+    if (!session) return null;
+    if (!sessionFromDatabase) return null;
+    const sessionData = JSON.parse(session) as TInMemorySession;
+    const updatedSession = { ...sessionData, ...data };
+    await this.ctx.cache.set(key, JSON.stringify(updatedSession));
+    await this.ctx.sessionRepository.update(sessionId, {
+      aal: data.aal,
+      userAgent: data.userAgent,
+      ip: data.ip,
+      factorId: data.factorId,
+      userId: data.userId
+    });
+    return updatedSession;
   }
 }

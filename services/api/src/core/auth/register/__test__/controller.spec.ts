@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 
 import { Assertions } from "@votewise/errors";
-import { Minute } from "@votewise/times";
+import { Minute, Second } from "@votewise/times";
 
 import { requestParserPluginFactory } from "@/plugins/request-parser";
 
@@ -53,7 +53,6 @@ describe("Register Controller", () => {
 
     const error = await controller.handle(req, res).catch((e) => e);
     expect(helpers.mockUserRepository.findByEmail).toHaveBeenCalledWith(body.email);
-    expect(helpers.mockUserRepository.findByUsername).not.toHaveBeenCalled();
     expect(helpers.mockUserRepository.create).not.toHaveBeenCalled();
     expect(error.message).toBe(`${body.email} already exists`);
   });
@@ -74,7 +73,7 @@ describe("Register Controller", () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
     const { otp, uuid: verificationCode } = helpers.setupHappyPath();
-    const windowExpiryInMs = 5 * Minute;
+    const windowExpiryIn = (5 * Minute) / Second;
     const data = JSON.stringify({ userId: user.id, ip });
     const createBody = {
       email: body.email,
@@ -97,15 +96,13 @@ describe("Register Controller", () => {
     const response = {
       user_id: user.id,
       verification_code: verificationCode,
-      expires_in: windowExpiryInMs,
-      expires_in_unit: "ms"
+      expires_in: windowExpiryIn
     };
 
     await controller.handle(req, res);
 
-    expect(helpers.mockUserRepository.findByEmail).toHaveBeenCalledWith(body.email);
     expect(helpers.mockUserRepository.create).toHaveBeenCalledWith(createBody);
-    expect(helpers.mockCache.setWithExpiry).toHaveBeenCalledWith(verificationCode, data, windowExpiryInMs);
+    expect(helpers.mockCache.setWithExpiry).toHaveBeenCalledWith(verificationCode, data, windowExpiryIn);
     expect(helpers.mockTaskQueue.add).toHaveBeenCalledWith(queueData);
     expect(res.status).toHaveBeenCalledWith(StatusCodes.CREATED);
     expect(res.json).toHaveBeenCalledWith(response);

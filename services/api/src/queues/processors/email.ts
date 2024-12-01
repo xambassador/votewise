@@ -27,6 +27,7 @@ export type EmailJob = SignupTemplate | WelcomeTemplate | ForgotPasswordTemplate
 type EmailProcessorOptions = {
   logger: AppContext["logger"];
   mailer: AppContext["mailer"];
+  userRepository: AppContext["repositories"]["user"];
 };
 
 export class EmailProcessor implements ITaskWorker {
@@ -51,6 +52,7 @@ export class EmailProcessor implements ITaskWorker {
         subject
       });
       this.opts.logger.info(`Email sent to ${to}`);
+      await this.opts.userRepository.updateByEmail(to, { email_confirmation_sent_at: new Date() });
     } catch (err) {
       this.opts.logger.error(`Failed to send email to ${to}`);
       throw err;

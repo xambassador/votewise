@@ -1,14 +1,12 @@
 import { Router } from "express";
 
-import { twoFactorAuthMiddlewareFactory } from "@/http/middlewares/2fa";
 import { authMiddlewareFactory } from "@/http/middlewares/auth";
 
-import { disable2FAControllerFactory } from "./auth/2fa/disable";
-import { enable2FAControllerFactory } from "./auth/2fa/enable";
-import { generate2FAControllerFactory } from "./auth/2fa/generate";
-import { verify2FAControllerFactory } from "./auth/2fa/verify";
 import { forgotPasswordControllerFactory } from "./auth/forgot-password";
 import { logoutControllerFactory } from "./auth/logout";
+import { challengeMFAControllerFactory } from "./auth/mfa/challenge";
+import { enrollMFAControllerFactory } from "./auth/mfa/enroll";
+import { verifyChallangeControllerFactory } from "./auth/mfa/verify";
 import { refreshControllerFactory } from "./auth/refresh";
 import { registerControllerFactory } from "./auth/register";
 import { resetPasswordControllerFactory } from "./auth/reset-password";
@@ -27,7 +25,6 @@ export function moduleRouterFactory(basePath: string): Router {
   const router = Router();
   const path = basePath + "/v1";
   const auth = authMiddlewareFactory();
-  const twoFactorAuth = twoFactorAuthMiddlewareFactory();
 
   router.post(path + "/auth/register", registerControllerFactory());
   router.patch(path + "/auth/verify", verifyControllerFactory());
@@ -37,10 +34,9 @@ export function moduleRouterFactory(basePath: string): Router {
   router.patch(path + "/auth/reset-password", resetPasswordControllerFactory());
   router.delete(path + "/auth/logout", auth, logoutControllerFactory());
   router.get(path + "/user/sessions", auth, listSessionsControllerFactory());
-  router.get(path + "/auth/2fa/generate", auth, generate2FAControllerFactory());
-  router.post(path + "/auth/2fa/enable", auth, enable2FAControllerFactory());
-  router.post(path + "/auth/2fa/verify", auth, verify2FAControllerFactory());
-  router.post(path + "/auth/2fa/disable", auth, twoFactorAuth, disable2FAControllerFactory());
+  router.post(path + "/auth/factors/enroll", auth, enrollMFAControllerFactory());
+  router.post(path + "/auth/factors/:factor_id/challenge", auth, challengeMFAControllerFactory());
+  router.post(path + "/auth/factors/:factor_id/verify", auth, verifyChallangeControllerFactory());
 
   return router;
 }

@@ -79,10 +79,7 @@ const MINIO_SECRET_KEY = z
 const MINIO_ENDPOINT = z
   .string({ required_error: "MINIO_ENDPOINT is required" })
   .min(1, { message: "MINIO_ENDPOINT is required" });
-const MINIO_PORT = z
-  .string({ required_error: "MINIO_PORT is required" })
-  .min(1, { message: "MINIO_PORT is required" })
-  .transform((val) => parseInt(val, 10));
+const MINIO_PORT = z.string({ required_error: "MINIO_PORT is required" }).min(1, { message: "MINIO_PORT is required" });
 
 export const envBaseSchema = z.object({
   ACCESS_TOKEN_SECRET,
@@ -150,7 +147,7 @@ export const envSchema = z.object({
   MINIO_ACCESS_KEY,
   MINIO_SECRET_KEY,
   MINIO_ENDPOINT,
-  MINIO_PORT
+  MINIO_PORT: MINIO_PORT.transform((val) => parseInt(val, 10))
 });
 
 envSchema.superRefine((data) => {

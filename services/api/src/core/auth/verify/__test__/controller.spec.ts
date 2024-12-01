@@ -129,9 +129,14 @@ describe("Verify Email Controller", () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
     helpers.setupHappyPath();
+    helpers.mockCryptoService.generateUUID.mockReturnValue("new-secret");
 
     await controller.handle(req, res);
-    expect(helpers.mockUserRepository.update).toHaveBeenCalledWith(body.user_id, { is_email_verify: true });
+    expect(helpers.mockUserRepository.update).toHaveBeenCalledWith(body.user_id, {
+      is_email_verify: true,
+      email_confirmed_at: expect.any(Date),
+      secret: "new-secret"
+    });
     expect(helpers.mockCache.del).toHaveBeenCalledWith(body.verification_code);
     expect(res.status).toHaveBeenCalledWith(StatusCodes.OK);
     expect(res.json).toHaveBeenCalledWith({

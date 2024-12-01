@@ -60,14 +60,6 @@ export class CryptoService {
     return decrypted;
   }
 
-  public generateRandomKey(size = 32): string {
-    return nanoid(size);
-  }
-
-  public generateRandomToken(size = 32): string {
-    return nanoid(size);
-  }
-
   public generateUUID(): string {
     return v4();
   }
@@ -112,7 +104,7 @@ export class CryptoService {
     return authenticator.generateSecret();
   }
 
-  public verify2FAToken(secret: string, token: string): boolean {
+  public verify2FACode(secret: string, token: string): boolean {
     authenticator.options = { window: [2, 2] };
     const delta = authenticator.checkDelta(token, secret);
     if (!Number.isInteger(delta)) return false;
@@ -129,5 +121,9 @@ export class CryptoService {
    */
   public generate2FAQRCode(secret: string, label: string, issuer: string): Promise<string> {
     return toDataURL(authenticator.keyuri(label, issuer, secret));
+  }
+
+  public generateKeyUri(secret: string, label: string, issuer: string): string {
+    return authenticator.keyuri(label, issuer, secret);
   }
 }

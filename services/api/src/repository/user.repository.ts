@@ -1,6 +1,8 @@
 import type { AppContext } from "@/context";
 import type { Prisma } from "@votewise/prisma";
 
+import { BaseRepository } from "./base.repository";
+
 type Dependencies = {
   db: AppContext["db"];
 };
@@ -8,41 +10,55 @@ type Dependencies = {
 type TCreate = Prisma.UserCreateInput;
 type TUpdate = Prisma.UserUpdateInput;
 
-export class UserRepository {
+export class UserRepository extends BaseRepository {
   private readonly db: Dependencies["db"];
 
   constructor(cfg: Dependencies) {
+    super();
     this.db = cfg.db;
   }
 
-  async create(data: TCreate) {
-    const user = await this.db.user.create({ data });
-    return user;
+  public create(data: TCreate) {
+    return this.execute(async () => {
+      const user = await this.db.user.create({ data });
+      return user;
+    });
   }
 
-  async find() {}
-
-  async findOne() {}
-
-  async findById(id: string) {
-    const user = await this.db.user.findUnique({ where: { id } });
-    return user;
+  public findById(id: string) {
+    return this.execute(async () => {
+      const user = await this.db.user.findUnique({ where: { id } });
+      return user;
+    });
   }
 
-  async findByEmail(email: string) {
-    const user = await this.db.user.findUnique({ where: { email } });
-    return user;
+  public findByEmail(email: string) {
+    return this.execute(async () => {
+      const user = await this.db.user.findUnique({ where: { email } });
+      return user;
+    });
   }
 
-  async findByUsername(username: string) {
-    const user = await this.db.user.findUnique({ where: { user_name: username } });
-    return user;
+  public findByUsername(username: string) {
+    return this.execute(async () => {
+      const user = await this.db.user.findUnique({ where: { user_name: username } });
+      return user;
+    });
   }
 
-  async update(id: string, data: TUpdate) {
-    const user = await this.db.user.update({ where: { id }, data });
-    return user;
+  public update(id: string, data: TUpdate) {
+    return this.execute(async () => {
+      const user = await this.db.user.update({ where: { id }, data });
+      return user;
+    });
   }
 
-  async delete() {}
+  public updateByEmail(email: string, data: TUpdate) {
+    return this.execute(async () => {
+      const user = await this.db.user.update({ where: { email }, data });
+      return user;
+    });
+  }
+
+  delete() {}
 }

@@ -1,8 +1,9 @@
 import type { AppContext } from "@/context";
-import type { Locals } from "@/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
+
+import { getAuthenticateLocals } from "@/utils/locals";
 
 type ControllerOptions = {
   sessionManager: AppContext["sessionManager"];
@@ -17,11 +18,8 @@ export class Controller {
   }
 
   public async handle(_: Request, res: Response) {
-    const locals = res.locals as Locals;
-    const { user_id, session_id } = locals.session.accessToken;
-    const session = await this.ctx.sessionManager.getSession(user_id, session_id);
-    this.ctx.assert.badRequest(!session || Object.keys(session).length === 0, "Invalid session");
-    await this.ctx.sessionManager.delete(user_id, session_id);
+    const { payload } = getAuthenticateLocals(res);
+    await this.ctx.sessionManager.delete(payload.session_id);
     return res.status(StatusCodes.NO_CONTENT).send();
   }
 }
