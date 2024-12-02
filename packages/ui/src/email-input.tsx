@@ -11,7 +11,7 @@ import { Input, InputField } from "./input-field";
 /* -----------------------------------------------------------------------------------------------
  * EmailInput
  * -----------------------------------------------------------------------------------------------*/
-type EmailInputProps = InputProps & { wrapperProps?: InputFieldProps };
+export type EmailInputProps = InputProps & { wrapperProps?: InputFieldProps };
 export const EmailInput = forwardRef<InputRef, EmailInputProps>((props, ref) => {
   const { wrapperProps, ...inputProps } = props;
   const hasError = !!inputProps["data-has-error" as keyof typeof inputProps];

@@ -5484,6 +5484,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@votewise/client@workspace:packages/client":
+  version: 0.0.0-use.local
+  resolution: "@votewise/client@workspace:packages/client"
+  dependencies:
+    tsup: "npm:^8.2.4"
+    typescript: "npm:^5.5.4"
+  languageName: unknown
+  linkType: soft
+
 "@votewise/config@npm:*, @votewise/config@workspace:packages/config":
   version: 0.0.0-use.local
   resolution: "@votewise/config@workspace:packages/config"

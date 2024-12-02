@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { checkStrength } from "@votewise/ui/password-strength";
 
-export const ZStepOneFormSchema = z
+export const ZSignUpForm = z
   .object({
     email: z.string({ required_error: "Email is required" }).email({ message: "Invalid email address" }),
     password: z.string({ required_error: "Password is required" })
@@ -33,13 +33,5 @@ export const ZStepOneFormSchema = z
     return data;
   });
 
-export const ZStepTwoFormSchema = z.object({
-  userName: z.string({ required_error: "Username is required" }).min(3, { message: "Username is too short" }),
-  firstName: z.string({ required_error: "First name is required" }).min(1, { message: "First name is required" }),
-  lastName: z.string({ required_error: "Last name is required" }).min(1, { message: "Last name is required" })
-});
-
-export type TStepOneForm = z.infer<typeof ZStepOneFormSchema>;
-export type TStepOneFormKeys = keyof TStepOneForm;
-export type TStepTwoForm = z.infer<typeof ZStepTwoFormSchema>;
-export type TStepTwoFormKeys = keyof TStepTwoForm;
+export type TSignUpForm = z.infer<typeof ZSignUpForm>;
+export type TSignUpFormKeys = keyof TSignUpForm;

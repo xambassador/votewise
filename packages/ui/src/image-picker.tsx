@@ -26,7 +26,7 @@ const [Provider, useProvider] = createContext<{
 /* -----------------------------------------------------------------------------------------------
  * ImagePicker
  * -----------------------------------------------------------------------------------------------*/
-type ImagePickerProps = React.HTMLAttributes<HTMLDivElement> & { url?: string | null };
+export type ImagePickerProps = React.HTMLAttributes<HTMLDivElement> & { url?: string | null };
 
 export function ImagePicker(props: ImagePickerProps) {
   const { url: controlledUrl, ...rest } = props;
@@ -72,7 +72,7 @@ export function ImagePreview(props: ImagePreviewProps) {
 /* -----------------------------------------------------------------------------------------------
  * ImagePickerButton
  * -----------------------------------------------------------------------------------------------*/
-type ImagePickerButtonProps = React.HTMLAttributes<HTMLLabelElement> & {
+export type ImagePickerButtonProps = React.HTMLAttributes<HTMLLabelElement> & {
   isMultiple?: boolean;
   accept?: string;
   preventDefaultBehavior?: boolean;
@@ -111,7 +111,7 @@ export function ImagePickerButton(props: ImagePickerButtonProps) {
 /* -----------------------------------------------------------------------------------------------
  * ResetPreviewButton
  * -----------------------------------------------------------------------------------------------*/
-type ResetPreviewButtonProps = React.HTMLAttributes<HTMLDivElement> & { onReset?: () => void };
+export type ResetPreviewButtonProps = React.HTMLAttributes<HTMLDivElement> & { onReset?: () => void };
 
 export function ResetPreviewButton(props: ResetPreviewButtonProps) {
   const { onReset, ...rest } = props;

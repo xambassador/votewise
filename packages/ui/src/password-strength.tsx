@@ -19,7 +19,7 @@ export function checkStrength(password: string) {
 }
 export type Strength = ReturnType<typeof checkStrength>;
 
-type PasswordStrengthProps = React.HTMLAttributes<HTMLDivElement> & { password: string };
+export type PasswordStrengthProps = React.HTMLAttributes<HTMLDivElement> & { password: string };
 export const PasswordStrength = forwardRef<HTMLDivElement, PasswordStrengthProps>((props, ref) => {
   const { password, ...rest } = props;
 

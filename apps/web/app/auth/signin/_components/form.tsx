@@ -6,7 +6,7 @@ import Link from "next/link";
 import { routes } from "@/lib/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Button, variants } from "@votewise/ui/button";
+import { Button } from "@votewise/ui/button";
 import { UsernameInput } from "@votewise/ui/email-input";
 import { Form, FormControl, FormField, FormLabel, FormMessage, useForm } from "@votewise/ui/form";
 import { PasswordInput } from "@votewise/ui/password-input";
@@ -22,7 +22,7 @@ export function SignInForm() {
     <Form {...form}>
       <div className="flex flex-col gap-3 min-w-[calc((450/16)*1rem)]">
         <FormField name="username">
-          <FormLabel className="sr-only">Username or email address</FormLabel>
+          {usernameLabel}
           <FormControl>
             <UsernameInput placeholder="Username or email address" {...form.register("username")} />
           </FormControl>
@@ -30,24 +30,27 @@ export function SignInForm() {
         </FormField>
 
         <FormField name="password">
-          <FormLabel className="sr-only">Password</FormLabel>
+          {passwordLabel}
           <FormControl>
             <PasswordInput placeholder="Password" {...form.register("password")} />
           </FormControl>
           <FormMessage />
         </FormField>
       </div>
-
-      <Link href={routes.auth.forgot()} className="font-medium text-sm text-gray-500 w-fit">
-        Forgot?
-      </Link>
-
+      {forgotLink}
       <div className="flex items-center justify-between">
-        <Link role="button" className={variants({ variant: "secondary" })} href={routes.auth.signUp()}>
-          Back
-        </Link>
-        <Button onClick={onSubmit}>Sign in</Button>
+        <Button className="w-full" onClick={onSubmit}>
+          Let&apos;s Go!
+        </Button>
       </div>
     </Form>
   );
 }
+
+const usernameLabel = <FormLabel className="sr-only">Username or email address</FormLabel>;
+const passwordLabel = <FormLabel className="sr-only">Password</FormLabel>;
+const forgotLink = (
+  <Link href={routes.auth.forgot()} className="font-medium text-sm text-gray-500 w-fit">
+    Forgot?
+  </Link>
+);

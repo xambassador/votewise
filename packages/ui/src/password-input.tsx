@@ -12,7 +12,7 @@ import { Input, InputField } from "./input-field";
 /* -----------------------------------------------------------------------------------------------
  * PasswordInput
  * -----------------------------------------------------------------------------------------------*/
-type PasswordInputProps = InputProps & { wrapperProps?: InputFieldProps };
+export type PasswordInputProps = InputProps & { wrapperProps?: InputFieldProps };
 export const PasswordInput = forwardRef<InputRef, PasswordInputProps>((props, ref) => {
   const { wrapperProps, ...inputProps } = props;
   const hasError = !!inputProps["data-has-error" as keyof typeof inputProps];

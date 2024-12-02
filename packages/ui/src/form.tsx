@@ -25,7 +25,7 @@ function useFormField(name: string) {
   return { id: ctx.id, name: ctx.name, ...fieldState };
 }
 
-type FormFieldProps = React.HTMLAttributes<HTMLDivElement> & { name: string };
+export type FormFieldProps = React.HTMLAttributes<HTMLDivElement> & { name: string };
 export const FormField = forwardRef<HTMLDivElement, FormFieldProps>((props, ref) => {
   const { name, ...rest } = props;
   const id = useId();
@@ -37,7 +37,7 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>((props, ref)
 });
 FormField.displayName = "FormField";
 
-type FormLabelProps = React.ComponentPropsWithoutRef<typeof Label>;
+export type FormLabelProps = React.ComponentPropsWithoutRef<typeof Label>;
 type LabelRef = React.ElementRef<typeof Label>;
 export const FormLabel = forwardRef<LabelRef, FormLabelProps>((props, ref) => {
   const { error, id } = useFormField("FormLabel");
@@ -45,7 +45,7 @@ export const FormLabel = forwardRef<LabelRef, FormLabelProps>((props, ref) => {
 });
 FormLabel.displayName = "FormLabel";
 
-type FormControlProps = Omit<React.ComponentPropsWithoutRef<typeof Slot>, "children"> & {
+export type FormControlProps = Omit<React.ComponentPropsWithoutRef<typeof Slot>, "children"> & {
   children:
     | React.ComponentPropsWithoutRef<typeof Slot>["children"]
     | ((props: { id: string; hasError: boolean }) => React.ReactNode);
@@ -67,7 +67,7 @@ export const FormControl = forwardRef<FormControlRef, FormControlProps>((props, 
 });
 FormControl.displayName = "FormControl";
 
-type FormMessageProps = React.HTMLAttributes<HTMLParagraphElement>;
+export type FormMessageProps = React.HTMLAttributes<HTMLParagraphElement>;
 export const FormMessage = forwardRef<HTMLParagraphElement, FormMessageProps>((props, ref) => {
   const { error } = useFormField("FormMessage");
   const message = error ? error.message : null;

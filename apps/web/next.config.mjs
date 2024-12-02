@@ -23,6 +23,12 @@ const nextConfig = bundleAnalyzer({
       "utf-8-validate": "utf-8-validate"
     });
     return config;
+  },
+  experimental: {
+    serverActions: {
+      // https://github.com/vercel/next.js/issues/58295
+      allowedOrigins: [new URL(process.env.VOTEWISE_APP_URL).host]
+    }
   }
 });
 

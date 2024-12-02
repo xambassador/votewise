@@ -8,9 +8,10 @@ export const routes = {
   },
   onboard: {
     root: () => "/onboard",
-    step1: () => "/onboard/step-1",
-    step2: () => "/onboard/step-2",
-    step3: () => "/onboard/step-3",
-    step4: () => "/onboard/step-4"
+    step1: () => "/onboard/what-should-we-call",
+    step2: () => "/onboard/tell-us-about-you",
+    step3: () => "/onboard/your-photos-shine",
+    step4: () => "/onboard/your-profile-stands-out",
+    step5: () => "/onboard/connect-your-socials"
   }
 };

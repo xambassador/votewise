@@ -10,18 +10,20 @@ export default function Layout(props: Props) {
     <div className="flex min-h-screen">
       <div className="flex-1 min-h-screen flex flex-col items-end mr-20 justify-center">{props.children}</div>
       <div className="w-full relative overflow-hidden flex-1 flex flex-col justify-center border-l border-nobelBlack-200 min-h-screen">
-        <DotBackground className="flex flex-col justify-center">
-          {() => (
-            <div className="flex flex-col gap-5 ml-12 relative max-w-fit">
-              <h1 className="text-7xl leading-11 text-black-100">Create Account</h1>
-              <p className="text-lg leading-7 font-light">We&apos;re so excited to have you join us!</p>
-              <Link className="text-blue-400 w-fit" href={routes.auth.signIn()}>
-                Have an account?
-              </Link>
-            </div>
-          )}
-        </DotBackground>
+        <DotBackground className="flex flex-col justify-center">{() => <Banner />}</DotBackground>
       </div>
+    </div>
+  );
+}
+
+function Banner() {
+  return (
+    <div className="flex flex-col gap-5 ml-12 relative max-w-fit">
+      <h1 className="text-7xl leading-11 text-black-100">Create Account</h1>
+      <p className="text-lg leading-7 font-light">We&apos;re so excited to have you join us!</p>
+      <Link className="text-blue-400 w-fit" href={routes.auth.signIn()}>
+        Log In Here!
+      </Link>
     </div>
   );
 }
