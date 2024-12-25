@@ -20,6 +20,10 @@
     "./upload": {
       "import": "./dist/upload.mjs",
       "require": "./dist/upload.js"
+    },
+    "./onboard": {
+      "import": "./dist/onboard.mjs",
+      "require": "./dist/onboard.js"
     }
   },
   "scripts": {
@@ -42,7 +46,8 @@
     "entry": [
       "./src/index.ts",
       "./src/auth.ts",
-      "./src/upload.ts"
+      "./src/upload.ts",
+      "./src/onboard.ts"
     ],
     "format": [
       "cjs",

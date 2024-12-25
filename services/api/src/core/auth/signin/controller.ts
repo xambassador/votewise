@@ -4,7 +4,9 @@ import type { Strategy } from "./strategies";
 
 import { StatusCodes } from "http-status-codes";
 
+import { ERROR_CODES } from "@votewise/constant";
 import { ZSignin } from "@votewise/schemas";
+import { Milisecond } from "@votewise/times";
 
 type ControllerOptions = {
   requestParser: AppContext["plugins"]["requestParser"];
@@ -18,6 +20,8 @@ type ControllerOptions = {
   sessionRepository: AppContext["repositories"]["session"];
   factorRepository: AppContext["repositories"]["factor"];
 };
+
+const { USER_NOT_FOUND, INVALID_CREDENTIALS, EMAIL_NOT_VERIFIED } = ERROR_CODES.AUTH;
 
 export class Controller {
   private readonly ctx: ControllerOptions;
@@ -33,14 +37,15 @@ export class Controller {
 
     const { strategy, value, type } = this.getStrategy(email, username);
     const _user = await strategy.handle(value);
-    this.ctx.assert.resourceNotFound(!_user, `User with ${type} ${value} not found`);
+    this.ctx.assert.resourceNotFound(!_user, `User with ${type} ${value} not found`, USER_NOT_FOUND);
 
     const user = _user!;
     const isValid = await this.ctx.cryptoService.comparePassword(password, user.password);
-    this.ctx.assert.invalidInput(!isValid, "Invalid password");
+    this.ctx.assert.invalidInput(!isValid, "Invalid credentials", INVALID_CREDENTIALS);
     this.ctx.assert.invalidInput(
       !user.is_email_verify,
-      `Email ${user.email} is not verified. Please verify your email`
+      `Email ${user.email} is not verified. Please verify your email`,
+      EMAIL_NOT_VERIFIED
     );
 
     const factors = await this.ctx.factorRepository.findByUserId(user.id);
@@ -68,7 +73,7 @@ export class Controller {
       access_token: session.accessToken,
       refresh_token: session.refreshToken,
       token_type: "Bearer",
-      expires_in: session.expiresInSec,
+      expires_in: session.expiresInSec * Milisecond,
       expires_at: session.expiresAt,
       user: {
         id: user.id,
@@ -77,7 +82,8 @@ export class Controller {
         email_confirmed_at: user.email_confirmed_at,
         email_confirmation_sent_at: user.email_confirmation_sent_at,
         last_sign_in_at: lastLogin,
-        factors: verifiedFactors
+        factors: verifiedFactors,
+        is_onboarded: user.is_onboarded
       }
     });
   }

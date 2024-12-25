@@ -37,10 +37,7 @@ export const ZRefreshToken = z
 
 export const ZRegister = z.object({
   email: ZEmail,
-  password: ZPassword,
-  username: ZUsername,
-  first_name: ZFirstName,
-  last_name: ZLastName
+  password: ZPassword
 });
 
 export const ZVerifyEmail = z.object({

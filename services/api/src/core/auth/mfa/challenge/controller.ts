@@ -3,6 +3,8 @@ import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
+import { ERROR_CODES } from "@votewise/constant";
+
 import { getAuthenticateLocals } from "@/utils/locals";
 
 type ControllerOptions = {
@@ -10,6 +12,8 @@ type ControllerOptions = {
   factorRepository: AppContext["repositories"]["factor"];
   assert: AppContext["assert"];
 };
+
+const { FACTOR_NOT_FOUND } = ERROR_CODES["2FA"];
 
 export class Controller {
   private readonly ctx: ControllerOptions;
@@ -24,7 +28,7 @@ export class Controller {
     const params = req.params as { factor_id: string };
 
     const _factor = await this.ctx.factorRepository.findById(params.factor_id);
-    this.ctx.assert.resourceNotFound(!_factor, "Factor not found with the given id");
+    this.ctx.assert.resourceNotFound(!_factor, "Factor not found with the given id", FACTOR_NOT_FOUND);
 
     const factor = _factor!;
     const expiresAt = new Date();

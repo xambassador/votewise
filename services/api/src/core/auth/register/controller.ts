@@ -3,8 +3,9 @@ import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
+import { ERROR_CODES } from "@votewise/constant";
 import { ZRegister } from "@votewise/schemas";
-import { Minute, Second } from "@votewise/times";
+import { Minute } from "@votewise/times";
 
 type ControllerOptions = {
   userRepository: AppContext["repositories"]["user"];
@@ -14,6 +15,8 @@ type ControllerOptions = {
   assert: AppContext["assert"];
   requestParser: AppContext["plugins"]["requestParser"];
 };
+
+const { EMAIL_ALREADY_EXISTS } = ERROR_CODES.AUTH;
 
 export class Controller {
   private readonly ctx: ControllerOptions;
@@ -27,24 +30,22 @@ export class Controller {
     const ip = locals.meta.ip;
 
     const user = await this.ctx.userRepository.findByEmail(body.email);
-    this.ctx.assert.invalidInput(!!user, `${body.email} already exists`);
-
-    const username = await this.ctx.userRepository.findByUsername(body.username);
-    this.ctx.assert.invalidInput(!!username, `Username ${body.username} already exists`);
+    this.ctx.assert.invalidInput(!!user, `${body.email} already exists`, EMAIL_ALREADY_EXISTS);
 
     const hash = await this.ctx.cryptoService.hashPassword(body.password);
+    const defaultUserName = this.ctx.cryptoService.generateNanoId(20);
     const createdUser = await this.ctx.userRepository.create({
       email: body.email,
       password: hash,
-      user_name: body.username,
-      first_name: body.first_name,
-      last_name: body.last_name
+      user_name: `user_${defaultUserName}`, // We will update this later in onboarding process
+      first_name: "INVALID_FIRST_NAME",
+      last_name: "INVALID_LAST_NAME"
     });
 
     const otp = this.ctx.cryptoService.getOtp(createdUser.secret);
     const verificationCode = this.ctx.cryptoService.generateUUID().replace(/-/g, "");
-    const expiresIn = (5 * Minute) / Second;
-    const data = { userId: createdUser.id, ip };
+    const expiresIn = 5 * Minute;
+    const data = { userId: createdUser.id, ip, email: body.email };
     await this.ctx.cache.setWithExpiry(verificationCode, JSON.stringify(data), expiresIn);
 
     this.ctx.tasksQueue.add({

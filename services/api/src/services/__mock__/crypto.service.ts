@@ -15,5 +15,6 @@ export const mockCryptoService = {
   verify2FAToken: jest.fn().mockName("cryptoService.verify2FAToken"),
   generate2FASecret: jest.fn().mockName("cryptoService.generate2FASecret"),
   generateKeyUri: jest.fn().mockName("cryptoService.generateKeyUri"),
-  verify2FACode: jest.fn().mockName("cryptoService.verify2FACode")
+  verify2FACode: jest.fn().mockName("cryptoService.verify2FACode"),
+  generateNanoId: jest.fn().mockName("cryptoService.generateNanoId")
 } as jest.Mocked<CryptoService>;

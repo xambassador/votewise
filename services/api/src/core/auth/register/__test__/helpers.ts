@@ -14,7 +14,13 @@ export function setupHappyPath() {
   mockCryptoService.hashPassword.mockResolvedValue("hashed-password");
   mockCryptoService.getOtp.mockReturnValue("123456");
   mockCryptoService.generateUUID.mockReturnValue("some-random-uuid");
-  return { hashedPassword: "hashed-password", otp: "123456", uuid: "some-random-uuid".replace(/-/g, "") };
+  mockCryptoService.generateNanoId.mockReturnValue("some-random-username");
+  return {
+    hashedPassword: "hashed-password",
+    otp: "123456",
+    uuid: "some-random-uuid".replace(/-/g, ""),
+    defaultUserName: "some-random-username"
+  };
 }
 
 export function clearAllMocks() {

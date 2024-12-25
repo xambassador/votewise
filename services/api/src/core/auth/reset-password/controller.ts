@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
+import { ERROR_CODES } from "@votewise/constant";
 import { ZResetPassword, ZResetPasswordQuery } from "@votewise/schemas";
 
 type ControllerOptions = {
@@ -12,6 +13,8 @@ type ControllerOptions = {
   cryptoService: AppContext["cryptoService"];
   requestParser: AppContext["plugins"]["requestParser"];
 };
+
+const { USER_NOT_FOUND, INVALID_TOKEN, INVALID_EMAIL, INVALID_VERIFICATION_CODE } = ERROR_CODES.AUTH;
 
 export class Controller {
   private readonly ctx: ControllerOptions;
@@ -28,21 +31,21 @@ export class Controller {
     const { ip } = locals.meta;
 
     const _userFromUnsafeEmail = await this.ctx.userRepository.findByEmail(unsafeEmail);
-    this.ctx.assert.resourceNotFound(!_userFromUnsafeEmail, `User with email ${unsafeEmail} not found`);
+    this.ctx.assert.resourceNotFound(!_userFromUnsafeEmail, `User with email ${unsafeEmail} not found`, USER_NOT_FOUND);
     const userFromUnsafeEmail = _userFromUnsafeEmail!;
 
     const decoded = this.ctx.jwtService.verifyRid(token, userFromUnsafeEmail.secret);
     if (!decoded.success) {
-      return this.ctx.assert.badRequest(true, "Invalid token");
+      return this.ctx.assert.badRequest(true, "Invalid token", INVALID_TOKEN);
     }
 
     const { email, verification_code } = decoded.data;
-    this.ctx.assert.badRequest(email !== unsafeEmail, "Invalid email");
+    this.ctx.assert.badRequest(email !== unsafeEmail, "Invalid email", INVALID_EMAIL);
 
     const user = userFromUnsafeEmail!;
 
     const hash = this.ctx.cryptoService.hash(`${user.id}:${ip}`);
-    this.ctx.assert.badRequest(hash !== verification_code, "Invalid verification code");
+    this.ctx.assert.badRequest(hash !== verification_code, "Invalid verification code", INVALID_VERIFICATION_CODE);
 
     const hashedPassword = await this.ctx.cryptoService.hashPassword(password);
     await this.ctx.userRepository.update(user.id, {
