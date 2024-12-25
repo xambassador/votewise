@@ -13,5 +13,8 @@ export const routes = {
     step3: () => "/onboard/your-photos-shine",
     step4: () => "/onboard/your-profile-stands-out",
     step5: () => "/onboard/connect-your-socials"
+  },
+  app: {
+    root: () => "/"
   }
 };

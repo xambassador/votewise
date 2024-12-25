@@ -1,5 +1,7 @@
 "use client";
 
+import type { TStepTwoForm } from "../_hooks/use-step";
+
 import { FieldController, Form, FormControl, FormField, FormLabel, FormMessage } from "@votewise/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@votewise/ui/select";
 import { Textarea } from "@votewise/ui/textarea";
@@ -7,7 +9,7 @@ import { Textarea } from "@votewise/ui/textarea";
 import { useStep } from "../_hooks/use-step";
 import { Footer } from "../../_components/footer";
 
-export function OnboardForm() {
+export function OnboardForm(props: { defaultValue?: TStepTwoForm }) {
   const {
     form,
     getFormFieldProps,
@@ -16,7 +18,7 @@ export function OnboardForm() {
     getButtonProps,
     getAboutFieldProps,
     getBackButtonProps
-  } = useStep();
+  } = useStep(props);
 
   return (
     <Form {...form}>
@@ -34,8 +36,8 @@ export function OnboardForm() {
                         <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="MALE">Male</SelectItem>
+                        <SelectItem value="FEMALE">Female</SelectItem>
                       </SelectContent>
                     </Select>
                   )}

@@ -1,13 +1,15 @@
 "use client";
 
+import type { TStepOneForm } from "../_utils";
+
 import { Form, FormControl, FormField, FormLabel, FormMessage } from "@votewise/ui/form";
 import { Input } from "@votewise/ui/input";
 
 import { useStep } from "../_hooks/use-step";
 import { Footer } from "../../_components/footer";
 
-export function StepTwoForm() {
-  const { getFormFieldProps, form, getInputProps, getBackButtonProps, getNextButtonProps } = useStep();
+export function StepTwoForm(props: { defaultValues?: TStepOneForm }) {
+  const { getFormFieldProps, form, getInputProps, getBackButtonProps, getNextButtonProps } = useStep(props);
   return (
     <Form {...form}>
       <div className="flex flex-col gap-7">

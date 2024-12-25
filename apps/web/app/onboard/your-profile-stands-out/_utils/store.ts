@@ -12,8 +12,8 @@ type DialogProps = React.ComponentProps<typeof Dialog>;
  * -----------------------------------------------------------------------------------------------*/
 const isDialogOpenAtom = atom(false);
 const isChooseBgDialogOpenAtom = atom(false);
-const selectedBgAtom = atom<string | null>(null);
-const savedBgAtom = atom<string | null>(null);
+const selectedBgAtom = atom<string | File | null>(null);
+const savedBgAtom = atom<string | File | null>(null);
 
 /* -----------------------------------------------------------------------------------------------
  * Derived Atoms
@@ -32,8 +32,7 @@ const onSelectBgFromList = atom(null, (_, set, bg: string) => {
 
 const onFileDropAtom = atom(null, (_, set, files: File[]) => {
   const file = files[0];
-  const url = URL.createObjectURL(file);
-  set(selectedBgAtom, url);
+  set(selectedBgAtom, file);
 });
 
 /* -----------------------------------------------------------------------------------------------
@@ -68,6 +67,10 @@ export function useResetSelection() {
   };
 }
 
+export function useSetSavedBg() {
+  return useSetAtom(savedBgAtom);
+}
+
 /* -----------------------------------------------------------------------------------------------
  * Getters
  * -----------------------------------------------------------------------------------------------*/
@@ -80,7 +83,9 @@ export function useGetChooseBgDialogOpen() {
 }
 
 export function useGetSelectedBg() {
-  return useAtomValue(selectedBgAtom);
+  const selectedBg = useAtomValue(selectedBgAtom);
+  if (selectedBg instanceof File) return URL.createObjectURL(selectedBg);
+  return selectedBg;
 }
 
 export function useGetSavedBg() {

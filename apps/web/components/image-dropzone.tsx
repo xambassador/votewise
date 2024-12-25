@@ -1,5 +1,8 @@
 "use client";
 
+import type { DropzoneOptions } from "react-dropzone";
+
+import { useState } from "react";
 import { cn } from "@/lib/cn";
 import { useDropzone } from "react-dropzone";
 
@@ -7,18 +10,37 @@ import { Image as ImageIcon } from "@votewise/ui/icons/image";
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
   onFileDrop?: (files: File[]) => void;
+  onSizeError?: (file: File) => void;
+  onErrorReset?: () => void;
   disabled?: boolean;
   variant?: "success" | "error";
+  dropzoneProps?: DropzoneOptions;
 };
 
 export function ImageDropZone(props: Props) {
-  const { onFileDrop, children, disabled = false, variant, ...rest } = props;
+  const { onFileDrop, children, disabled = false, variant, dropzoneProps, onSizeError, onErrorReset, ...rest } = props;
+  const [error, setError] = useState<string | null>(null);
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
+    ...dropzoneProps,
     accept: {
-      "image/*": [".jpg", ".jpeg", ".png", ".gif", ".webp"]
+      "image/*": [".jpg", ".jpeg", ".png", ".gif", ".webp"],
+      ...dropzoneProps?.accept
     },
-    onDrop(acceptedFiles) {
+    onDrop(acceptedFiles, fileRejections, event) {
       onFileDrop?.(acceptedFiles as File[]);
+      dropzoneProps?.onDrop?.(acceptedFiles, fileRejections, event);
+      setError(null);
+      onErrorReset?.();
+      fileRejections.forEach((file) => {
+        file.errors.forEach((error) => {
+          if (error.code === "file-too-large") {
+            if (dropzoneProps?.maxSize) {
+              setError(`File is too large. Max size is ${dropzoneProps?.maxSize / 1024 / 1024}MB`);
+            }
+            onSizeError?.(file.file);
+          }
+        });
+      });
     }
   });
 
@@ -31,10 +53,10 @@ export function ImageDropZone(props: Props) {
       {...rootProps}
       className={cn(
         "bg-nobelBlack-200 cursor-pointer h-[calc((250/16)*1rem)] rounded-3xl border-2 border-dashed border-black-400 grid place-items-center p-5",
+        "focus:border-blue-500 focus:ring-blue-500/20 focus:outline-none focus:shadow-input-ring focus:ring-offset-1 focus:ring-offset-nobelBlack-200 transition-shadow",
         isDragActive && "border-blue-200",
         isDragAccept && "border-green-400",
-        isDragReject && "border-red-600",
-        "focus:border-blue-500 focus:ring-blue-500/20 focus:outline-none focus:shadow-input-ring focus:ring-offset-1 focus:ring-offset-nobelBlack-200 transition-shadow",
+        (isDragReject || error) && "border-red-600 focus:border-red-500 focus:ring-red-500/20",
         disabled && "cursor-not-allowed",
         variant === "success" && "border-green-300",
         variant === "error" && "border-red-600",

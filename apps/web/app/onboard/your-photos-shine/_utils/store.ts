@@ -16,12 +16,12 @@ const isChooseAvtarDialogOpen = atom(false);
 /**
  * Atom used to store the image URL of the image either from choosing from the list or from file drop.
  */
-const selectedAvatarAtom = atom<string | null>(null);
+const selectedAvatarAtom = atom<string | File | null>(null);
 
 /**
  * Atom to store the final selected avatar from either the list or file drop.
  */
-const savedAvatarAtom = atom<string | null>(null);
+const savedAvatarAtom = atom<string | File | null>(null);
 
 /* -----------------------------------------------------------------------------------------------
  * Derived Atoms
@@ -38,8 +38,7 @@ const onSelectAvatarFromList = atom(null, (_, set, avatar: string) => {
 });
 const onFileDropAtom = atom(null, (_, set, files: File[]) => {
   const file = files[0];
-  const url = URL.createObjectURL(file);
-  set(selectedAvatarAtom, url);
+  set(selectedAvatarAtom, file);
 });
 
 /* -----------------------------------------------------------------------------------------------
@@ -65,6 +64,10 @@ export function useOnFileDropAction() {
   return useSetAtom(onFileDropAtom);
 }
 
+export function useSetSavedAvatar() {
+  return useSetAtom(savedAvatarAtom);
+}
+
 export function useResetSelection() {
   const setSelectedAvatar = useSetAtom(selectedAvatarAtom);
   const setSavedAvatar = useSetAtom(savedAvatarAtom);
@@ -82,7 +85,11 @@ export function useGetDialogOpen() {
 }
 
 export function useGetSelectedAvatar() {
-  return useAtomValue(selectedAvatarAtom);
+  const selectedAvatar = useAtomValue(selectedAvatarAtom);
+  if (selectedAvatar instanceof File) {
+    return URL.createObjectURL(selectedAvatar);
+  }
+  return selectedAvatar;
 }
 
 export function useGetSavedAvatar() {

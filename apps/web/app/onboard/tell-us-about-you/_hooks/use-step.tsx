@@ -16,7 +16,7 @@ import { onboard } from "../../action";
 /* ----------------------------------------------------------------------------------------------- */
 
 const schema = z.object({
-  gender: z.string({ required_error: "This field is required" }).min(1, { message: "This field is required" }),
+  gender: z.enum(["MALE", "FEMALE", "OTHER"], { message: "This field is required" }),
   about: z.string({ required_error: "This field is required" }).min(1, { message: "This field is required" })
 });
 
@@ -24,17 +24,17 @@ type LinkProps = React.ComponentProps<typeof Link>;
 type HTMLFormProps = React.ComponentProps<"form">;
 type Schema = z.infer<typeof schema>;
 type Keys = keyof Schema;
+export type TStepTwoForm = Schema;
 
-export function useStep() {
+export function useStep(props: { defaultValue?: Schema }) {
   const [isPending, startTransition] = useTransition();
   const form = useForm<Schema>({
-    resolver: zodResolver(schema)
+    resolver: zodResolver(schema),
+    defaultValues: props.defaultValue
   });
 
-  const action = form.handleSubmit(() => {
-    startTransition(async () => {
-      await onboard({ redirectTo: routes.onboard.step3() });
-    });
+  const action = form.handleSubmit((data) => {
+    startTransition(() => onboard({ ...data, step: 2 }));
   });
 
   function getFormFieldProps(field: Keys, props?: FormFieldProps): FormFieldProps {

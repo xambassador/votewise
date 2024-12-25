@@ -8,7 +8,6 @@ import type { TStepOneForm, TStepOneFormKeys } from "../_utils";
 
 import { useTransition } from "react";
 import { chain } from "@/lib/chain";
-import { routes } from "@/lib/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm } from "@votewise/ui/form";
@@ -18,16 +17,15 @@ import { onboard } from "../../action";
 
 type LinkProps = React.ComponentProps<typeof Link>;
 
-export function useStep() {
+export function useStep(props: { defaultValues?: TStepOneForm }) {
   const [isPending, startTransition] = useTransition();
   const form = useForm<TStepOneForm>({
-    resolver: zodResolver(ZStepOneFormSchema)
+    resolver: zodResolver(ZStepOneFormSchema),
+    defaultValues: props.defaultValues
   });
 
-  const handleSubmit = form.handleSubmit(async () => {
-    startTransition(async () => {
-      await onboard({ redirectTo: routes.onboard.step2() });
-    });
+  const handleSubmit = form.handleSubmit((data) => {
+    startTransition(() => onboard({ ...data, step: 1 }));
   });
 
   function getFormFieldProps(field: TStepOneFormKeys, props?: FormFieldProps): FormFieldProps {

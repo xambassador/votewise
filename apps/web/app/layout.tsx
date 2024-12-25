@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 
 import { Poppins } from "next/font/google";
 
+import { Toaster } from "@votewise/ui/toast";
+
 import "@/styles/globals.css";
 
 import Providers, { MotionProvider } from "@/components/providers";
@@ -27,6 +29,7 @@ export default function RootLayout(props: Props) {
   return (
     <html lang="en">
       <body className={poppins.className + " bg-nobelBlack-50 text-gray-200"}>
+        <Toaster />
         <Providers>
           <MotionProvider>{props.children}</MotionProvider>
         </Providers>

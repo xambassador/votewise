@@ -2,6 +2,7 @@
 
 import type { TSinginForm } from "../_utils";
 
+import { useTransition } from "react";
 import Link from "next/link";
 import { routes } from "@/lib/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,13 +11,23 @@ import { Button } from "@votewise/ui/button";
 import { UsernameInput } from "@votewise/ui/email-input";
 import { Form, FormControl, FormField, FormLabel, FormMessage, useForm } from "@votewise/ui/form";
 import { PasswordInput } from "@votewise/ui/password-input";
+import { makeToast } from "@votewise/ui/toast";
 
 import { ZSingInFormSchema } from "../_utils";
+import { signin } from "../action";
 
 export function SignInForm() {
   const form = useForm<TSinginForm>({ resolver: zodResolver(ZSingInFormSchema) });
+  const [isPending, startTransition] = useTransition();
 
-  const onSubmit = form.handleSubmit(() => {});
+  const onSubmit = form.handleSubmit((data) => {
+    startTransition(async () => {
+      const res = await signin(data);
+      if (!res.success) {
+        makeToast.error("Oops!", res.error);
+      }
+    });
+  });
 
   return (
     <Form {...form}>
@@ -39,7 +50,7 @@ export function SignInForm() {
       </div>
       {forgotLink}
       <div className="flex items-center justify-between">
-        <Button className="w-full" onClick={onSubmit}>
+        <Button className="w-full" loading={isPending} onClick={onSubmit}>
           Let&apos;s Go!
         </Button>
       </div>

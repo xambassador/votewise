@@ -1,27 +1,44 @@
-import { Button } from "@votewise/ui/button";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@votewise/ui/otp-input";
+import { redirect } from "next/navigation";
+import { client } from "@/lib/client.server";
+import { clearAllCookies, COOKIE_KEYS, getCookie } from "@/lib/cookie";
+import { routes } from "@/lib/routes";
 
-import { Timer } from "./_components/timer";
+import { obfuscateEmail } from "@votewise/text";
 
-export default function Page() {
+import { OTPForm } from "./_components/form";
+
+type VerificationSessionResponse = { user_id: string; ttl: number; total: number; email: string };
+
+export default async function Page() {
+  const userId = getCookie(COOKIE_KEYS.userId);
+  const verificationCode = getCookie(COOKIE_KEYS.verificationCode);
+
+  if (!userId || !verificationCode) {
+    clearAllCookies();
+    return redirect(routes.auth.signIn());
+  }
+
+  const verificationResponse = await client.get<VerificationSessionResponse>(`/v1/auth/verify/${verificationCode}`);
+
+  if (!verificationResponse.success) {
+    clearAllCookies();
+    return redirect(routes.auth.signIn());
+  }
+
+  if (userId !== verificationResponse.data.user_id) {
+    clearAllCookies();
+    return redirect(routes.auth.signIn());
+  }
+
   return (
     <div className="flex flex-col gap-10">
       <div>
         <h1 className="text-3xl leading-10 text-gray-300 font-semibold mb-2">Verify your email</h1>
-        <p className="text-sm text-gray-300">We have send an OTP to john****@gmail.com</p>
+        <p className="text-sm text-gray-300">
+          We have send an OTP to {obfuscateEmail(verificationResponse.data.email)}
+        </p>
       </div>
-
-      <InputOTP maxLength={6}>
-        <InputOTPGroup>
-          {Array.from({ length: 6 }).map((_, index) => (
-            <InputOTPSlot key={index} index={index} />
-          ))}
-        </InputOTPGroup>
-      </InputOTP>
-
-      <Timer time={60000 * 1} />
-
-      <Button>Submit</Button>
+      <OTPForm total={verificationResponse.data.total} ttl={verificationResponse.data.ttl} />
     </div>
   );
 }

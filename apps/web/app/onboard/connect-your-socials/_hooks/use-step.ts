@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { useForm } from "@votewise/ui/form";
+import { makeToast } from "@votewise/ui/toast";
 
 import { onboard } from "../../action";
 
@@ -23,6 +24,7 @@ const schema = z.object({
 type LinkProps = React.ComponentProps<typeof Link>;
 type FormProps = React.ComponentProps<"form">;
 type TSchema = z.infer<typeof schema>;
+export type TStepFiveForm = TSchema;
 
 export function useStep() {
   const [isPending, startTransition] = useTransition();
@@ -30,9 +32,12 @@ export function useStep() {
     resolver: zodResolver(schema)
   });
 
-  function onSubmit() {
+  function onSubmit(data: TSchema) {
     startTransition(async () => {
-      await onboard({ redirectTo: "/" });
+      const res = await onboard({ step: 5, ...data });
+      if (!res.success) {
+        makeToast.error("Oops!", res.error);
+      }
     });
   }
 

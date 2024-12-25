@@ -5,7 +5,10 @@ import type Link from "next/link";
 
 import { useTransition } from "react";
 import { chain } from "@/lib/chain";
+import { uploadClient } from "@/lib/client";
 import { routes } from "@/lib/routes";
+
+import { makeToast } from "@votewise/ui/toast";
 
 import { useGetSavedAvatar } from "../_utils/store";
 import { onboard } from "../../action";
@@ -18,11 +21,17 @@ export function useStep() {
 
   async function onSubmit() {
     if (!savedAvatar) return;
-    const res = await fetch(savedAvatar);
-    await res.blob();
-    startTransition(async () => {
-      await onboard({ redirectTo: routes.onboard.step4() });
-    });
+    if (savedAvatar instanceof File) {
+      const uploadRes = await uploadClient.upload(savedAvatar);
+      if (!uploadRes.success) {
+        makeToast.error("Oops!", uploadRes.error);
+        return;
+      }
+      startTransition(() => onboard({ step: 3, avatar: uploadRes.data.url }));
+      return;
+    }
+
+    startTransition(() => onboard({ step: 3, avatar: savedAvatar }));
   }
 
   function getButtonProps(props?: ButtonProps): ButtonProps {

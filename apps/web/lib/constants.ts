@@ -1,1 +1,1 @@
-export const VOTEWISE_API = "http://localhost:8080/api";
+export const VOTEWISE_API = "http://localhost:5001/api";

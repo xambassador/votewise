@@ -6,25 +6,38 @@ import type { PasswordInputProps } from "@votewise/ui/password-input";
 import type { PasswordStrengthProps } from "@votewise/ui/password-strength";
 import type { TSignUpForm, TSignUpFormKeys } from "../_utils";
 
+import { useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { routes } from "@/lib/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm } from "@votewise/ui/form";
+import { makeToast } from "@votewise/ui/toast";
 
 import { ZSignUpForm } from "../_utils";
+import { signup } from "../action";
 
-export function useSignupBase() {
+export function useSignup() {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const form = useForm<TSignUpForm>({
     resolver: zodResolver(ZSignUpForm),
     defaultValues: { email: "", password: "" }
   });
 
-  const handleSubmit = form.handleSubmit(() => {});
+  const handleSubmit = form.handleSubmit((data) => {
+    startTransition(async () => {
+      const res = await signup(data);
+      if (!res.success) {
+        makeToast.error("Signup failed", res.error);
+        return;
+      }
 
-  return { handleSubmit, form };
-}
+      makeToast.success("Signup successful", res.data.message);
+      router.push(routes.auth.verify());
+    });
+  });
 
-export function useSignup() {
-  const { form, handleSubmit } = useSignupBase();
   const password = form.watch("password");
 
   function getPasswordStrengthProps(): PasswordStrengthProps {
@@ -36,7 +49,7 @@ export function useSignup() {
   }
 
   function getSubmitButtonProps(props?: ButtonProps): ButtonProps {
-    return { children: "Let’s Do This!", ...props, onClick: handleSubmit };
+    return { children: "Let’s Do This!", ...props, onClick: handleSubmit, disabled: isPending, loading: isPending };
   }
 
   function getEmailInputProps(props?: EmailInputProps): EmailInputProps {

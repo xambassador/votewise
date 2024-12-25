@@ -4,8 +4,9 @@ import { ImagePicker, ImagePickerButton, ImagePreview, ResetPreviewButton } from
 
 import { useAvatarPicker } from "../_hooks/use-avatar-picker";
 
-export function AvatarPicker() {
-  const { getImagePickerButtonProps, getImagePickerProps, getResetPreviewButtonProps } = useAvatarPicker();
+export function AvatarPicker(props?: { url?: string }) {
+  const { url } = props || {};
+  const { getImagePickerButtonProps, getImagePickerProps, getResetPreviewButtonProps } = useAvatarPicker({ url });
   return (
     <ImagePicker {...getImagePickerProps({ className: "mx-auto" })}>
       <ImagePreview />

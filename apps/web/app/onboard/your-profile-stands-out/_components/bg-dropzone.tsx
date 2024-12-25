@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { Cross } from "@votewise/ui/icons/cross";
 
 import { ImageDropZone, Placeholder } from "@/components/image-dropzone";
@@ -9,9 +11,18 @@ import { useGetSelectedBg, useOnFileDropAction, useResetSelection } from "../_ut
 export function BackgroundDropzone() {
   const selectedBg = useGetSelectedBg();
   const onFileDropAction = useOnFileDropAction();
+  const [error, setError] = useState<string | null>(null);
   return (
-    <ImageDropZone variant={selectedBg ? "success" : undefined} onFileDrop={onFileDropAction} disabled={!!selectedBg}>
+    <ImageDropZone
+      variant={selectedBg ? "success" : undefined}
+      onFileDrop={onFileDropAction}
+      disabled={!!selectedBg}
+      dropzoneProps={{ maxSize: 5 * 1024 * 1024 }}
+      onSizeError={() => setError("File size should be less than 5MB")}
+      onErrorReset={() => setError(null)}
+    >
       <BackgroundDropzonePlaceholder />
+      {error && <p className="text-red-500 text-sm">{error}</p>}
     </ImageDropZone>
   );
 }
