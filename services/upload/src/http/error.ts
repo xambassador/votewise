@@ -39,12 +39,12 @@ export const handler: ErrorRequestHandler = (err, _req, res, next) => {
     if (err instanceof errorType) {
       const { statusCode, message, name } = err;
       const response = new ErrorResponse(statusCode, message, name);
-      return res.status(statusCode).json(response);
+      return res.status(statusCode).json({ error: response });
     }
   }
 
   const response = new ErrorResponse(500, INTERNAL_SERVER_ERROR_MSG, INTERNAL_SERVER_ERROR);
-  return res.status(500).json(response);
+  return res.status(500).json({ error: response });
 };
 
 export const withAppContext = (_ctx: AppContext) => {
