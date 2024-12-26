@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { client } from "@/lib/client.server";
-import { clearAllCookies, COOKIE_KEYS, getCookie } from "@/lib/cookie";
+import { COOKIE_KEYS, getCookie } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
 import { obfuscateEmail } from "@votewise/text";
@@ -14,20 +14,17 @@ export default async function Page() {
   const verificationCode = getCookie(COOKIE_KEYS.verificationCode);
 
   if (!userId || !verificationCode) {
-    clearAllCookies();
-    return redirect(routes.auth.signIn());
+    return redirect(routes.auth.signIn(`redirect=${encodeURIComponent(routes.auth.verify())}&logout=true`));
   }
 
   const verificationResponse = await client.get<VerificationSessionResponse>(`/v1/auth/verify/${verificationCode}`);
 
   if (!verificationResponse.success) {
-    clearAllCookies();
-    return redirect(routes.auth.signIn());
+    return redirect(routes.auth.signIn(`redirect=${encodeURIComponent(routes.auth.verify())}&logout=true`));
   }
 
   if (userId !== verificationResponse.data.user_id) {
-    clearAllCookies();
-    return redirect(routes.auth.signIn());
+    return redirect(routes.auth.signIn(`redirect=${encodeURIComponent(routes.auth.verify())}&logout=true`));
   }
 
   return (

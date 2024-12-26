@@ -4,6 +4,7 @@ import type { TSinginForm } from "../_utils";
 
 import { useTransition } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { routes } from "@/lib/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -19,10 +20,11 @@ import { signin } from "../action";
 export function SignInForm() {
   const form = useForm<TSinginForm>({ resolver: zodResolver(ZSingInFormSchema) });
   const [isPending, startTransition] = useTransition();
+  const searchParams = useSearchParams();
 
   const onSubmit = form.handleSubmit((data) => {
     startTransition(async () => {
-      const res = await signin(data);
+      const res = await signin(data, searchParams.get("redirect"));
       if (!res.success) {
         makeToast.error("Oops!", res.error);
       }
@@ -31,29 +33,34 @@ export function SignInForm() {
 
   return (
     <Form {...form}>
-      <div className="flex flex-col gap-3 min-w-[calc((450/16)*1rem)]">
-        <FormField name="username">
-          {usernameLabel}
-          <FormControl>
-            <UsernameInput placeholder="Username or email address" {...form.register("username")} />
-          </FormControl>
-          <FormMessage />
-        </FormField>
+      <form onSubmit={onSubmit} className="flex flex-col gap-7 min-w-[calc((450/16)*1rem)]">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
+            <h1 className="text-lg">Account</h1>
+            <FormField name="username">
+              {usernameLabel}
+              <FormControl>
+                <UsernameInput placeholder="Username or email address" {...form.register("username")} />
+              </FormControl>
+              <FormMessage />
+            </FormField>
 
-        <FormField name="password">
-          {passwordLabel}
-          <FormControl>
-            <PasswordInput placeholder="Password" {...form.register("password")} />
-          </FormControl>
-          <FormMessage />
-        </FormField>
-      </div>
-      {forgotLink}
-      <div className="flex items-center justify-between">
-        <Button className="w-full" loading={isPending} onClick={onSubmit}>
-          Let&apos;s Go!
-        </Button>
-      </div>
+            <FormField name="password">
+              {passwordLabel}
+              <FormControl>
+                <PasswordInput placeholder="Password" {...form.register("password")} />
+              </FormControl>
+              <FormMessage />
+            </FormField>
+          </div>
+          {forgotLink}
+        </div>
+        <div className="flex items-center justify-between">
+          <Button type="submit" className="w-full" loading={isPending}>
+            Let&apos;s Go!
+          </Button>
+        </div>
+      </form>
     </Form>
   );
 }

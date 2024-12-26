@@ -31,7 +31,7 @@ type SigninResponse = {
   };
 };
 
-export async function signin(data: TSinginForm): Promise<TActionResponse<SigninResponse>> {
+export async function signin(data: TSinginForm, redirectTo?: string | null): Promise<TActionResponse<SigninResponse>> {
   const res = await client.post<SigninResponse, { email: string; password: string }>("/v1/auth/signin", {
     email: data.username,
     password: data.password
@@ -41,15 +41,19 @@ export async function signin(data: TSinginForm): Promise<TActionResponse<SigninR
     return { success: false, error: res.error, errorData: res.errorData };
   }
 
-  setCookie(COOKIE_KEYS.accessToken, res.data.access_token, { expires: new Date(Date.now() + res.data.expires_in) });
-  setCookie(COOKIE_KEYS.refreshToken, res.data.refresh_token, { expires: new Date(Date.now() + res.data.expires_in) });
-  setCookie(COOKIE_KEYS.user, JSON.stringify(res.data.user), { expires: new Date(Date.now() + res.data.expires_in) });
+  const expires = new Date(Date.now() + res.data.expires_in);
+  setCookie(COOKIE_KEYS.accessToken, res.data.access_token, { expires });
+  setCookie(COOKIE_KEYS.refreshToken, res.data.refresh_token, { expires });
+  setCookie(COOKIE_KEYS.user, JSON.stringify(res.data.user), { expires });
+  setCookie(COOKIE_KEYS.is_onboarded, res.data.user.is_onboarded ? "true" : "false", { expires });
 
-  // TODO: If factors exist, redirect to the 2fa page.
-
-  if (!res.data.user.is_onboarded) {
-    return redirect(routes.onboard.root());
+  const hasFactors = res.data.user.factors.length > 0;
+  if (hasFactors) {
+    return redirect(routes.auth.verify2FA());
   }
 
-  return { success: true, data: res.data };
+  if (redirectTo) {
+    return redirect(redirectTo);
+  }
+  return redirect(routes.onboard.root());
 }

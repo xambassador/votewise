@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { TOnboard } from "@votewise/schemas/onboard";
 import type { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
 

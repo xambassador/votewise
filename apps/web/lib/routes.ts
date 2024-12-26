@@ -4,7 +4,14 @@ export const routes = {
     signUp: () => "/auth/signup",
     verify: () => "/auth/verify",
     forgot: () => "/auth/forgot",
-    resetPassword: () => "/auth/reset-password"
+    resetPassword: () => "/auth/reset-password",
+    logout: (prop?: { redirect?: string }) => {
+      if (prop && prop.redirect) {
+        return `/auth/logout?redirect=${encodeURIComponent(prop.redirect)}`;
+      }
+      return "/auth/logout";
+    },
+    verify2FA: () => "/factors/verify"
   },
   onboard: {
     root: () => "/onboard",
