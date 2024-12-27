@@ -2,9 +2,7 @@
 
 import type { TActionResponse } from "@/types";
 import type { TOnboard } from "@votewise/schemas/onboard";
-import type { TStepFiveForm } from "./connect-your-socials/_hooks/use-step";
-import type { TStepTwoForm } from "./tell-us-about-you/_hooks/use-step";
-import type { TStepOneForm } from "./what-should-we-call/_utils";
+import type { TConnectYourSocials, TTellUsAboutYou, TWhatShouldWeCall } from "./_utils/schema";
 
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
@@ -12,13 +10,13 @@ import { client } from "@/lib/client.server";
 import { clearCookie, COOKIE_KEYS, setCookie, setOnboardingData } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
-import { getStepFiveData } from "./utils";
+import { getStepFiveData } from "./_utils";
 
-type Props = Partial<TStepOneForm> &
-  Partial<TStepTwoForm> &
+type Props = Partial<TWhatShouldWeCall> &
+  Partial<TTellUsAboutYou> &
   Partial<{ avatar: string }> &
   Partial<{ cover: string }> &
-  Partial<TStepFiveForm> & { step: number };
+  Partial<TConnectYourSocials> & { step: number };
 
 type OnboardResponse = { is_onboarded: boolean } & TOnboard;
 

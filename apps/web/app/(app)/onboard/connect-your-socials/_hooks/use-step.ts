@@ -2,37 +2,29 @@
 
 import type { ButtonProps } from "@votewise/ui/button";
 import type Link from "next/link";
+import type { TConnectYourSocials } from "../../_utils/schema";
 
 import { useTransition } from "react";
 import { chain } from "@/lib/chain";
 import { routes } from "@/lib/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 
 import { useForm } from "@votewise/ui/form";
 import { makeToast } from "@votewise/ui/toast";
 
+import { ZConnectYourSocials } from "../../_utils/schema";
 import { onboard } from "../../action";
-
-const schema = z.object({
-  location: z.string({ required_error: "This field is required" }).min(1, { message: "This field is required" }),
-  facebook: z.string().optional(),
-  instagram: z.string().optional(),
-  twitter: z.string().optional()
-});
 
 type LinkProps = React.ComponentProps<typeof Link>;
 type FormProps = React.ComponentProps<"form">;
-type TSchema = z.infer<typeof schema>;
-export type TStepFiveForm = TSchema;
 
 export function useStep() {
   const [isPending, startTransition] = useTransition();
-  const form = useForm<TSchema>({
-    resolver: zodResolver(schema)
+  const form = useForm<TConnectYourSocials>({
+    resolver: zodResolver(ZConnectYourSocials)
   });
 
-  function onSubmit(data: TSchema) {
+  function onSubmit(data: TConnectYourSocials) {
     startTransition(async () => {
       const res = await onboard({ step: 5, ...data });
       if (!res.success) {
@@ -55,5 +47,3 @@ export function useStep() {
 
   return { form, getFormProps, getButtonProps, getBackProps };
 }
-
-export type { TSchema };

@@ -4,44 +4,40 @@ import type { ButtonProps } from "@votewise/ui/button";
 import type { FormFieldProps, TFieldControllerProps } from "@votewise/ui/form";
 import type { TextareaProps } from "@votewise/ui/textarea";
 import type Link from "next/link";
+import type { TTellUsAboutYou } from "../../_utils/schema";
 
 import { useTransition } from "react";
 import { routes } from "@/lib/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
+import { ZTellUsAboutYou } from "../../_utils/schema";
 import { onboard } from "../../action";
 
 /* ----------------------------------------------------------------------------------------------- */
 
-const schema = z.object({
-  gender: z.enum(["MALE", "FEMALE", "OTHER"], { message: "This field is required" }),
-  about: z.string({ required_error: "This field is required" }).min(1, { message: "This field is required" })
-});
-
 type LinkProps = React.ComponentProps<typeof Link>;
 type HTMLFormProps = React.ComponentProps<"form">;
-type Schema = z.infer<typeof schema>;
-type Keys = keyof Schema;
-export type TStepTwoForm = Schema;
+type Keys = keyof TTellUsAboutYou;
 
-export function useStep(props: { defaultValue?: Schema }) {
+export function useStep(props: { defaultValue?: TTellUsAboutYou }) {
   const [isPending, startTransition] = useTransition();
-  const form = useForm<Schema>({
-    resolver: zodResolver(schema),
+  const form = useForm<TTellUsAboutYou>({
+    resolver: zodResolver(ZTellUsAboutYou),
     defaultValues: props.defaultValue
   });
 
   const action = form.handleSubmit((data) => {
-    startTransition(() => onboard({ ...data, step: 2 }));
+    startTransition(() => {
+      onboard({ ...data, step: 2 });
+    });
   });
 
   function getFormFieldProps(field: Keys, props?: FormFieldProps): FormFieldProps {
     return { ...props, name: field };
   }
 
-  function getGenderFieldProps(): Omit<TFieldControllerProps<Schema>, "render"> {
+  function getGenderFieldProps(): Omit<TFieldControllerProps<TTellUsAboutYou>, "render"> {
     return { name: "gender", control: form.control };
   }
 

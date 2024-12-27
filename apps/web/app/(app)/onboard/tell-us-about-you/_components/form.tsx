@@ -1,6 +1,6 @@
 "use client";
 
-import type { TStepTwoForm } from "../_hooks/use-step";
+import type { TTellUsAboutYou } from "../../_utils/schema";
 
 import { FieldController, Form, FormControl, FormField, FormLabel, FormMessage } from "@votewise/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@votewise/ui/select";
@@ -9,7 +9,7 @@ import { Textarea } from "@votewise/ui/textarea";
 import { useStep } from "../_hooks/use-step";
 import { Footer } from "../../_components/footer";
 
-export function OnboardForm(props: { defaultValue?: TStepTwoForm }) {
+export function OnboardForm(props: { defaultValue?: TTellUsAboutYou }) {
   const {
     form,
     getFormFieldProps,

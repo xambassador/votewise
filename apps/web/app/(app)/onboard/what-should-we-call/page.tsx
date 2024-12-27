@@ -1,6 +1,6 @@
 import { OnboardContainer } from "../_components/container";
 import { OnboardHeader, OnboardSubtitle, OnboardTitle } from "../_components/typography";
-import { getStepOneData } from "../utils";
+import { getStepOneData } from "../_utils";
 import { StepTwoForm } from "./_components/form";
 
 export default function Page() {

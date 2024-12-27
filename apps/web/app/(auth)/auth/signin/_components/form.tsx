@@ -1,35 +1,17 @@
 "use client";
 
-import type { TSinginForm } from "../_utils";
-
-import { useTransition } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { routes } from "@/lib/routes";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@votewise/ui/button";
 import { UsernameInput } from "@votewise/ui/email-input";
-import { Form, FormControl, FormField, FormLabel, FormMessage, useForm } from "@votewise/ui/form";
+import { Form, FormControl, FormField, FormLabel, FormMessage } from "@votewise/ui/form";
 import { PasswordInput } from "@votewise/ui/password-input";
-import { makeToast } from "@votewise/ui/toast";
 
-import { ZSingInFormSchema } from "../_utils";
-import { signin } from "../action";
+import { useSignIn } from "../_hooks/use-signin";
 
 export function SignInForm() {
-  const form = useForm<TSinginForm>({ resolver: zodResolver(ZSingInFormSchema) });
-  const [isPending, startTransition] = useTransition();
-  const searchParams = useSearchParams();
-
-  const onSubmit = form.handleSubmit((data) => {
-    startTransition(async () => {
-      const res = await signin(data, searchParams.get("redirect"));
-      if (!res.success) {
-        makeToast.error("Oops!", res.error);
-      }
-    });
-  });
+  const { form, onSubmit, loading } = useSignIn();
 
   return (
     <Form {...form}>
@@ -56,7 +38,7 @@ export function SignInForm() {
           {forgotLink}
         </div>
         <div className="flex items-center justify-between">
-          <Button type="submit" className="w-full" loading={isPending}>
+          <Button type="submit" className="w-full" loading={loading}>
             Let&apos;s Go!
           </Button>
         </div>

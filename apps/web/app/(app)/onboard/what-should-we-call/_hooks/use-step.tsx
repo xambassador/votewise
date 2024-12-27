@@ -4,7 +4,7 @@ import type { ButtonProps } from "@votewise/ui/button";
 import type { FormFieldProps } from "@votewise/ui/form";
 import type { InputProps } from "@votewise/ui/input";
 import type Link from "next/link";
-import type { TStepOneForm, TStepOneFormKeys } from "../_utils";
+import type { TWhatShouldWeCall } from "../../_utils/schema";
 
 import { useTransition } from "react";
 import { chain } from "@/lib/chain";
@@ -12,27 +12,30 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm } from "@votewise/ui/form";
 
-import { ZStepOneFormSchema } from "../_utils";
+import { ZWhatShouldWeCall } from "../../_utils/schema";
 import { onboard } from "../../action";
 
 type LinkProps = React.ComponentProps<typeof Link>;
+type Keys = keyof TWhatShouldWeCall;
 
-export function useStep(props: { defaultValues?: TStepOneForm }) {
+export function useStep(props: { defaultValues?: TWhatShouldWeCall }) {
   const [isPending, startTransition] = useTransition();
-  const form = useForm<TStepOneForm>({
-    resolver: zodResolver(ZStepOneFormSchema),
+  const form = useForm<TWhatShouldWeCall>({
+    resolver: zodResolver(ZWhatShouldWeCall),
     defaultValues: props.defaultValues
   });
 
   const handleSubmit = form.handleSubmit((data) => {
-    startTransition(() => onboard({ ...data, step: 1 }));
+    startTransition(() => {
+      onboard({ ...data, step: 1 });
+    });
   });
 
-  function getFormFieldProps(field: TStepOneFormKeys, props?: FormFieldProps): FormFieldProps {
+  function getFormFieldProps(field: Keys, props?: FormFieldProps): FormFieldProps {
     return { ...props, name: field };
   }
 
-  function getInputProps(field: TStepOneFormKeys, props?: InputProps): InputProps {
+  function getInputProps(field: Keys, props?: InputProps): InputProps {
     return { ...props, ...form.register(field) };
   }
 

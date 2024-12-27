@@ -1,6 +1,6 @@
 import { OnboardContainer } from "../_components/container";
 import { OnboardHeader, OnboardSubtitle, OnboardTitle } from "../_components/typography";
-import { getStepFourData } from "../utils";
+import { getStepFourData } from "../_utils";
 import { BackgrondPicker } from "./_components/bg-picker";
 import { BackgroundPickerDialog } from "./_components/bg-picker-dialog";
 import { FooterAction } from "./_components/footer";

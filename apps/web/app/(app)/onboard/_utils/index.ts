@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getOnboardingData } from "@/lib/cookie";
+import { COOKIE_KEYS, getCookie, getOnboardingData } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
 type OnboardingData = ReturnType<typeof getOnboardingData>;
@@ -58,4 +58,13 @@ export function getStepFourData() {
 export function getStepFiveData() {
   const onboardingData = getOnboardingData();
   return checkStepFourData(onboardingData);
+}
+
+export function shouldNotOnboarded() {
+  const isOnboarded = getCookie(COOKIE_KEYS.isOnboarded);
+  if (!isOnboarded) {
+    return redirect(routes.auth.logout({ redirect: routes.onboard.root() }));
+  }
+  if (isOnboarded === "true") return redirect(routes.app.root());
+  return false;
 }

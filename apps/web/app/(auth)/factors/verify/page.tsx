@@ -1,5 +1,5 @@
-import { MultiFactorForm } from "./components/form";
+import { MultiFactorForm } from "./_components/form";
 
-export default async function Page() {
+export default function Page() {
   return <MultiFactorForm />;
 }

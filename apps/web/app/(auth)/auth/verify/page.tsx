@@ -14,17 +14,17 @@ export default async function Page() {
   const verificationCode = getCookie(COOKIE_KEYS.verificationCode);
 
   if (!userId || !verificationCode) {
-    return redirect(routes.auth.signIn(`redirect=${encodeURIComponent(routes.auth.verify())}&logout=true`));
+    return redirect(routes.auth.logout());
   }
 
   const verificationResponse = await client.get<VerificationSessionResponse>(`/v1/auth/verify/${verificationCode}`);
 
   if (!verificationResponse.success) {
-    return redirect(routes.auth.signIn(`redirect=${encodeURIComponent(routes.auth.verify())}&logout=true`));
+    return redirect(routes.auth.logout());
   }
 
   if (userId !== verificationResponse.data.user_id) {
-    return redirect(routes.auth.signIn(`redirect=${encodeURIComponent(routes.auth.verify())}&logout=true`));
+    return redirect(routes.auth.logout());
   }
 
   return (

@@ -1,6 +1,6 @@
 import { OnboardContainer } from "../_components/container";
 import { OnboardHeader, OnboardSubtitle, OnboardTitle } from "../_components/typography";
-import { getStepFiveData } from "../utils";
+import { getStepFiveData } from "../_utils";
 import { SocialsForm } from "./_components/form";
 
 export default function Page() {
