@@ -126,7 +126,8 @@ describe("Signin Controller", () => {
         amr: [{ method: "password", timestamp: expect.any(Number) }],
         app_metadata: { provider: "email", providers: ["email"] },
         user_metadata: {},
-        session_id: sessionId
+        session_id: sessionId,
+        user_aal_level: "aal1"
       },
       { expiresIn: 30 * Minute }
     );
@@ -154,7 +155,8 @@ describe("Signin Controller", () => {
         email_confirmation_sent_at: user.email_confirmation_sent_at,
         last_sign_in_at: expect.any(Date),
         is_onboarded: user.is_onboarded,
-        factors: []
+        factors: [],
+        user_aal_level: "aal1"
       }
     });
   });

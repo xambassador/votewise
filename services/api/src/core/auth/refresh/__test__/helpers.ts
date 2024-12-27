@@ -22,7 +22,8 @@ export const accessToken = jwtService.signAccessToken({
   session_id: "session_id",
   sub: user.id,
   user_metadata: {},
-  app_metadata: appMetaData
+  app_metadata: appMetaData,
+  user_aal_level: "aal1"
 });
 export const refreshToken = "refresh_token";
 

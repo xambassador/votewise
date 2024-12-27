@@ -60,6 +60,7 @@ export class Controller {
       amr: [{ method: "password", timestamp: Date.now() }],
       email: user.email,
       role: "user",
+      user_aal_level: aal,
       appMetaData: { provider: "email", providers: ["email"] }
     });
 
@@ -83,7 +84,8 @@ export class Controller {
         email_confirmation_sent_at: user.email_confirmation_sent_at,
         last_sign_in_at: lastLogin,
         factors: verifiedFactors,
-        is_onboarded: user.is_onboarded
+        is_onboarded: user.is_onboarded,
+        user_aal_level: aal
       }
     });
   }

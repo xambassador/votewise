@@ -1,5 +1,5 @@
+import { ERROR_CODES } from "@votewise/constant";
 import { AuthenticationError } from "@votewise/errors";
-import { codes } from "@votewise/errors/codes";
 
 import { ExceptionLayer } from "@/lib/exception-layer";
 import { getAuthenticateLocals } from "@/utils/locals";
@@ -14,7 +14,7 @@ export function twoFactorAuthMiddlewareFactory() {
     if (currentAAL !== nextAAL) {
       throw new AuthenticationError(
         "Multi factor authentication is required. Please create a new challenge and verify it to continue.",
-        codes["2FA_VERIFICATION_REQIURED"]
+        ERROR_CODES["2FA"].VERIFICATION_REQIURED
       );
     }
     return next();

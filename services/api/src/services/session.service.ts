@@ -19,6 +19,7 @@ type CreateOptions = {
   amr: { method: string; timestamp: number }[];
   aal: "aal1" | "aal2";
   sessionId?: string; // If need to create a session for existing session ID
+  user_aal_level: "aal1" | "aal2";
 };
 
 export class SessionManager {
@@ -38,7 +39,17 @@ export class SessionManager {
    * @param opts - Session creation options
    */
   public create(opts: CreateOptions) {
-    const { subject, role, email, aal, amr, appMetaData = {}, userMetaData = {}, sessionId: existingSessionId } = opts;
+    const {
+      subject,
+      role,
+      email,
+      aal,
+      amr,
+      appMetaData = {},
+      userMetaData = {},
+      sessionId: existingSessionId,
+      user_aal_level
+    } = opts;
     const sessionId = existingSessionId || this.ctx.cryptoService.generateUUID();
     const refreshToken = this.ctx.cryptoService.generateUUID().replace(/-/g, "");
     const expiresIn = Minute * 30;
@@ -52,7 +63,8 @@ export class SessionManager {
         amr,
         app_metadata: appMetaData,
         user_metadata: userMetaData,
-        session_id: sessionId
+        session_id: sessionId,
+        user_aal_level
       },
       { expiresIn }
     );

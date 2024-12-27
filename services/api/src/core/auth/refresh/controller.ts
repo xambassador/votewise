@@ -56,7 +56,8 @@ export class Controller {
       role: accessTokenPayload.role,
       subject: user.id,
       appMetaData: accessTokenPayload.app_metadata,
-      userMetaData: accessTokenPayload.user_metadata
+      userMetaData: accessTokenPayload.user_metadata,
+      user_aal_level: accessTokenPayload.user_aal_level
     });
     await this.ctx.sessionManager.save(session.sessionId, {
       ip,

@@ -5,6 +5,7 @@ import { StatusCodes } from "http-status-codes";
 
 import { ERROR_CODES } from "@votewise/constant";
 import { ZVerifyChallenge } from "@votewise/schemas";
+import { Milisecond } from "@votewise/times";
 
 import { getAuthenticateLocals } from "@/utils/locals";
 
@@ -73,7 +74,8 @@ export class Controller {
       email: payload.email,
       role: payload.role,
       appMetaData: payload.app_metadata,
-      sessionId: payload.session_id
+      sessionId: payload.session_id,
+      user_aal_level: payload.user_aal_level
     });
     await this.ctx.sessionManager.update(session.sessionId, { aal: "aal2", factorId: factor.id });
 
@@ -81,7 +83,7 @@ export class Controller {
       access_token: session.accessToken,
       refresh_token: session.refreshToken,
       token_type: "Bearer",
-      expires_in: session.expiresInSec,
+      expires_in: session.expiresInSec * Milisecond,
       expires_at: session.expiresAt
     });
   }
