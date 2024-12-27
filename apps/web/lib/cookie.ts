@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { SigninResponse } from "@/app/(auth)/auth/signin/action";
 import type { TOnboard } from "@votewise/schemas/onboard";
 import type { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
@@ -17,7 +18,9 @@ export const COOKIE_KEYS = {
   refreshToken: "__votewise_refresh_token",
   user: "__votewise_user",
   onboard: "__votewise_onboard",
-  is_onboarded: "__votewise_is_onboarded"
+  isOnboarded: "__votewise_is_onboarded",
+  challengeId: "__votewise_challenge_id",
+  factorId: "__votewise_factor_id"
 };
 
 export function getCookie(name: string): string | null {
@@ -86,4 +89,15 @@ export function setOnboardingData(data: Partial<TOnboard>) {
   const onboardData = getOnboardingData() || {};
   const updatedData = { ...onboardData, ...data };
   setCookie(COOKIE_KEYS.onboard, JSON.stringify(updatedData));
+}
+
+export function getUser() {
+  const user = getCookie(COOKIE_KEYS.user);
+  if (!user) return null;
+  try {
+    const data = JSON.parse(user) as SigninResponse;
+    return data;
+  } catch (err) {
+    return null;
+  }
 }

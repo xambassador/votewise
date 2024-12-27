@@ -7,7 +7,7 @@ type Props = { children: React.ReactNode };
 
 export default async function Layout(props: Props) {
   auth<true>({ redirect: true });
-  const isOnboarded = getCookie(COOKIE_KEYS.is_onboarded);
+  const isOnboarded = getCookie(COOKIE_KEYS.isOnboarded);
   if (!isOnboarded) {
     return redirect(routes.auth.logout({ redirect: routes.onboard.root() }));
   }

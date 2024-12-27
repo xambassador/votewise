@@ -1,6 +1,15 @@
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { routes } from "@/lib/routes";
+
 import { DotBackground } from "@votewise/ui/dot-background";
 
 export default function Layout(props: { children: React.ReactNode }) {
+  const { user } = auth<true>({ redirect: true });
+  if (user.aal === user.user_aal_level) {
+    return redirect(routes.app.root());
+  }
+
   return (
     <div className="flex min-h-screen">
       <div className="flex-1 min-h-screen flex flex-col items-end mr-20 justify-center">{props.children}</div>

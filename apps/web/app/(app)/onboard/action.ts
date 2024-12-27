@@ -46,7 +46,7 @@ export async function onboard(props: Props): Promise<TActionResponse<OnboardResp
   }
 
   if (props.step === 5) {
-    const onboardingData = getStepFiveData();
+    const onboardingData = { ...getStepFiveData(), ...props };
     const res = await client.patch<OnboardResponse, TOnboard>(
       "/v1/user/onboard",
       {
@@ -71,7 +71,7 @@ export async function onboard(props: Props): Promise<TActionResponse<OnboardResp
       COOKIE_KEYS.flash,
       JSON.stringify({ message: "Welcome to Votewise!", title: "Onboard complete!", type: "success" })
     );
-    setCookie(COOKIE_KEYS.is_onboarded, "true");
+    setCookie(COOKIE_KEYS.isOnboarded, "true");
     clearCookie(COOKIE_KEYS.onboard);
     return redirect(routes.app.root());
   }

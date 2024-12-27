@@ -16,6 +16,7 @@ export type AccessTokenPayload = {
   amr: { method: string; timestamp: number }[];
   aal: "aal1" | "aal2";
   session_id: string;
+  user_aal_level: "aal1" | "aal2";
 };
 type Codes = "TOKEN_EXPIRED" | "MALFORMED_TOKEN";
 type VerifyResult<T> = { success: true; data: T } | { success: false; error: Codes };
