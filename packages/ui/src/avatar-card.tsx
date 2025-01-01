@@ -3,10 +3,11 @@ import { Cross } from "./icons/cross";
 
 type Props = React.HTMLProps<HTMLDivElement> & {
   url: string;
+  figureProps?: React.ComponentProps<"figure">;
 };
 
 export function AvatarCard(props: Props) {
-  const { url, children, ...rest } = props;
+  const { url, children, figureProps, ...rest } = props;
   return (
     <div
       {...rest}
@@ -15,7 +16,13 @@ export function AvatarCard(props: Props) {
         rest.className
       )}
     >
-      <figure className="relative z-[3] w-[calc((100/16)*1rem)] h-[calc((140/16)*1rem)] bg-nobelBlack-200 rounded-2xl border border-black-400 shadow-image-card p-3 group-hover:translate-y-[-5px] transition-transform duration-300">
+      <figure
+        {...figureProps}
+        className={cn(
+          "relative z-[3] w-[calc((100/16)*1rem)] h-[calc((140/16)*1rem)] bg-nobelBlack-200 rounded-2xl border border-black-400 shadow-image-card p-3 group-hover:translate-y-[-5px] transition-transform duration-300",
+          figureProps?.className
+        )}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={url} alt="Avatar" className="size-full object-cover rounded-2xl" />
       </figure>

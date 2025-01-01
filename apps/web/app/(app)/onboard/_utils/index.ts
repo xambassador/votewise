@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+
 import { COOKIE_KEYS, getCookie, getOnboardingData } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 

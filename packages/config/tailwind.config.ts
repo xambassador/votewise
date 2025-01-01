@@ -59,9 +59,15 @@ const config = {
       width: {
         15: "3.75rem" // 60px
       },
+      maxWidth: {
+        "8xl": "87.5rem" // 1400px
+      },
       boxShadow: {
         "input-ring": "0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color), 0 0 0 4px var(--tw-ring-color)",
-        "image-card": "0 4px 7px 0px rgba(0, 0, 0, 0.25)"
+        "image-card": "0 4px 7px 0px rgba(0, 0, 0, 0.25)",
+        "vote-button": "0px 4px 0px 0px var(--tw-ring-color)",
+        "vote-button-active": "0px 2px 0px 0px var(--tw-ring-color)",
+        "vote-button-hover": "0px 6px 0px 0px var(--tw-ring-color)"
       },
       fontSize: {
         "3xl": "2rem",

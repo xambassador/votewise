@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { routes } from "@/lib/routes";
 
 import { DotBackground } from "@votewise/ui/dot-background";
 
-import { Banner } from "../../_components/banner";
+import { Banner } from "@/app/(auth)/_components/banner";
+
+import { routes } from "@/lib/routes";
 
 type Props = { children: React.ReactNode };
 

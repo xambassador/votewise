@@ -8,11 +8,12 @@ import type { TSignUpForm, TSignUpFormKeys } from "../_utils";
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { routes } from "@/lib/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm } from "@votewise/ui/form";
 import { makeToast } from "@votewise/ui/toast";
+
+import { routes } from "@/lib/routes";
 
 import { ZSignUpForm } from "../_utils";
 import { signup } from "../action";

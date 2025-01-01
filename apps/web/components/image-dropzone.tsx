@@ -3,10 +3,11 @@
 import type { DropzoneOptions } from "react-dropzone";
 
 import { useState } from "react";
-import { cn } from "@/lib/cn";
 import { useDropzone } from "react-dropzone";
 
 import { Image as ImageIcon } from "@votewise/ui/icons/image";
+
+import { cn } from "@/lib/cn";
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
   onFileDrop?: (files: File[]) => void;

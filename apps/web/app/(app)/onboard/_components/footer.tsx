@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { cn } from "@/lib/cn";
 
 import { Button, variants } from "@votewise/ui/button";
+
+import { cn } from "@/lib/cn";
 
 type Props = {
   nextProps?: React.ComponentProps<typeof Button>;

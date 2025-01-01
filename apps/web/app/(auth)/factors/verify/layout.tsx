@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { routes } from "@/lib/routes";
 
 import { DotBackground } from "@votewise/ui/dot-background";
 
-import { Banner } from "../../_components/banner";
+import { Banner } from "@/app/(auth)/_components/banner";
+
+import { auth } from "@/lib/auth";
+import { routes } from "@/lib/routes";
 
 export default function Layout(props: { children: React.ReactNode }) {
   const { user } = auth<true>({ redirect: true });

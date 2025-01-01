@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
+
+import { obfuscateEmail } from "@votewise/text";
+
 import { client } from "@/lib/client.server";
 import { COOKIE_KEYS, getCookie } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
-
-import { obfuscateEmail } from "@votewise/text";
 
 import { OTPForm } from "./_components/form";
 

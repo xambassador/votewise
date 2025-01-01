@@ -1,6 +1,6 @@
 import { DotBackground } from "@votewise/ui/dot-background";
 
-import { Banner } from "../../_components/banner";
+import { Banner } from "@/app/(auth)/_components/banner";
 
 type Props = { children: React.ReactNode };
 
