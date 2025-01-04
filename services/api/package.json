@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@types/crypto-js": "^4.2.2",
+    "@votewise/constant": "*",
     "@votewise/debug": "*",
     "@votewise/env": "*",
     "@votewise/errors": "*",
@@ -52,6 +53,7 @@
     "pino-pretty": "^11.2.2",
     "pug": "^3.0.3",
     "qrcode": "^1.5.4",
+    "request-ip": "^3.3.0",
     "slug": "^9.1.0",
     "slugify": "^1.6.6",
     "uuid": "^10.0.0",
@@ -73,6 +75,7 @@
     "@types/nodemailer": "^6.4.15",
     "@types/pug": "^2.0.10",
     "@types/qrcode": "^1",
+    "@types/request-ip": "^0.0.41",
     "@types/supertest": "^6.0.2",
     "@votewise/config": "*",
     "@votewise/tsconfig": "*",

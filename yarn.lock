@@ -5123,6 +5123,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/request-ip@npm:^0.0.41":
+  version: 0.0.41
+  resolution: "@types/request-ip@npm:0.0.41"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: f8c0394cf4db561a742f1e92bbaaf488c94d4998a49c894f28e2018279c014827c4064d2c076053831a4d4313bbe821fe4357cc491f0d1e3e1bde4f5098be9aa
+  languageName: node
+  linkType: hard
+
 "@types/retry@npm:0.12.0":
   version: 0.12.0
   resolution: "@types/retry@npm:0.12.0"
@@ -5428,8 +5437,10 @@ __metadata:
     "@types/nodemailer": "npm:^6.4.15"
     "@types/pug": "npm:^2.0.10"
     "@types/qrcode": "npm:^1"
+    "@types/request-ip": "npm:^0.0.41"
     "@types/supertest": "npm:^6.0.2"
     "@votewise/config": "npm:*"
+    "@votewise/constant": "npm:*"
     "@votewise/debug": "npm:*"
     "@votewise/env": "npm:*"
     "@votewise/errors": "npm:*"
@@ -5470,6 +5481,7 @@ __metadata:
     pino-pretty: "npm:^11.2.2"
     pug: "npm:^3.0.3"
     qrcode: "npm:^1.5.4"
+    request-ip: "npm:^3.3.0"
     rimraf: "npm:^6.0.1"
     slug: "npm:^9.1.0"
     slugify: "npm:^1.6.6"
@@ -5494,6 +5506,27 @@ __metadata:
     prettier-plugin-tailwindcss: "npm:^0.6.6"
     tailwindcss: "npm:3.4.10"
     tailwindcss-animate: "npm:^1.0.7"
+    typescript: "npm:^5.5.4"
+  languageName: unknown
+  linkType: soft
+
+"@votewise/constant@npm:*, @votewise/constant@workspace:packages/common/constant":
+  version: 0.0.0-use.local
+  resolution: "@votewise/constant@workspace:packages/common/constant"
+  dependencies:
+    tsup: "npm:^8.2.4"
+    typescript: "npm:^5.5.4"
+  languageName: unknown
+  linkType: soft
+
+"@votewise/crypto@npm:*, @votewise/crypto@workspace:packages/common/crypto":
+  version: 0.0.0-use.local
+  resolution: "@votewise/crypto@workspace:packages/common/crypto"
+  dependencies:
+    "@types/debug": "npm:^4"
+    "@types/node": "npm:^20.16.1"
+    debug: "npm:^4.3.7"
+    tsup: "npm:^8.2.4"
     typescript: "npm:^5.5.4"
   languageName: unknown
   linkType: soft
@@ -5623,6 +5656,7 @@ __metadata:
     input-otp: "npm:^1.2.4"
     react: "npm:^18.3.1"
     react-hook-form: "npm:^7.53.0"
+    sonner: "npm:^1.7.0"
     tailwind-merge: "npm:^2.5.2"
     typescript: "npm:^5.5.4"
   languageName: unknown
@@ -5669,12 +5703,18 @@ __metadata:
     "@testing-library/react": "npm:^16.0.0"
     "@types/async": "npm:^3.2.24"
     "@types/cookie": "npm:^0.6.0"
+    "@types/jsonwebtoken": "npm:^9.0.6"
     "@types/lodash": "npm:^4.17.7"
     "@types/node": "npm:20.16.1"
+    "@types/qrcode": "npm:^1"
     "@types/react": "npm:18.3.4"
     "@types/react-dom": "npm:18.3.0"
     "@types/uuid": "npm:^10.0.0"
     "@votewise/config": "npm:*"
+    "@votewise/crypto": "npm:*"
+    "@votewise/debug": "npm:*"
+    "@votewise/env": "npm:*"
+    "@votewise/schemas": "npm:*"
     "@votewise/tsconfig": "npm:*"
     "@votewise/ui": "npm:*"
     async: "npm:^3.2.6"
@@ -5686,15 +5726,18 @@ __metadata:
     dayjs: "npm:^1.11.13"
     framer-motion: "npm:^11.3.30"
     jotai: "npm:^2.9.3"
+    jsonwebtoken: "npm:^9.0.2"
     next: "npm:^14.2.6"
     next-seo: "npm:^6.5.0"
     postcss: "npm:8.4.41"
+    qrcode: "npm:^1.5.4"
     qs: "npm:^6.13.0"
     react: "npm:^18.3.1"
     react-dnd: "npm:^16.0.1"
     react-dom: "npm:^18.3.1"
     react-dropzone: "npm:^14.2.9"
     react-hook-form: "npm:^7.53.0"
+    server-only: "npm:^0.0.1"
     sharp: "npm:^0.33.5"
     tailwind-merge: "npm:^2.5.3"
     tailwind-scrollbar: "npm:^3.1.0"
@@ -18062,6 +18105,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"request-ip@npm:^3.3.0":
+  version: 3.3.0
+  resolution: "request-ip@npm:3.3.0"
+  checksum: 35ab5fcb29408cb72629b53207f00a443a60fe881ffb63e3b08a06c07dae3eee617522741bd0b035492153d6c9babe7f8d9f79c008d493d1e6638b0bd92cb02b
+  languageName: node
+  linkType: hard
+
 "require-directory@npm:^2.1.1":
   version: 2.1.1
   resolution: "require-directory@npm:2.1.1"
@@ -18698,6 +18748,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"server-only@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "server-only@npm:0.0.1"
+  checksum: 4704f0ef85da0be981af6d4ed8e739d39bcfd265b9c246a684060acda5642d0fdc6daffc2308e71e2682c5f508090978802eae0a77623c9b90a49f9ae68048d6
+  languageName: node
+  linkType: hard
+
 "set-blocking@npm:^2.0.0":
   version: 2.0.0
   resolution: "set-blocking@npm:2.0.0"
@@ -19078,6 +19135,16 @@ __metadata:
   dependencies:
     atomic-sleep: "npm:^1.0.0"
   checksum: 7b467f2bc8af7ff60bf210382f21c59728cc4b769af9b62c31dd88723f5cc472752d2320736cc366acc7c765ddd5bec3072c033b0faf249923f576a7453ba9d3
+  languageName: node
+  linkType: hard
+
+"sonner@npm:^1.7.0":
+  version: 1.7.0
+  resolution: "sonner@npm:1.7.0"
+  peerDependencies:
+    react: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+  checksum: 02b16249b0c6e3a62c50dbcb643bb089aecd82c4f0ae988d00903e427d5485933d6cb59047fe5da338b548b6a3311643e511f63ed60a938458295015f7a3fdfd
   languageName: node
   linkType: hard
 

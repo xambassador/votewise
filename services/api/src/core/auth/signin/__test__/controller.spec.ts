@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 
 import { Assertions } from "@votewise/errors";
-import { Minute, Second } from "@votewise/times";
+import { Minute } from "@votewise/times";
 
 import { requestParserPluginFactory } from "@/plugins/request-parser";
 import { SessionManager } from "@/services/session.service";
@@ -91,7 +91,7 @@ describe("Signin Controller", () => {
     const error = await controller.handle(req, res).catch((e) => e);
     expect(helpers.mockCryptoService.comparePassword).toHaveBeenCalledWith(body.password, user.password);
     expect(helpers.mockJWTService.signAccessToken).not.toHaveBeenCalled();
-    expect(error.message).toBe("Invalid password");
+    expect(error.message).toBe("Invalid credentials");
   });
 
   it("should throw error if email is not verified", async () => {
@@ -126,7 +126,8 @@ describe("Signin Controller", () => {
         amr: [{ method: "password", timestamp: expect.any(Number) }],
         app_metadata: { provider: "email", providers: ["email"] },
         user_metadata: {},
-        session_id: sessionId
+        session_id: sessionId,
+        user_aal_level: "aal1"
       },
       { expiresIn: 30 * Minute }
     );
@@ -144,7 +145,7 @@ describe("Signin Controller", () => {
       access_token: accessToken,
       refresh_token: refreshToken,
       token_type: "Bearer",
-      expires_in: (30 * Minute) / Second,
+      expires_in: 30 * Minute,
       expires_at: expect.any(Number),
       user: {
         id: user.id,
@@ -153,7 +154,9 @@ describe("Signin Controller", () => {
         email_confirmed_at: user.email_confirmed_at,
         email_confirmation_sent_at: user.email_confirmation_sent_at,
         last_sign_in_at: expect.any(Date),
-        factors: []
+        is_onboarded: user.is_onboarded,
+        factors: [],
+        user_aal_level: "aal1"
       }
     });
   });

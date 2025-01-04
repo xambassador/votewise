@@ -20,6 +20,7 @@ export type AccessTokenPayload = {
   amr: { method: string; timestamp: number }[];
   aal: "aal1" | "aal2";
   session_id: string;
+  user_aal_level: "aal1" | "aal2";
 };
 export type TInMemorySession = { ip: string; userAgent: string; aal: "aal1" | "aal2" };
 export type Locals = {

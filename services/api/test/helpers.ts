@@ -101,6 +101,7 @@ export function buildAccessToken(data: Partial<AccessTokenPayload>): AccessToken
     session_id: "session_id",
     role: "user",
     email: "test@gmail.com",
+    user_aal_level: "aal1",
     ...data
   };
 }

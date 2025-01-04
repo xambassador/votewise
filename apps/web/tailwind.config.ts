@@ -4,7 +4,7 @@ import votewiseTheme from "@votewise/config/tailwind.config";
 
 const config = {
   ...votewiseTheme,
-  content: [...votewiseTheme.content, "../../packages/ui/**/*.tsx", "../../packages/ui/**/*.ts"]
+  content: [...votewiseTheme.content, "../../packages/ui/src/**/*.tsx", "../../packages/ui/src/**/*.ts"]
 } satisfies Config;
 
 export default config;

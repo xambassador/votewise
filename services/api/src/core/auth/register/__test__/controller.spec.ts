@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 
 import { Assertions } from "@votewise/errors";
-import { Minute, Second } from "@votewise/times";
+import { Minute } from "@votewise/times";
 
 import { requestParserPluginFactory } from "@/plugins/request-parser";
 
@@ -14,10 +14,7 @@ const ip = "192.168.2.45";
 const locals = { meta: { ip } };
 const body = {
   email: user.email,
-  password: "Johndoe@123",
-  username: user.user_name,
-  first_name: user.first_name,
-  last_name: user.last_name
+  password: "Johndoe@123"
 };
 const assert = new Assertions();
 const controller = new Controller({
@@ -57,30 +54,18 @@ describe("Register Controller", () => {
     expect(error.message).toBe(`${body.email} already exists`);
   });
 
-  it("should throw error if username already exists", async () => {
-    const req = buildReq({ body });
-    const res = buildRes({ locals });
-    helpers.setupHappyPath();
-    helpers.mockUserRepository.findByUsername.mockResolvedValue(user);
-
-    const error = await controller.handle(req, res).catch((e) => e);
-    expect(helpers.mockUserRepository.findByUsername).toHaveBeenCalledWith(body.username);
-    expect(helpers.mockUserRepository.create).not.toHaveBeenCalled();
-    expect(error.message).toBe(`Username ${body.username} already exists`);
-  });
-
   it("should create user and send verification email", async () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
-    const { otp, uuid: verificationCode } = helpers.setupHappyPath();
-    const windowExpiryIn = (5 * Minute) / Second;
-    const data = JSON.stringify({ userId: user.id, ip });
+    const { otp, uuid: verificationCode, defaultUserName } = helpers.setupHappyPath();
+    const windowExpiryIn = 5 * Minute;
+    const data = JSON.stringify({ userId: user.id, ip, email: body.email });
     const createBody = {
       email: body.email,
       password: "hashed-password",
-      user_name: body.username,
-      first_name: body.first_name,
-      last_name: body.last_name
+      user_name: "user_" + defaultUserName,
+      first_name: "INVALID_FIRST_NAME",
+      last_name: "INVALID_LAST_NAME"
     };
     const queueData = {
       name: "email",

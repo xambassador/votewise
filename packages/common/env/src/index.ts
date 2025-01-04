@@ -80,6 +80,12 @@ const MINIO_ENDPOINT = z
   .string({ required_error: "MINIO_ENDPOINT is required" })
   .min(1, { message: "MINIO_ENDPOINT is required" });
 const MINIO_PORT = z.string({ required_error: "MINIO_PORT is required" }).min(1, { message: "MINIO_PORT is required" });
+const APP_COOKIE_SECRET = z
+  .string({ required_error: "APP_COOKIE_SECRET is required" })
+  .min(1, { message: "APP_COOKIE_SECRET is required" });
+const API_COOKIE_SECRET = z
+  .string({ required_error: "API_COOKIE_SECRET is required" })
+  .min(1, { message: "API_COOKIE_SECRET is required" });
 
 export const envBaseSchema = z.object({
   ACCESS_TOKEN_SECRET,
@@ -110,7 +116,9 @@ export const envBaseSchema = z.object({
   MINIO_ACCESS_KEY,
   MINIO_SECRET_KEY,
   MINIO_ENDPOINT,
-  MINIO_PORT
+  MINIO_PORT,
+  APP_COOKIE_SECRET,
+  API_COOKIE_SECRET
 });
 
 export const envSchema = z.object({
@@ -147,7 +155,9 @@ export const envSchema = z.object({
   MINIO_ACCESS_KEY,
   MINIO_SECRET_KEY,
   MINIO_ENDPOINT,
-  MINIO_PORT: MINIO_PORT.transform((val) => parseInt(val, 10))
+  MINIO_PORT: MINIO_PORT.transform((val) => parseInt(val, 10)),
+  APP_COOKIE_SECRET,
+  API_COOKIE_SECRET
 });
 
 envSchema.superRefine((data) => {

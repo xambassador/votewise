@@ -105,7 +105,8 @@ describe("Refresh Controller", () => {
         amr: helpers.amr,
         app_metadata: helpers.appMetaData,
         user_metadata: {},
-        session_id: "new_session_id"
+        session_id: "new_session_id",
+        user_aal_level: "aal1"
       },
       { expiresIn: 30 * Minute }
     );

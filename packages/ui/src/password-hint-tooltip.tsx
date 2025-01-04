@@ -7,7 +7,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 const success = "✅";
 const fail = "❌";
 
-export function PasswordHintTooltip(props: { password: string }) {
+export type PasswordHintTooltipProps = { password: string };
+export function PasswordHintTooltip(props: PasswordHintTooltipProps) {
   const { password } = props;
 
   const strength = checkStrength(password);

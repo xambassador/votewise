@@ -6,6 +6,7 @@ import { cn } from "./cn";
 import { createContext } from "./context";
 import { Cross } from "./icons/cross";
 import { Image as ImgIcon } from "./icons/image";
+import { Spinner } from "./ring-spinner";
 
 /* ----------------------------------------------------------------------------------------------- */
 
@@ -20,16 +21,17 @@ const theme = {
 
 const [Provider, useProvider] = createContext<{
   preview: string | null;
+  spinner?: boolean;
   onPreviewChange: (preview: string | null) => void;
 }>("ImagePicker");
 
 /* -----------------------------------------------------------------------------------------------
  * ImagePicker
  * -----------------------------------------------------------------------------------------------*/
-type ImagePickerProps = React.HTMLAttributes<HTMLDivElement> & { url?: string | null };
+export type ImagePickerProps = React.HTMLAttributes<HTMLDivElement> & { url?: string | null; spinner?: boolean };
 
 export function ImagePicker(props: ImagePickerProps) {
-  const { url: controlledUrl, ...rest } = props;
+  const { url: controlledUrl, spinner, ...rest } = props;
   const [preview, setPreview] = useState<string | null>(null);
 
   const onPreviewChange = useCallback((preview: string | null) => {
@@ -41,7 +43,7 @@ export function ImagePicker(props: ImagePickerProps) {
   }, [controlledUrl]);
 
   return (
-    <Provider preview={preview} onPreviewChange={onPreviewChange}>
+    <Provider preview={preview} onPreviewChange={onPreviewChange} spinner={spinner}>
       <div {...rest} className={cn(theme.imagePicker, rest?.className)} />
     </Provider>
   );
@@ -57,11 +59,16 @@ type ImagePreviewProps = Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src"> 
 };
 
 export function ImagePreview(props: ImagePreviewProps) {
-  const { preview } = useProvider("ImagePreview");
+  const { preview, spinner } = useProvider("ImagePreview");
   const { imageWrapperProps, caption = "User avatar", children, defaultUrl = defaultAvatarUrl, ...rest } = props;
 
   return (
     <figure {...imageWrapperProps} className={cn(theme.imagePreview, imageWrapperProps?.className)}>
+      {spinner && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black-900">
+          <Spinner className="size-8 text-white" />
+        </div>
+      )}
       <Img {...rest} src={preview || defaultUrl} alt={rest.alt || "User avatar"} />
       <figcaption className="sr-only">{caption}</figcaption>
       {children}
@@ -72,7 +79,7 @@ export function ImagePreview(props: ImagePreviewProps) {
 /* -----------------------------------------------------------------------------------------------
  * ImagePickerButton
  * -----------------------------------------------------------------------------------------------*/
-type ImagePickerButtonProps = React.HTMLAttributes<HTMLLabelElement> & {
+export type ImagePickerButtonProps = React.HTMLAttributes<HTMLLabelElement> & {
   isMultiple?: boolean;
   accept?: string;
   preventDefaultBehavior?: boolean;
@@ -111,7 +118,7 @@ export function ImagePickerButton(props: ImagePickerButtonProps) {
 /* -----------------------------------------------------------------------------------------------
  * ResetPreviewButton
  * -----------------------------------------------------------------------------------------------*/
-type ResetPreviewButtonProps = React.HTMLAttributes<HTMLDivElement> & { onReset?: () => void };
+export type ResetPreviewButtonProps = React.HTMLAttributes<HTMLDivElement> & { onReset?: () => void };
 
 export function ResetPreviewButton(props: ResetPreviewButtonProps) {
   const { onReset, ...rest } = props;

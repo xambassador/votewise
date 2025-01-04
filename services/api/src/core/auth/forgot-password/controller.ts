@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
+import { ERROR_CODES } from "@votewise/constant";
 import { ZForgotPassword } from "@votewise/schemas";
 
 type ControllerOptions = {
@@ -14,6 +15,8 @@ type ControllerOptions = {
   appUrl: AppContext["config"]["appUrl"];
   requestParser: AppContext["plugins"]["requestParser"];
 };
+
+const { USER_NOT_FOUND } = ERROR_CODES.AUTH;
 
 export class Controller {
   private readonly ctx: ControllerOptions;
@@ -28,7 +31,7 @@ export class Controller {
     const { ip } = locals.meta;
 
     const _user = await this.ctx.userRepository.findByEmail(email);
-    this.ctx.assert.resourceNotFound(!_user, `User with email ${email} not found`);
+    this.ctx.assert.resourceNotFound(!_user, `User with email ${email} not found`, USER_NOT_FOUND);
 
     const user = _user!;
     const verificationCode = this.ctx.cryptoService.hash(`${user.id}:${ip}`);

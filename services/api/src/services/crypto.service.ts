@@ -126,4 +126,8 @@ export class CryptoService {
   public generateKeyUri(secret: string, label: string, issuer: string): string {
     return authenticator.keyuri(label, issuer, secret);
   }
+
+  public generateNanoId(size = 21): string {
+    return nanoid(size);
+  }
 }

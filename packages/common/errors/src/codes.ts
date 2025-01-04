@@ -1,3 +1,6 @@
+/**
+ * @deprecated Use `@votewise/constant` instead.
+ */
 export const codes = {
   "2FA_VERIFICATION_REQIURED": 1000,
   "2FA_VERIFICATION_FAILED": 1001,

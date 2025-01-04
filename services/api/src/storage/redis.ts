@@ -227,4 +227,8 @@ export class Cache {
   public async keys(pattern: string) {
     return await this.client.keys(pattern);
   }
+
+  public async getRemainingTime(key: string) {
+    return await this.client.pttl(key);
+  }
 }

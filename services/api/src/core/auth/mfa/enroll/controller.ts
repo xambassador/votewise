@@ -3,6 +3,8 @@ import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
+import { ERROR_CODES } from "@votewise/constant";
+
 import { getAuthenticateLocals } from "@/utils/locals";
 
 type ControllerOptions = {
@@ -13,6 +15,11 @@ type ControllerOptions = {
   assert: AppContext["assert"];
   config: AppContext["config"];
 };
+
+const { USER_NOT_FOUND } = ERROR_CODES.AUTH;
+const { CONFLICTING_FACTOR } = ERROR_CODES["2FA"];
+const USER_NOT_FOUND_MSG = "A valid session and a registered user are required to enroll a factor";
+const CONFLICTING_FACTOR_MSG = "User already has a TOTP factor";
 
 export class Controller {
   private readonly ctx: ControllerOptions;
@@ -26,12 +33,12 @@ export class Controller {
     const { payload } = locals;
 
     const _user = await this.ctx.userRepository.findById(payload.sub);
-    this.ctx.assert.resourceNotFound(!_user, "A valid session and a registered user are required to enroll a factor");
+    this.ctx.assert.resourceNotFound(!_user, USER_NOT_FOUND_MSG, USER_NOT_FOUND);
 
     const user = _user!;
 
     const userHasTOTPFactor = await this.ctx.factorRepository.findByUserIdAndType(user.id, "TOTP");
-    this.ctx.assert.unprocessableEntity(userHasTOTPFactor !== null, "User already has a TOTP factor");
+    this.ctx.assert.unprocessableEntity(userHasTOTPFactor !== null, CONFLICTING_FACTOR_MSG, CONFLICTING_FACTOR);
 
     const totpSecret = this.ctx.cryptoService.generate2FASecret();
     const encryptedSecret = this.ctx.cryptoService.symmetricEncrypt(totpSecret, this.ctx.environment.APP_SECRET);
