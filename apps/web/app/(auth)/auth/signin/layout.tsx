@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { getFlashMessage } from "@/lib/cookie";
-import { routes } from "@/lib/routes";
 
 import { DotBackground } from "@votewise/ui/dot-background";
 
 import { FlashMessage } from "@/components/flash";
 
-import { Banner } from "../../_components/banner";
+import { Banner } from "@/app/(auth)/_components/banner";
+
+import { getFlashMessage } from "@/lib/cookie";
+import { routes } from "@/lib/routes";
 
 type Props = { children: React.ReactNode };
 

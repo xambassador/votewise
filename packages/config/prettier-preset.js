@@ -29,6 +29,12 @@ module.exports = {
     "",
     "@/components/(.*)$",
     "",
+    "@/app/(.*)$",
+    "",
+    "@/lib/(.*)$",
+    "",
+    "@/assets/(.*)$",
+    "",
     "^[./]"
   ],
   importOrderTypeScriptVersion: "5.3.3",

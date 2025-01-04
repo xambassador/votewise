@@ -1,19 +1,20 @@
 "use client";
 
+import type { TConnectYourSocials } from "@/app/(app)/onboard/_utils/schema";
 import type { ButtonProps } from "@votewise/ui/button";
 import type Link from "next/link";
-import type { TConnectYourSocials } from "../../_utils/schema";
 
 import { useTransition } from "react";
-import { chain } from "@/lib/chain";
-import { routes } from "@/lib/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm } from "@votewise/ui/form";
 import { makeToast } from "@votewise/ui/toast";
 
-import { ZConnectYourSocials } from "../../_utils/schema";
-import { onboard } from "../../action";
+import { ZConnectYourSocials } from "@/app/(app)/onboard/_utils/schema";
+import { onboard } from "@/app/(app)/onboard/action";
+
+import { chain } from "@/lib/chain";
+import { routes } from "@/lib/routes";
 
 type LinkProps = React.ComponentProps<typeof Link>;
 type FormProps = React.ComponentProps<"form">;

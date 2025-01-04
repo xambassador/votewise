@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+
 import { clearCookie, COOKIE_KEYS } from "@/lib/cookie";
 
 export async function GET() {
