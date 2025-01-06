@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "target": "ES6",
+    "jsx": "preserve",
+    "resolveJsonModule": true,
+    "lib": ["DOM", "DOM.Iterable"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "verbatimModuleSyntax": false,
+    "incremental": false,
+    "composite": false
+  },
+  "include": ["./src"],
+  "exclude": ["dist", "build", "node_modules"]
+}

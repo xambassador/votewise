@@ -18,6 +18,7 @@
     "@votewise/debug": "*",
     "@votewise/env": "*",
     "@votewise/schemas": "*",
+    "@votewise/client": "*",
     "@votewise/ui": "*",
     "async": "^3.2.6",
     "axios": "^1.7.5",

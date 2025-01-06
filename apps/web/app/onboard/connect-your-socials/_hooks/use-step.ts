@@ -1,6 +1,6 @@
 "use client";
 
-import type { TConnectYourSocials } from "@/app/(app)/onboard/_utils/schema";
+import type { TConnectYourSocials } from "@/app/onboard/_utils/schema";
 import type { ButtonProps } from "@votewise/ui/button";
 import type Link from "next/link";
 
@@ -10,8 +10,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "@votewise/ui/form";
 import { makeToast } from "@votewise/ui/toast";
 
-import { ZConnectYourSocials } from "@/app/(app)/onboard/_utils/schema";
-import { onboard } from "@/app/(app)/onboard/action";
+import { ZConnectYourSocials } from "@/app/onboard/_utils/schema";
+import { onboard } from "@/app/onboard/action";
 
 import { chain } from "@/lib/chain";
 import { routes } from "@/lib/routes";

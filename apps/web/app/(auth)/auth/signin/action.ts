@@ -4,7 +4,8 @@ import type { TActionResponse } from "@/types";
 import type { TSinginForm } from "./_utils";
 
 import { redirect } from "next/navigation";
-import { client } from "@/lib/client.server";
+
+import { auth, client } from "@/lib/client.server";
 import { clearCookie, COOKIE_KEYS, setCookie } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
@@ -33,20 +34,15 @@ export type SigninResponse = {
 };
 
 export async function signin(data: TSinginForm, redirectTo?: string | null): Promise<TActionResponse<SigninResponse>> {
-  const res = await client.post<SigninResponse, { email: string; password: string }>("/v1/auth/signin", {
-    email: data.username,
-    password: data.password
-  });
+  const res = await auth.signin({ username: data.username, password: data.password });
 
   if (!res.success) {
     return { success: false, error: res.error, errorData: res.errorData };
   }
 
-  const expires = new Date(Date.now() + res.data.expires_in);
-  setCookie(COOKIE_KEYS.accessToken, res.data.access_token, { expires });
-  setCookie(COOKIE_KEYS.refreshToken, res.data.refresh_token, { expires });
-  setCookie(COOKIE_KEYS.user, JSON.stringify(res.data.user), { expires });
-  setCookie(COOKIE_KEYS.isOnboarded, res.data.user.is_onboarded ? "true" : "false", { expires });
+  if (!res.data.user.is_onboarded) {
+    return redirect(routes.onboard.root());
+  }
 
   const hasFactors = res.data.user.factors.length > 0;
   const hasTotp = res.data.user.factors.find((f) => f.type === "TOTP");

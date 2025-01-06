@@ -3,7 +3,7 @@
 import { Form, FormControl, FormField, FormLabel, FormMessage } from "@votewise/ui/form";
 import { Input, InputField } from "@votewise/ui/input-field";
 
-import { Footer } from "@/app/(app)/onboard/_components/footer";
+import { Footer } from "@/app/onboard/_components/footer";
 
 import { useStep } from "../_hooks/use-step";
 import { fields } from "./fields";

@@ -7,10 +7,11 @@ import type Link from "next/link";
 import type { TWhatShouldWeCall } from "../../_utils/schema";
 
 import { useTransition } from "react";
-import { chain } from "@/lib/chain";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm } from "@votewise/ui/form";
+
+import { chain } from "@/lib/chain";
 
 import { ZWhatShouldWeCall } from "../../_utils/schema";
 import { onboard } from "../../action";

@@ -1,4 +1,4 @@
-import type { TConnectYourSocials } from "@/app/(app)/onboard/_utils/schema";
+import type { TConnectYourSocials } from "@/app/onboard/_utils/schema";
 
 type Keys = keyof TConnectYourSocials;
 export const fields: { name: Keys; label: string; type: string; placeholder: string }[] = [

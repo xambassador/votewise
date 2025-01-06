@@ -7,9 +7,10 @@ import type Link from "next/link";
 import type { TTellUsAboutYou } from "../../_utils/schema";
 
 import { useTransition } from "react";
-import { routes } from "@/lib/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+
+import { routes } from "@/lib/routes";
 
 import { ZTellUsAboutYou } from "../../_utils/schema";
 import { onboard } from "../../action";

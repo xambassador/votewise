@@ -4,33 +4,39 @@ import type { ButtonProps } from "@votewise/ui/button";
 import type Link from "next/link";
 
 import { useTransition } from "react";
+
+import { makeToast } from "@votewise/ui/toast";
+
 import { chain } from "@/lib/chain";
 import { uploadClient } from "@/lib/client";
 import { routes } from "@/lib/routes";
 
-import { makeToast } from "@votewise/ui/toast";
-
-import { useGetSavedBg } from "../_utils/store";
+import { useGetSavedAvatar } from "../_utils/store";
 import { onboard } from "../../action";
 
 type LinkProps = React.ComponentProps<typeof Link>;
 
 export function useStep() {
   const [isPending, startTransition] = useTransition();
-  const savedBg = useGetSavedBg();
+  const savedAvatar = useGetSavedAvatar();
 
   async function onSubmit() {
-    if (!savedBg) return;
-    if (savedBg instanceof File) {
-      const uploadRes = await uploadClient.upload(savedBg);
+    if (!savedAvatar) return;
+    if (savedAvatar instanceof File) {
+      const uploadRes = await uploadClient.upload(savedAvatar);
       if (!uploadRes.success) {
-        makeToast.error("Ooop!", uploadRes.error);
+        makeToast.error("Oops!", uploadRes.error);
         return;
       }
-      startTransition(() => onboard({ cover: uploadRes.data.url, step: 4 }));
+      startTransition(() => {
+        onboard({ step: 3, avatar: uploadRes.data.url });
+      });
       return;
     }
-    startTransition(() => onboard({ cover: savedBg, step: 4 }));
+
+    startTransition(() => {
+      onboard({ step: 3, avatar: savedAvatar });
+    });
   }
 
   function getButtonProps(props?: ButtonProps): ButtonProps {
@@ -38,7 +44,7 @@ export function useStep() {
   }
 
   function getBackProps(props?: LinkProps): LinkProps {
-    return { ...props, href: routes.onboard.step3() };
+    return { ...props, href: routes.onboard.step2() };
   }
 
   return { getButtonProps, getBackProps };

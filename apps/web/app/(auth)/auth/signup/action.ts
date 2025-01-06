@@ -3,9 +3,10 @@
 import type { TActionResponse } from "@/types";
 import type { TSignUpForm } from "./_utils";
 
+import { z } from "zod";
+
 import { client } from "@/lib/client.server";
 import { COOKIE_KEYS, setCookie } from "@/lib/cookie";
-import { z } from "zod";
 
 type TSignupResponse = {
   user_id: string;
