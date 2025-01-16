@@ -31,7 +31,11 @@ const nextConfig = bundleAnalyzer({
   experimental: {
     serverActions: {
       // https://github.com/vercel/next.js/issues/58295
-      allowedOrigins: [new URL(process.env.VOTEWISE_APP_URL).host, process.env.VOTEWISE_APP_URL]
+      allowedOrigins: [
+        new URL(process.env.VOTEWISE_APP_URL).host,
+        process.env.VOTEWISE_APP_URL,
+        new URL(process.env.VOTEWISE_HOST_ADDRESS).host
+      ]
     }
   }
 });

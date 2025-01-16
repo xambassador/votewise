@@ -36,7 +36,7 @@ export function setCookie(name: string, value: string, options?: Partial<Respons
   const encryptedValue = symmetricEncrypt(value, environment.APP_COOKIE_SECRET);
   cookieStore.set(name, encryptedValue, {
     path: "/",
-    secure: true,
+    secure: process.env.NODE_ENV === "production" ? true : false,
     sameSite: "strict",
     httpOnly: environment.NODE_ENV === "production",
     ...options
