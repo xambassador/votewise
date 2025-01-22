@@ -7,15 +7,9 @@ import { clearCookie, getCookie, setCookie } from "./cookie";
 
 export const client = new Client({
   storage: {
-    set(key, value, options) {
-      setCookie(key, value, options);
-    },
-    get(key) {
-      return getCookie(key);
-    },
-    remove(key) {
-      clearCookie(key);
-    }
+    set: setCookie,
+    get: getCookie,
+    remove: clearCookie
   },
   headersFactory() {
     const headersList = headers();

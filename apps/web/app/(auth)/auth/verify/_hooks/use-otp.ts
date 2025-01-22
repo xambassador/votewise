@@ -23,8 +23,11 @@ export function useOTP() {
       return;
     }
 
-    startTransition(() => {
-      verifyEmail(otp);
+    startTransition(async () => {
+      const res = await verifyEmail(otp);
+      if (!res.success) {
+        makeToast.error("Ooops!", res.error);
+      }
     });
   }
 

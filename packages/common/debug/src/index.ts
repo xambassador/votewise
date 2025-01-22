@@ -33,6 +33,10 @@ export class Debugger {
     return this._debug.enabled;
   }
 
+  enable() {
+    debug.enable(this._debug.namespace);
+  }
+
   debug(message: string, ...args: unknown[]) {
     this.log("debug", message, ...args);
   }
