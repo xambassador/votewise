@@ -25,7 +25,12 @@ export class Controller {
       })
       .on("end", () => {
         Promise.all(promises).then(() => {
-          res.json(results);
+          const urls = results.map((r) => ({
+            url: "http://" + this.ctx.environment.MINIO_ENDPOINT + "/" + bucket + "/" + r.name,
+            name: r.name,
+            etag: r.etag
+          }));
+          res.json(urls);
         });
       })
       .on("error", (err) => {

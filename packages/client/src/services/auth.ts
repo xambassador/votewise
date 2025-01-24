@@ -53,6 +53,8 @@ type VerifyEmailBody = {
   user_id: string;
 };
 
+type ChallengeFactorResponse = { id: string; expires_at: string; type: string };
+
 export type VerifyResponse = {
   access_token: string;
   refresh_token: string;
@@ -73,7 +75,7 @@ export class Auth {
     this.client = opts.client;
   }
 
-  public async signin(data: { username: string; password: string }) {
+  public async signin(data: { username: string; password: string }): Promise<TFetchResult<SigninResponse>> {
     const res = await this.client.post<SigninResponse, { email: string; password: string }>("/v1/auth/signin", {
       email: data.username,
       password: data.password
@@ -89,7 +91,7 @@ export class Auth {
     return res;
   }
 
-  public async signup(data: { email: string; password: string }) {
+  public async signup(data: { email: string; password: string }): Promise<TFetchResult<TSignupResponse>> {
     const res = await this.client.post<TSignupResponse, { email: string; password: string }>("/v1/auth/register", {
       email: data.email,
       password: data.password
@@ -142,8 +144,8 @@ export class Auth {
     return res;
   }
 
-  public async challengeFactor(factorId: string, token: string) {
-    const res = await this.client.post<{ id: string; expires_at: string; type: string }, object>(
+  public async challengeFactor(factorId: string, token: string): Promise<TFetchResult<ChallengeFactorResponse>> {
+    const res = await this.client.post<ChallengeFactorResponse, object>(
       `/v1/auth/factors/${factorId}/challenge`,
       {},
       { headers: { Authorization: `Votewise ${token}` } }

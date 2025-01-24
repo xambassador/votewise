@@ -24,6 +24,10 @@
     "./auth": {
       "import": "./dist/services/auth.mjs",
       "require": "./dist/services/auth.js"
+    },
+    "./onboard": {
+      "import": "./dist/services/onboard.mjs",
+      "require": "./dist/services/onboard.js"
     }
   },
   "scripts": {
@@ -45,7 +49,8 @@
       "./src/client/index.ts",
       "./src/client/upload.ts",
       "./src/server/index.ts",
-      "./src/services/auth.ts"
+      "./src/services/auth.ts",
+      "./src/services/onboard.ts"
     ],
     "format": [
       "cjs",

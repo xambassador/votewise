@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 
 import { Auth } from "@votewise/client/auth";
+import { Onboard } from "@votewise/client/onboard";
 import { Client } from "@votewise/client/server";
 
 import { clearCookie, getCookie, setCookie } from "./cookie";
@@ -21,3 +22,4 @@ export const client = new Client({
   }
 });
 export const auth = new Auth({ client });
+export const onboard = new Onboard({ client });
