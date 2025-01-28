@@ -4,11 +4,11 @@ import { DotBackground } from "@votewise/ui/dot-background";
 
 import { Banner } from "@/app/(auth)/_components/banner";
 
-import { auth } from "@/lib/auth";
+import { isAuthorized } from "@/lib/auth";
 import { routes } from "@/lib/routes";
 
 export default function Layout(props: { children: React.ReactNode }) {
-  const { user } = auth<true>({ redirect: true });
+  const user = isAuthorized<true>({ redirect: true });
   if (user.aal === user.user_aal_level) {
     return redirect(routes.app.root());
   }

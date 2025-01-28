@@ -1,6 +1,7 @@
 import type { Locals } from "@/types";
 import type { Request } from "express";
 
+import { ERROR_CODES } from "@votewise/constant";
 import { AuthenticationError } from "@votewise/errors";
 
 import { AppContext } from "@/context";
@@ -12,7 +13,12 @@ export function authMiddlewareFactory() {
   return exceptionLayer.catch(async (req, res, next) => {
     const token = getAuthorizationToken(req);
     const validate = ctx.jwtService.verifyAccessToken(token);
-    if (!validate.success) throw new AuthenticationError("Unauthorized");
+    if (!validate.success) {
+      if (validate.error === "TOKEN_EXPIRED") {
+        throw new AuthenticationError("Unauthorized", ERROR_CODES.AUTH.ACCESS_TOKEN_EXPIRED);
+      }
+      throw new AuthenticationError("Unauthorized");
+    }
     const payload = validate.data;
     const session = await ctx.sessionManager.get(payload.session_id);
     if (!session) throw new AuthenticationError("Unauthorized");

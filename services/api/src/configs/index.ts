@@ -39,8 +39,8 @@ export class SSL {
 }
 
 export class JWT {
-  public accessTokenExpiration: string;
-  public refreshTokenExpiration: string;
+  public accessTokenExpiration: number;
+  public refreshTokenExpiration: number;
 
   constructor(cfg: JWT) {
     this.accessTokenExpiration = cfg.accessTokenExpiration;

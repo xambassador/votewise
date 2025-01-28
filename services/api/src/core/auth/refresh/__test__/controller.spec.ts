@@ -19,7 +19,8 @@ const sessionManager = new SessionManager({
   cryptoService: helpers.mockCryptoService,
   cache: helpers.mockCache,
   assert,
-  sessionRepository: helpers.mockSessionRepository
+  sessionRepository: helpers.mockSessionRepository,
+  accessTokenExpiration: 30 * Minute
 });
 const controller = new Controller({
   useRepository: helpers.mockUserRepository,

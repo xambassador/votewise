@@ -1,14 +1,18 @@
+import type { AccessTokenPayload } from "@votewise/jwt";
 import type { Client } from "../client";
 import type { Client as ServerClient } from "../server";
 import type { TFetchResult } from "../types";
 
 import { ERROR_CODES } from "@votewise/constant";
+import { Debugger } from "@votewise/debug";
 
-import { COOKIE_KEYS } from "../utils";
+import { COOKIE_KEYS, jwt } from "../utils";
 
 type AuthOptions = {
   client: Client | ServerClient;
 };
+
+export type { AccessTokenPayload };
 
 export type SigninResponse = {
   access_token: string;
@@ -67,6 +71,17 @@ type VerifyBody = {
   challenge_id: string;
   code: string;
 };
+
+type RefreshResponse = {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  expires_in: number;
+  expires_at: number;
+};
+
+const debug = new Debugger("auth");
+debug.enable();
 
 export class Auth {
   private readonly client: Client | ServerClient;
@@ -167,11 +182,12 @@ export class Auth {
     return res;
   }
 
-  public async verifyFactor(code: string, token: string): Promise<TFetchResult<VerifyResponse>> {
+  public async verifyFactor(code: string): Promise<TFetchResult<VerifyResponse>> {
     const storage = this.client.getStorage();
+    const accessToken = storage?.get(COOKIE_KEYS.accessToken);
     const challengeId = storage?.get(COOKIE_KEYS.challengeId);
     const factorId = storage?.get(COOKIE_KEYS.factorId);
-    if (!challengeId || !factorId) {
+    if (!challengeId || !factorId || !accessToken) {
       storage?.remove(COOKIE_KEYS.accessToken);
       storage?.remove(COOKIE_KEYS.refreshToken);
       storage?.remove(COOKIE_KEYS.user);
@@ -194,7 +210,7 @@ export class Auth {
         challenge_id: challengeId,
         code
       },
-      { headers: { Authorization: `Votewise ${token}` } }
+      { headers: { Authorization: `Votewise ${accessToken}` } }
     );
 
     if (!res.success && res.errorData.error_code === ERROR_CODES["2FA"].CHALLENGE_EXPIRED) {
@@ -225,5 +241,80 @@ export class Auth {
       storage?.set(COOKIE_KEYS.refreshToken, res.data.refresh_token, { expires });
     }
     return res;
+  }
+
+  public async refresh(): Promise<TFetchResult<RefreshResponse>> {
+    const storage = this.client.getStorage();
+    const accessToken = storage?.get(COOKIE_KEYS.accessToken);
+    const refreshToken = storage?.get(COOKIE_KEYS.refreshToken);
+    if (!accessToken || !refreshToken) {
+      return {
+        success: false,
+        error: "Invalid request",
+        status: 400,
+        errorData: { message: "Invalid request", name: "InvalidRequestError", status_code: 400 }
+      };
+    }
+
+    const res = await this.client.post<RefreshResponse, { access_token: string; refresh_token: string }>(
+      "/v1/auth/refresh",
+      {
+        access_token: accessToken,
+        refresh_token: refreshToken
+      }
+    );
+    return res;
+  }
+
+  /**
+   * Get user from the auth cookies.
+   * @returns {AccessTokenPayload | null} Returns the user if it exists.
+   */
+  public getUser(): AccessTokenPayload | null {
+    const storage = this.client.getStorage();
+    const accessToken = storage?.get(COOKIE_KEYS.accessToken);
+    if (!accessToken) return null;
+    const result = jwt.verifyAccessToken(accessToken);
+    if (!result.success) return null;
+    return result.data;
+  }
+
+  /**
+   * Check if the user is authorized. This method will also refresh the token if it's expired.
+   * @returns {Promise<{ user: AccessTokenPayload; accessToken: string } | null} Returns the user and the access token if the user is authorized.
+   */
+  public async isAuthorized(): Promise<{ user: AccessTokenPayload; accessToken: string } | null> {
+    const storage = this.client.getStorage();
+    const accessToken = storage?.get(COOKIE_KEYS.accessToken);
+    if (!accessToken) return null;
+    const result = jwt.verifyAccessToken(accessToken);
+    if (!result.success) {
+      if (result.error === "TOKEN_EXPIRED") {
+        debug.warn("Token expired. Refreshing token...");
+        const res = await this.refresh();
+        if (!res.success) {
+          debug.warn("Token refresh failed. Logging out...");
+          storage?.remove(COOKIE_KEYS.accessToken);
+          storage?.remove(COOKIE_KEYS.refreshToken);
+          storage?.remove(COOKIE_KEYS.user);
+          storage?.remove(COOKIE_KEYS.isOnboarded);
+          return null;
+        }
+        const newResult = jwt.verifyAccessToken(res.data.access_token);
+        if (!newResult.success) return null;
+        storage?.set(COOKIE_KEYS.accessToken, res.data.access_token, {
+          expires: new Date(Date.now() + res.data.expires_in)
+        });
+        storage?.set(COOKIE_KEYS.refreshToken, res.data.refresh_token, {
+          expires: new Date(Date.now() + res.data.expires_in)
+        });
+        debug.info("Token refreshed successfully.");
+        return { user: newResult.data, accessToken: res.data.access_token };
+      }
+
+      return null;
+    }
+
+    return { user: result.data, accessToken };
   }
 }

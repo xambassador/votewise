@@ -111,7 +111,14 @@ export class AppContext {
     const sessionRepository = new SessionRepository({ db });
     const mailer = new Mailer({ env: environment });
     const tasksQueue = new TasksQueue({ env: environment });
-    const sessionManager = new SessionManager({ jwtService, cache, assert, cryptoService, sessionRepository });
+    const sessionManager = new SessionManager({
+      jwtService,
+      cache,
+      assert,
+      cryptoService,
+      sessionRepository,
+      accessTokenExpiration: cfg.jwt.accessTokenExpiration
+    });
     const requestParser = requestParserPluginFactory();
     const jwtPlugin = jwtPluginFactory({ jwtService });
     const ctx = new AppContext({

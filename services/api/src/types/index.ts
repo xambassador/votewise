@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 
 import type { envBaseSchema } from "@votewise/env";
+import type { AccessTokenPayload } from "@votewise/jwt";
 import type { z } from "zod";
 
 export type AuthenticatedUser = {
@@ -11,17 +12,7 @@ export type AuthenticatedUser = {
   email: string;
   username: string;
 };
-export type AccessTokenPayload = {
-  sub: string;
-  email: string;
-  role: string;
-  app_metadata?: Record<string, unknown>;
-  user_metadata?: Record<string, unknown>;
-  amr: { method: string; timestamp: number }[];
-  aal: "aal1" | "aal2";
-  session_id: string;
-  user_aal_level: "aal1" | "aal2";
-};
+
 export type TInMemorySession = { ip: string; userAgent: string; aal: "aal1" | "aal2" };
 export type Locals = {
   meta: { ip: string };

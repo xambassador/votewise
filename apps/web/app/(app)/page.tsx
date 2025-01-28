@@ -1,13 +1,11 @@
 import { FlashMessage } from "@/components/flash";
 
-import { auth } from "@/lib/auth";
 import { getFlashMessage } from "@/lib/cookie";
 
 import { FeedList } from "./_components/feed-list";
 
-export default function Home() {
+export default async function Home() {
   const flash = getFlashMessage();
-  auth<true>({ redirect: true });
 
   return (
     <>

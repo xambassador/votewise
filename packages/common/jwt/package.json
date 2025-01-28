@@ -1,5 +1,5 @@
 {
-  "name": "@votewise/crypto",
+  "name": "@votewise/jwt",
   "version": "0.0.0",
   "private": true,
   "sideEffects": false,
@@ -11,10 +11,6 @@
     ".": {
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
-    },
-    "./edge": {
-      "import": "./dist/edge.mjs",
-      "require": "./dist/edge.js"
     }
   },
   "scripts": {
@@ -26,11 +22,10 @@
     "clean": "rm -rf dist node_modules"
   },
   "dependencies": {
-    "debug": "^4.3.7"
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
-    "@types/debug": "^4",
-    "@types/node": "^20.16.1",
+    "@types/jsonwebtoken": "^9.0.6",
     "tsup": "^8.2.4",
     "typescript": "^5.5.4"
   },

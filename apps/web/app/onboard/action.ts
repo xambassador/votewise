@@ -6,8 +6,8 @@ import type { TConnectYourSocials, TTellUsAboutYou, TWhatShouldWeCall } from "./
 
 import { redirect } from "next/navigation";
 
-import { auth } from "@/lib/auth";
-import { client } from "@/lib/client.server";
+import { isAuthorized } from "@/lib/auth";
+import { onboard as onboardClient } from "@/lib/client.server";
 import { clearCookie, COOKIE_KEYS, setCookie, setOnboardingData } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
@@ -22,7 +22,7 @@ type Props = Partial<TWhatShouldWeCall> &
 type OnboardResponse = { is_onboarded: boolean } & TOnboard;
 
 export async function onboard(props: Props): Promise<TActionResponse<OnboardResponse>> {
-  const user = auth<true>({ redirect: true });
+  isAuthorized<true>({ redirect: true });
 
   if (props.step === 1) {
     setOnboardingData({ user_name: props.userName, first_name: props.firstName, last_name: props.lastName });
@@ -45,24 +45,9 @@ export async function onboard(props: Props): Promise<TActionResponse<OnboardResp
   }
 
   if (props.step === 5) {
-    const onboardingData = { ...getStepFiveData(), ...props };
-    const res = await client.patch<OnboardResponse, TOnboard>(
-      "/v1/user/onboard",
-      {
-        user_name: onboardingData.user_name,
-        first_name: onboardingData.first_name,
-        last_name: onboardingData.last_name,
-        about: onboardingData.about,
-        avatar_url: onboardingData.avatar_url,
-        cover_url: onboardingData.cover_url,
-        gender: onboardingData.gender,
-        location: onboardingData.location,
-        facebook_url: onboardingData.facebook_url,
-        twitter_url: onboardingData.twitter_url,
-        instagram_url: onboardingData.instagram_url
-      },
-      { headers: { Authorization: `Votewise ${user.accessToken}` } }
-    );
+    const stepFiveData = getStepFiveData();
+    const onboardingData = { ...stepFiveData, ...props };
+    const res = await onboardClient.onboard(onboardingData);
     if (!res.success) {
       return { success: false, error: res.error, errorData: res.errorData };
     }

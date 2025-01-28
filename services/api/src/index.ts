@@ -1,13 +1,14 @@
 import "dotenv/config";
 
 import { environment } from "@votewise/env";
+import { Minute } from "@votewise/times";
 
 import { Server } from "@/http/server";
 
 import { Cors, JWT, ServerConfig, ServerSecrets } from "./configs";
 
 const cors = new Cors({ origin: "*" });
-const jwt = new JWT({ accessTokenExpiration: "15m", refreshTokenExpiration: "7d" });
+const jwt = new JWT({ accessTokenExpiration: Minute * 15, refreshTokenExpiration: Minute * 60 * 24 * 7 });
 const cfg = new ServerConfig({
   hostname: "",
   jwt,

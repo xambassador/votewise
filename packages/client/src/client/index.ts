@@ -25,7 +25,7 @@ export class Client {
   public readonly url: string;
   public readonly headers?: Record<string, string>;
   public readonly fetch: Fetch = fetch;
-  private readonly storage?: Storage;
+  private storage?: Storage;
 
   constructor(opts?: ClientOptions) {
     const settings = { ...DEFAULT_OPTIONS, ...opts };
@@ -160,5 +160,9 @@ export class Client {
 
   public getStorage() {
     return this.storage;
+  }
+
+  public setStorage(storage: Storage) {
+    this.storage = storage;
   }
 }

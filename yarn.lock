@@ -5532,11 +5532,13 @@ __metadata:
     "@votewise/debug": "npm:*"
     "@votewise/env": "npm:*"
     "@votewise/errors": "npm:*"
+    "@votewise/jwt": "npm:*"
     "@votewise/log": "npm:*"
     "@votewise/prisma": "npm:*"
     "@votewise/schemas": "npm:*"
     "@votewise/times": "npm:*"
     "@votewise/tsconfig": "npm:*"
+    "@votewise/types": "npm:*"
     bcrypt: "npm:^5.1.1"
     bullmq: "npm:^5.12.10"
     busboy: "npm:^1.6.0"
@@ -5584,10 +5586,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@votewise/client@workspace:packages/client":
+"@votewise/client@npm:*, @votewise/client@workspace:packages/client":
   version: 0.0.0-use.local
   resolution: "@votewise/client@workspace:packages/client"
   dependencies:
+    "@types/jsonwebtoken": "npm:^9.0.6"
+    "@votewise/constant": "npm:*"
+    "@votewise/debug": "npm:*"
+    "@votewise/jwt": "npm:*"
+    "@votewise/types": "npm:*"
+    jsonwebtoken: "npm:^9.0.2"
     tsup: "npm:^8.2.4"
     typescript: "npm:^5.5.4"
   languageName: unknown
@@ -5654,6 +5662,17 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@votewise/errors@workspace:packages/common/errors"
   dependencies:
+    tsup: "npm:^8.2.4"
+    typescript: "npm:^5.5.4"
+  languageName: unknown
+  linkType: soft
+
+"@votewise/jwt@npm:*, @votewise/jwt@workspace:packages/common/jwt":
+  version: 0.0.0-use.local
+  resolution: "@votewise/jwt@workspace:packages/common/jwt"
+  dependencies:
+    "@types/jsonwebtoken": "npm:^9.0.6"
+    jsonwebtoken: "npm:^9.0.2"
     tsup: "npm:^8.2.4"
     typescript: "npm:^5.5.4"
   languageName: unknown
@@ -5732,6 +5751,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@votewise/types@npm:*, @votewise/types@workspace:packages/types":
+  version: 0.0.0-use.local
+  resolution: "@votewise/types@workspace:packages/types"
+  dependencies:
+    typescript: "npm:^5.5.4"
+  languageName: unknown
+  linkType: soft
+
 "@votewise/ui@npm:*, @votewise/ui@workspace:packages/ui":
   version: 0.0.0-use.local
   resolution: "@votewise/ui@workspace:packages/ui"
@@ -5807,12 +5834,14 @@ __metadata:
     "@types/react": "npm:18.3.4"
     "@types/react-dom": "npm:18.3.0"
     "@types/uuid": "npm:^10.0.0"
+    "@votewise/client": "npm:*"
     "@votewise/config": "npm:*"
     "@votewise/crypto": "npm:*"
     "@votewise/debug": "npm:*"
     "@votewise/env": "npm:*"
     "@votewise/schemas": "npm:*"
     "@votewise/tsconfig": "npm:*"
+    "@votewise/types": "npm:*"
     "@votewise/ui": "npm:*"
     async: "npm:^3.2.6"
     autoprefixer: "npm:^10.4.20"

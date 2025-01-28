@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 
-import { auth } from "@/lib/auth";
+import { isAuthorized } from "@/lib/auth";
 import { onboard } from "@/lib/client.server";
 import { getOnboardingData } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
-type OnboardingData = ReturnType<typeof getOnboardingData>;
+type OnboardingData = Awaited<ReturnType<typeof getOnboardingData>>;
 
 export function getStepOneData() {
   const onboardingData = getOnboardingData();
@@ -64,11 +64,9 @@ export function getStepFiveData() {
 }
 
 export async function shouldNotOnboarded() {
-  const { accessToken } = auth<true>({ redirect: true });
-  const res = await onboard.isOnboarded(accessToken);
-  if (!res.success) {
-    throw new Error(res.error);
-  }
+  isAuthorized<true>({ redirect: true });
+  const res = await onboard.isOnboarded();
+  if (!res.success) throw new Error(res.error);
   if (res.data.is_onboarded) {
     return redirect(routes.app.root());
   }

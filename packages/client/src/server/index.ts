@@ -13,7 +13,7 @@ type Options = {
   domain?: string | undefined;
 };
 type Storage = {
-  get: (key: string) => string | null;
+  get: (key: string) => string | null | undefined;
   set: (key: string, value: string, options?: Options) => void;
   remove: (key: string) => void;
 };
@@ -55,7 +55,7 @@ export class Client {
   public readonly url: string | undefined;
   public readonly headers: Record<string, string> | undefined;
   public readonly fetch: Fetch = fetch;
-  private readonly storage: Storage | undefined;
+  private storage: Storage | undefined;
   private readonly headersFactory: () => Record<string, string>;
 
   constructor(opts?: ClientOptions) {
@@ -164,5 +164,9 @@ export class Client {
 
   public getStorage() {
     return this.storage;
+  }
+
+  public setStorage(storage: Storage) {
+    this.storage = storage;
   }
 }

@@ -23,7 +23,8 @@ const sessionManager = new SessionManager({
   jwtService: helpers.mockJWTService,
   cryptoService: helpers.mockCryptoService,
   assert: new Assertions(),
-  sessionRepository: helpers.mockSessionRepository
+  sessionRepository: helpers.mockSessionRepository,
+  accessTokenExpiration: 30 * Minute
 });
 const controller = new Controller({
   requestParser: requestParserPluginFactory(),
