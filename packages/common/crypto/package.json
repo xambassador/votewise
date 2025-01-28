@@ -11,6 +11,10 @@
     ".": {
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./edge": {
+      "import": "./dist/edge.mjs",
+      "require": "./dist/edge.js"
     }
   },
   "scripts": {

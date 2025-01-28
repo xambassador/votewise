@@ -1,4 +1,4 @@
-import type { AccessTokenPayload } from "@/types";
+import type { AccessTokenPayload } from "@votewise/jwt";
 import type { Challange, Factor, RefreshToken, User } from "@votewise/prisma/client";
 import type { Request, Response } from "express";
 

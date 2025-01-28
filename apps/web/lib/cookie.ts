@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { SigninResponse } from "@/app/(auth)/auth/signin/action";
+import type { SigninResponse } from "@votewise/client/auth";
 import type { TOnboard } from "@votewise/schemas/onboard";
 import type { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
@@ -36,7 +36,7 @@ export function setCookie(name: string, value: string, options?: Partial<Respons
   const encryptedValue = symmetricEncrypt(value, environment.APP_COOKIE_SECRET);
   cookieStore.set(name, encryptedValue, {
     path: "/",
-    secure: true,
+    secure: process.env.NODE_ENV === "production" ? true : false,
     sameSite: "strict",
     httpOnly: environment.NODE_ENV === "production",
     ...options
@@ -72,6 +72,10 @@ export function getFlashMessage() {
   } catch (err) {
     return null;
   }
+}
+
+export function setFlashMessage(title: string, message: string, type: "success" | "error") {
+  setCookie(COOKIE_KEYS.flash, JSON.stringify({ title, message, type }));
 }
 
 export function getOnboardingData() {

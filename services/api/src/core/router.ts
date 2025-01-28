@@ -14,6 +14,7 @@ import { resetPasswordControllerFactory } from "./auth/reset-password";
 import { singinControllerFactory } from "./auth/signin";
 import { verifyControllerFactory } from "./auth/verify";
 import { onboardControllerFactory } from "./user/onboard";
+import { getOnboardStatusControllerFactory } from "./user/onboard/get";
 import { listSessionsControllerFactory } from "./user/sessions/list";
 
 /**
@@ -41,6 +42,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.get(path + "/auth/verify/:verification_code", getVerificationSessionControllerFactory());
   router.get(path + "/user/sessions", auth, listSessionsControllerFactory());
   router.patch(path + "/user/onboard", auth, onboardControllerFactory());
+  router.get(path + "/user/onboard", auth, getOnboardStatusControllerFactory());
 
   return router;
 }

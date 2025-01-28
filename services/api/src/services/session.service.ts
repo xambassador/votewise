@@ -1,7 +1,7 @@
 import type { AppContext } from "@/context";
 import type { TInMemorySession } from "@/types";
 
-import { Minute, Second } from "@votewise/times";
+import { Second } from "@votewise/times";
 
 type SessionManagerOptions = {
   cache: AppContext["cache"];
@@ -9,6 +9,7 @@ type SessionManagerOptions = {
   jwtService: AppContext["jwtService"];
   assert: AppContext["assert"];
   sessionRepository: AppContext["repositories"]["session"];
+  accessTokenExpiration: number;
 };
 type CreateOptions = {
   subject: string;
@@ -52,7 +53,7 @@ export class SessionManager {
     } = opts;
     const sessionId = existingSessionId || this.ctx.cryptoService.generateUUID();
     const refreshToken = this.ctx.cryptoService.generateUUID().replace(/-/g, "");
-    const expiresIn = Minute * 30;
+    const expiresIn = this.ctx.accessTokenExpiration;
     const expiresAt = Date.now() + expiresIn;
     const accessToken = this.ctx.jwtService.signAccessToken(
       {

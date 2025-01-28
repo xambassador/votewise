@@ -1,0 +1,68 @@
+{
+  "name": "@votewise/client",
+  "description": "Votewise API client",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./client": {
+      "import": "./dist/client/index.mjs",
+      "require": "./dist/client/index.js"
+    },
+    "./upload": {
+      "import": "./dist/client/upload.mjs",
+      "require": "./dist/client/upload.js"
+    },
+    "./server": {
+      "import": "./dist/server/index.mjs",
+      "require": "./dist/server/index.js"
+    },
+    "./auth": {
+      "import": "./dist/services/auth.mjs",
+      "require": "./dist/services/auth.js"
+    },
+    "./onboard": {
+      "import": "./dist/services/onboard.mjs",
+      "require": "./dist/services/onboard.js"
+    }
+  },
+  "scripts": {
+    "dev": "rm -rf dist && tsup --watch",
+    "build": "tsup",
+    "clean:build": "rm -rf dist",
+    "clean": "rm -rf dist node_modules"
+  },
+  "dependencies": {
+    "@votewise/constant": "*",
+    "@votewise/debug": "*",
+    "@votewise/jwt": "*",
+    "@votewise/env": "*",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.6",
+    "@votewise/types": "*",
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.4"
+  },
+  "tsup": {
+    "entry": [
+      "./src/client/index.ts",
+      "./src/client/upload.ts",
+      "./src/server/index.ts",
+      "./src/services/auth.ts",
+      "./src/services/onboard.ts"
+    ],
+    "format": [
+      "cjs",
+      "esm"
+    ],
+    "sourcemap": true,
+    "dts": true,
+    "clean": true
+  }
+}

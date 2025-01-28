@@ -102,9 +102,7 @@ export class AppContext {
     const assert = new Assertions();
     const cache = new Cache();
     const db = prisma;
-    const jwtService = new JWTService({
-      accessTokenSecret: secrets.jwtSecret
-    });
+    const jwtService = new JWTService({ accessTokenSecret: secrets.jwtSecret });
     const cryptoService = new CryptoService();
     const userRepository = new UserRepository({ db });
     const factorRepository = new FactorRepository({ db });
@@ -113,7 +111,14 @@ export class AppContext {
     const sessionRepository = new SessionRepository({ db });
     const mailer = new Mailer({ env: environment });
     const tasksQueue = new TasksQueue({ env: environment });
-    const sessionManager = new SessionManager({ jwtService, cache, assert, cryptoService, sessionRepository });
+    const sessionManager = new SessionManager({
+      jwtService,
+      cache,
+      assert,
+      cryptoService,
+      sessionRepository,
+      accessTokenExpiration: cfg.jwt.accessTokenExpiration
+    });
     const requestParser = requestParserPluginFactory();
     const jwtPlugin = jwtPluginFactory({ jwtService });
     const ctx = new AppContext({
