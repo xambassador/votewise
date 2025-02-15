@@ -39,8 +39,8 @@
   "dependencies": {
     "@votewise/constant": "*",
     "@votewise/debug": "*",
-    "@votewise/jwt": "*",
     "@votewise/env": "*",
+    "@votewise/jwt": "*",
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {

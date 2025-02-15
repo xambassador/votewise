@@ -47,7 +47,7 @@ export const SelectScrollUpButton = forwardRef<SelectScrollUpButtonRef, SelectSc
   ({ className, ...props }, ref) => (
     <SelectPrimitive.ScrollUpButton
       ref={ref}
-      className={cn("flex cursor-default items-center justify-center py-1", className)}
+      className={cn("flex cursor-default items-center justify-center py-1 text-gray-400", className)}
       {...props}
     >
       <ChevronUpTiny />
@@ -62,7 +62,7 @@ export const SelectScrollDownButton = forwardRef<SelectScrollDownButtonRef, Sele
   ({ className, ...props }, ref) => (
     <SelectPrimitive.ScrollDownButton
       ref={ref}
-      className={cn("flex cursor-default items-center justify-center py-1", className)}
+      className={cn("flex cursor-default items-center justify-center py-1 text-gray-400", className)}
       {...props}
     >
       <ChevronDownTiny />
@@ -107,7 +107,11 @@ type SelectLabelRef = React.ElementRef<typeof SelectPrimitive.Label>;
 type SelectLabelProps = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>;
 
 export const SelectLabel = forwardRef<SelectLabelRef, SelectLabelProps>(({ className, ...props }, ref) => (
-  <SelectPrimitive.Label ref={ref} className={cn("px-2 py-1.5 text-sm font-semibold", className)} {...props} />
+  <SelectPrimitive.Label
+    ref={ref}
+    className={cn("px-2 py-1.5 text-sm font-semibold text-gray-400", className)}
+    {...props}
+  />
 ));
 
 type SelectItemRef = React.ElementRef<typeof SelectPrimitive.Item>;
@@ -135,7 +139,7 @@ type SelectSeparatorRef = React.ElementRef<typeof SelectPrimitive.Separator>;
 type SelectSeparatorProps = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator>;
 
 export const SelectSeparator = forwardRef<SelectSeparatorRef, SelectSeparatorProps>(({ className, ...props }, ref) => (
-  <SelectPrimitive.Separator ref={ref} className={cn("-mx-1 my-1 h-px", className)} {...props} />
+  <SelectPrimitive.Separator ref={ref} className={cn("-mx-1 my-1 h-px bg-nobelBlack-200", className)} {...props} />
 ));
 
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;

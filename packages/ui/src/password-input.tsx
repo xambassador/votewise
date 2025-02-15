@@ -15,7 +15,7 @@ import { Input, InputField } from "./input-field";
 export type PasswordInputProps = InputProps & { wrapperProps?: InputFieldProps };
 export const PasswordInput = forwardRef<InputRef, PasswordInputProps>((props, ref) => {
   const { wrapperProps, ...inputProps } = props;
-  const hasError = !!inputProps["data-has-error" as keyof typeof inputProps];
+  const hasError = !!inputProps["data-has-error"];
 
   const [showPassword, setShowPassword] = useState(false);
   const type = showPassword ? "text" : "password";

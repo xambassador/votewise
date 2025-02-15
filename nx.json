@@ -52,6 +52,12 @@
     },
     "test:watch": {
       "dependsOn": []
+    },
+    "storybook": {
+      "dependsOn": []
+    },
+    "storybook:build": {
+      "dependsOn": []
     }
   }
 }

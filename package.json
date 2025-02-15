@@ -31,6 +31,8 @@
     "dev": "lerna run dev --stream",
     "start": "lerna run start --stream",
     "build": "lerna run build --stream",
+    "storybook": "lerna run storybook --stream",
+    "storybook:build": "lerna run storybook:build --stream",
     "graph": "nx graph",
     "format": "prettier . --write \"**/*.{ts,tsx,md}\" --cache",
     "format:check": "prettier . --check \"**/*.{ts,tsx,md}\"",

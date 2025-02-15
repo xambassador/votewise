@@ -32,17 +32,26 @@ prefetchImages();
 
 type Props = {
   onSelect?: (background: string) => void;
+  backgroundList?: Background[];
 };
 
 export function BackgroundList(props: Props) {
-  const { onSelect } = props;
+  const { onSelect, backgroundList: _backgroundList } = props;
+  let list: Background[] | null = null;
+
+  if (errorDuringPrefetch) {
+    if (_backgroundList) list = _backgroundList;
+  } else {
+    list = backgroundList;
+  }
 
   return (
     <ScrollArea className="bg-nobelBlack-200 rounded-3xl border border-black-400 max-h-[calc((480/16)*1rem)]">
       <div className="items-center justify-center px-4 py-8 flex flex-wrap gap-7">
-        {errorDuringPrefetch && <div className="text-red-500">{error}</div>}
-        {!errorDuringPrefetch &&
-          backgroundList.map((bg) => (
+        {!list ? (
+          <div className="text-red-500">{error}</div>
+        ) : (
+          list.map((bg) => (
             <button key={bg.etag} onClick={() => onSelect?.(bg.url)}>
               <figure className="size-[calc((60/16)*1rem)] rounded-full overflow-hidden border-2 border-red-200">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -53,7 +62,8 @@ export function BackgroundList(props: Props) {
                 />
               </figure>
             </button>
-          ))}
+          ))
+        )}
       </div>
     </ScrollArea>
   );
