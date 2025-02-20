@@ -14,7 +14,7 @@ import { Input, InputField } from "./input-field";
 export type EmailInputProps = InputProps & { wrapperProps?: InputFieldProps };
 export const EmailInput = forwardRef<InputRef, EmailInputProps>((props, ref) => {
   const { wrapperProps, ...inputProps } = props;
-  const hasError = !!inputProps["data-has-error" as keyof typeof inputProps];
+  const hasError = !!inputProps["data-has-error"];
   return (
     <InputField {...wrapperProps} hasError={hasError}>
       <Mail className="text-gray-600" />
@@ -31,7 +31,7 @@ EmailInput.displayName = "EmailInput";
 type UsernameInputProps = InputProps & { wrapperProps?: InputFieldProps };
 export const UsernameInput = forwardRef<InputRef, UsernameInputProps>((props, ref) => {
   const { wrapperProps, ...inputProps } = props;
-  const hasError = !!inputProps["data-has-error" as keyof typeof inputProps];
+  const hasError = !!inputProps["data-has-error"];
   return (
     <InputField {...wrapperProps} hasError={hasError}>
       <User className="text-gray-600" />

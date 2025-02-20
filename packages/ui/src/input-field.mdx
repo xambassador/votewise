@@ -1,0 +1,30 @@
+import { Canvas, Meta } from "@storybook/blocks";
+
+import * as InputFieldStories from "./input-field.stories";
+
+<Meta of={InputFieldStories} />
+
+# InputField
+
+**InputField** is a wrapper component that enables the error state and composition with other components.
+This is useful when you want to create an input field with icons or buttons. By default it will render a blank div with default styles.
+
+<Canvas of={InputFieldStories.Default} />
+
+## With `Input` component
+
+By composing the `Input` component with the `InputField` component, you can easily create a form field with error state.
+
+<Canvas of={InputFieldStories.WithInput} />
+
+### With `hasError` state
+
+You can also pass the `hasError` prop to the `InputField` component to set the error state.
+
+<Canvas of={InputFieldStories.WithErrorState} />
+
+## Composition with other components
+
+We can also compose the `InputField` component with other components.
+
+<Canvas of={InputFieldStories.Composition} />

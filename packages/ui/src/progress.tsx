@@ -52,7 +52,9 @@ export function ProgressBar(props: ProgressBarProps) {
   const { progress, cx, cy, radius } = useProgress("ProgressBar");
   const len = 2 * Math.PI * 80;
   const strokeDashArray = len;
-  const strokeDashOffset = len - (progress / 100) * len;
+  const maxProgress = 100;
+  const p = progress > maxProgress ? maxProgress : progress;
+  const strokeDashOffset = len - (p / 100) * len;
   return (
     <circle
       {...props}

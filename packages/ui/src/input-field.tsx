@@ -21,7 +21,9 @@ export const InputField = forwardRef<HTMLDivElement, InputFieldProps>((props, re
 });
 InputField.displayName = "InputField";
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  "data-has-error"?: boolean;
+}
 
 export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const { id } = useInputField("Input");

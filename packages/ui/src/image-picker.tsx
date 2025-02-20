@@ -66,7 +66,7 @@ export function ImagePreview(props: ImagePreviewProps) {
     <figure {...imageWrapperProps} className={cn(theme.imagePreview, imageWrapperProps?.className)}>
       {spinner && (
         <div className="absolute inset-0 flex items-center justify-center bg-black-900">
-          <Spinner className="size-8 text-white" />
+          <Spinner className="size-8 text-white-50" />
         </div>
       )}
       <Img {...rest} src={preview || defaultUrl} alt={rest.alt || "User avatar"} />

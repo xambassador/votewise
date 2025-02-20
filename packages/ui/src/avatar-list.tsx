@@ -32,17 +32,26 @@ prefetchImages();
 
 type Props = {
   onSelect?: (avatar: string) => void;
+  avatarList?: Avatar[];
 };
 
 export function AvatarList(props: Props) {
-  const { onSelect } = props;
+  const { onSelect, avatarList: _avatarList } = props;
+  let list: Avatar[] | null = null;
+
+  if (errorDuringPrefetch) {
+    if (_avatarList) list = _avatarList;
+  } else {
+    list = avatarList;
+  }
 
   return (
     <ScrollArea className="bg-nobelBlack-200 rounded-3xl border border-black-400 max-h-[calc((480/16)*1rem)]">
       <div className="items-center justify-center px-4 py-8 flex flex-wrap gap-7">
-        {errorDuringPrefetch && <div className="text-red-500">{error}</div>}
-        {!errorDuringPrefetch &&
-          avatarList.map((avatar) => (
+        {!list ? (
+          <div className="text-red-500">{error}</div>
+        ) : (
+          list.map((avatar) => (
             <button key={avatar.etag} onClick={() => onSelect?.(avatar.url)}>
               <figure className="size-[calc((60/16)*1rem)] rounded-full overflow-hidden border-2 border-red-200">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -53,7 +62,8 @@ export function AvatarList(props: Props) {
                 />
               </figure>
             </button>
-          ))}
+          ))
+        )}
       </div>
     </ScrollArea>
   );
