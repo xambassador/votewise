@@ -8,8 +8,9 @@ const config = {
     ...votewiseTheme.content,
     "./index.html",
     "./src/**/*.{js,jsx,ts,tsx}",
-    "../web/**/*.{js,jsx,ts,tsx}",
-    "../../packages/ui/**/*.{js,jsx,ts,tsx}"
+    "../web/app/**/*.{js,jsx,ts,tsx}",
+    "../web/components/**/*.{js,jsx,ts,tsx}",
+    "../../packages/ui/src/**/*.{js,jsx,ts,tsx}"
   ]
 } satisfies Config;
 

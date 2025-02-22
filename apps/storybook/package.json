@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "storybook": "NODE_ENV=\"development\" storybook dev -p 6006",
+    "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "storybook:start": "npx serve -s storybook-static -l 6006 --cors"
   },
