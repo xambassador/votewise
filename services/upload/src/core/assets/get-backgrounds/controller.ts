@@ -26,7 +26,16 @@ export class Controller {
       .on("end", () => {
         Promise.all(promises).then(() => {
           const urls = results.map((r) => ({
-            url: "http://" + this.ctx.environment.MINIO_ENDPOINT + "/" + bucket + "/" + r.name,
+            // TODO: Protocol should be configurable
+            url:
+              "http://" +
+              this.ctx.environment.MINIO_ENDPOINT +
+              ":" +
+              this.ctx.environment.MINIO_PORT +
+              "/" +
+              bucket +
+              "/" +
+              r.name,
             name: r.name,
             etag: r.etag
           }));
