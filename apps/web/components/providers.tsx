@@ -27,5 +27,9 @@ export default function Providers(props: Props) {
 
 export function MotionProvider(props: Props) {
   const { children } = props;
-  return <LazyMotion features={domAnimation}>{children}</LazyMotion>;
+  return (
+    <LazyMotion strict features={domAnimation}>
+      {children}
+    </LazyMotion>
+  );
 }
