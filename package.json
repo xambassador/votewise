@@ -40,6 +40,7 @@
     "lint:fix": "lerna run lint --parallel --stream --no-bail -- --fix",
     "lint:report": "lerna run lint --parallel --stream --no-bail -- --report",
     "prepare": "husky",
+    "prepack": "husky",
     "commit": "cz"
   },
   "devDependencies": {
