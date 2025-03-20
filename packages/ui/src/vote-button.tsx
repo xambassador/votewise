@@ -53,7 +53,7 @@ const voted = <span className="text-transparent bg-clip-text bg-gradient-to-r fr
 
 export function VoteButton(props: VoteButtonProps) {
   const { setCount, count } = useVoteButton("VoteButton");
-  const { children, className, isVoted: _isVoted = false, ...rest } = props;
+  const { children, className, isVoted: _isVoted = false, onClick, ...rest } = props;
   const [isVoted, setIsVoted] = useState(_isVoted);
 
   if (isVoted) {
@@ -63,9 +63,10 @@ export function VoteButton(props: VoteButtonProps) {
   return (
     <button
       {...rest}
-      onClick={() => {
+      onClick={(e) => {
         setCount(count + 1);
         setIsVoted(true);
+        onClick?.(e);
       }}
       className={
         // Don't know why, but cn is not working on shadow classes and it is removing them from the output list
