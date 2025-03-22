@@ -28,6 +28,10 @@
     "./onboard": {
       "import": "./dist/services/onboard.mjs",
       "require": "./dist/services/onboard.js"
+    },
+    "./user": {
+      "import": "./dist/services/user.mjs",
+      "require": "./dist/services/user.js"
     }
   },
   "scripts": {
@@ -51,11 +55,9 @@
   },
   "tsup": {
     "entry": [
-      "./src/client/index.ts",
-      "./src/client/upload.ts",
-      "./src/server/index.ts",
-      "./src/services/auth.ts",
-      "./src/services/onboard.ts"
+      "./src/client/*.ts",
+      "./src/server/*.ts",
+      "./src/services/*.ts"
     ],
     "format": [
       "cjs",

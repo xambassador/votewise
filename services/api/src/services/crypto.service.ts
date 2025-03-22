@@ -92,7 +92,7 @@ export class CryptoService {
 
   public verifyOtp(secret: string, otp: string, digits = 6): boolean {
     const windowInSeconds = 300;
-    totp.options = { algorithm: HashAlgorithms.SHA256, digits, step: windowInSeconds };
+    totp.options = { algorithm: HashAlgorithms.SHA256, digits, step: windowInSeconds, window: 1 };
     return totp.check(otp, secret);
   }
 

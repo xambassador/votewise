@@ -14,15 +14,8 @@ type ControllerOptions = {
   cryptoService: AppContext["cryptoService"];
 };
 
-const {
-  INVALID_VERIFICATION_CODE,
-  INVALID_USER_ID,
-  USER_NOT_FOUND,
-  INVALID_EMAIL,
-  EMAIL_ALREADY_VERIFIED,
-  INVALID_OTP
-} = ERROR_CODES.AUTH;
-const { INVALID_REQUEST } = ERROR_CODES.COMMON;
+const { INVALID_VERIFICATION_CODE, USER_NOT_FOUND, INVALID_EMAIL, INVALID_OTP, VERIFICATION_CODE_EXPIRED } =
+  ERROR_CODES.AUTH;
 
 export class Controller {
   private readonly ctx: ControllerOptions;
@@ -32,30 +25,35 @@ export class Controller {
   }
 
   public async handle(req: Request, res: Response) {
-    const { body, locals } = this.ctx.requestParser.getParser(ZVerifyEmail).parseRequest(req, res);
-    const ip = locals.meta.ip;
+    const { body } = this.ctx.requestParser.getParser(ZVerifyEmail).parseRequest(req, res);
 
-    const _session = await this.ctx.cache.get(body.verification_code);
-    this.ctx.assert.invalidInput(!_session, "Invalid verification_code", INVALID_VERIFICATION_CODE);
+    const key = `email:${body.email}:verification`;
+    const _session = await this.ctx.cache.get(key);
+    this.ctx.assert.invalidInput(!_session, "Verification session expired. Try again.", VERIFICATION_CODE_EXPIRED);
 
-    const session = JSON.parse(_session!) as { userId: string; ip: string };
+    const session = JSON.parse(_session!) as { userId: string; ip: string; email: string; verificationCode: string };
+    this.ctx.assert.invalidInput(
+      session.verificationCode !== body.verification_code,
+      "Invalid verification code",
+      INVALID_VERIFICATION_CODE
+    );
 
-    this.ctx.assert.invalidInput(!(session.ip === ip), "Invalid request", INVALID_REQUEST);
-    this.ctx.assert.invalidInput(!(session.userId === body.user_id), "Invalid user_id", INVALID_USER_ID);
+    this.ctx.assert.invalidInput(session.email !== body.email, "Invalid email", INVALID_EMAIL);
 
-    const _user = await this.ctx.userRepository.findById(body.user_id);
-    this.ctx.assert.resourceNotFound(!_user, `User with id ${body.user_id} not found`, USER_NOT_FOUND);
-
+    const _user = await this.ctx.userRepository.findByEmail(body.email);
+    this.ctx.assert.resourceNotFound(!_user, `User with email ${body.email} not found`, USER_NOT_FOUND);
     const user = _user!;
-    this.ctx.assert.invalidInput(user.email !== body.email, "Invalid email", INVALID_EMAIL);
-    this.ctx.assert.invalidInput(user.is_email_verify, "Email is already verified", EMAIL_ALREADY_VERIFIED);
+
+    if (user.is_email_verify) {
+      return res.status(StatusCodes.OK).json({ user_id: user.id, email: user.email, is_email_verify: true });
+    }
 
     const secret = user.secret;
     const isValidOtp = this.ctx.cryptoService.verifyOtp(secret, body.otp);
     this.ctx.assert.invalidInput(!isValidOtp, "Invalid otp", INVALID_OTP);
 
-    await this.ctx.cache.del(body.verification_code);
-    await this.ctx.userRepository.update(body.user_id, {
+    await this.ctx.cache.del(key);
+    await this.ctx.userRepository.update(user.id, {
       is_email_verify: true,
       email_confirmed_at: new Date(),
       secret: this.ctx.cryptoService.generateUUID()

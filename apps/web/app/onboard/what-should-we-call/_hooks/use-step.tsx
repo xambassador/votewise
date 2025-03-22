@@ -6,12 +6,15 @@ import type { InputProps } from "@votewise/ui/input";
 import type Link from "next/link";
 import type { TWhatShouldWeCall } from "../../_utils/schema";
 
-import { useTransition } from "react";
+import { useEffect, useTransition } from "react";
+import { useDebounce } from "@/hooks/use-debounce";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { User } from "@votewise/client/user";
 import { useForm } from "@votewise/ui/form";
 
 import { chain } from "@/lib/chain";
+import { client } from "@/lib/client";
 
 import { ZWhatShouldWeCall } from "../../_utils/schema";
 import { onboard } from "../../action";
@@ -19,12 +22,27 @@ import { onboard } from "../../action";
 type LinkProps = React.ComponentProps<typeof Link>;
 type Keys = keyof TWhatShouldWeCall;
 
+const user = new User({ client });
+
 export function useStep(props: { defaultValues?: TWhatShouldWeCall }) {
   const [isPending, startTransition] = useTransition();
   const form = useForm<TWhatShouldWeCall>({
     resolver: zodResolver(ZWhatShouldWeCall),
     defaultValues: props.defaultValues
   });
+
+  const username = form.watch("userName");
+  const debouncedUsername = useDebounce(username);
+
+  useEffect(() => {
+    if (debouncedUsername) {
+      user.isUsernameAvailable(debouncedUsername).then((res) => {
+        if (!res.success) {
+          form.setError("userName", { message: res.error });
+        }
+      });
+    }
+  }, [debouncedUsername, form]);
 
   const handleSubmit = form.handleSubmit((data) => {
     startTransition(() => {

@@ -49,9 +49,6 @@ const ignoredHeaders = [
 ];
 
 export class Client {
-  private static nextInstanceId = 0;
-
-  private readonly instanceId: number;
   public readonly url: string | undefined;
   public readonly headers: Record<string, string> | undefined;
   public readonly fetch: Fetch = fetch;
@@ -59,13 +56,6 @@ export class Client {
   private readonly headersFactory: () => Record<string, string>;
 
   constructor(opts?: ClientOptions) {
-    this.instanceId = Client.nextInstanceId++;
-
-    if (this.instanceId > 0) {
-      // eslint-disable-next-line no-console
-      console.warn(`Multiple instances of Client detected.`);
-    }
-
     const settings = { ...DEFAULT_OPTIONS, ...opts };
 
     this.url = settings.url;
@@ -87,9 +77,26 @@ export class Client {
       const _options = { ...options, headers: { ...forwardedHeaders, ...this.headers, ...options.headers } };
       const response = await this.fetch(endpoint, _options);
       const isJson = response.headers.get("content-type")?.includes("application/json");
+      const responseHeaders: Record<string, string | string[]> = {};
+
+      response.headers.forEach((value, key) => {
+        if (key.toLowerCase() === "set-cookie") {
+          // Maybe there are multiple cookies in the response
+          responseHeaders[key] = responseHeaders[key] ? [...responseHeaders[key], value] : [value];
+        } else {
+          responseHeaders[key] = value;
+        }
+      });
+
       if (!response.ok && isJson) {
         const data = (await response.json()) as TApiErrorResponse;
-        return { success: false, error: data.error.message, errorData: data.error, status: response.status };
+        return {
+          success: false,
+          error: data.error.message,
+          errorData: data.error,
+          status: response.status,
+          headers: responseHeaders
+        };
       }
 
       if (!response.ok && !isJson) {
@@ -97,6 +104,7 @@ export class Client {
           success: false,
           error: response.statusText,
           status: response.status,
+          headers: responseHeaders,
           errorData: {
             message: response.statusText,
             name: "NetworkError",
@@ -106,7 +114,7 @@ export class Client {
       }
 
       const data = (await response.json()) as T;
-      return { success: true, data };
+      return { success: true, data, headers: responseHeaders };
     } catch (err) {
       let message = "Network Error";
       if (err instanceof Error) {

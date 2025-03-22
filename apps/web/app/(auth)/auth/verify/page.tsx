@@ -11,20 +11,20 @@ import { OTPForm } from "./_components/form";
 type VerificationSessionResponse = { user_id: string; ttl: number; total: number; email: string };
 
 export default async function Page() {
-  const userId = getCookie(COOKIE_KEYS.userId);
   const verificationCode = getCookie(COOKIE_KEYS.verificationCode);
+  const email = getCookie(COOKIE_KEYS.email);
 
-  if (!userId || !verificationCode) {
+  if (!verificationCode || !email) {
     return redirect(routes.auth.logout());
   }
 
-  const verificationResponse = await client.get<VerificationSessionResponse>(`/v1/auth/verify/${verificationCode}`);
+  const verificationResponse = await client.get<VerificationSessionResponse>(`/v1/auth/verify/${email}`);
 
   if (!verificationResponse.success) {
     return redirect(routes.auth.logout());
   }
 
-  if (userId !== verificationResponse.data.user_id) {
+  if (email !== verificationResponse.data.email) {
     return redirect(routes.auth.logout());
   }
 

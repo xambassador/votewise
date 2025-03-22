@@ -1,4 +1,5 @@
 import type { AppContext } from "@/context";
+import type { UserRegisterService } from "@/core/auth/register/service";
 import type { Request, Response } from "express";
 import type { Strategy } from "./strategies";
 
@@ -6,7 +7,9 @@ import { StatusCodes } from "http-status-codes";
 
 import { ERROR_CODES } from "@votewise/constant";
 import { ZSignin } from "@votewise/schemas";
-import { Milisecond } from "@votewise/times";
+
+import { COOKIE_KEYS } from "@/utils/constant";
+import { getCookieOptions } from "@/utils/cookie";
 
 type ControllerOptions = {
   requestParser: AppContext["plugins"]["requestParser"];
@@ -19,6 +22,7 @@ type ControllerOptions = {
   userRepository: AppContext["repositories"]["user"];
   sessionRepository: AppContext["repositories"]["session"];
   factorRepository: AppContext["repositories"]["factor"];
+  userRegisterService: UserRegisterService;
 };
 
 const { USER_NOT_FOUND, INVALID_CREDENTIALS, EMAIL_NOT_VERIFIED } = ERROR_CODES.AUTH;
@@ -42,11 +46,26 @@ export class Controller {
     const user = _user!;
     const isValid = await this.ctx.cryptoService.comparePassword(password, user.password);
     this.ctx.assert.invalidInput(!isValid, "Invalid credentials", INVALID_CREDENTIALS);
-    this.ctx.assert.invalidInput(
-      !user.is_email_verify,
-      `Email ${user.email} is not verified. Please verify your email`,
-      EMAIL_NOT_VERIFIED
-    );
+
+    const hasEmailVerified = user.is_email_verify;
+    if (!hasEmailVerified) {
+      const { verificationCode, expiresIn } = await this.ctx.userRegisterService.startVerificationProcess({
+        email: user.email,
+        userId: user.id,
+        secret: user.secret,
+        ip
+      });
+      return res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
+        error: {
+          status_code: StatusCodes.UNPROCESSABLE_ENTITY,
+          message: `Email ${user.email} is not verified. We have sent a verification code to your email. Please verify your email to continue.`,
+          name: "UnprocessableEntityError",
+          error_code: EMAIL_NOT_VERIFIED,
+          verification_code: verificationCode,
+          expires_in: expiresIn
+        }
+      });
+    }
 
     const factors = await this.ctx.factorRepository.findByUserId(user.id);
     const verifiedFactors = factors
@@ -70,11 +89,19 @@ export class Controller {
     const lastLogin = new Date();
     await this.ctx.userRepository.update(user.id, { last_login: lastLogin });
 
+    const { accessToken, refreshToken } = COOKIE_KEYS;
+    res.cookie(
+      accessToken,
+      session.accessToken,
+      getCookieOptions({ expires: new Date(Date.now() + session.expiresInMs) })
+    );
+    res.cookie(refreshToken, session.refreshToken, getCookieOptions());
+
     return res.status(StatusCodes.OK).json({
       access_token: session.accessToken,
       refresh_token: session.refreshToken,
       token_type: "Bearer",
-      expires_in: session.expiresInSec * Milisecond,
+      expires_in: session.expiresInMs,
       expires_at: session.expiresAt,
       user: {
         id: user.id,

@@ -1,5 +1,6 @@
 import chrona from "chrona";
 import compression from "compression";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import { json, urlencoded } from "express";
 import helmet from "helmet";
@@ -13,9 +14,10 @@ export class AppMiddleware {
 
   public register() {
     const extractIp = extractIpMiddlewareFactory();
-    const ctx = AppContext.getInjectionTokens(["config", "logger"]);
+    const ctx = AppContext.getInjectionTokens(["config", "logger", "environment"]);
     return [
       chrona(":date :incoming :method :url :status :response-time :remote-address", (l) => ctx.logger.info(l)),
+      cookieParser(ctx.environment.API_COOKIE_SECRET),
       compression(),
       cors(ctx.config.cors),
       helmet(),

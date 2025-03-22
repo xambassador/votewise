@@ -1,6 +1,7 @@
 import type { User } from "../../../../../test/helpers";
 import type { EmailStrategy, UsernameStrategy } from "../strategies";
 
+import { mockTaskQueue } from "@/queues/__mock__";
 import { mockFactorRepository } from "@/repository/__mock__/factor.repository";
 import { mockRefreshTokenRepository } from "@/repository/__mock__/refresh-token.repository";
 import { mockSessionRepository } from "@/repository/__mock__/session.repository";
@@ -49,5 +50,6 @@ export {
   mockCache,
   mockSessionRepository,
   mockFactorRepository,
-  mockRefreshTokenRepository
+  mockRefreshTokenRepository,
+  mockTaskQueue
 };

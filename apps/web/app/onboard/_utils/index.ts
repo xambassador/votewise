@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { isAuthorized } from "@/lib/auth";
 import { onboard } from "@/lib/client.server";
-import { getOnboardingData } from "@/lib/cookie";
+import { getOnboardingData, getUser } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
 type OnboardingData = Awaited<ReturnType<typeof getOnboardingData>>;
@@ -65,7 +65,9 @@ export function getStepFiveData() {
 
 export async function shouldNotOnboarded() {
   isAuthorized<true>({ redirect: true });
-  const res = await onboard.isOnboarded();
+  const user = getUser();
+  if (!user) throw new Error("User not found");
+  const res = await onboard.isOnboarded(user.id);
   if (!res.success) throw new Error(res.error);
   if (res.data.is_onboarded) {
     return redirect(routes.app.root());

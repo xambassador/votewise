@@ -6,6 +6,7 @@ import { AuthenticationError } from "@votewise/errors";
 
 import { AppContext } from "@/context";
 import { ExceptionLayer } from "@/lib/exception-layer";
+import { COOKIE_KEYS } from "@/utils/constant";
 
 export function authMiddlewareFactory() {
   const ctx = AppContext.getInjectionTokens(["jwtService", "sessionManager", "repositories"]);
@@ -28,6 +29,11 @@ export function authMiddlewareFactory() {
 }
 
 function getAuthorizationToken(req: Request) {
+  const signedCookie = req.signedCookies;
+  if (signedCookie && signedCookie[COOKIE_KEYS.accessToken]) {
+    return signedCookie[COOKIE_KEYS.accessToken];
+  }
+
   const authorization = req.headers.authorization;
   if (!authorization) {
     throw new AuthenticationError("Authorization header is missing");

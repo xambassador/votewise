@@ -24,6 +24,10 @@
     "./onboard": {
       "import": "./dist/onboard.mjs",
       "require": "./dist/onboard.js"
+    },
+    "./user": {
+      "import": "./dist/user.mjs",
+      "require": "./dist/user.js"
     }
   },
   "scripts": {
@@ -41,10 +45,7 @@
   },
   "tsup": {
     "entry": [
-      "./src/index.ts",
-      "./src/auth.ts",
-      "./src/upload.ts",
-      "./src/onboard.ts"
+      "./src/*.ts"
     ],
     "format": [
       "cjs",
