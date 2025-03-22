@@ -4,7 +4,7 @@ import type { StateSnapshot, VirtuosoHandle } from "react-virtuoso";
 
 import styles from "./feed-list.module.css";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Virtuoso } from "react-virtuoso";
 
 import { truncateOnWord } from "@votewise/text";
@@ -23,6 +23,7 @@ import {
   FeedUserHandle,
   FeedUserName
 } from "@votewise/ui/cards/feed";
+import { Confetti } from "@votewise/ui/confetti";
 import { Comment } from "@votewise/ui/icons/comment";
 import { PaperPlane } from "@votewise/ui/icons/paper-plane";
 import { Separator } from "@votewise/ui/separator";
@@ -81,48 +82,57 @@ export function FeedList() {
           ? virtuosoState?.current?.getState((state: StateSnapshot) => state)
           : virtuosoState
       }
-      itemContent={(index, data) => (
-        <Feed>
-          <VoteProvider>
-            <VoteCount />
-            <VoteButton>Vote</VoteButton>
-          </VoteProvider>
-          <Separator orientation="vertical" className="min-h-[200px] h-auto" />
-          <FeedContainer>
-            <div className="flex gap-2">
-              <Avatar className="size-12">
-                <AvatarFallback>JD</AvatarFallback>
-                <AvatarImage src={data.user.avatar} alt={data.user.name} />
-              </Avatar>
-              <FeedContent>
-                <FeedHeader>
-                  <FeedUserName>{data.user.name}</FeedUserName>
-                  <FeedUserHandle>{data.user.handle}</FeedUserHandle>
-                  <FeedTimeAgo>{data.user.timeAgo}</FeedTimeAgo>
-                </FeedHeader>
-                <FeedContentText>{truncateOnWord(data.content.text, 128)}</FeedContentText>
-                <FeedContentTags>
-                  {data.content.tags.map((tag) => (
-                    <span key={tag}>{tag}</span>
-                  ))}
-                </FeedContentTags>
-                <FeedImages className="mt-2" images={data.content.images.map((image) => image.src)} />
-              </FeedContent>
-            </div>
-
-            <FeedFooter>
-              <FeedFooterItem>
-                <Comment className="text-gray-400" />
-                <span className="text-gray-400 text-xs">3 discussions</span>
-              </FeedFooterItem>
-              <FeedFooterItem>
-                <PaperPlane className="text-gray-400" />
-                <span className="text-gray-400 text-xs">Share</span>
-              </FeedFooterItem>
-            </FeedFooter>
-          </FeedContainer>
-        </Feed>
-      )}
+      itemContent={(index, data) => <FeedItem feed={data} key={data.id + "-" + index} />}
     />
+  );
+}
+
+function FeedItem(props: { feed: (typeof data)[0] }) {
+  const { feed } = props;
+
+  const [isVoted, setIsVoted] = useState(false);
+
+  return (
+    <Feed>
+      <VoteProvider>
+        <VoteCount />
+        {isVoted && <Confetti amount={30} />}
+        <VoteButton onClick={() => setIsVoted(true)}>Vote</VoteButton>
+      </VoteProvider>
+      <Separator orientation="vertical" className="min-h-[200px] h-auto" />
+      <FeedContainer>
+        <div className="flex gap-2">
+          <Avatar className="size-12">
+            <AvatarFallback>JD</AvatarFallback>
+            <AvatarImage src={feed.user.avatar} alt={feed.user.name} />
+          </Avatar>
+          <FeedContent>
+            <FeedHeader>
+              <FeedUserName>{feed.user.name}</FeedUserName>
+              <FeedUserHandle>{feed.user.handle}</FeedUserHandle>
+              <FeedTimeAgo>{feed.user.timeAgo}</FeedTimeAgo>
+            </FeedHeader>
+            <FeedContentText>{truncateOnWord(feed.content.text, 128)}</FeedContentText>
+            <FeedContentTags>
+              {feed.content.tags.map((tag) => (
+                <span key={tag}>{tag}</span>
+              ))}
+            </FeedContentTags>
+            <FeedImages className="mt-2" images={feed.content.images.map((image) => image.src)} />
+          </FeedContent>
+        </div>
+
+        <FeedFooter>
+          <FeedFooterItem>
+            <Comment className="text-gray-400" />
+            <span className="text-gray-400 text-xs">3 discussions</span>
+          </FeedFooterItem>
+          <FeedFooterItem>
+            <PaperPlane className="text-gray-400" />
+            <span className="text-gray-400 text-xs">Share</span>
+          </FeedFooterItem>
+        </FeedFooter>
+      </FeedContainer>
+    </Feed>
   );
 }
