@@ -43,6 +43,14 @@ function checkStepFourData(data: OnboardingData) {
   return stepThreeData;
 }
 
+function checkStepFiveData(data: OnboardingData) {
+  const stepFourData = checkStepFourData(data);
+  if (!stepFourData.location) {
+    return redirect(routes.onboard.step5());
+  }
+  return stepFourData;
+}
+
 export function getStepTwoData() {
   const onboardingData = getOnboardingData();
   return checkStepOneData(onboardingData);
@@ -61,6 +69,11 @@ export function getStepFourData() {
 export function getStepFiveData() {
   const onboardingData = getOnboardingData();
   return checkStepFourData(onboardingData);
+}
+
+export function getStepSixData() {
+  const onboardingData = getOnboardingData();
+  return checkStepFiveData(onboardingData);
 }
 
 export async function shouldNotOnboarded() {

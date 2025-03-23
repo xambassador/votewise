@@ -21,6 +21,8 @@ type OnboardBody = {
   instagram_url?: string | undefined;
   twitter_url?: string | undefined;
 };
+type GetTopicsResponse = { topics: { id: string; name: string }[] };
+
 export class Onboard {
   private readonly client: Client | ServerClient;
 
@@ -37,6 +39,12 @@ export class Onboard {
   public async onboard(userId: string, data: OnboardBody): Promise<TFetchResult<OnboardResponse>> {
     const path = `/v1/users/${userId}/onboard`;
     const res = await this.client.patch<OnboardResponse, OnboardBody>(path, data);
+    return res;
+  }
+
+  public async getTopics(): Promise<TFetchResult<GetTopicsResponse>> {
+    const path = `/v1/topics`;
+    const res = await this.client.get<GetTopicsResponse>(path);
     return res;
   }
 }
