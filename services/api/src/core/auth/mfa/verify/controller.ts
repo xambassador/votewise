@@ -5,7 +5,10 @@ import { StatusCodes } from "http-status-codes";
 
 import { ERROR_CODES } from "@votewise/constant";
 import { ZVerifyChallenge } from "@votewise/schemas";
+import { Day } from "@votewise/times";
 
+import { COOKIE_KEYS } from "@/utils/constant";
+import { getCookieOptions } from "@/utils/cookie";
 import { getAuthenticateLocals } from "@/utils/locals";
 
 type ControllerOptions = {
@@ -77,6 +80,17 @@ export class Controller {
       user_aal_level: payload.user_aal_level
     });
     await this.ctx.sessionManager.update(session.sessionId, { aal: "aal2", factorId: factor.id });
+
+    res.cookie(
+      COOKIE_KEYS.accessToken,
+      session.accessToken,
+      getCookieOptions({ expires: new Date(Date.now() + session.expiresInMs) })
+    );
+    res.cookie(
+      COOKIE_KEYS.refreshToken,
+      session.refreshToken,
+      getCookieOptions({ expires: new Date(Date.now() + 30 * Day) })
+    );
 
     return res.status(StatusCodes.OK).json({
       access_token: session.accessToken,

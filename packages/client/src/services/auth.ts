@@ -109,8 +109,16 @@ export class Auth {
     return res;
   }
 
-  public async challengeFactor(factorId: string): Promise<TFetchResult<ChallengeFactorResponse>> {
-    const res = await this.client.post<ChallengeFactorResponse, object>(`/v1/auth/factors/${factorId}/challenge`, {});
+  public async challengeFactor(factorId: string, token?: string): Promise<TFetchResult<ChallengeFactorResponse>> {
+    const res = await this.client.post<ChallengeFactorResponse, object>(
+      `/v1/auth/factors/${factorId}/challenge`,
+      {},
+      {
+        headers: {
+          ...(token ? { Authorization: `Votewise ${token}` } : {})
+        }
+      }
+    );
     return res;
   }
 

@@ -7,6 +7,7 @@ import { StatusCodes } from "http-status-codes";
 
 import { ERROR_CODES } from "@votewise/constant";
 import { ZSignin } from "@votewise/schemas";
+import { Day } from "@votewise/times";
 
 import { COOKIE_KEYS } from "@/utils/constant";
 import { getCookieOptions } from "@/utils/cookie";
@@ -95,7 +96,7 @@ export class Controller {
       session.accessToken,
       getCookieOptions({ expires: new Date(Date.now() + session.expiresInMs) })
     );
-    res.cookie(refreshToken, session.refreshToken, getCookieOptions());
+    res.cookie(refreshToken, session.refreshToken, getCookieOptions({ expires: new Date(Date.now() + 30 * Day) }));
 
     return res.status(StatusCodes.OK).json({
       access_token: session.accessToken,
