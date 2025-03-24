@@ -71,7 +71,7 @@ export class Controller {
       access_token: session.accessToken,
       refresh_token: session.refreshToken,
       token_type: "Bearer",
-      expires_in: session.expiresInSec,
+      expires_in: session.expiresInMs,
       expires_at: session.expiresAt
     });
   }

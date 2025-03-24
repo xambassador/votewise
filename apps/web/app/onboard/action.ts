@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 
 import { isAuthorized } from "@/lib/auth";
 import { onboard as onboardClient } from "@/lib/client.server";
-import { clearCookie, COOKIE_KEYS, setCookie, setOnboardingData } from "@/lib/cookie";
+import { COOKIE_KEYS, getUser, setCookie, setOnboardingData } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
 import { getStepFiveData } from "./_utils";
@@ -46,8 +46,17 @@ export async function onboard(props: Props): Promise<TActionResponse<OnboardResp
 
   if (props.step === 5) {
     const stepFiveData = getStepFiveData();
+    setOnboardingData({ ...stepFiveData, ...props });
+    const user = getUser();
+    if (!user) {
+      return {
+        success: false,
+        error: "User not found",
+        errorData: { status_code: 401, name: "Unauthorized", message: "User not found" }
+      };
+    }
     const onboardingData = { ...stepFiveData, ...props };
-    const res = await onboardClient.onboard(onboardingData);
+    const res = await onboardClient.onboard(user.id, onboardingData);
     if (!res.success) {
       return { success: false, error: res.error, errorData: res.errorData };
     }
@@ -56,8 +65,7 @@ export async function onboard(props: Props): Promise<TActionResponse<OnboardResp
       JSON.stringify({ message: "Welcome to Votewise!", title: "Onboard complete!", type: "success" })
     );
     setCookie(COOKIE_KEYS.isOnboarded, "true");
-    clearCookie(COOKIE_KEYS.onboard);
-    return redirect(routes.app.root());
+    return redirect(routes.onboard.step6());
   }
 
   return redirect(routes.onboard.step1());

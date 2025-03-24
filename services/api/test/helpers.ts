@@ -12,6 +12,7 @@ export function buildRes(overrides: Partial<Response> = {}) {
     json: jest.fn(() => res).mockName("json"),
     status: jest.fn(() => res).mockName("status"),
     locals: {},
+    cookie: jest.fn(),
     ...overrides
   };
   return res as jest.Mocked<Response>;

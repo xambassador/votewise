@@ -131,6 +131,7 @@ model User {
     factors          Factor[]
     sessions         Session[]
     refreshTokens    RefreshToken[]
+    interests        UserInterests[]
 }
 
 model Factor {
@@ -392,6 +393,26 @@ model RefreshToken {
     user_id String
     user    User    @relation(fields: [user_id], references: [id])
     revoked Boolean @default(false)
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model Topics {
+    id   String @id @default(cuid())
+    name String @unique
+
+    created_at    DateTime        @default(now())
+    updated_at    DateTime        @updatedAt
+    userInterests UserInterests[]
+}
+
+model UserInterests {
+    id       String @id @default(cuid())
+    user_id  String
+    user     User   @relation(fields: [user_id], references: [id])
+    topic_id String
+    topic    Topics @relation(fields: [topic_id], references: [id])
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt

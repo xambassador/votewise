@@ -1,12 +1,15 @@
 import { StatusCodes } from "http-status-codes";
 
+import { ERROR_CODES } from "@votewise/constant";
 import { Assertions } from "@votewise/errors";
 import { Minute } from "@votewise/times";
 
 import { requestParserPluginFactory } from "@/plugins/request-parser";
 import { SessionManager } from "@/services/session.service";
+import { COOKIE_KEYS } from "@/utils/constant";
 
 import { buildReq, buildRes } from "../../../../../test/helpers";
+import { UserRegisterService } from "../../register/service";
 import { Controller } from "../controller";
 import { EmailStrategy, UsernameStrategy } from "../strategies";
 import * as helpers from "./helpers";
@@ -26,6 +29,11 @@ const sessionManager = new SessionManager({
   sessionRepository: helpers.mockSessionRepository,
   accessTokenExpiration: 30 * Minute
 });
+const userRegisterService = new UserRegisterService({
+  tasksQueue: helpers.mockTaskQueue,
+  cache: helpers.mockCache,
+  cryptoService: helpers.mockCryptoService
+});
 const controller = new Controller({
   requestParser: requestParserPluginFactory(),
   cryptoService: helpers.mockCryptoService,
@@ -39,7 +47,8 @@ const controller = new Controller({
   userRepository: helpers.mockUserRepository,
   sessionRepository: helpers.mockSessionRepository,
   refreshTokenRepository: helpers.mockRefreshTokenRepository,
-  factorRepository: helpers.mockFactorRepository
+  factorRepository: helpers.mockFactorRepository,
+  userRegisterService
 });
 
 beforeEach(() => {
@@ -95,13 +104,25 @@ describe("Signin Controller", () => {
     expect(error.message).toBe("Invalid credentials");
   });
 
-  it("should throw error if email is not verified", async () => {
+  it("should resend OTP if email is not verified", async () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
+    const verificationCode = "verification_code";
     const { user } = helpers.setupHappyPath({ is_email_verify: false });
-    const error = await controller.handle(req, res).catch((e) => e);
+    helpers.mockCryptoService.generateUUID.mockReturnValue(verificationCode);
+    await controller.handle(req, res).catch((e) => e);
     expect(helpers.mockJWTService.signAccessToken).not.toHaveBeenCalled();
-    expect(error.message).toBe(`Email ${user.email} is not verified. Please verify your email`);
+    expect(res.status).toHaveBeenCalledWith(StatusCodes.UNPROCESSABLE_ENTITY);
+    expect(res.json.mock.calls[0]?.[0]).toEqual({
+      error: {
+        status_code: StatusCodes.UNPROCESSABLE_ENTITY,
+        message: `Email ${user.email} is not verified. We have sent a verification code to your email. Please verify your email to continue.`,
+        name: "UnprocessableEntityError",
+        error_code: ERROR_CODES.AUTH.EMAIL_NOT_VERIFIED,
+        verification_code: verificationCode,
+        expires_in: 5 * Minute
+      }
+    });
   });
 
   it("should create a session and return JWT", async () => {
@@ -160,6 +181,10 @@ describe("Signin Controller", () => {
         user_aal_level: "aal1"
       }
     });
+    expect(res.cookie.mock.calls[0]?.[0]).toBe(COOKIE_KEYS.accessToken);
+    expect(res.cookie.mock.calls[0]?.[1]).toBe(accessToken);
+    expect(res.cookie.mock.calls[1]?.[0]).toBe(COOKIE_KEYS.refreshToken);
+    expect(res.cookie.mock.calls[1]?.[1]).toBe(refreshToken);
   });
 
   describe("Signin strategy", () => {
@@ -173,7 +198,8 @@ describe("Signin Controller", () => {
       userRepository: helpers.mockUserRepository,
       sessionRepository: helpers.mockSessionRepository,
       refreshTokenRepository: helpers.mockRefreshTokenRepository,
-      factorRepository: helpers.mockFactorRepository
+      factorRepository: helpers.mockFactorRepository,
+      userRegisterService
     });
 
     it("should pick correct strategy", async () => {

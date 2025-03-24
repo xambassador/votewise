@@ -19,7 +19,8 @@ export const routes = {
     step2: () => "/onboard/tell-us-about-you",
     step3: () => "/onboard/your-photos-shine",
     step4: () => "/onboard/your-profile-stands-out",
-    step5: () => "/onboard/connect-your-socials"
+    step5: () => "/onboard/connect-your-socials",
+    step6: () => "/onboard/pick-topics"
   },
   app: {
     root: () => "/"

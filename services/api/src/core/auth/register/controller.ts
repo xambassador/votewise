@@ -1,19 +1,18 @@
 import type { AppContext } from "@/context";
 import type { Request, Response } from "express";
+import type { UserRegisterService } from "./service";
 
 import { StatusCodes } from "http-status-codes";
 
 import { ERROR_CODES } from "@votewise/constant";
 import { ZRegister } from "@votewise/schemas";
-import { Minute } from "@votewise/times";
 
 type ControllerOptions = {
   userRepository: AppContext["repositories"]["user"];
   cryptoService: AppContext["cryptoService"];
-  cache: AppContext["cache"];
-  tasksQueue: AppContext["queues"]["tasksQueue"];
   assert: AppContext["assert"];
   requestParser: AppContext["plugins"]["requestParser"];
+  userRegisterService: UserRegisterService;
 };
 
 const { EMAIL_ALREADY_EXISTS } = ERROR_CODES.AUTH;
@@ -42,22 +41,11 @@ export class Controller {
       last_name: "INVALID_LAST_NAME"
     });
 
-    const otp = this.ctx.cryptoService.getOtp(createdUser.secret);
-    const verificationCode = this.ctx.cryptoService.generateUUID().replace(/-/g, "");
-    const expiresIn = 5 * Minute;
-    const data = { userId: createdUser.id, ip, email: body.email };
-    await this.ctx.cache.setWithExpiry(verificationCode, JSON.stringify(data), expiresIn);
-
-    this.ctx.tasksQueue.add({
-      name: "email",
-      payload: {
-        to: body.email,
-        subject: "Verify your email",
-        templateName: "signup",
-        locals: {
-          otp
-        }
-      }
+    const { verificationCode, expiresIn } = await this.ctx.userRegisterService.startVerificationProcess({
+      userId: createdUser.id,
+      email: body.email,
+      ip,
+      secret: createdUser.secret
     });
 
     return res.status(StatusCodes.CREATED).json({

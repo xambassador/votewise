@@ -12,7 +12,15 @@ export default function Page() {
         <OnboardSubtitle>Hello 👋, {name}</OnboardSubtitle>
         <OnboardTitle>Connect Your Socials and Location!</OnboardTitle>
       </OnboardHeader>
-      <SocialsForm />
+      <SocialsForm
+        defaultValues={{
+          location: onboardingData.location,
+          facebook: onboardingData.facebook_url,
+          instagram: onboardingData.instagram_url,
+          twitter: onboardingData.twitter_url,
+          name
+        }}
+      />
     </OnboardContainer>
   );
 }

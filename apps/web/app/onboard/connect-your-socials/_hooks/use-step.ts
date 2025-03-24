@@ -18,11 +18,14 @@ import { routes } from "@/lib/routes";
 
 type LinkProps = React.ComponentProps<typeof Link>;
 type FormProps = React.ComponentProps<"form">;
+type Props = { defaultValues?: TConnectYourSocials };
 
-export function useStep() {
+export function useStep(props?: Props) {
+  const { defaultValues } = props || {};
   const [isPending, startTransition] = useTransition();
   const form = useForm<TConnectYourSocials>({
-    resolver: zodResolver(ZConnectYourSocials)
+    resolver: zodResolver(ZConnectYourSocials),
+    defaultValues
   });
 
   function onSubmit(data: TConnectYourSocials) {

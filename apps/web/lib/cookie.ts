@@ -5,6 +5,8 @@ import type { TOnboard } from "@votewise/schemas/onboard";
 import type { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
 import { cookies } from "next/headers";
+import { parse } from "cookie";
+import { signedCookie } from "cookie-parser";
 
 import { symmetricDecrypt, symmetricEncrypt } from "@votewise/crypto";
 import { environment } from "@votewise/env";
@@ -28,6 +30,11 @@ export function getCookie(name: string): string | null {
   const cookie = cookieStore.get(name);
   if (!cookie) return null;
   if (!cookie.value) return null;
+  if ([COOKIE_KEYS.accessToken, COOKIE_KEYS.refreshToken].includes(name)) {
+    const v = signedCookie(cookie.value, environment.API_COOKIE_SECRET);
+    if (!v) return null;
+    return v;
+  }
   return symmetricDecrypt(cookie.value, environment.APP_COOKIE_SECRET);
 }
 
@@ -99,9 +106,53 @@ export function getUser() {
   const user = getCookie(COOKIE_KEYS.user);
   if (!user) return null;
   try {
-    const data = JSON.parse(user) as SigninResponse;
+    const data = JSON.parse(user) as SigninResponse["user"];
     return data;
   } catch (err) {
     return null;
+  }
+}
+
+const knownCookies = Object.values(COOKIE_KEYS);
+
+export function forwardCookie(header: Record<string, string | string[]> = {}) {
+  const cookieHeader = header["set-cookie"];
+  if (!cookieHeader) return;
+  const cookieStore = cookies();
+  if (Array.isArray(cookieHeader)) {
+    cookieHeader.forEach((cookie) => {
+      const parsed = parse(cookie);
+      const options = {} as Partial<ResponseCookie>;
+      Object.keys(parsed).forEach((key) => {
+        if (knownCookies.includes(key)) {
+          const value = parsed[key] || "";
+          if (parsed.SameSite) {
+            options.sameSite = parsed.SameSite as "strict" | "lax" | "none";
+          }
+
+          if (parsed.Path) {
+            options.path = parsed.Path;
+          }
+
+          if (parsed.Expires) {
+            options.expires = new Date(parsed.Expires);
+          }
+
+          if (parsed.Domain) {
+            options.domain = parsed.Domain;
+          }
+
+          if (parsed.Secure) {
+            options.secure = true;
+          }
+
+          cookieStore.set(key, value, {
+            secure: environment.NODE_ENV === "production",
+            httpOnly: environment.NODE_ENV === "production",
+            ...options
+          });
+        }
+      });
+    });
   }
 }

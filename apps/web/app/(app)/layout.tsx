@@ -15,7 +15,7 @@ export default async function Layout(props: Props) {
   if (user.aal !== user.user_aal_level) {
     return redirect(routes.auth.verify2FA());
   }
-  const onboardedResult = await onboard.isOnboarded();
+  const onboardedResult = await onboard.isOnboarded(user.sub);
   if (!onboardedResult.success) {
     throw new Error(onboardedResult.error);
   }

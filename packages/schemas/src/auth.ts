@@ -43,8 +43,7 @@ export const ZRegister = z.object({
 export const ZVerifyEmail = z.object({
   email: ZEmail,
   verification_code: ZVerificationCode,
-  otp: ZOtp,
-  user_id: ZUserId
+  otp: ZOtp
 });
 
 export const ZSignin = z

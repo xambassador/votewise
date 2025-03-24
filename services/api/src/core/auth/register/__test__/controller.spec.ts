@@ -7,6 +7,7 @@ import { requestParserPluginFactory } from "@/plugins/request-parser";
 
 import { buildReq, buildRes, buildUser } from "../../../../../test/helpers";
 import { Controller } from "../controller";
+import { UserRegisterService } from "../service";
 import * as helpers from "./helpers";
 
 const user = buildUser();
@@ -17,13 +18,17 @@ const body = {
   password: "Johndoe@123"
 };
 const assert = new Assertions();
-const controller = new Controller({
-  assert,
+const service = new UserRegisterService({
   cache: helpers.mockCache,
   cryptoService: helpers.mockCryptoService,
-  tasksQueue: helpers.mockTaskQueue,
+  tasksQueue: helpers.mockTaskQueue
+});
+const controller = new Controller({
+  assert,
+  cryptoService: helpers.mockCryptoService,
   userRepository: helpers.mockUserRepository,
-  requestParser: requestParserPluginFactory()
+  requestParser: requestParserPluginFactory(),
+  userRegisterService: service
 });
 
 beforeEach(() => {
@@ -59,7 +64,7 @@ describe("Register Controller", () => {
     const res = buildRes({ locals });
     const { otp, uuid: verificationCode, defaultUserName } = helpers.setupHappyPath();
     const windowExpiryIn = 5 * Minute;
-    const data = JSON.stringify({ userId: user.id, ip, email: body.email });
+    const data = JSON.stringify({ userId: user.id, ip, email: body.email, verificationCode });
     const createBody = {
       email: body.email,
       password: "hashed-password",
@@ -83,11 +88,12 @@ describe("Register Controller", () => {
       verification_code: verificationCode,
       expires_in: windowExpiryIn
     };
+    const key = `email:${user.email}:verification`;
 
     await controller.handle(req, res);
 
     expect(helpers.mockUserRepository.create).toHaveBeenCalledWith(createBody);
-    expect(helpers.mockCache.setWithExpiry).toHaveBeenCalledWith(verificationCode, data, windowExpiryIn);
+    expect(helpers.mockCache.setWithExpiry).toHaveBeenCalledWith(key, data, windowExpiryIn);
     expect(helpers.mockTaskQueue.add).toHaveBeenCalledWith(queueData);
     expect(res.status).toHaveBeenCalledWith(StatusCodes.CREATED);
     expect(res.json).toHaveBeenCalledWith(response);

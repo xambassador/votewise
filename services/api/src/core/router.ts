@@ -13,6 +13,8 @@ import { registerControllerFactory } from "./auth/register";
 import { resetPasswordControllerFactory } from "./auth/reset-password";
 import { singinControllerFactory } from "./auth/signin";
 import { verifyControllerFactory } from "./auth/verify";
+import { getAllTopicsControllerFactory } from "./topics/get-all";
+import { getUsernameExistsControllerFactory } from "./user/exists";
 import { onboardControllerFactory } from "./user/onboard";
 import { getOnboardStatusControllerFactory } from "./user/onboard/get";
 import { listSessionsControllerFactory } from "./user/sessions/list";
@@ -39,10 +41,12 @@ export function moduleRouterFactory(basePath: string): Router {
   router.post(path + "/auth/factors/enroll", auth, enrollMFAControllerFactory());
   router.post(path + "/auth/factors/:factor_id/challenge", auth, challengeMFAControllerFactory());
   router.post(path + "/auth/factors/:factor_id/verify", auth, verifyChallangeControllerFactory());
-  router.get(path + "/auth/verify/:verification_code", getVerificationSessionControllerFactory());
-  router.get(path + "/user/sessions", auth, listSessionsControllerFactory());
-  router.patch(path + "/user/onboard", auth, onboardControllerFactory());
-  router.get(path + "/user/onboard", auth, getOnboardStatusControllerFactory());
+  router.get(path + "/auth/verify/:email", getVerificationSessionControllerFactory());
+  router.get(path + "/users/sessions", auth, listSessionsControllerFactory());
+  router.patch(path + "/users/:user_id/onboard", auth, onboardControllerFactory());
+  router.get(path + "/users/:user_id/onboard", auth, getOnboardStatusControllerFactory());
+  router.get(path + "/users/:username/exists", auth, getUsernameExistsControllerFactory());
+  router.get(path + "/topics", getAllTopicsControllerFactory());
 
   return router;
 }

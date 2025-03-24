@@ -1,7 +1,7 @@
 import type { AppContext } from "@/context";
 import type { TInMemorySession } from "@/types";
 
-import { Second } from "@votewise/times";
+import { Minute } from "@votewise/times";
 
 type SessionManagerOptions = {
   cache: AppContext["cache"];
@@ -74,8 +74,7 @@ export class SessionManager {
       refreshToken,
       sessionId,
       expiresInMs: expiresIn,
-      expiresAt,
-      expiresInSec: expiresIn / Second
+      expiresAt
     };
   }
 
@@ -87,7 +86,11 @@ export class SessionManager {
    */
   public async save(sessionId: string, session: TInMemorySession & { userId: string }) {
     const key = this.getSessionKey(sessionId);
-    await this.ctx.cache.set(key, JSON.stringify({ ip: session.ip, userAgent: session.userAgent, aal: session.aal }));
+    await this.ctx.cache.setWithExpiry(
+      key,
+      JSON.stringify({ ip: session.ip, userAgent: session.userAgent, aal: session.aal }),
+      20 * Minute
+    );
     await this.ctx.sessionRepository.create({
       id: sessionId,
       aal: session.aal,

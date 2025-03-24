@@ -17,8 +17,12 @@ export class Controller {
     this.ctx = opts;
   }
 
-  async handle(_: Request, res: Response) {
+  async handle(req: Request, res: Response) {
     const locals = getAuthenticateLocals(res);
+    const _userId = req.params.user_id;
+    this.ctx.assert.badRequest(!_userId, "User ID is missing");
+    const userId = _userId!;
+    this.ctx.assert.forbidden(userId !== locals.payload.sub, "Forbidden");
     const _user = await this.ctx.userRepository.findById(locals.payload.sub);
     this.ctx.assert.resourceNotFound(!_user, "User does not exist");
     const user = _user!;

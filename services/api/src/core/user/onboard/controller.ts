@@ -22,6 +22,10 @@ export class Controller {
 
   async handle(req: Request, res: Response) {
     const locals = getAuthenticateLocals(res);
+    const _userId = req.params.user_id;
+    this.ctx.assert.badRequest(!_userId, "User ID is missing");
+    const userId = _userId!;
+    this.ctx.assert.forbidden(userId !== locals.payload.sub, "Forbidden access");
     const { body } = this.ctx.requestParser.getParser(ZOnboard).parseRequest(req, res);
     const user = await this.ctx.userRepository.update(locals.payload.sub, {
       user_name: body.user_name,
