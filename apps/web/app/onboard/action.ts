@@ -11,13 +11,14 @@ import { onboard as onboardClient } from "@/lib/client.server";
 import { COOKIE_KEYS, getUser, setCookie, setOnboardingData } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
-import { getStepFiveData } from "./_utils";
+import { getStepSixData } from "./_utils";
 
 type Props = Partial<TWhatShouldWeCall> &
   Partial<TTellUsAboutYou> &
   Partial<{ avatar: string }> &
   Partial<{ cover: string }> &
-  Partial<TConnectYourSocials> & { step: number };
+  Partial<TConnectYourSocials> &
+  Partial<{ topics: string[] }> & { step: number };
 
 type OnboardResponse = { is_onboarded: boolean } & TOnboard;
 
@@ -45,8 +46,16 @@ export async function onboard(props: Props): Promise<TActionResponse<OnboardResp
   }
 
   if (props.step === 5) {
-    const stepFiveData = getStepFiveData();
-    setOnboardingData({ ...stepFiveData, ...props });
+    setOnboardingData({
+      location: props.location,
+      twitter_url: props.twitter,
+      instagram_url: props.instagram,
+      facebook_url: props.facebook
+    });
+    return redirect(routes.onboard.step6());
+  }
+
+  if (props.step === 6) {
     const user = getUser();
     if (!user) {
       return {
@@ -55,7 +64,8 @@ export async function onboard(props: Props): Promise<TActionResponse<OnboardResp
         errorData: { status_code: 401, name: "Unauthorized", message: "User not found" }
       };
     }
-    const onboardingData = { ...stepFiveData, ...props };
+    const stepSixData = getStepSixData();
+    const onboardingData = { ...stepSixData, ...props };
     const res = await onboardClient.onboard(user.id, onboardingData);
     if (!res.success) {
       return { success: false, error: res.error, errorData: res.errorData };
@@ -65,7 +75,7 @@ export async function onboard(props: Props): Promise<TActionResponse<OnboardResp
       JSON.stringify({ message: "Welcome to Votewise!", title: "Onboard complete!", type: "success" })
     );
     setCookie(COOKIE_KEYS.isOnboarded, "true");
-    return redirect(routes.onboard.step6());
+    return redirect(routes.app.root());
   }
 
   return redirect(routes.onboard.step1());

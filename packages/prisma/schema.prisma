@@ -416,4 +416,6 @@ model UserInterests {
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
+
+    @@unique([user_id, topic_id], name: "user_topic_unique")
 }

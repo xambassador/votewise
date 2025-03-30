@@ -20,6 +20,7 @@ type OnboardBody = {
   facebook_url?: string | undefined;
   instagram_url?: string | undefined;
   twitter_url?: string | undefined;
+  topics?: string[] | undefined;
 };
 type GetTopicsResponse = { topics: { id: string; name: string }[] };
 

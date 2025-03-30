@@ -10,6 +10,7 @@ import { getAuthenticateLocals } from "@/utils/locals";
 type ControllerOptions = {
   assert: AppContext["assert"];
   userRepository: AppContext["repositories"]["user"];
+  userInterestRepository: AppContext["repositories"]["userInterest"];
   requestParser: AppContext["plugins"]["requestParser"];
 };
 
@@ -27,6 +28,7 @@ export class Controller {
     const userId = _userId!;
     this.ctx.assert.forbidden(userId !== locals.payload.sub, "Forbidden access");
     const { body } = this.ctx.requestParser.getParser(ZOnboard).parseRequest(req, res);
+    const userTopics = await this.ctx.userInterestRepository.findByUserId(userId);
     const user = await this.ctx.userRepository.update(locals.payload.sub, {
       user_name: body.user_name,
       location: body.location,
@@ -41,6 +43,15 @@ export class Controller {
       twitter_profile_url: body.twitter_url,
       instagram_profile_url: body.instagram_url
     });
+
+    const topics: string[] = [];
+    body.topics.forEach((topic) => {
+      const isAlreadyAdded = userTopics.some((userTopic) => userTopic.topic_id === topic);
+      if (!isAlreadyAdded) topics.push(topic);
+    });
+
+    await this.ctx.userInterestRepository.create(userId, topics);
+
     return res.status(StatusCodes.OK).json({ is_onboarded: user.is_onboarded, ...body });
   }
 }

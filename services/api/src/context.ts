@@ -23,6 +23,7 @@ import { TasksQueue } from "./queues";
 import { RefreshTokenRepository } from "./repository/refresh-token.repository";
 import { SessionRepository } from "./repository/session.repository";
 import { TopicRepository } from "./repository/topic.repository";
+import { UserInterestRepository } from "./repository/user-interest.repository";
 
 type Repositories = {
   user: UserRepository;
@@ -31,6 +32,7 @@ type Repositories = {
   refreshToken: RefreshTokenRepository;
   session: SessionRepository;
   topic: TopicRepository;
+  userInterest: UserInterestRepository;
 };
 
 type Queue = {
@@ -112,6 +114,7 @@ export class AppContext {
     const refreshTokenRepository = new RefreshTokenRepository({ db });
     const sessionRepository = new SessionRepository({ db });
     const topicRepository = new TopicRepository({ db });
+    const userInterestRepository = new UserInterestRepository({ db });
     const mailer = new Mailer({ env: environment });
     const tasksQueue = new TasksQueue({ env: environment });
     const sessionManager = new SessionManager({
@@ -142,7 +145,8 @@ export class AppContext {
         challenge: challengeRepository,
         refreshToken: refreshTokenRepository,
         session: sessionRepository,
-        topic: topicRepository
+        topic: topicRepository,
+        userInterest: userInterestRepository
       },
       queues: { tasksQueue },
       plugins: { requestParser, jwt: jwtPlugin },
