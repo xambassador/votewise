@@ -13,7 +13,8 @@ export const ZOnboard = z.object({
   location: z.string({ required_error: "location is missing" }).min(3, { message: "location is too short" }),
   facebook_url: z.string().optional(),
   instagram_url: z.string().optional(),
-  twitter_url: z.string().optional()
+  twitter_url: z.string().optional(),
+  topics: z.array(z.string()).min(3, { message: "Please select at least 3 topics" })
 });
 
 export type TOnboard = z.infer<typeof ZOnboard>;

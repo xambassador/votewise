@@ -8,7 +8,8 @@ export function onboardControllerFactory() {
   const controller = new Controller({
     assert: ctx.assert,
     requestParser: ctx.plugins.requestParser,
-    userRepository: ctx.repositories.user
+    userRepository: ctx.repositories.user,
+    userInterestRepository: ctx.repositories.userInterest
   });
   const exceptionLayer = new ExceptionLayer({ name: "onboard" });
   return exceptionLayer.catch(controller.handle.bind(controller));
