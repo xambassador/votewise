@@ -5,11 +5,12 @@ import type { VerifyEmailResponse } from "@votewise/client/auth";
 
 import { redirect } from "next/navigation";
 
-import { auth } from "@/lib/client.server";
+import { getAuth } from "@/lib/client.server";
 import { clearCookie, COOKIE_KEYS, getCookie, setFlashMessage } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
 export async function verifyEmail(otp: string): Promise<TActionResponse<VerifyEmailResponse>> {
+  const auth = getAuth();
   const email = getCookie(COOKIE_KEYS.email);
   const verificationCode = getCookie(COOKIE_KEYS.verificationCode);
   if (!email || !verificationCode) {
