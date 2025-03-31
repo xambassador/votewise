@@ -35,12 +35,19 @@ export function useStep(props: { defaultValues?: TWhatShouldWeCall }) {
   const debouncedUsername = useDebounce(username);
 
   useEffect(() => {
+    const isErrorSet = !!form.formState.errors.userName;
     if (debouncedUsername) {
       user.isUsernameAvailable(debouncedUsername).then((res) => {
         if (!res.success) {
           form.setError("userName", { message: res.error });
+        } else if (isErrorSet) {
+          form.clearErrors("userName");
         }
       });
+    }
+
+    if (debouncedUsername === "" && isErrorSet) {
+      form.clearErrors("userName");
     }
   }, [debouncedUsername, form]);
 

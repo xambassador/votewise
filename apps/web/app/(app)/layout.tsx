@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 
-import { NavTabs } from "@/components/nav-tabs";
 import { Sidebar } from "@/components/sidebar";
 import { SuggestionPanel } from "@/components/suggestion-panel";
 
@@ -26,10 +25,7 @@ export default async function Layout(props: Props) {
   return (
     <div className="min-h-screen max-w-8xl mx-auto flex justify-between">
       <Sidebar />
-      <div className="flex-1 max-w-[calc((664/16)*1rem)] mx-auto pt-7 px-8">
-        <NavTabs />
-        {props.children}
-      </div>
+      <main className="flex-1 max-w-[calc((664/16)*1rem)] mx-auto pt-7 px-8">{props.children}</main>
       <SuggestionPanel />
     </div>
   );

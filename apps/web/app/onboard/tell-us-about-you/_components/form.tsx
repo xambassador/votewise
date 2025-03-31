@@ -29,19 +29,17 @@ export function OnboardForm(props: { defaultValue?: TTellUsAboutYou }) {
             render={({ field }) => (
               <FormField {...getFormFieldProps("gender")}>
                 <FormLabel>Gender</FormLabel>
-                <FormControl>
-                  {({ id, hasError }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger ref={field.ref} id={id} hasError={hasError}>
-                        <SelectValue placeholder="Select gender" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="MALE">Male</SelectItem>
-                        <SelectItem value="FEMALE">Female</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                </FormControl>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger ref={field.ref}>
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="MALE">Male</SelectItem>
+                    <SelectItem value="FEMALE">Female</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormField>
             )}
