@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { isAuthorized } from "@/lib/auth";
-import { onboard } from "@/lib/client.server";
+import { getOnboard } from "@/lib/client.server";
 import { getOnboardingData, getUser } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
@@ -80,6 +80,7 @@ export async function shouldNotOnboarded() {
   isAuthorized<true>({ redirect: true });
   const user = getUser();
   if (!user) throw new Error("User not found");
+  const onboard = getOnboard();
   const res = await onboard.isOnboarded(user.id);
   if (!res.success) throw new Error(res.error);
   if (res.data.is_onboarded) {

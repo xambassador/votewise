@@ -1,6 +1,4 @@
-import { Onboard } from "@votewise/client/onboard";
-
-import { client } from "@/lib/client.server";
+import { getOnboard } from "@/lib/client.server";
 
 import { OnboardContainer } from "../_components/container";
 import { OnboardHeader, OnboardSubtitle, OnboardTitle } from "../_components/typography";
@@ -10,7 +8,7 @@ import { Topics } from "./_components/form";
 export default async function Page() {
   const onboardingData = getStepSixData();
   const name = onboardingData.first_name + " " + onboardingData.last_name;
-  const onboard = new Onboard({ client });
+  const onboard = getOnboard();
   const topicsResult = await onboard.getTopics();
   if (!topicsResult.success) throw new Error(topicsResult.error);
   const topics = topicsResult.data.topics;

@@ -7,7 +7,7 @@ import type { TConnectYourSocials, TTellUsAboutYou, TWhatShouldWeCall } from "./
 import { redirect } from "next/navigation";
 
 import { isAuthorized } from "@/lib/auth";
-import { onboard as onboardClient } from "@/lib/client.server";
+import { getOnboard } from "@/lib/client.server";
 import { COOKIE_KEYS, getUser, setCookie, setOnboardingData } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
@@ -66,6 +66,7 @@ export async function onboard(props: Props): Promise<TActionResponse<OnboardResp
     }
     const stepSixData = getStepSixData();
     const onboardingData = { ...stepSixData, ...props };
+    const onboardClient = getOnboard();
     const res = await onboardClient.onboard(user.id, onboardingData);
     if (!res.success) {
       return { success: false, error: res.error, errorData: res.errorData };

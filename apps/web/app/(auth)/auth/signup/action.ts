@@ -3,10 +3,11 @@
 import type { TActionResponse } from "@/types";
 import type { TSignUpForm } from "./_utils";
 
-import { auth } from "@/lib/client.server";
+import { getAuth } from "@/lib/client.server";
 import { COOKIE_KEYS, setCookie } from "@/lib/cookie";
 
 export async function signup(data: TSignUpForm): Promise<TActionResponse<{ message: string }>> {
+  const auth = getAuth();
   const response = await auth.signup(data);
 
   if (!response.success) {

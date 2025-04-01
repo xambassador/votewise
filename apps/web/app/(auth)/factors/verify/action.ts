@@ -6,7 +6,7 @@ import type { VerifyResponse } from "@votewise/client/auth";
 import { redirect } from "next/navigation";
 
 import { isAuthorized } from "@/lib/auth";
-import { auth as authClient } from "@/lib/client.server";
+import { getAuth } from "@/lib/client.server";
 import { clearCookie, COOKIE_KEYS, forwardCookie, getCookie } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
@@ -20,6 +20,7 @@ export async function verifyFactor(code: string): Promise<TActionResponse<Verify
     return redirect(routes.auth.logout());
   }
 
+  const authClient = getAuth();
   const res = await authClient.verifyFactor({ code, challengeId, factorId });
   if (!res.success) return res;
 
