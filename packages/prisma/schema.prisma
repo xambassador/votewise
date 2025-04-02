@@ -132,6 +132,7 @@ model User {
     sessions         Session[]
     refreshTokens    RefreshToken[]
     interests        UserInterests[]
+    timelines        Timeline[]
 }
 
 model Factor {
@@ -206,6 +207,7 @@ model Post {
     hashTags       PostHashTag[]
     assets         PostAsset[]
     commentUpvotes CommentUpvote[]
+    timelines      Timeline[]
 }
 
 model PostAsset {
@@ -418,4 +420,24 @@ model UserInterests {
     updated_at DateTime @updatedAt
 
     @@unique([user_id, topic_id], name: "user_topic_unique")
+}
+
+model UserSimilarity {
+    user_id_1  String
+    user_id_2  String
+    similarity Float
+
+    @@id([user_id_1, user_id_2])
+}
+
+model Timeline {
+    id         String   @id @default(cuid())
+    user_id    String
+    post_id    String
+    created_at DateTime @default(now())
+
+    user User @relation(fields: [user_id], references: [id])
+    post Post @relation(fields: [post_id], references: [id])
+
+    @@index([user_id, created_at])
 }

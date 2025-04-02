@@ -33,7 +33,7 @@ class RecommendationRequest(BaseModel):
 def init_db():
     with engine.connect() as conn:
         conn.execute(text("""
-            CREATE TABLE IF NOT EXISTS user_similarity (
+            CREATE TABLE IF NOT EXISTS UserSimilarity (
                 user_id_1 VARCHAR,
                 user_id_2 VARCHAR,
                 similarity FLOAT,
