@@ -190,8 +190,8 @@ model Post {
     title   String     @db.VarChar(255)
     content String     @db.Text
     slug    String     @unique @db.VarChar(255)
-    type    PostType
-    status  PostStatus
+    type    PostType   @default(PUBLIC)
+    status  PostStatus @default(OPEN)
 
     group_id String?
     group    Group?  @relation(fields: [group_id], references: [id])
