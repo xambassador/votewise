@@ -17,9 +17,9 @@ type Dependencies = {
 export class SessionRepository extends BaseRepository {
   private readonly db: Dependencies["db"];
 
-  constructor(opts: Dependencies) {
+  constructor(cfg: Dependencies) {
     super();
-    this.db = opts.db;
+    this.db = cfg.db;
   }
 
   public create(data: TCreate) {

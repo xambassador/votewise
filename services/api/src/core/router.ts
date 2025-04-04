@@ -13,6 +13,7 @@ import { registerControllerFactory } from "./auth/register";
 import { resetPasswordControllerFactory } from "./auth/reset-password";
 import { singinControllerFactory } from "./auth/signin";
 import { verifyControllerFactory } from "./auth/verify";
+import { createFeedControllerFactory } from "./feed/create";
 import { getAllTopicsControllerFactory } from "./topics/get-all";
 import { getUsernameExistsControllerFactory } from "./user/exists";
 import { onboardControllerFactory } from "./user/onboard";
@@ -47,6 +48,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.get(path + "/users/:user_id/onboard", auth, getOnboardStatusControllerFactory());
   router.get(path + "/users/:username/exists", auth, getUsernameExistsControllerFactory());
   router.get(path + "/topics", getAllTopicsControllerFactory());
+  router.post(path + "/feeds", auth, createFeedControllerFactory());
 
   return router;
 }

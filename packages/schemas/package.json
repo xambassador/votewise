@@ -28,6 +28,10 @@
     "./user": {
       "import": "./dist/user.mjs",
       "require": "./dist/user.js"
+    },
+    "./feed": {
+      "import": "./dist/feed.mjs",
+      "require": "./dist/feed.js"
     }
   },
   "scripts": {

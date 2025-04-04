@@ -10,9 +10,9 @@ type TCreate = { userId: string; token: string; revoked?: boolean };
 export class RefreshTokenRepository extends BaseRepository {
   private readonly db: Dependencies["db"];
 
-  constructor(opts: Dependencies) {
+  constructor(cfg: Dependencies) {
     super();
-    this.db = opts.db;
+    this.db = cfg.db;
   }
 
   public create(data: TCreate) {
