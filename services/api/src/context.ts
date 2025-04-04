@@ -21,8 +21,10 @@ import { jwtPluginFactory } from "./plugins/jwt";
 import { requestParserPluginFactory } from "./plugins/request-parser";
 import { TasksQueue } from "./queues";
 import { FeedRepository } from "./repository/feed.repository";
+import { FollowRepository } from "./repository/follow.repository";
 import { RefreshTokenRepository } from "./repository/refresh-token.repository";
 import { SessionRepository } from "./repository/session.repository";
+import { TimelineRepository } from "./repository/timeline.repository";
 import { TopicRepository } from "./repository/topic.repository";
 import { UserInterestRepository } from "./repository/user-interest.repository";
 
@@ -35,6 +37,8 @@ type Repositories = {
   topic: TopicRepository;
   userInterest: UserInterestRepository;
   feed: FeedRepository;
+  follow: FollowRepository;
+  timeline: TimelineRepository;
 };
 
 type Queue = {
@@ -118,6 +122,8 @@ export class AppContext {
     const topicRepository = new TopicRepository({ db });
     const userInterestRepository = new UserInterestRepository({ db });
     const feedRepository = new FeedRepository({ db });
+    const followRepository = new FollowRepository({ db });
+    const timelineRepository = new TimelineRepository({ db });
     const mailer = new Mailer({ env: environment });
     const tasksQueue = new TasksQueue({ env: environment });
     const sessionManager = new SessionManager({
@@ -150,7 +156,9 @@ export class AppContext {
         session: sessionRepository,
         topic: topicRepository,
         userInterest: userInterestRepository,
-        feed: feedRepository
+        feed: feedRepository,
+        follow: followRepository,
+        timeline: timelineRepository
       },
       queues: { tasksQueue },
       plugins: { requestParser, jwt: jwtPlugin },

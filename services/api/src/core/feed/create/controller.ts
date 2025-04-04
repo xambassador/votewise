@@ -10,6 +10,8 @@ import { getAuthenticateLocals } from "@/utils/locals";
 type ControllerOptions = {
   requestParser: AppContext["plugins"]["requestParser"];
   feedRepository: AppContext["repositories"]["feed"];
+  followRepository: AppContext["repositories"]["follow"];
+  timelineRepository: AppContext["repositories"]["timeline"];
 };
 
 export class Controller {
@@ -30,6 +32,13 @@ export class Controller {
       slug: body.title,
       status: "OPEN"
     });
+    const followers = await this.ctx.followRepository.findByFollowingId(locals.payload.sub);
+    const timelines = followers.map((follower) => ({
+      user_id: follower.follower_id,
+      post_id: feed.id,
+      created_at: feed.created_at
+    }));
+    await this.ctx.timelineRepository.createMany(timelines);
     return res.status(StatusCodes.CREATED).json({ id: feed.id });
   }
 }
