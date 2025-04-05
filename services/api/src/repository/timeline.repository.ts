@@ -25,4 +25,18 @@ export class TimelineRepository extends BaseRepository {
       await this.db.timeline.createMany({ data: timeline });
     });
   }
+
+  public findByUserId(userId: string) {
+    return this.execute(async () => {
+      const timeline = await this.db.timeline.findMany({
+        where: {
+          user_id: userId
+        },
+        select: {
+          post: true
+        }
+      });
+      return timeline;
+    });
+  }
 }
