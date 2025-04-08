@@ -7201,6 +7201,7 @@ __metadata:
   resolution: "@votewise/jwt@workspace:packages/common/jwt"
   dependencies:
     "@types/jsonwebtoken": "npm:^9.0.6"
+    "@votewise/types": "npm:*"
     jsonwebtoken: "npm:^9.0.2"
     tsup: "npm:^8.2.4"
     typescript: "npm:^5.5.4"

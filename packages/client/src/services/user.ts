@@ -1,3 +1,4 @@
+import type { UsernameIsAvailableResponse } from "@votewise/types";
 import type { Client } from "../client";
 import type { Client as ServerClient } from "../server";
 
@@ -14,7 +15,7 @@ export class User {
 
   public async isUsernameAvailable(username: string) {
     const path = `/v1/users/${username}/exists`;
-    const res = await this.client.get<{ is_available: boolean }>(path);
+    const res = await this.client.get<UsernameIsAvailableResponse>(path);
     return res;
   }
 }

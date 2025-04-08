@@ -1,4 +1,4 @@
-import type { AccessTokenPayload } from "@votewise/client/auth";
+import type { AccessTokenPayload } from "@votewise/types";
 
 import { redirect } from "next/navigation";
 

@@ -1,4 +1,4 @@
-import type { TApiErrorResponse, TFetchResult } from "../types";
+import type { ApiErrorResponse, FetchResult } from "@votewise/types";
 
 type Fetch = typeof fetch;
 type Storage = {
@@ -42,7 +42,7 @@ export class Client {
     }
   }
 
-  private async _fetch<T>(url: string, options: RequestInit): Promise<TFetchResult<T>> {
+  private async _fetch<T>(url: string, options: RequestInit): Promise<FetchResult<T>> {
     try {
       const endpoint = `${this.url}${url}`;
       const _options = { ...options, headers: { ...this.headers, ...options.headers } };
@@ -60,7 +60,7 @@ export class Client {
       const response = await this.fetch(endpoint, _options);
       const isJson = response.headers.get("content-type")?.includes("application/json");
       if (!response.ok && isJson) {
-        const data = (await response.json()) as TApiErrorResponse;
+        const data = (await response.json()) as ApiErrorResponse;
         return { success: false, error: data.error.message, errorData: data.error, status: response.status };
       }
 
@@ -98,39 +98,39 @@ export class Client {
     }
   }
 
-  public async get<T>(url: string, options?: RequestInit): Promise<TFetchResult<T>> {
+  public async get<T>(url: string, options?: RequestInit): Promise<FetchResult<T>> {
     return this._fetch<T>(url, { method: "GET", ...options });
   }
 
-  public async post<T, B extends object>(url: string, body: B, options?: RequestInit): Promise<TFetchResult<T>> {
+  public async post<T, B extends object>(url: string, body: B, options?: RequestInit): Promise<FetchResult<T>> {
     return this._fetch<T>(url, { method: "POST", body: JSON.stringify(body), ...options });
   }
 
-  public async put<T, B extends object>(url: string, body: B, options?: RequestInit): Promise<TFetchResult<T>> {
+  public async put<T, B extends object>(url: string, body: B, options?: RequestInit): Promise<FetchResult<T>> {
     return this._fetch<T>(url, { method: "PUT", body: JSON.stringify(body), ...options });
   }
 
-  public async delete<T>(url: string, options?: RequestInit): Promise<TFetchResult<T>> {
+  public async delete<T>(url: string, options?: RequestInit): Promise<FetchResult<T>> {
     return this._fetch<T>(url, { method: "DELETE", ...options });
   }
 
-  public async patch<T, B extends object>(url: string, body: B, options?: RequestInit): Promise<TFetchResult<T>> {
+  public async patch<T, B extends object>(url: string, body: B, options?: RequestInit): Promise<FetchResult<T>> {
     return this._fetch<T>(url, { method: "PATCH", body: JSON.stringify(body), ...options });
   }
 
-  public async head<T>(url: string, options?: RequestInit): Promise<TFetchResult<T>> {
+  public async head<T>(url: string, options?: RequestInit): Promise<FetchResult<T>> {
     return this._fetch<T>(url, { method: "HEAD", ...options });
   }
 
-  public async options<T>(url: string, options?: RequestInit): Promise<TFetchResult<T>> {
+  public async options<T>(url: string, options?: RequestInit): Promise<FetchResult<T>> {
     return this._fetch<T>(url, { method: "OPTIONS", ...options });
   }
 
-  public async connect<T>(url: string, options?: RequestInit): Promise<TFetchResult<T>> {
+  public async connect<T>(url: string, options?: RequestInit): Promise<FetchResult<T>> {
     return this._fetch<T>(url, { method: "CONNECT", ...options });
   }
 
-  public async trace<T>(url: string, options?: RequestInit): Promise<TFetchResult<T>> {
+  public async trace<T>(url: string, options?: RequestInit): Promise<FetchResult<T>> {
     return this._fetch<T>(url, { method: "TRACE", ...options });
   }
 

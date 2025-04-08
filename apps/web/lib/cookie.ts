@@ -1,7 +1,7 @@
 import "server-only";
 
-import type { SigninResponse } from "@votewise/client/auth";
 import type { TOnboard } from "@votewise/schemas/onboard";
+import type { SigninResponse } from "@votewise/types";
 import type { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
 import { cookies } from "next/headers";
