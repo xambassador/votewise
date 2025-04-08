@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.6",
+    "@votewise/types": "*",
     "tsup": "^8.2.4",
     "typescript": "^5.5.4"
   },

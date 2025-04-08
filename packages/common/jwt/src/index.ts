@@ -1,3 +1,4 @@
+import type { AccessTokenPayload } from "@votewise/types";
 import type { SignOptions } from "jsonwebtoken";
 
 import { decode, sign, TokenExpiredError, verify } from "jsonwebtoken";
@@ -6,18 +7,6 @@ type Codes = "TOKEN_EXPIRED" | "MALFORMED_TOKEN";
 type VerifyResult<T> = { success: true; data: T } | { success: false; error: Codes };
 type JWTOptions = { accessTokenSecret: string };
 export type { SignOptions };
-
-export type AccessTokenPayload = {
-  sub: string;
-  email: string;
-  role: string;
-  app_metadata?: Record<string, unknown>;
-  user_metadata?: Record<string, unknown>;
-  amr: { method: string; timestamp: number }[];
-  aal: "aal1" | "aal2";
-  session_id: string;
-  user_aal_level: "aal1" | "aal2";
-};
 
 export class JWT {
   private readonly accessTokenSecret: string;
