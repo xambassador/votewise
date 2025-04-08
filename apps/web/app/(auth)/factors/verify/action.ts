@@ -1,7 +1,7 @@
 "use server";
 
 import type { TActionResponse } from "@/types";
-import type { VerifyResponse } from "@votewise/client/auth";
+import type { VerifyResponse } from "@votewise/types";
 
 import { redirect } from "next/navigation";
 

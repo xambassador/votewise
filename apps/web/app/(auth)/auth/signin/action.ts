@@ -1,7 +1,7 @@
 "use server";
 
 import type { TActionResponse } from "@/types";
-import type { SigninResponse } from "@votewise/client/auth";
+import type { SigninResponse } from "@votewise/types";
 import type { TSinginForm } from "./_utils";
 
 import { redirect } from "next/navigation";
