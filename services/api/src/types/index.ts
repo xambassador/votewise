@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 
 import type { envBaseSchema } from "@votewise/env";
-import type { AccessTokenPayload } from "@votewise/jwt";
+import type { AccessTokenPayload } from "@votewise/types";
 import type { z } from "zod";
 
 export type AuthenticatedUser = {

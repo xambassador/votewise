@@ -1,4 +1,5 @@
-import type { AccessTokenPayload, SignOptions } from "@votewise/jwt";
+import type { SignOptions } from "@votewise/jwt";
+import type { AccessTokenPayload } from "@votewise/types";
 
 import { JWT } from "@votewise/jwt";
 
