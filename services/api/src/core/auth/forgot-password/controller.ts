@@ -3,7 +3,6 @@ import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
-import { ERROR_CODES } from "@votewise/constant";
 import { ZForgotPassword } from "@votewise/schemas";
 
 type ControllerOptions = {
@@ -16,7 +15,7 @@ type ControllerOptions = {
   requestParser: AppContext["plugins"]["requestParser"];
 };
 
-const { USER_NOT_FOUND } = ERROR_CODES.AUTH;
+const msg = "If the email exists, a reset link will be sent.";
 
 export class Controller {
   private readonly ctx: ControllerOptions;
@@ -31,7 +30,9 @@ export class Controller {
     const { ip } = locals.meta;
 
     const _user = await this.ctx.userRepository.findByEmail(email);
-    this.ctx.assert.resourceNotFound(!_user, `User with email ${email} not found`, USER_NOT_FOUND);
+    if (!_user) {
+      return res.status(StatusCodes.OK).json({ message: msg });
+    }
 
     const user = _user!;
     const verificationCode = this.ctx.cryptoService.hash(`${user.id}:${ip}`);
@@ -49,13 +50,14 @@ export class Controller {
           firstName: user.first_name,
           expiresInUnit: "minutes",
           expiresIn: 5,
-          clientUrl: this.ctx.appUrl,
+          resetLink: this.ctx.appUrl + `/auth/reset-password?token=${ridToken}`,
           ip,
-          email
+          email,
+          logo: this.ctx.appUrl + "/assets/logo.png"
         }
       }
     });
 
-    return res.status(StatusCodes.OK).json({ email, rid_token: ridToken });
+    return res.status(StatusCodes.OK).json({ message: msg });
   }
 }

@@ -16,10 +16,11 @@ type ForgotPasswordTemplate = BaseData & {
     firstName: string;
     expiresIn: number;
     expiresInUnit: "hours" | "minutes";
-    clientUrl: string;
     token: string;
     ip: string;
     email: string;
+    resetLink: string;
+    logo: string;
   };
 };
 export type EmailJob = SignupTemplate | WelcomeTemplate | ForgotPasswordTemplate;
