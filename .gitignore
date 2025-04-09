@@ -119,6 +119,7 @@ packages/prisma/.snaplet/dataExamples.json
 !.yarn/versions
 !.yarn/cache
 .pnp.*
+.yarn/install-state.gz
 
 diff.txt
 
