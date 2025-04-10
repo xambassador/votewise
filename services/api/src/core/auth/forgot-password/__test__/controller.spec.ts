@@ -1,4 +1,4 @@
-import { Assertions, InvalidInputError, ResourceNotFoundError } from "@votewise/errors";
+import { Assertions, InvalidInputError } from "@votewise/errors";
 
 import { requestParserPluginFactory } from "@/plugins/request-parser";
 import { mockTaskQueue } from "@/queues/__mock__";
@@ -37,15 +37,15 @@ describe("Forgot Password Controller", () => {
     expect(error.message).toBe("email is missing");
   });
 
-  it("should throw error if user not found", async () => {
+  it("should return generic message if user not found", async () => {
     const req = buildReq({ body: { email: user.email } });
     const res = buildRes({ locals });
     mockUserRepository.findByEmail.mockResolvedValueOnce(null);
 
-    const error = await controller.handle(req, res).catch((e) => e);
+    await controller.handle(req, res);
     expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(user.email);
-    expect(error).toBeInstanceOf(ResourceNotFoundError);
-    expect(error.message).toBe(`User with email ${user.email} not found`);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ message: "If the email exists, a reset link will be sent." });
   });
 
   it("should create rid token and send email", async () => {
@@ -65,7 +65,7 @@ describe("Forgot Password Controller", () => {
           firstName: user.first_name,
           expiresInUnit: "minutes",
           expiresIn: 5,
-          clientUrl: "http://localhost:3000",
+          resetLink: `http://localhost:3000/auth/reset-password?token=${ridToken}`,
           ip: locals.meta.ip,
           email: user.email
         }

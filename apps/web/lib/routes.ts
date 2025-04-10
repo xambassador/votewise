@@ -3,7 +3,7 @@ export const routes = {
     signIn: () => "/auth/signin",
     signUp: () => "/auth/signup",
     verify: () => "/auth/verify",
-    forgot: () => "/auth/forgot",
+    forgot: () => "/auth/forgot-password",
     resetPassword: () => "/auth/reset-password",
     logout: (prop?: { redirect?: string }) => {
       if (prop && prop.redirect) {

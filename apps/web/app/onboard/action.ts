@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 
 import { isAuthorized } from "@/lib/auth";
 import { getOnboard } from "@/lib/client.server";
-import { COOKIE_KEYS, getUser, setCookie, setOnboardingData } from "@/lib/cookie";
+import { COOKIE_KEYS, getUser, setCookie, setFlashMessage, setOnboardingData } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
 import { getStepSixData } from "./_utils";
@@ -71,10 +71,7 @@ export async function onboard(props: Props): Promise<TActionResponse<OnboardResp
     if (!res.success) {
       return { success: false, error: res.error, errorData: res.errorData };
     }
-    setCookie(
-      COOKIE_KEYS.flash,
-      JSON.stringify({ message: "Welcome to Votewise!", title: "Onboard complete!", type: "success" })
-    );
+    setFlashMessage("Onboard complete!", "Welcome to Votewise!", "success");
     setCookie(COOKIE_KEYS.isOnboarded, "true");
     return redirect(routes.app.root());
   }
