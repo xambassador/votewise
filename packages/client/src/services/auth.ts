@@ -84,6 +84,11 @@ export class Auth {
     return res;
   }
 
+  public async forgotPassword(email: string) {
+    const res = await this.client.post<{ message: string }, { email: string }>("/v1/auth/forgot-password", { email });
+    return res;
+  }
+
   /**
    * Get user from the auth cookies.
    * @returns {AccessTokenPayload | null} Returns the user if it exists.
