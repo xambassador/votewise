@@ -2,24 +2,19 @@ import { Suspense } from "react";
 
 import { Spinner } from "@votewise/ui/ring-spinner";
 
-import { FlashMessage } from "@/components/flash";
+import { FlashProvider } from "@/components/flash-provider";
 import { NavTabs } from "@/components/nav-tabs";
-
-import { getFlashMessage } from "@/lib/cookie";
 
 import { FeedList } from "./_components/feed-list";
 
 export default async function Home() {
-  const flash = getFlashMessage();
-
   return (
-    <>
-      {flash && <FlashMessage title={flash.title} message={flash.message} type={flash.type} />}
+    <FlashProvider>
       <NavTabs />
       <Suspense fallback={<Loading />}>
         <RetrieveFeed />
       </Suspense>
-    </>
+    </FlashProvider>
   );
 }
 

@@ -20,9 +20,7 @@ export function useSignIn() {
   const onSubmit = form.handleSubmit((data) => {
     startTransition(async () => {
       const res = await signin(data, searchParams.get("redirect"));
-      if (!res.success) {
-        makeToast.error("Oops!", res.error);
-      }
+      if (!res.success) makeToast.error("Oops!", res.error);
     });
   });
 

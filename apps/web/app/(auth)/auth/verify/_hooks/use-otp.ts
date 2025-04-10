@@ -25,9 +25,7 @@ export function useOTP() {
 
     startTransition(async () => {
       const res = await verifyEmail(otp);
-      if (!res.success) {
-        makeToast.error("Ooops!", res.error);
-      }
+      if (!res.success) makeToast.error("Ooops!", res.error);
     });
   }
 

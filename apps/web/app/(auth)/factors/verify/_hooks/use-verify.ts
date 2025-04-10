@@ -22,9 +22,7 @@ export function useVerify() {
     }
     startTransition(async () => {
       const res = await verifyFactor(code.current);
-      if (!res.success) {
-        makeToast.error("Oops!", res.error);
-      }
+      if (!res.success) makeToast.error("Oops!", res.error);
     });
   }
 

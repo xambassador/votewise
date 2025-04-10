@@ -21,7 +21,7 @@ export async function verifyEmail(otp: string): Promise<TActionResponse<VerifyEm
     };
   }
   const res = await auth.verifyEmail({ otp, email, verificationCode });
-  if (!res.success) return res;
+  if (!res.success) return { success: false, error: res.error, errorData: res.errorData };
   clearCookie(COOKIE_KEYS.email);
   clearCookie(COOKIE_KEYS.verificationCode);
   clearCookie(COOKIE_KEYS.userId);
