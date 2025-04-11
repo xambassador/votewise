@@ -13,6 +13,8 @@ type ControllerOptions = {
   cryptoService: AppContext["cryptoService"];
   requestParser: AppContext["plugins"]["requestParser"];
   sessionManager: AppContext["sessionManager"];
+  taskQueue: AppContext["queues"]["tasksQueue"];
+  appUrl: AppContext["config"]["appUrl"];
 };
 
 const { USER_NOT_FOUND, FORGOT_PASSWORD_SESSION_EXPIRED } = ERROR_CODES.AUTH;
@@ -49,6 +51,20 @@ export class Controller {
     });
     await this.ctx.sessionManager.deleteForgotPasswordSession(token);
     await this.ctx.sessionManager.clearUserSessions(user.id);
+
+    this.ctx.taskQueue.add({
+      name: "email",
+      payload: {
+        templateName: "password-reset-success",
+        to: user.email,
+        subject: "Password changed successfully",
+        locals: {
+          name: user.first_name,
+          loginUrl: this.ctx.appUrl + "/auth/signin",
+          logo: this.ctx.appUrl + "/assets/logo.png"
+        }
+      }
+    });
 
     return res.status(StatusCodes.OK).json({ message: "Password updated successfully" });
   }

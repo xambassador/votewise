@@ -17,7 +17,9 @@ const controller = new Controller({
   assert: new Assertions(),
   userRepository: helpers.mockUserRepository,
   cryptoService: helpers.mockCryptoService,
-  sessionManager: mockSessionManager
+  sessionManager: mockSessionManager,
+  appUrl: helpers.appUrl,
+  taskQueue: helpers.mockTaskQueue
 });
 
 beforeEach(() => {
@@ -73,11 +75,26 @@ describe("Reset Password Controller", () => {
     helpers.mockCryptoService.hashPassword.mockResolvedValue("hashed-password");
     helpers.mockCryptoService.generateUUID.mockReturnValue("new-secret");
 
+    const data = {
+      name: "email",
+      payload: {
+        templateName: "password-reset-success",
+        to: user.email,
+        subject: "Password changed successfully",
+        locals: {
+          name: user.first_name,
+          loginUrl: `${helpers.appUrl}/auth/signin`,
+          logo: `${helpers.appUrl}/assets/logo.png`
+        }
+      }
+    };
+
     await controller.handle(req, res);
     expect(helpers.mockUserRepository.update).toHaveBeenCalledWith(user.id, {
       password: "hashed-password",
       secret: "new-secret"
     });
+    expect(helpers.mockTaskQueue.add).toHaveBeenCalledWith(data);
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({ message: "Password updated successfully" });
   });

@@ -10,7 +10,9 @@ export function resetPasswordControllerFactory() {
     "jwtService",
     "assert",
     "cryptoService",
-    "sessionManager"
+    "sessionManager",
+    "queues",
+    "config"
   ]);
   const controller = new Controller({
     requestParser: ctx.plugins.requestParser,
@@ -18,7 +20,9 @@ export function resetPasswordControllerFactory() {
     jwtService: ctx.jwtService,
     assert: ctx.assert,
     cryptoService: ctx.cryptoService,
-    sessionManager: ctx.sessionManager
+    sessionManager: ctx.sessionManager,
+    taskQueue: ctx.queues.tasksQueue,
+    appUrl: ctx.config.appUrl
   });
   const exceptionLayer = new ExceptionLayer({ name: "reset-password" });
   return exceptionLayer.catch(controller.handle.bind(controller));

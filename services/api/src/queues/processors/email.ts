@@ -21,7 +21,15 @@ type ForgotPasswordTemplate = BaseData & {
     logo: string;
   };
 };
-export type EmailJob = SignupTemplate | WelcomeTemplate | ForgotPasswordTemplate;
+type PasswordResetSuccessTemplate = BaseData & {
+  templateName: "password-reset-success";
+  locals: {
+    logo: string;
+    name: string;
+    loginUrl: string;
+  };
+};
+export type EmailJob = SignupTemplate | WelcomeTemplate | ForgotPasswordTemplate | PasswordResetSuccessTemplate;
 
 type EmailProcessorOptions = {
   logger: AppContext["logger"];
