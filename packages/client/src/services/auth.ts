@@ -89,6 +89,12 @@ export class Auth {
     return res;
   }
 
+  public async resetPassword(data: { password: string; token: string }) {
+    const url = `/v1/auth/reset-password?token=${data.token}`;
+    const res = await this.client.patch<{ message: string }, { password: string }>(url, { password: data.password });
+    return res;
+  }
+
   /**
    * Get user from the auth cookies.
    * @returns {AccessTokenPayload | null} Returns the user if it exists.
