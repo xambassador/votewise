@@ -59,4 +59,17 @@ export class SessionRepository extends BaseRepository {
       });
     });
   }
+
+  public findByUserId(userId: string) {
+    return this.execute(async () => {
+      const sessions = await this.db.session.findMany({ where: { user_id: userId } });
+      return sessions;
+    });
+  }
+
+  public clearByUserId(userId: string) {
+    return this.execute(async () => {
+      await this.db.session.deleteMany({ where: { user_id: userId } });
+    });
+  }
 }

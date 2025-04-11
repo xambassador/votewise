@@ -11,7 +11,8 @@ export function forgotPasswordControllerFactory() {
     "jwtService",
     "queues",
     "config",
-    "plugins"
+    "plugins",
+    "sessionManager"
   ]);
   const controller = new Controller({
     assert: ctx.assert,
@@ -20,7 +21,8 @@ export function forgotPasswordControllerFactory() {
     jwtService: ctx.jwtService,
     tasksQueue: ctx.queues.tasksQueue,
     appUrl: ctx.config.appUrl,
-    requestParser: ctx.plugins.requestParser
+    requestParser: ctx.plugins.requestParser,
+    sessionManager: ctx.sessionManager
   });
   const exceptionLayer = new ExceptionLayer({ name: "forgot-password" });
   return exceptionLayer.catch(controller.handle.bind(controller));

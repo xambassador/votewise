@@ -1,10 +1,12 @@
 import { Assertions, InvalidInputError } from "@votewise/errors";
+import { Minute } from "@votewise/times";
 
 import { requestParserPluginFactory } from "@/plugins/request-parser";
 import { mockTaskQueue } from "@/queues/__mock__";
 import { mockUserRepository } from "@/repository/__mock__/user.repository";
 import { mockCryptoService } from "@/services/__mock__/crypto.service";
 import { mockJWTService } from "@/services/__mock__/jwt.service";
+import { mockSessionManager, sessionManagerMockDeps } from "@/services/__mock__/session.service";
 
 import { buildReq, buildRes, buildUser } from "../../../../../test/helpers";
 import { Controller } from "../controller";
@@ -12,14 +14,16 @@ import { Controller } from "../controller";
 const user = buildUser();
 const ip = "192.168.4.45";
 const locals = { meta: { ip } };
+const appUrl = "http://localhost:3000";
 const controller = new Controller({
   userRepository: mockUserRepository,
   assert: new Assertions(),
   jwtService: mockJWTService,
   cryptoService: mockCryptoService,
   tasksQueue: mockTaskQueue,
-  appUrl: "http://localhost:3000",
-  requestParser: requestParserPluginFactory()
+  appUrl,
+  requestParser: requestParserPluginFactory(),
+  sessionManager: mockSessionManager
 });
 
 beforeEach(() => {
@@ -48,12 +52,14 @@ describe("Forgot Password Controller", () => {
     expect(res.json).toHaveBeenCalledWith({ message: "If the email exists, a reset link will be sent." });
   });
 
-  it("should create rid token and send email", async () => {
+  it("should create a new session and queue email", async () => {
     const req = buildReq({ body: { email: user.email } });
     const res = buildRes({ locals });
+    const sessionId = "session-id";
 
-    const ridToken = "rid_token";
-    const verificationCode = "verification_code";
+    mockUserRepository.findByEmail.mockResolvedValueOnce(user);
+    sessionManagerMockDeps.mockCryptoService.generateRandomString.mockReturnValue(sessionId);
+
     const queueData = {
       name: "email",
       payload: {
@@ -61,27 +67,25 @@ describe("Forgot Password Controller", () => {
         to: user.email,
         subject: "Forgot Password",
         locals: {
-          token: ridToken,
           firstName: user.first_name,
           expiresInUnit: "minutes",
-          expiresIn: 5,
-          resetLink: `http://localhost:3000/auth/reset-password?token=${ridToken}`,
-          ip: locals.meta.ip,
-          email: user.email
+          expiresIn: 30,
+          resetLink: `http://localhost:3000/auth/reset-password?token=${sessionId}`,
+          email: user.email,
+          logo: appUrl + "/assets/logo.png"
         }
       }
     };
-    const data = { email: user.email, verification_code: verificationCode };
-    const key = user.secret;
 
-    mockUserRepository.findByEmail.mockResolvedValueOnce(user);
-    mockJWTService.signRid.mockReturnValue(ridToken);
-    mockCryptoService.hash.mockReturnValue(verificationCode);
+    const key = `forgot-password:${sessionId}`;
+    const expiresIn = 30 * Minute;
+    const data = { userId: user.id, email: user.email };
 
     await controller.handle(req, res);
 
-    expect(mockCryptoService.hash).toHaveBeenCalledWith(`${user.id}:${ip}`);
-    expect(mockJWTService.signRid).toHaveBeenCalledWith(data, key, { expiresIn: "5m" });
+    expect(sessionManagerMockDeps.mockCache.setWithExpiry).toHaveBeenCalledWith(key, JSON.stringify(data), expiresIn);
     expect(mockTaskQueue.add).toHaveBeenCalledWith(queueData);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ message: "If the email exists, a reset link will be sent." });
   });
 });

@@ -159,4 +159,61 @@ export class SessionManager {
     });
     return updatedSession;
   }
+
+  /**
+   * Create a new forgot password session
+   *
+   * @param {string} userId - User ID
+   */
+  public async createForgotPasswordSession(data: { userId: string; email: string }) {
+    const sessionId = this.ctx.cryptoService.generateRandomString();
+    const expiresIn = 30 * Minute;
+    const sessionData = { userId: data.userId, email: data.email };
+    const key = `forgot-password:${sessionId}`;
+    await this.ctx.cache.setWithExpiry(key, JSON.stringify(sessionData), expiresIn);
+    return { sessionId, expiresIn };
+  }
+
+  /**
+   * Get the forgot password session
+   *
+   * @param {string} sessionId - Session ID
+   */
+  public async getForgotPasswordSession(sessionId: string) {
+    const key = `forgot-password:${sessionId}`;
+    const session = await this.ctx.cache.get(key);
+    if (!session) return null;
+    try {
+      const sessionData = JSON.parse(session) as { userId: string; email: string };
+      return sessionData;
+    } catch (err) {
+      return this.ctx.assert.badRequest(true, "Invalid session data");
+    }
+  }
+
+  /**
+   * Delete the forgot password session
+   *
+   * @param {string} sessionId - Session ID
+   */
+  public async deleteForgotPasswordSession(sessionId: string) {
+    const key = `forgot-password:${sessionId}`;
+    const session = await this.ctx.cache.get(key);
+    if (!session) return null;
+    await this.ctx.cache.del(key);
+    return true;
+  }
+
+  /**
+   * Delete all sessions for a user
+   *
+   * @param {string} userId - User ID
+   */
+  public async clearUserSessions(userId: string) {
+    const sessions = await this.ctx.sessionRepository.findByUserId(userId);
+    const sessionIds = sessions.map((session) => session.id);
+    const keys = sessionIds.map((sessionId) => this.getSessionKey(sessionId));
+    await Promise.all(keys.map((key) => this.ctx.cache.del(key)));
+    await this.ctx.sessionRepository.clearByUserId(userId);
+  }
 }

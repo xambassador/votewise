@@ -4,8 +4,8 @@ import { Assertions } from "@votewise/errors";
 import { Minute } from "@votewise/times";
 
 import { requestParserPluginFactory } from "@/plugins/request-parser";
+import { mockSessionManager } from "@/services/__mock__/session.service";
 import { JWTService } from "@/services/jwt.service";
-import { SessionManager } from "@/services/session.service";
 
 import { buildRefreshToken, buildReq, buildRes } from "../../../../../test/helpers";
 import { Controller } from "../controller";
@@ -14,17 +14,10 @@ import * as helpers from "./helpers";
 const jwtService = new JWTService({ accessTokenSecret: "secret" });
 
 const assert = new Assertions();
-const sessionManager = new SessionManager({
-  jwtService: helpers.mockJWTService,
-  cryptoService: helpers.mockCryptoService,
-  cache: helpers.mockCache,
-  assert,
-  sessionRepository: helpers.mockSessionRepository,
-  accessTokenExpiration: 30 * Minute
-});
+
 const controller = new Controller({
   useRepository: helpers.mockUserRepository,
-  sessionManager,
+  sessionManager: mockSessionManager,
   assert,
   requestParser: requestParserPluginFactory(),
   refreshTokensRepository: helpers.mockRefreshTokenRepository,

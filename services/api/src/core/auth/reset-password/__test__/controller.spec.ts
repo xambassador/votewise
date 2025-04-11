@@ -1,15 +1,14 @@
-import { StatusCodes } from "http-status-codes";
-
-import { Assertions, BadRequestError, InvalidInputError, ResourceNotFoundError } from "@votewise/errors";
+import { Assertions, InvalidInputError, ResourceNotFoundError } from "@votewise/errors";
 
 import { requestParserPluginFactory } from "@/plugins/request-parser";
+import { mockSessionManager, sessionManagerMockDeps } from "@/services/__mock__/session.service";
 
 import { buildReq, buildRes } from "../../../../../test/helpers";
 import { Controller } from "../controller";
 import * as helpers from "./helpers";
 
 const locals = helpers.locals;
-const body = { password: helpers.password, email: helpers.user.email };
+const body = { password: helpers.password };
 const user = helpers.user;
 
 const controller = new Controller({
@@ -17,7 +16,8 @@ const controller = new Controller({
   jwtService: helpers.jwtService,
   assert: new Assertions(),
   userRepository: helpers.mockUserRepository,
-  cryptoService: helpers.cryptoService
+  cryptoService: helpers.mockCryptoService,
+  sessionManager: mockSessionManager
 });
 
 beforeEach(() => {
@@ -26,7 +26,7 @@ beforeEach(() => {
 
 describe("Reset Password Controller", () => {
   it("should throw error if request is invalid", async () => {
-    let req = buildReq({ body: { email: helpers.user.email } });
+    let req = buildReq({ body: {} });
     const res = buildRes({ locals });
 
     let error = await controller.handle(req, res).catch((e) => e);
@@ -41,79 +41,44 @@ describe("Reset Password Controller", () => {
     expect(error.message).toBe("token is missing");
   });
 
-  it("should throw error if email is invalid", async () => {
-    const req = buildReq({ body, query: { token: helpers.rid } });
+  it("should throw error if session is expired", async () => {
+    const req = buildReq({ body, query: { token: helpers.invalidSessionId } });
     const res = buildRes({ locals });
-    helpers.setupHappyPath();
-    helpers.mockUserRepository.findByEmail.mockResolvedValue(null);
-
+    sessionManagerMockDeps.mockCache.get.mockResolvedValue(null);
     const error = await controller.handle(req, res).catch((e) => e);
-    expect(helpers.mockUserRepository.findByEmail).toHaveBeenCalledWith(user.email);
-    expect(helpers.mockUserRepository.findByEmail).toHaveBeenCalledTimes(1);
-    expect(error).toBeInstanceOf(ResourceNotFoundError);
-    expect(error.message).toBe(`User with email ${user.email} not found`);
-  });
-
-  it("should throw error if token is invalid", async () => {
-    const req = buildReq({ body, query: { token: "invalid-token" } });
-    const res = buildRes({ locals });
-    helpers.setupHappyPath();
-
-    const error = await controller.handle(req, res).catch((e) => e);
-    expect(helpers.mockUserRepository.findByEmail).toHaveBeenCalledWith(user.email);
-    expect(helpers.mockUserRepository.findByEmail).toHaveBeenCalledTimes(1);
-    expect(error).toBeInstanceOf(BadRequestError);
-    expect(error.message).toBe("Invalid token");
-  });
-
-  it("should throw error if emails do not match", async () => {
-    const req = buildReq({ body: { ...body, email: helpers.invalidUser.email }, query: { token: helpers.rid } });
-    const res = buildRes({ locals });
-    helpers.setupHappyPath();
-    helpers.mockUserRepository.findByEmail.mockResolvedValue(helpers.invalidUser);
-
-    const error = await controller.handle(req, res).catch((e) => e);
-    expect(helpers.mockUserRepository.findByEmail).toHaveBeenCalledWith(helpers.invalidUser.email);
+    expect(helpers.mockUserRepository.findById).not.toHaveBeenCalled();
     expect(helpers.mockUserRepository.update).not.toHaveBeenCalled();
-    expect(error).toBeInstanceOf(BadRequestError);
-    expect(error.message).toBe("Invalid email");
+    expect(error).toBeInstanceOf(ResourceNotFoundError);
+    expect(error.message).toBe("Your session has expired. Please try again");
   });
 
   it("should throw error if user is not found", async () => {
-    const req = buildReq({ body, query: { token: helpers.rid } });
+    const req = buildReq({ body, query: { token: helpers.invalidSessionId } });
     const res = buildRes({ locals });
-    helpers.mockUserRepository.findByEmail.mockResolvedValue(null);
+    sessionManagerMockDeps.mockCache.get.mockResolvedValue(helpers.sessionData);
+    helpers.mockUserRepository.findById.mockResolvedValue(null);
 
     const error = await controller.handle(req, res).catch((e) => e);
-    expect(helpers.mockUserRepository.findByEmail).toHaveBeenCalledWith(user.email);
+    expect(helpers.mockUserRepository.findById).toHaveBeenCalledWith(user.id);
     expect(helpers.mockUserRepository.update).not.toHaveBeenCalled();
     expect(error).toBeInstanceOf(ResourceNotFoundError);
-    expect(error.message).toBe(`User with email ${user.email} not found`);
+    expect(error.message).toBe(`User with email ${helpers.sessionDataAsJson.email} not found`);
   });
 
-  it("should throw error if verification code is invalid", async () => {
-    const req = buildReq({ body, query: { token: helpers.invalidRid } });
+  it("should update password successfully", async () => {
+    const req = buildReq({ body, query: { token: helpers.invalidSessionId } });
     const res = buildRes({ locals });
-    helpers.mockUserRepository.findByEmail.mockResolvedValue(user);
-
-    const error = await controller.handle(req, res).catch((e) => e);
-    expect(helpers.mockUserRepository.update).not.toHaveBeenCalled();
-    expect(error).toBeInstanceOf(BadRequestError);
-    expect(error.message).toBe("Invalid verification code");
-  });
-
-  it("should update user password", async () => {
-    const req = buildReq({ body, query: { token: helpers.rid } });
-    const res = buildRes({ locals });
-    helpers.setupHappyPath();
+    sessionManagerMockDeps.mockCache.get.mockResolvedValue(helpers.sessionData);
+    helpers.mockUserRepository.findById.mockResolvedValue(user);
+    helpers.mockCryptoService.hashPassword.mockResolvedValue("hashed-password");
+    helpers.mockCryptoService.generateUUID.mockReturnValue("new-secret");
 
     await controller.handle(req, res);
-
     expect(helpers.mockUserRepository.update).toHaveBeenCalledWith(user.id, {
-      password: expect.any(String),
-      secret: expect.any(String)
+      password: "hashed-password",
+      secret: "new-secret"
     });
-    expect(res.status).toHaveBeenCalledWith(StatusCodes.OK);
-    expect(res.json).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ message: "Password updated successfully" });
   });
 });

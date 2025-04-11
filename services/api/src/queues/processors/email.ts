@@ -16,8 +16,6 @@ type ForgotPasswordTemplate = BaseData & {
     firstName: string;
     expiresIn: number;
     expiresInUnit: "hours" | "minutes";
-    token: string;
-    ip: string;
     email: string;
     resetLink: string;
     logo: string;
