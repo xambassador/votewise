@@ -22,7 +22,7 @@ export async function verifyFactor(code: string): Promise<TActionResponse<Verify
 
   const authClient = getAuth();
   const res = await authClient.verifyFactor({ code, challengeId, factorId });
-  if (!res.success) return res;
+  if (!res.success) return { success: false, error: res.error, errorData: res.errorData };
 
   clearCookie(COOKIE_KEYS.factorId);
   clearCookie(COOKIE_KEYS.challengeId);
