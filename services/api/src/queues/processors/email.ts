@@ -8,8 +8,16 @@ type BaseData = {
   to: string;
   subject: string;
 };
-type SignupTemplate = BaseData & { templateName: "signup"; locals: { otp: string } };
-type WelcomeTemplate = BaseData & { templateName: "welcome"; locals: { userName: string } };
+type BaseLocals = { logo: string };
+type SignupTemplate = BaseData & {
+  templateName: "signup";
+  locals: {
+    otp: string;
+    expiresIn: number;
+    expiresInUnit: string;
+  } & BaseLocals;
+};
+type WelcomeTemplate = BaseData & { templateName: "welcome"; locals: { userName: string } & BaseLocals };
 type ForgotPasswordTemplate = BaseData & {
   templateName: "forgot-password";
   locals: {
@@ -18,16 +26,11 @@ type ForgotPasswordTemplate = BaseData & {
     expiresInUnit: "hours" | "minutes";
     email: string;
     resetLink: string;
-    logo: string;
-  };
+  } & BaseLocals;
 };
 type PasswordResetSuccessTemplate = BaseData & {
   templateName: "password-reset-success";
-  locals: {
-    logo: string;
-    name: string;
-    loginUrl: string;
-  };
+  locals: { name: string; loginUrl: string } & BaseLocals;
 };
 export type EmailJob = SignupTemplate | WelcomeTemplate | ForgotPasswordTemplate | PasswordResetSuccessTemplate;
 

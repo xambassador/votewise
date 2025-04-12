@@ -6,6 +6,7 @@ type RegisterServiceOptions = {
   cryptoService: AppContext["cryptoService"];
   cache: AppContext["cache"];
   tasksQueue: AppContext["queues"]["tasksQueue"];
+  appUrl: AppContext["config"]["appUrl"];
 };
 
 type User = {
@@ -45,7 +46,10 @@ export class UserRegisterService {
           subject: "Verify your email",
           templateName: "signup",
           locals: {
-            otp
+            otp,
+            logo: this.ctx.appUrl + "/assets/logo.png",
+            expiresIn: expiresIn / Minute,
+            expiresInUnit: "minutes"
           }
         }
       });
