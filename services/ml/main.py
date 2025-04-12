@@ -12,6 +12,7 @@ import redis
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+ML_SERVICE_PORT = os.getenv("ML_SERVICE_PORT", 5003)
 if not DATABASE_URL:
     raise ValueError("Invalid environment configuration. DATABASE_URL is missing")
 
@@ -33,7 +34,7 @@ class RecommendationRequest(BaseModel):
 def init_db():
     with engine.connect() as conn:
         conn.execute(text("""
-            CREATE TABLE IF NOT EXISTS UserSimilarity (
+            CREATE TABLE IF NOT EXISTS "UserSimilarity" (
                 user_id_1 VARCHAR,
                 user_id_2 VARCHAR,
                 similarity FLOAT,
@@ -74,15 +75,15 @@ def compute_and_store_similarity():
     ) / 2
 
     with engine.connect() as conn:
-        conn.execute(text("TRUNCATE TABLE user_similarity"))  # Clear old data
+        conn.execute(text('TRUNCATE TABLE "UserSimilarity"'))  # Clear old data
         similarity_data = [
             {"user_id_1": user1, "user_id_2": user2, "similarity": float(sim)}
             for user1, row in hybrid_similarity.iterrows()
             for user2, sim in row.items()
             if user1 != user2  # Exclude self-similarity
         ]
-        conn.execute(
-            text("INSERT INTO user_similarity (user_id_1, user_id_2, similarity) VALUES (:user_id_1, :user_id_2, :similarity) ON CONFLICT DO NOTHING"),
+        res = conn.execute(
+            text('INSERT INTO "UserSimilarity" (user_id_1, user_id_2, similarity) VALUES (:user_id_1, :user_id_2, :similarity) ON CONFLICT DO NOTHING'),
             similarity_data
         )
         conn.commit()
@@ -105,7 +106,7 @@ def load_similarity():
     if similarity_dict:
         return pd.DataFrame(similarity_dict).fillna(0).reindex(index=all_users, columns=all_users, fill_value=0)
 
-    sim_df = pd.read_sql('SELECT "user_id_1", "user_id_2", "similarity" FROM "user_similarity"', engine)
+    sim_df = pd.read_sql('SELECT "user_id_1", "user_id_2", "similarity" FROM "UserSimilarity"', engine)
     if sim_df.empty:
         return None
     pivot_df = sim_df.pivot(index="user_id_1", columns="user_id_2", values="similarity").fillna(0)
@@ -176,4 +177,4 @@ def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=ML_SERVICE_PORT)
