@@ -5,5 +5,7 @@ export const mockSessionRepository = {
   delete: jest.fn().mockName("sessionRepository.delete"),
   findByToken: jest.fn().mockName("sessionRepository.findByToken"),
   update: jest.fn().mockName("sessionRepository.update"),
-  find: jest.fn().mockName("sessionRepository.find")
+  find: jest.fn().mockName("sessionRepository.find"),
+  findByUserId: jest.fn().mockName("sessionRepository.findByUserId").mockResolvedValue([]),
+  clearByUserId: jest.fn().mockName("sessionRepository.clearByUserId")
 } as unknown as jest.Mocked<SessionRepository>;

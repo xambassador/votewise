@@ -1,5 +1,5 @@
-import type { AccessTokenPayload } from "@votewise/jwt";
 import type { Challange, Factor, RefreshToken, User } from "@votewise/prisma/client";
+import type { AccessTokenPayload } from "@votewise/types";
 import type { Request, Response } from "express";
 
 export function buildReq(overrides: Partial<Request> = {}) {

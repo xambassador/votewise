@@ -8,22 +8,30 @@ import type { PasswordStrengthProps } from "@votewise/ui/password-strength";
 import type { TResetPasswordForm, TResetPasswordFormKeys } from "../_utils";
 
 import { useTransition } from "react";
+import { useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm } from "@votewise/ui/form";
+import { makeToast } from "@votewise/ui/toast";
 
 import { ZResetPasswordSchema } from "../_utils";
+import { resetPassword } from "../action";
 
 export function useResetPassword() {
   const form = useForm<TResetPasswordForm>({
     resolver: zodResolver(ZResetPasswordSchema),
     defaultValues: { password: "" }
   });
+  const token = useSearchParams().get("token");
   const [isPending, startTransition] = useTransition();
   const password = form.watch("password");
 
-  const handleSubmit = form.handleSubmit(() => {
-    startTransition(() => {});
+  const handleSubmit = form.handleSubmit(({ password }) => {
+    startTransition(async () => {
+      if (!token) return;
+      const res = await resetPassword({ password, token });
+      if (!res.success) makeToast.error("Oops!", res.error);
+    });
   });
 
   function getPasswordStrengthProps(): PasswordStrengthProps {

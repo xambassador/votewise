@@ -5,7 +5,7 @@ import { Assertions } from "@votewise/errors";
 import { Minute } from "@votewise/times";
 
 import { requestParserPluginFactory } from "@/plugins/request-parser";
-import { SessionManager } from "@/services/session.service";
+import { mockSessionManager } from "@/services/__mock__/session.service";
 import { COOKIE_KEYS } from "@/utils/constant";
 
 import { buildReq, buildRes } from "../../../../../test/helpers";
@@ -21,14 +21,6 @@ const userNameBody = { username: "test", password: "password" };
 const ip = "192.34.24.45";
 const locals = { meta: { ip } };
 
-const sessionManager = new SessionManager({
-  cache: helpers.mockCache,
-  jwtService: helpers.mockJWTService,
-  cryptoService: helpers.mockCryptoService,
-  assert: new Assertions(),
-  sessionRepository: helpers.mockSessionRepository,
-  accessTokenExpiration: 30 * Minute
-});
 const userRegisterService = new UserRegisterService({
   tasksQueue: helpers.mockTaskQueue,
   cache: helpers.mockCache,
@@ -39,7 +31,7 @@ const controller = new Controller({
   cryptoService: helpers.mockCryptoService,
   jwtService: helpers.mockJWTService,
   assert: new Assertions(),
-  sessionManager,
+  sessionManager: mockSessionManager,
   strategies: {
     email: new EmailStrategy({ userRepository: helpers.mockUserRepository }),
     username: new UsernameStrategy({ userRepository: helpers.mockUserRepository })
@@ -193,7 +185,7 @@ describe("Signin Controller", () => {
       cryptoService: helpers.mockCryptoService,
       jwtService: helpers.mockJWTService,
       assert: new Assertions(),
-      sessionManager,
+      sessionManager: mockSessionManager,
       strategies: { email: helpers.mockEmailStrategy, username: helpers.mockUsernameStrategy },
       userRepository: helpers.mockUserRepository,
       sessionRepository: helpers.mockSessionRepository,

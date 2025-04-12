@@ -75,10 +75,7 @@ export const ZForgotPassword = z.object({
   email: ZEmail
 });
 
-export const ZResetPassword = z.object({
-  password: ZPassword,
-  email: ZEmail
-});
+export const ZResetPassword = z.object({ password: ZPassword });
 export const ZResetPasswordQuery = z.object({
   token: z
     .string({ required_error: "token is missing", invalid_type_error: "token must be a string" })

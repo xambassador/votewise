@@ -4,6 +4,7 @@ import type { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 
 import { ZForgotPassword } from "@votewise/schemas";
+import { Minute } from "@votewise/times";
 
 type ControllerOptions = {
   userRepository: AppContext["repositories"]["user"];
@@ -13,6 +14,7 @@ type ControllerOptions = {
   tasksQueue: AppContext["queues"]["tasksQueue"];
   appUrl: AppContext["config"]["appUrl"];
   requestParser: AppContext["plugins"]["requestParser"];
+  sessionManager: AppContext["sessionManager"];
 };
 
 const msg = "If the email exists, a reset link will be sent.";
@@ -25,9 +27,8 @@ export class Controller {
   }
 
   public async handle(req: Request, res: Response) {
-    const { body, locals } = this.ctx.requestParser.getParser(ZForgotPassword).parseRequest(req, res);
+    const { body } = this.ctx.requestParser.getParser(ZForgotPassword).parseRequest(req, res);
     const { email } = body;
-    const { ip } = locals.meta;
 
     const _user = await this.ctx.userRepository.findByEmail(email);
     if (!_user) {
@@ -35,10 +36,10 @@ export class Controller {
     }
 
     const user = _user!;
-    const verificationCode = this.ctx.cryptoService.hash(`${user.id}:${ip}`);
-    const data = { email, verification_code: verificationCode };
-    const key = user.secret;
-    const ridToken = this.ctx.jwtService.signRid(data, key, { expiresIn: "5m" });
+    const { expiresIn, sessionId } = await this.ctx.sessionManager.createForgotPasswordSession({
+      userId: user.id,
+      email
+    });
     this.ctx.tasksQueue.add({
       name: "email",
       payload: {
@@ -46,18 +47,15 @@ export class Controller {
         to: email,
         subject: "Forgot Password",
         locals: {
-          token: ridToken,
           firstName: user.first_name,
           expiresInUnit: "minutes",
-          expiresIn: 5,
-          resetLink: this.ctx.appUrl + `/auth/reset-password?token=${ridToken}`,
-          ip,
+          expiresIn: expiresIn / Minute,
+          resetLink: this.ctx.appUrl + `/auth/reset-password?token=${sessionId}`,
           email,
           logo: this.ctx.appUrl + "/assets/logo.png"
         }
       }
     });
-
     return res.status(StatusCodes.OK).json({ message: msg });
   }
 }

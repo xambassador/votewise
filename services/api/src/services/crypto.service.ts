@@ -130,4 +130,8 @@ export class CryptoService {
   public generateNanoId(size = 21): string {
     return nanoid(size);
   }
+
+  public generateRandomString(length = 32): string {
+    return crypto.randomBytes(length).toString("hex");
+  }
 }

@@ -12,9 +12,12 @@ type ControllerOptions = {
   userRepository: AppContext["repositories"]["user"];
   cryptoService: AppContext["cryptoService"];
   requestParser: AppContext["plugins"]["requestParser"];
+  sessionManager: AppContext["sessionManager"];
+  taskQueue: AppContext["queues"]["tasksQueue"];
+  appUrl: AppContext["config"]["appUrl"];
 };
 
-const { USER_NOT_FOUND, INVALID_TOKEN, INVALID_EMAIL, INVALID_VERIFICATION_CODE } = ERROR_CODES.AUTH;
+const { USER_NOT_FOUND, FORGOT_PASSWORD_SESSION_EXPIRED } = ERROR_CODES.AUTH;
 
 export class Controller {
   private readonly ctx: ControllerOptions;
@@ -25,32 +28,42 @@ export class Controller {
 
   public async handle(req: Request, res: Response) {
     const parser = this.ctx.requestParser.getParser(ZResetPassword, ZResetPasswordQuery);
-    const { body, query, locals } = parser.parseRequest(req, res);
-    const { password, email: unsafeEmail } = body;
+    const { body, query } = parser.parseRequest(req, res);
+    const { password } = body;
     const { token } = query;
-    const { ip } = locals.meta;
 
-    const _userFromUnsafeEmail = await this.ctx.userRepository.findByEmail(unsafeEmail);
-    this.ctx.assert.resourceNotFound(!_userFromUnsafeEmail, `User with email ${unsafeEmail} not found`, USER_NOT_FOUND);
-    const userFromUnsafeEmail = _userFromUnsafeEmail!;
+    const _session = await this.ctx.sessionManager.getForgotPasswordSession(token);
+    this.ctx.assert.resourceNotFound(
+      !_session,
+      "Your session has expired. Please try again",
+      FORGOT_PASSWORD_SESSION_EXPIRED
+    );
+    const session = _session!;
 
-    const decoded = this.ctx.jwtService.verifyRid(token, userFromUnsafeEmail.secret);
-    if (!decoded.success) {
-      return this.ctx.assert.badRequest(true, "Invalid token", INVALID_TOKEN);
-    }
-
-    const { email, verification_code } = decoded.data;
-    this.ctx.assert.badRequest(email !== unsafeEmail, "Invalid email", INVALID_EMAIL);
-
-    const user = userFromUnsafeEmail!;
-
-    const hash = this.ctx.cryptoService.hash(`${user.id}:${ip}`);
-    this.ctx.assert.badRequest(hash !== verification_code, "Invalid verification code", INVALID_VERIFICATION_CODE);
+    const _user = await this.ctx.userRepository.findById(session.userId);
+    this.ctx.assert.resourceNotFound(!_user, `User with email ${session.email} not found`, USER_NOT_FOUND);
+    const user = _user!;
 
     const hashedPassword = await this.ctx.cryptoService.hashPassword(password);
     await this.ctx.userRepository.update(user.id, {
       password: hashedPassword,
       secret: this.ctx.cryptoService.generateUUID()
+    });
+    await this.ctx.sessionManager.deleteForgotPasswordSession(token);
+    await this.ctx.sessionManager.clearUserSessions(user.id);
+
+    this.ctx.taskQueue.add({
+      name: "email",
+      payload: {
+        templateName: "password-reset-success",
+        to: user.email,
+        subject: "Password changed successfully",
+        locals: {
+          name: user.first_name,
+          loginUrl: this.ctx.appUrl + "/auth/signin",
+          logo: this.ctx.appUrl + "/assets/logo.png"
+        }
+      }
     });
 
     return res.status(StatusCodes.OK).json({ message: "Password updated successfully" });
