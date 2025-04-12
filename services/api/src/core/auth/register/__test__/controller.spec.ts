@@ -21,7 +21,8 @@ const assert = new Assertions();
 const service = new UserRegisterService({
   cache: helpers.mockCache,
   cryptoService: helpers.mockCryptoService,
-  tasksQueue: helpers.mockTaskQueue
+  tasksQueue: helpers.mockTaskQueue,
+  appUrl: "http://localhost:3000"
 });
 const controller = new Controller({
   assert,
@@ -79,7 +80,10 @@ describe("Register Controller", () => {
         subject: "Verify your email",
         templateName: "signup",
         locals: {
-          otp
+          otp,
+          logo: "http://localhost:3000/assets/logo.png",
+          expiresIn: windowExpiryIn / Minute,
+          expiresInUnit: "minutes"
         }
       }
     };

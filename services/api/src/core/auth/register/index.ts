@@ -5,11 +5,20 @@ import { Controller } from "./controller";
 import { UserRegisterService } from "./service";
 
 export function registerControllerFactory() {
-  const ctx = AppContext.getInjectionTokens(["repositories", "assert", "queues", "cache", "cryptoService", "plugins"]);
+  const ctx = AppContext.getInjectionTokens([
+    "repositories",
+    "assert",
+    "queues",
+    "cache",
+    "cryptoService",
+    "plugins",
+    "config"
+  ]);
   const service = new UserRegisterService({
     cache: ctx.cache,
     cryptoService: ctx.cryptoService,
-    tasksQueue: ctx.queues.tasksQueue
+    tasksQueue: ctx.queues.tasksQueue,
+    appUrl: ctx.config.appUrl
   });
   const controller = new Controller({
     userRepository: ctx.repositories.user,

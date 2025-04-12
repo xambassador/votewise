@@ -1,11 +1,138 @@
+- appName = "Votewise";
+- supportEmail = "support@votewise.com"
+- socialLinks = [{ name: "Twitter", url: "https://twitter.com/votewise" },{ name: "Facebook", url: "https://facebook.com/votewise" }, { name: "Instagram", url: "https://instagram.com/votewise" }]
+
 doctype html
 html(lang="en")
-    head
-        meta(charset="UTF-8")
-        meta(name="viewport", content="width=device-width, initial-scale=1.0")
-        title Sign Up Confirmation
-    body
-        h1 Welcome to our platform!
-        p
-            | Thank you for signing up. Here is your confirmation code:
-        h2 #{otp}
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Welcome to #{appName} - Verify Your Email
+    style.
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: hsla(214, 11.9%, 11.6%, 1); /* --black-500 */
+        color: hsla(220, 14.3%, 95.9%, 1); /* --gray-100 */
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .email-wrapper {
+        background-color: hsla(240, 5.3%, 11.2%, 1); /* --nobel-black-100 */
+        border-radius: 8px;
+        padding: 30px;
+        margin-top: 20px;
+        border: 1px solid hsla(240, 3.7%, 15.9%, 1); /* --nobel-black-200 */
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .logo {
+        max-width: 120px;
+        margin-bottom: 20px;
+      }
+      h1 {
+        color: hsla(0, 0%, 89.8%, 1); /* --white-50 */
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 16px;
+      }
+      h2 {
+        color: hsla(0, 0%, 89.8%, 1); /* --white-50 */
+        font-size: 20px;
+        font-weight: 600;
+        margin: 30px 0 16px;
+      }
+      p {
+        color: hsla(218, 10.6%, 64.9%, 1); /* --gray-400 */
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 24px;
+      }
+      .welcome-message {
+        font-size: 18px;
+        margin-bottom: 30px;
+      }
+      .verification-button {
+        display: inline-block;
+        background-color: hsla(18, 27%, 49.4%, 1); /* --orange-50 */
+        color: hsla(0, 0%, 89.8%, 1); /* --white-50 */
+        text-decoration: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-weight: 500;
+        margin: 16px 0;
+        text-align: center;
+      }
+      .verification-button:hover {
+        background-color: hsla(18, 27%, 45%, 1); /* slightly darker orange */
+      }
+      .verification-code {
+        background-color: hsla(240, 2.4%, 8%, 1); /* --nobel-black-50 */
+        border-radius: 6px;
+        padding: 16px;
+        margin: 20px 0;
+        text-align: center;
+        letter-spacing: 4px;
+        font-size: 28px;
+        font-weight: 600;
+        color: hsla(0, 0%, 89.8%, 1); /* --white-50 */
+      }
+      .divider {
+        height: 1px;
+        background-color: hsla(216, 12.2%, 83.9%, 0.1); /* --gray-300 with opacity */
+        margin: 30px 0;
+      }
+      .expiry-notice {
+        font-size: 14px;
+        color: hsla(220, 8.9%, 46.1%, 1); /* --gray-500 */
+        font-style: italic;
+        margin-top: 10px;
+      }
+      .footer {
+        text-align: center;
+        color: hsla(220, 8.9%, 46.1%, 1); /* --gray-500 */
+        font-size: 14px;
+        margin-top: 30px;
+      }
+      .footer p {
+        color: hsla(220, 8.9%, 46.1%, 1); /* --gray-500 */
+        font-size: 14px;
+        margin: 5px 0;
+      }
+      @media only screen and (max-width: 600px) {
+        .container {
+          padding: 10px;
+        }
+        .email-wrapper {
+          padding: 20px;
+        }
+      }
+
+  body
+    div.container
+      div.email-wrapper
+        div.header
+          if logo
+            img.logo(src=logo, alt=`${appName} Logo`)
+          h1 Welcome to #{appName}!
+
+        p.welcome-message Hi,
+        p Thank you for signing up! We're excited to have you join our community. To get started, please verify your email address.
+        h2 Your Verification Code
+        div.verification-code #{otp}
+        p Enter this code on the verification page.
+        //- p Enter this code on the verification page or click the button below to verify your email address:
+        //- div(style="text-align: center;")
+        //-   a.verification-button(href=verificationLink) Verify Email Address
+        p.expiry-notice This verification code will expire in #{expiresIn} #{expiresInUnit}.
+        div.divider
+        p If you have any questions or need assistance, our support team is here to help.
+        div.footer
+          p If you have any questions, contact our support team at #{supportEmail}
+          p &copy; #{new Date().getFullYear()} #{appName}. All rights reserved.

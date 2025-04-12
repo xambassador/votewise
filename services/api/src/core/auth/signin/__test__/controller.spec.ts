@@ -24,7 +24,8 @@ const locals = { meta: { ip } };
 const userRegisterService = new UserRegisterService({
   tasksQueue: helpers.mockTaskQueue,
   cache: helpers.mockCache,
-  cryptoService: helpers.mockCryptoService
+  cryptoService: helpers.mockCryptoService,
+  appUrl: "http://localhost:3000"
 });
 const controller = new Controller({
   requestParser: requestParserPluginFactory(),

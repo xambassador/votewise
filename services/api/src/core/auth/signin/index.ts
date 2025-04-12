@@ -14,7 +14,8 @@ export function singinControllerFactory() {
     "cryptoService",
     "sessionManager",
     "cache",
-    "queues"
+    "queues",
+    "config"
   ]);
   const emailStrategy = new EmailStrategy({ userRepository: ctx.repositories.user });
   const usernameStrategy = new UsernameStrategy({ userRepository: ctx.repositories.user });
@@ -22,7 +23,8 @@ export function singinControllerFactory() {
   const service = new UserRegisterService({
     cache: ctx.cache,
     tasksQueue: ctx.queues.tasksQueue,
-    cryptoService: ctx.cryptoService
+    cryptoService: ctx.cryptoService,
+    appUrl: ctx.config.appUrl
   });
   const controller = new Controller({
     strategies,
