@@ -12,6 +12,7 @@ import { getSSL } from "@/utils";
 import { banner } from "@/utils/banner";
 
 import { AppContext } from "../context";
+import { DevelopmentRouter } from "./dev-router";
 import * as error from "./error";
 import { AppMiddleware } from "./middlewares";
 import { AppRouter } from "./router";
@@ -35,7 +36,8 @@ export class Server {
     const app = express();
     const ctx = await AppContext.fromConfig(cfg, secrets, overrides);
     const middleware = new AppMiddleware();
-    const routers = new AppRouter({});
+    const devRouter = new DevelopmentRouter({ devMode: ctx.config.devMode });
+    const routers = new AppRouter({ devRouter });
     app.disable("x-powered-by");
     app.set("trust proxy", true);
     app.use(middleware.register());
