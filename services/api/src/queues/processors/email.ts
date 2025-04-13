@@ -17,7 +17,7 @@ type SignupTemplate = BaseData & {
     expiresInUnit: string;
   } & BaseLocals;
 };
-type WelcomeTemplate = BaseData & { templateName: "welcome"; locals: { userName: string } & BaseLocals };
+type WelcomeTemplate = BaseData & { templateName: "welcome"; locals: { name: string } & BaseLocals };
 type ForgotPasswordTemplate = BaseData & {
   templateName: "forgot-password";
   locals: {

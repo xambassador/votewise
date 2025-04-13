@@ -12,6 +12,8 @@ type ControllerOptions = {
   userRepository: AppContext["repositories"]["user"];
   userInterestRepository: AppContext["repositories"]["userInterest"];
   requestParser: AppContext["plugins"]["requestParser"];
+  taskQueue: AppContext["queues"]["tasksQueue"];
+  appUrl: AppContext["config"]["appUrl"];
 };
 
 export class Controller {
@@ -51,6 +53,19 @@ export class Controller {
     });
 
     await this.ctx.userInterestRepository.create(userId, topics);
+
+    this.ctx.taskQueue.add({
+      name: "email",
+      payload: {
+        templateName: "welcome",
+        to: user.email,
+        subject: "Welcome to VoteWise",
+        locals: {
+          name: user.first_name + " " + user.last_name,
+          logo: this.ctx.appUrl + "/assets/logo.png"
+        }
+      }
+    });
 
     return res.status(StatusCodes.OK).json({ is_onboarded: user.is_onboarded, ...body });
   }
