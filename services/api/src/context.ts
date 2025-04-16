@@ -17,6 +17,7 @@ import { SessionManager } from "@/services/session.service";
 import { Cache } from "@/storage/redis";
 import { checkEnv } from "@/utils";
 
+import { RateLimiterManager } from "./lib/rate-limiter";
 import { jwtPluginFactory } from "./plugins/jwt";
 import { requestParserPluginFactory } from "./plugins/request-parser";
 import { TasksQueue } from "./queues";
@@ -65,6 +66,7 @@ export type AppContextOptions = {
   queues: Queue;
   assert: Assertions;
   plugins: Plugins;
+  rateLimiteManager: RateLimiterManager;
 };
 
 export class AppContext {
@@ -84,6 +86,7 @@ export class AppContext {
   public assert: Assertions;
   public sessionManager: SessionManager;
   public plugins: Plugins;
+  public rateLimiteManager: RateLimiterManager;
 
   constructor(opts: AppContextOptions) {
     this.config = opts.config;
@@ -100,6 +103,7 @@ export class AppContext {
     this.assert = opts.assert;
     this.sessionManager = opts.sessionManager;
     this.plugins = opts.plugins;
+    this.rateLimiteManager = opts.rateLimiteManager;
   }
 
   static async fromConfig(
@@ -136,6 +140,7 @@ export class AppContext {
     });
     const requestParser = requestParserPluginFactory();
     const jwtPlugin = jwtPluginFactory({ jwtService });
+    const rateLimiteManager = RateLimiterManager.create();
     const ctx = new AppContext({
       config: cfg,
       secrets,
@@ -148,6 +153,7 @@ export class AppContext {
       cryptoService,
       assert,
       sessionManager,
+      rateLimiteManager,
       repositories: {
         user: userRepository,
         factor: factorRepository,

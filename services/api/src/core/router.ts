@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import { authMiddlewareFactory } from "@/http/middlewares/auth";
+import { rateLimitMiddlewareFactory } from "@/http/middlewares/rate-limit";
 
 import { forgotPasswordControllerFactory } from "./auth/forgot-password";
 import { getVerificationSessionControllerFactory } from "./auth/get-verification-session";
@@ -35,7 +36,15 @@ export function moduleRouterFactory(basePath: string): Router {
 
   router.post(path + "/auth/register", registerControllerFactory());
   router.patch(path + "/auth/verify", verifyControllerFactory());
-  router.post(path + "/auth/signin", singinControllerFactory());
+  router.post(
+    path + "/auth/signin",
+    rateLimitMiddlewareFactory(path + "/auth/signin", {
+      keyPrefix: "rtSignin",
+      points: 2,
+      duration: 60
+    }),
+    singinControllerFactory()
+  );
   router.post(path + "/auth/refresh", refreshControllerFactory());
   router.post(path + "/auth/forgot-password", forgotPasswordControllerFactory());
   router.patch(path + "/auth/reset-password", resetPasswordControllerFactory());

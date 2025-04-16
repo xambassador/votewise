@@ -141,6 +141,26 @@ class UnprocessableEntityError extends Error {
   }
 }
 
+class ConflictError extends Error {
+  statusCode = 409;
+  errorCode?: number;
+  constructor(message: string, errorCode?: number) {
+    super(message);
+    this.name = "ConflictError";
+    this.errorCode = errorCode;
+  }
+}
+
+class TooManyRequestsError extends Error {
+  statusCode = 429;
+  errorCode?: number;
+  constructor(message: string, errorCode?: number) {
+    super(message);
+    this.name = "TooManyRequestsError";
+    this.errorCode = errorCode;
+  }
+}
+
 class Assertions {
   public invalidInput(condition: boolean, message: string, errorCode = 400) {
     if (condition) throw new InvalidInputError(message, errorCode);
@@ -185,6 +205,14 @@ class Assertions {
   public unprocessableEntity(condition: boolean, message: string, errorCode = 422) {
     if (condition) throw new UnprocessableEntityError(message, errorCode);
   }
+
+  public conflict(condition: boolean, message: string, errorCode = 409) {
+    if (condition) throw new ConflictError(message, errorCode);
+  }
+
+  public tooManyRequests(condition: boolean, message: string, errorCode = 429) {
+    if (condition) throw new TooManyRequestsError(message, errorCode);
+  }
 }
 
 export {
@@ -198,5 +226,7 @@ export {
   InternalServerError,
   BadRequestError,
   Assertions,
-  UnprocessableEntityError
+  UnprocessableEntityError,
+  ConflictError,
+  TooManyRequestsError
 };

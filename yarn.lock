@@ -7099,6 +7099,7 @@ __metadata:
     pino-pretty: "npm:^11.2.2"
     pug: "npm:^3.0.3"
     qrcode: "npm:^1.5.4"
+    rate-limiter-flexible: "npm:^7.0.0"
     request-ip: "npm:^3.3.0"
     rimraf: "npm:^6.0.1"
     slug: "npm:^9.1.0"
@@ -20118,6 +20119,13 @@ __metadata:
   version: 1.2.1
   resolution: "range-parser@npm:1.2.1"
   checksum: 96c032ac2475c8027b7a4e9fe22dc0dfe0f6d90b85e496e0f016fbdb99d6d066de0112e680805075bd989905e2123b3b3d002765149294dce0c1f7f01fcc2ea0
+  languageName: node
+  linkType: hard
+
+"rate-limiter-flexible@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "rate-limiter-flexible@npm:7.0.0"
+  checksum: 53c3a0fa6feeac19913b9d10d6c858052fcab1ba6d1662c2c13af473a2f5dc8e564ed8c709215a45e066e1e9abf839e97f4b1a23798e2ac4ae881683ee1b64f5
   languageName: node
   linkType: hard
 
