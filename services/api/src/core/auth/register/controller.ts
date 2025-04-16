@@ -7,6 +7,8 @@ import { StatusCodes } from "http-status-codes";
 import { ERROR_CODES } from "@votewise/constant";
 import { ZRegister } from "@votewise/schemas";
 
+import { normalizeEmail } from "@/utils/email";
+
 type ControllerOptions = {
   userRepository: AppContext["repositories"]["user"];
   cryptoService: AppContext["cryptoService"];
@@ -33,8 +35,9 @@ export class Controller {
 
     const hash = await this.ctx.cryptoService.hashPassword(body.password);
     const defaultUserName = this.ctx.cryptoService.generateNanoId(20);
+    const email = normalizeEmail(body.email);
     const createdUser = await this.ctx.userRepository.create({
-      email: body.email,
+      email,
       password: hash,
       user_name: `user_${defaultUserName}`, // We will update this later in onboarding process
       first_name: "INVALID_FIRST_NAME",
@@ -43,7 +46,7 @@ export class Controller {
 
     const { verificationCode, expiresIn } = await this.ctx.userRegisterService.startVerificationProcess({
       userId: createdUser.id,
-      email: body.email,
+      email,
       ip,
       secret: createdUser.secret
     });
