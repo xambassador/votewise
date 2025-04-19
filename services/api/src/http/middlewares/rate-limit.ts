@@ -7,30 +7,34 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { RateLimiterRes } from "@/lib/rate-limiter";
 import { getIpLocals } from "@/utils/locals";
 
-export function rateLimitMiddlewareFactory(path: string, opts: IRateLimiterOptions) {
+type Options = IRateLimiterOptions & { calcKey?: (ip: string) => string };
+
+export function rateLimitMiddlewareFactory(path: string, opts: Options) {
+  const { calcKey, ...rest } = opts;
   const rateLimiteManager = AppContext.getInjectionToken("rateLimiteManager");
   const exceptionLayer = new ExceptionLayer({ name: "rate-limit-middleware" });
   return exceptionLayer.catch(async (_, res, next) => {
     const {
       meta: { ip }
     } = getIpLocals(res);
-    const limiter = rateLimiteManager.register(path, opts);
+    const key = calcKey ? calcKey(ip) : ip;
+    const limiter = rateLimiteManager.register(path, rest);
     try {
-      await limiter.consume(ip);
+      await limiter.consume(key);
     } catch (rateLimitRes) {
       if (rateLimitRes instanceof RateLimiterRes) {
         if (rateLimitRes.msBeforeNext) {
           res.set("Retry-After", `${rateLimitRes.msBeforeNext / 1000}`);
           res.set("RateLimit-Limit", `${limiter.points}`);
           res.set("RateLimit-Remaining", `${rateLimitRes.remainingPoints}`);
-          res.set("RateLimit-Reset", `${new Date(Date.now() + rateLimitRes.msBeforeNext)}`);
+          res.set("RateLimit-Reset", `${Math.floor((Date.now() + rateLimitRes.msBeforeNext) / 1000)}`);
           res.set("X-RateLimit-Limit", `${limiter.points}`);
           res.set("X-RateLimit-Remaining", `${rateLimitRes.remainingPoints}`);
-          res.set("X-RateLimit-Reset", `${new Date(Date.now() + rateLimitRes.msBeforeNext)}`);
+          res.set("X-RateLimit-Reset", `${Math.floor((Date.now() + rateLimitRes.msBeforeNext) / 1000)}`);
         }
       }
       throw new TooManyRequestsError(
-        `Rate limit exceeded for ${path} with ${opts.points} points per ${opts.duration} seconds`
+        "ERROR: Too many requests. Server experiencing user enthusiasm overload. Apply patience liberally."
       );
     }
 

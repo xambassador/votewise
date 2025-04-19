@@ -5,6 +5,7 @@ import { RateLimiterMemory, RateLimiterRedis, RateLimiterRes } from "rate-limite
 
 import { environment } from "@votewise/env";
 
+export { RateLimiterRes };
 export type IRateLimiterOptions = {
   keyPrefix: string;
   points: number;
@@ -14,28 +15,20 @@ export type IRateLimiterOptions = {
   blockDuration?: number;
 };
 
-export { RateLimiterRes };
+function createInMemoryLimiterFactory(opt: IRateLimiterOptions): RateLimiterAbstract {
+  return new RateLimiterMemory(opt);
+}
 
-export class RateLimiter {
-  constructor() {
-    throw new Error("RateLimiter is a static class and cannot be instantiated.");
-  }
-
-  static createInMemory(opt: IRateLimiterOptions): RateLimiterAbstract {
-    return new RateLimiterMemory(opt);
-  }
-
-  static createRedisLimiter(storeClient: unknown, opt: IRateLimiterOptions): RateLimiterAbstract {
-    return new RateLimiterRedis({
-      storeClient,
-      ...opt,
-      insuranceLimiter: this.createInMemory(opt)
-    });
-  }
+function createRedisLimiterFactory(storeClient: unknown, opt: IRateLimiterOptions): RateLimiterAbstract {
+  return new RateLimiterRedis({
+    storeClient,
+    ...opt,
+    insuranceLimiter: createInMemoryLimiterFactory(opt)
+  });
 }
 
 export class RateLimiterManager {
-  private static _instance: RateLimiterManager;
+  private static _instance: RateLimiterManager | null = null;
   private _redisClient: Redis | null = null;
   private readonly routeRateLimiters: Map<string, RateLimiterAbstract> = new Map();
 
@@ -61,13 +54,31 @@ export class RateLimiterManager {
   }
 
   public register(route: string, opt: IRateLimiterOptions) {
-    const instance = RateLimiterManager.create();
+    const instance = RateLimiterManager._instance;
+    if (!instance) {
+      throw new Error(`RateLimiterManager is not initialized. Call create() first.`);
+    }
     const limiter = instance.routeRateLimiters.get(route);
     if (!limiter) {
-      const limiter = RateLimiter.createRedisLimiter(instance._redisClient, opt);
+      const limiter = createRedisLimiterFactory(instance._redisClient, opt);
       instance.routeRateLimiters.set(route, limiter);
       return limiter;
     }
     return limiter;
   }
 }
+
+export const rateLimitStrategies = {
+  THREE_PER_MINUTE: {
+    points: 3,
+    duration: 60
+  },
+  FIVE_PER_HOUR: {
+    points: 5,
+    duration: 60 * 60
+  },
+  THREE_PER_HOUR: {
+    points: 3,
+    duration: 60 * 60
+  }
+};

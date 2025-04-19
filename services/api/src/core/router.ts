@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import { authMiddlewareFactory } from "@/http/middlewares/auth";
 import { rateLimitMiddlewareFactory } from "@/http/middlewares/rate-limit";
+import { rateLimitStrategies } from "@/lib/rate-limiter";
 
 import { forgotPasswordControllerFactory } from "./auth/forgot-password";
 import { getVerificationSessionControllerFactory } from "./auth/get-verification-session";
@@ -34,20 +35,42 @@ export function moduleRouterFactory(basePath: string): Router {
   const path = basePath + "/v1";
   const auth = authMiddlewareFactory();
 
-  router.post(path + "/auth/register", registerControllerFactory());
+  router.post(
+    path + "/auth/register",
+    rateLimitMiddlewareFactory(path + "/auth/register", {
+      ...rateLimitStrategies.FIVE_PER_HOUR,
+      keyPrefix: "rtRegister"
+    }),
+    registerControllerFactory()
+  );
   router.patch(path + "/auth/verify", verifyControllerFactory());
   router.post(
     path + "/auth/signin",
     rateLimitMiddlewareFactory(path + "/auth/signin", {
-      keyPrefix: "rtSignin",
-      points: 2,
-      duration: 60
+      ...rateLimitStrategies.THREE_PER_MINUTE,
+      keyPrefix: "rtSignin"
     }),
     singinControllerFactory()
   );
   router.post(path + "/auth/refresh", refreshControllerFactory());
-  router.post(path + "/auth/forgot-password", forgotPasswordControllerFactory());
-  router.patch(path + "/auth/reset-password", resetPasswordControllerFactory());
+  router.post(
+    path + "/auth/forgot-password",
+    rateLimitMiddlewareFactory(path + "/auth/forgot-password", {
+      ...rateLimitStrategies.THREE_PER_HOUR,
+      keyPrefix: "rtForgotPassword",
+      blockDuration: 60 * 60 * 3
+    }),
+    forgotPasswordControllerFactory()
+  );
+  router.patch(
+    path + "/auth/reset-password",
+    rateLimitMiddlewareFactory(path + "/auth/reset-password", {
+      ...rateLimitStrategies.THREE_PER_HOUR,
+      keyPrefix: "rtResetPassword",
+      blockDuration: 60 * 60 * 3
+    }),
+    resetPasswordControllerFactory()
+  );
   router.delete(path + "/auth/logout", auth, logoutControllerFactory());
   router.post(path + "/auth/factors/enroll", auth, enrollMFAControllerFactory());
   router.post(path + "/auth/factors/:factor_id/challenge", auth, challengeMFAControllerFactory());
