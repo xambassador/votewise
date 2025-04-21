@@ -11,7 +11,9 @@ const errorTypes = [
   Errors.OperationNotAllowedError,
   Errors.AuthenticationError,
   Errors.InternalServerError,
-  Errors.UnprocessableEntityError
+  Errors.UnprocessableEntityError,
+  Errors.ConflictError,
+  Errors.TooManyRequestsError
 ];
 
 const serverErrors = [Errors.UnknowError, Errors.DatabaseError];
