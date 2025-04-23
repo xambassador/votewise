@@ -1,9 +1,54 @@
 import { z } from "zod";
 
+export const ZAsset = z.object({
+  url: z.string({ required_error: "url is required" }).url({ message: "url is not a valid url" }),
+  type: z.enum(["IMAGE", "VIDEO"], {
+    errorMap: (issue, ctx) => {
+      if (issue.code === "invalid_enum_value") {
+        return { message: `type must be one of IMAGE, VIDEO` };
+      }
+
+      if (issue.code === "invalid_type" && issue.received === "undefined") {
+        return { message: `type is required` };
+      }
+
+      if (issue.code === "invalid_type") {
+        return { message: `type must be a string` };
+      }
+
+      return { message: issue.message || ctx.defaultError };
+    }
+  })
+});
+
 export const ZFeedCreate = z.object({
   title: z
-    .string({ message: "title is required" })
+    .string({ required_error: "title is required" })
     .min(1, { message: "title is required" })
     .max(255, { message: "title must be less than 255 characters" }),
-  content: z.string({ message: "content is required" }).min(1, { message: "content is required" })
+  content: z.string({ message: "content is required" }).min(1, { message: "content is required" }),
+  status: z
+    .enum(["OPEN", "CLOSED", "ARCHIVED", "INPROGRESS"], {
+      errorMap: (issue, ctx) => {
+        if (issue.code === "invalid_enum_value") {
+          return { message: `status must be one of OPEN, CLOSED, ARCHIVED, INPROGRESS` };
+        }
+        return { message: issue.message || ctx.defaultError };
+      }
+    })
+    .default("OPEN"),
+  type: z
+    .enum(["PUBLIC", "GROUP_ONLY"], {
+      errorMap: (issue, ctx) => {
+        if (issue.code === "invalid_enum_value") {
+          return { message: `type must be one of PUBLIC, GROUP_ONLY` };
+        }
+        return { message: issue.message || ctx.defaultError };
+      }
+    })
+    .default("PUBLIC"),
+  group_id: z.string({ invalid_type_error: "group_id must be a string" }).optional(),
+  assets: z.array(ZAsset, { invalid_type_error: "assets must be an array" }).optional()
 });
+
+export type TFeedCreate = z.infer<typeof ZFeedCreate>;

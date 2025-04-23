@@ -9,7 +9,8 @@ export function createFeedControllerFactory() {
     feedRepository: ctx.repositories.feed,
     requestParser: ctx.plugins.requestParser,
     timelineRepository: ctx.repositories.timeline,
-    followRepository: ctx.repositories.follow
+    followRepository: ctx.repositories.follow,
+    feedAsset: ctx.repositories.feedAsset
   });
   const exceptionLayer = new ExceptionLayer({ name: "create-feed" });
   return exceptionLayer.catch(controller.handle.bind(controller));

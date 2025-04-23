@@ -21,6 +21,7 @@ import { RateLimiterManager } from "./lib/rate-limiter";
 import { jwtPluginFactory } from "./plugins/jwt";
 import { requestParserPluginFactory } from "./plugins/request-parser";
 import { TasksQueue } from "./queues";
+import { FeedAssetRepository } from "./repository/feed-asset.repository";
 import { FeedRepository } from "./repository/feed.repository";
 import { FollowRepository } from "./repository/follow.repository";
 import { RefreshTokenRepository } from "./repository/refresh-token.repository";
@@ -40,6 +41,7 @@ type Repositories = {
   feed: FeedRepository;
   follow: FollowRepository;
   timeline: TimelineRepository;
+  feedAsset: FeedAssetRepository;
 };
 
 type Queue = {
@@ -128,6 +130,7 @@ export class AppContext {
     const feedRepository = new FeedRepository({ db });
     const followRepository = new FollowRepository({ db });
     const timelineRepository = new TimelineRepository({ db });
+    const feedAssetRepository = new FeedAssetRepository({ db });
     const mailer = new Mailer({ env: environment });
     const tasksQueue = new TasksQueue({ env: environment });
     const sessionManager = new SessionManager({
@@ -164,7 +167,8 @@ export class AppContext {
         userInterest: userInterestRepository,
         feed: feedRepository,
         follow: followRepository,
-        timeline: timelineRepository
+        timeline: timelineRepository,
+        feedAsset: feedAssetRepository
       },
       queues: { tasksQueue },
       plugins: { requestParser, jwt: jwtPlugin },
