@@ -101,6 +101,21 @@ export class SessionManager {
   }
 
   /**
+   * Save the session into memory
+   *
+   * @param {string} sessionId - Session ID
+   * @param {TSession & { userId: string }} session - Session object
+   */
+  public async saveSessionToCache(sessionId: string, session: TInMemorySession & { userId: string }) {
+    const key = this.getSessionKey(sessionId);
+    await this.ctx.cache.setWithExpiry(
+      key,
+      JSON.stringify({ ip: session.ip, userAgent: session.userAgent, aal: session.aal }),
+      20 * Minute
+    );
+  }
+
+  /**
    * Get the session from the cache if found else load from database and save in cache
    *
    * @param {string} sessionId - Session ID
@@ -117,7 +132,7 @@ export class SessionManager {
       aal: sessionData.aal as "aal1" | "aal2",
       userId: sessionData.user_id
     };
-    await this.save(sessionId, data);
+    await this.saveSessionToCache(sessionId, data);
     return data;
   }
 
