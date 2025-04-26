@@ -83,3 +83,13 @@ export class ServerConfig {
     this.appName = cfg.appName;
   }
 }
+
+declare global {
+  interface ApplicationConfigs {
+    server: ServerConfig;
+    secrets: ServerSecrets;
+    cors: Cors;
+    ssl: SSL;
+    jwt: JWT;
+  }
+}

@@ -1,46 +1,33 @@
-import type { ServerConfig, ServerSecrets } from "@/configs";
-import type { TEnv } from "@votewise/env";
-import type { JWTPlugin } from "./plugins/jwt";
-import type { RequestParserPlugin } from "./plugins/request-parser";
-
 import { Assertions } from "@votewise/errors";
 import logger from "@votewise/log";
 import { prisma } from "@votewise/prisma";
 
 import { Mailer } from "@/emails/mailer";
+import * as Plugins from "@/plugins";
 import * as Repositories from "@/repository";
-import { CryptoService } from "@/services/crypto.service";
-import { JWTService } from "@/services/jwt.service";
-import { SessionManager } from "@/services/session.service";
+import * as Services from "@/services";
 import { Cache } from "@/storage/redis";
 import { checkEnv } from "@/utils";
 
 import { RateLimiterManager } from "./lib/rate-limiter";
-import { jwtPluginFactory } from "./plugins/jwt";
-import { requestParserPluginFactory } from "./plugins/request-parser";
 import { TasksQueue } from "./queues";
 
-type Queue = {
-  tasksQueue: TasksQueue;
-};
-
-type Plugins = {
-  requestParser: RequestParserPlugin;
-  jwt: JWTPlugin;
-};
+type Queue = { tasksQueue: TasksQueue };
+type ServerConfig = ApplicationConfigs["server"];
+type ServerSecrets = ApplicationConfigs["secrets"];
 
 export type AppContextOptions = {
   config: ServerConfig;
   secrets: ServerSecrets;
   db: typeof prisma;
   logger: typeof logger;
-  environment: TEnv;
+  environment: Environment;
   cache: Cache;
   mailer: Mailer;
   repositories: Repositories;
-  jwtService: JWTService;
-  cryptoService: CryptoService;
-  sessionManager: SessionManager;
+  jwtService: Services["jwt"];
+  cryptoService: Services["crypto"];
+  sessionManager: Services["session"];
   queues: Queue;
   assert: Assertions;
   plugins: Plugins;
@@ -54,15 +41,15 @@ export class AppContext {
   public secrets: ServerSecrets;
   public db: typeof prisma;
   public logger: typeof logger;
-  public environment: TEnv;
+  public environment: Environment;
   public cache: Cache;
-  public jwtService: JWTService;
+  public jwtService: Services["jwt"];
   public repositories: Repositories;
   public mailer: Mailer;
-  public cryptoService: CryptoService;
+  public cryptoService: Services["crypto"];
   public queues: Queue;
   public assert: Assertions;
-  public sessionManager: SessionManager;
+  public sessionManager: Services["session"];
   public plugins: Plugins;
   public rateLimiteManager: RateLimiterManager;
 
@@ -94,8 +81,8 @@ export class AppContext {
     const assert = new Assertions();
     const cache = new Cache();
     const db = prisma;
-    const jwtService = new JWTService({ accessTokenSecret: secrets.jwtSecret });
-    const cryptoService = new CryptoService();
+    const jwtService = new Services.JWTService({ accessTokenSecret: secrets.jwtSecret });
+    const cryptoService = new Services.CryptoService();
     const userRepository = new Repositories.UserRepository({ db });
     const factorRepository = new Repositories.FactorRepository({ db });
     const challengeRepository = new Repositories.ChallengeRepository({ db });
@@ -109,7 +96,7 @@ export class AppContext {
     const feedAssetRepository = new Repositories.FeedAssetRepository({ db });
     const mailer = new Mailer({ env: environment });
     const tasksQueue = new TasksQueue({ env: environment });
-    const sessionManager = new SessionManager({
+    const sessionManager = new Services.SessionManager({
       jwtService,
       cache,
       assert,
@@ -117,8 +104,8 @@ export class AppContext {
       sessionRepository,
       accessTokenExpiration: cfg.jwt.accessTokenExpiration
     });
-    const requestParser = requestParserPluginFactory();
-    const jwtPlugin = jwtPluginFactory({ jwtService });
+    const requestParser = Plugins.requestParserPluginFactory();
+    const jwtPlugin = Plugins.jwtPluginFactory({ jwtService });
     const rateLimiteManager = RateLimiterManager.create();
     const ctx = new AppContext({
       config: cfg,

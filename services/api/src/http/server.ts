@@ -1,6 +1,5 @@
 import "@/types";
 
-import type { ServerConfig, ServerSecrets } from "@/configs";
 import type { HttpTerminator } from "http-terminator";
 
 import http from "http";
@@ -18,6 +17,9 @@ import { AppMiddleware } from "./middlewares";
 import { AppRouter } from "./router";
 
 /* ----------------------------------------------------------------------------------------------- */
+
+type ServerConfig = ApplicationConfigs["server"];
+type ServerSecrets = ApplicationConfigs["secrets"];
 
 export class Server {
   public ctx: AppContext;
