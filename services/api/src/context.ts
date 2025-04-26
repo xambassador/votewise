@@ -8,9 +8,7 @@ import logger from "@votewise/log";
 import { prisma } from "@votewise/prisma";
 
 import { Mailer } from "@/emails/mailer";
-import { ChallengeRepository } from "@/repository/challenge.repository";
-import { FactorRepository } from "@/repository/factor.repository";
-import { UserRepository } from "@/repository/user.repository";
+import * as Repositories from "@/repository";
 import { CryptoService } from "@/services/crypto.service";
 import { JWTService } from "@/services/jwt.service";
 import { SessionManager } from "@/services/session.service";
@@ -21,28 +19,6 @@ import { RateLimiterManager } from "./lib/rate-limiter";
 import { jwtPluginFactory } from "./plugins/jwt";
 import { requestParserPluginFactory } from "./plugins/request-parser";
 import { TasksQueue } from "./queues";
-import { FeedAssetRepository } from "./repository/feed-asset.repository";
-import { FeedRepository } from "./repository/feed.repository";
-import { FollowRepository } from "./repository/follow.repository";
-import { RefreshTokenRepository } from "./repository/refresh-token.repository";
-import { SessionRepository } from "./repository/session.repository";
-import { TimelineRepository } from "./repository/timeline.repository";
-import { TopicRepository } from "./repository/topic.repository";
-import { UserInterestRepository } from "./repository/user-interest.repository";
-
-type Repositories = {
-  user: UserRepository;
-  factor: FactorRepository;
-  challenge: ChallengeRepository;
-  refreshToken: RefreshTokenRepository;
-  session: SessionRepository;
-  topic: TopicRepository;
-  userInterest: UserInterestRepository;
-  feed: FeedRepository;
-  follow: FollowRepository;
-  timeline: TimelineRepository;
-  feedAsset: FeedAssetRepository;
-};
 
 type Queue = {
   tasksQueue: TasksQueue;
@@ -120,17 +96,17 @@ export class AppContext {
     const db = prisma;
     const jwtService = new JWTService({ accessTokenSecret: secrets.jwtSecret });
     const cryptoService = new CryptoService();
-    const userRepository = new UserRepository({ db });
-    const factorRepository = new FactorRepository({ db });
-    const challengeRepository = new ChallengeRepository({ db });
-    const refreshTokenRepository = new RefreshTokenRepository({ db });
-    const sessionRepository = new SessionRepository({ db });
-    const topicRepository = new TopicRepository({ db });
-    const userInterestRepository = new UserInterestRepository({ db });
-    const feedRepository = new FeedRepository({ db });
-    const followRepository = new FollowRepository({ db });
-    const timelineRepository = new TimelineRepository({ db });
-    const feedAssetRepository = new FeedAssetRepository({ db });
+    const userRepository = new Repositories.UserRepository({ db });
+    const factorRepository = new Repositories.FactorRepository({ db });
+    const challengeRepository = new Repositories.ChallengeRepository({ db });
+    const refreshTokenRepository = new Repositories.RefreshTokenRepository({ db });
+    const sessionRepository = new Repositories.SessionRepository({ db });
+    const topicRepository = new Repositories.TopicRepository({ db });
+    const userInterestRepository = new Repositories.UserInterestRepository({ db });
+    const feedRepository = new Repositories.FeedRepository({ db });
+    const followRepository = new Repositories.FollowRepository({ db });
+    const timelineRepository = new Repositories.TimelineRepository({ db });
+    const feedAssetRepository = new Repositories.FeedAssetRepository({ db });
     const mailer = new Mailer({ env: environment });
     const tasksQueue = new TasksQueue({ env: environment });
     const sessionManager = new SessionManager({

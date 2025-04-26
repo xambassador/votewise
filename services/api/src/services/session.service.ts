@@ -1,5 +1,4 @@
 import type { AppContext } from "@/context";
-import type { TInMemorySession } from "@/types";
 
 import { Minute } from "@votewise/times";
 
@@ -84,7 +83,7 @@ export class SessionManager {
    * @param {string} sessionId - Session ID
    * @param {TSession & { userId: string }} session - Session object
    */
-  public async save(sessionId: string, session: TInMemorySession & { userId: string }) {
+  public async save(sessionId: string, session: InMemorySession & { userId: string }) {
     const key = this.getSessionKey(sessionId);
     await this.ctx.cache.setWithExpiry(
       key,
@@ -106,7 +105,7 @@ export class SessionManager {
    * @param {string} sessionId - Session ID
    * @param {TSession & { userId: string }} session - Session object
    */
-  public async saveSessionToCache(sessionId: string, session: TInMemorySession & { userId: string }) {
+  public async saveSessionToCache(sessionId: string, session: InMemorySession & { userId: string }) {
     const key = this.getSessionKey(sessionId);
     await this.ctx.cache.setWithExpiry(
       key,
@@ -123,7 +122,7 @@ export class SessionManager {
   public async get(sessionId: string) {
     const key = this.getSessionKey(sessionId);
     const session = await this.ctx.cache.get(key);
-    if (session) return JSON.parse(session) as TInMemorySession;
+    if (session) return JSON.parse(session) as InMemorySession;
     const sessionData = await this.ctx.sessionRepository.find(sessionId);
     if (!sessionData) return null;
     const data = {
@@ -162,7 +161,7 @@ export class SessionManager {
     const sessionFromDatabase = await this.ctx.sessionRepository.find(sessionId);
     if (!session) return null;
     if (!sessionFromDatabase) return null;
-    const sessionData = JSON.parse(session) as TInMemorySession;
+    const sessionData = JSON.parse(session) as InMemorySession;
     const updatedSession = { ...sessionData, ...data };
     await this.ctx.cache.set(key, JSON.stringify(updatedSession));
     await this.ctx.sessionRepository.update(sessionId, {

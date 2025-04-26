@@ -1,4 +1,3 @@
-import type { Locals } from "@/types";
 import type { Request, Response } from "express";
 import type { ZodSchema } from "zod";
 

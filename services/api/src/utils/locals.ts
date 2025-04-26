@@ -1,4 +1,3 @@
-import type { Locals } from "@/types";
 import type { Response } from "express";
 
 export function getAuthenticateLocals(res: Response): Locals {

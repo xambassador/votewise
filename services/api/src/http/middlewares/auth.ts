@@ -1,4 +1,3 @@
-import type { Locals } from "@/types";
 import type { Request } from "express";
 
 import { ERROR_CODES } from "@votewise/constant";
