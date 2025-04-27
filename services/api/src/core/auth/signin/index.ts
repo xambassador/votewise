@@ -1,11 +1,13 @@
 import { AppContext } from "@/context";
 import { UserRegisterService } from "@/core/auth/register/service";
+import { rateLimitMiddlewareFactory } from "@/http/middlewares/rate-limit";
 import { ExceptionLayer } from "@/lib/exception-layer";
+import { rateLimitStrategies } from "@/lib/rate-limiter";
 
 import { Controller } from "./controller";
 import { EmailStrategy, UsernameStrategy } from "./strategies";
 
-export function singinControllerFactory() {
+export function singinControllerFactory(path: string) {
   const ctx = AppContext.getInjectionTokens([
     "repositories",
     "assert",
@@ -39,6 +41,10 @@ export function singinControllerFactory() {
     factorRepository: ctx.repositories.factor,
     userRegisterService: service
   });
+  const limiter = rateLimitMiddlewareFactory(path, {
+    ...rateLimitStrategies.THREE_PER_MINUTE,
+    keyPrefix: "rtSignin"
+  });
   const exceptionLayer = new ExceptionLayer({ name: "signin" });
-  return exceptionLayer.catch(controller.handle.bind(controller));
+  return [limiter, exceptionLayer.catch(controller.handle.bind(controller))];
 }

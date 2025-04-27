@@ -13,5 +13,5 @@ export function verifyControllerFactory() {
     cryptoService: ctx.cryptoService
   });
   const exceptionLayer = new ExceptionLayer({ name: "verify-email" });
-  return exceptionLayer.catch(controller.handle.bind(controller));
+  return [exceptionLayer.catch(controller.handle.bind(controller))];
 }

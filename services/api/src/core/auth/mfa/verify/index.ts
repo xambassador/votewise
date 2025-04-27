@@ -1,4 +1,5 @@
 import { AppContext } from "@/context";
+import { authMiddlewareFactory } from "@/http/middlewares/auth";
 import { ExceptionLayer } from "@/lib/exception-layer";
 
 import { Controller } from "./controller";
@@ -21,6 +22,7 @@ export function verifyChallangeControllerFactory() {
     cryptoService: ctx.cryptoService,
     sessionManager: ctx.sessionManager
   });
+  const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "verify-challenge" });
-  return exceptionLayer.catch(controller.handle.bind(controller));
+  return [auth, exceptionLayer.catch(controller.handle.bind(controller))];
 }

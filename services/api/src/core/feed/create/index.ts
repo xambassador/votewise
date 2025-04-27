@@ -1,4 +1,5 @@
 import { AppContext } from "@/context";
+import { authMiddlewareFactory } from "@/http/middlewares/auth";
 import { ExceptionLayer } from "@/lib/exception-layer";
 
 import { Controller } from "./controller";
@@ -12,6 +13,7 @@ export function createFeedControllerFactory() {
     followRepository: ctx.repositories.follow,
     feedAsset: ctx.repositories.feedAsset
   });
+  const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "create-feed" });
-  return exceptionLayer.catch(controller.handle.bind(controller));
+  return [auth, exceptionLayer.catch(controller.handle.bind(controller))];
 }

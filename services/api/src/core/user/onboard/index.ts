@@ -1,4 +1,5 @@
 import { AppContext } from "@/context";
+import { authMiddlewareFactory } from "@/http/middlewares/auth";
 import { ExceptionLayer } from "@/lib/exception-layer";
 
 import { Controller } from "./controller";
@@ -13,6 +14,7 @@ export function onboardControllerFactory() {
     taskQueue: ctx.queues.tasksQueue,
     appUrl: ctx.config.appUrl
   });
+  const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "onboard" });
-  return exceptionLayer.catch(controller.handle.bind(controller));
+  return [auth, exceptionLayer.catch(controller.handle.bind(controller))];
 }

@@ -10,5 +10,5 @@ export function getVerificationSessionControllerFactory() {
     assert: ctx.assert
   });
   const exceptionLayer = new ExceptionLayer({ name: "get-verification-session" });
-  return exceptionLayer.catch(controller.handle.bind(controller));
+  return [exceptionLayer.catch(controller.handle.bind(controller))];
 }

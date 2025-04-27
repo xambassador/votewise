@@ -1,4 +1,5 @@
 import { AppContext } from "@/context";
+import { authMiddlewareFactory } from "@/http/middlewares/auth";
 import { ExceptionLayer } from "@/lib/exception-layer";
 
 import { Controller } from "./controller";
@@ -10,6 +11,7 @@ export function challengeMFAControllerFactory() {
     challengeRepository: ctx.repositories.challenge,
     assert: ctx.assert
   });
+  const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "challengeMFA" });
-  return exceptionLayer.catch(controller.handle.bind(controller));
+  return [auth, exceptionLayer.catch(controller.handle.bind(controller))];
 }

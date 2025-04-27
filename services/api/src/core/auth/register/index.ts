@@ -1,10 +1,12 @@
 import { AppContext } from "@/context";
+import { rateLimitMiddlewareFactory } from "@/http/middlewares/rate-limit";
 import { ExceptionLayer } from "@/lib/exception-layer";
+import { rateLimitStrategies } from "@/lib/rate-limiter";
 
 import { Controller } from "./controller";
 import { UserRegisterService } from "./service";
 
-export function registerControllerFactory() {
+export function registerControllerFactory(path: string) {
   const ctx = AppContext.getInjectionTokens([
     "repositories",
     "assert",
@@ -27,6 +29,10 @@ export function registerControllerFactory() {
     requestParser: ctx.plugins.requestParser,
     userRegisterService: service
   });
+  const limiter = rateLimitMiddlewareFactory(path, {
+    ...rateLimitStrategies.FIVE_PER_HOUR,
+    keyPrefix: "rtRegister"
+  });
   const exceptionLayer = new ExceptionLayer({ name: "register" });
-  return exceptionLayer.catch(controller.handle.bind(controller));
+  return [limiter, exceptionLayer.catch(controller.handle.bind(controller))];
 }

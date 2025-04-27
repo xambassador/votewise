@@ -14,5 +14,5 @@ export function refreshControllerFactory() {
     refreshTokensRepository: ctx.repositories.refreshToken
   });
   const exceptionLayer = new ExceptionLayer({ name: "refresh" });
-  return exceptionLayer.catch(controller.handle.bind(controller));
+  return [exceptionLayer.catch(controller.handle.bind(controller))];
 }

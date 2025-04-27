@@ -1,8 +1,6 @@
 import { Router } from "express";
 
-import { authMiddlewareFactory } from "@/http/middlewares/auth";
-import { rateLimitMiddlewareFactory } from "@/http/middlewares/rate-limit";
-import { rateLimitStrategies } from "@/lib/rate-limiter";
+import { auth, feeds, topics, user } from "@votewise/constant/routes";
 
 import { forgotPasswordControllerFactory } from "./auth/forgot-password";
 import { getVerificationSessionControllerFactory } from "./auth/get-verification-session";
@@ -33,56 +31,25 @@ import { listSessionsControllerFactory } from "./user/sessions/list";
 export function moduleRouterFactory(basePath: string): Router {
   const router = Router();
   const path = basePath + "/v1";
-  const auth = authMiddlewareFactory();
 
-  router.post(
-    path + "/auth/register",
-    rateLimitMiddlewareFactory(path + "/auth/register", {
-      ...rateLimitStrategies.FIVE_PER_HOUR,
-      keyPrefix: "rtRegister"
-    }),
-    registerControllerFactory()
-  );
-  router.patch(path + "/auth/verify", verifyControllerFactory());
-  router.post(
-    path + "/auth/signin",
-    rateLimitMiddlewareFactory(path + "/auth/signin", {
-      ...rateLimitStrategies.THREE_PER_MINUTE,
-      keyPrefix: "rtSignin"
-    }),
-    singinControllerFactory()
-  );
-  router.post(path + "/auth/refresh", refreshControllerFactory());
-  router.post(
-    path + "/auth/forgot-password",
-    rateLimitMiddlewareFactory(path + "/auth/forgot-password", {
-      ...rateLimitStrategies.THREE_PER_HOUR,
-      keyPrefix: "rtForgotPassword",
-      blockDuration: 60 * 60 * 3
-    }),
-    forgotPasswordControllerFactory()
-  );
-  router.patch(
-    path + "/auth/reset-password",
-    rateLimitMiddlewareFactory(path + "/auth/reset-password", {
-      ...rateLimitStrategies.THREE_PER_HOUR,
-      keyPrefix: "rtResetPassword",
-      blockDuration: 60 * 60 * 3
-    }),
-    resetPasswordControllerFactory()
-  );
-  router.delete(path + "/auth/logout", auth, logoutControllerFactory());
-  router.post(path + "/auth/factors/enroll", auth, enrollMFAControllerFactory());
-  router.post(path + "/auth/factors/:factor_id/challenge", auth, challengeMFAControllerFactory());
-  router.post(path + "/auth/factors/:factor_id/verify", auth, verifyChallangeControllerFactory());
-  router.get(path + "/auth/verify/:email", getVerificationSessionControllerFactory());
-  router.get(path + "/users/sessions", auth, listSessionsControllerFactory());
-  router.patch(path + "/users/:user_id/onboard", auth, onboardControllerFactory());
-  router.get(path + "/users/:user_id/onboard", auth, getOnboardStatusControllerFactory());
-  router.get(path + "/users/:username/exists", auth, getUsernameExistsControllerFactory());
-  router.get(path + "/topics", getAllTopicsControllerFactory());
-  router.post(path + "/feeds", auth, createFeedControllerFactory());
-  router.get(path + "/feeds", auth, getAllFeedControllerFactory());
+  router.post(auth.paths.register(path), ...registerControllerFactory(auth.paths.register(path)));
+  router.patch(auth.paths.verify(path), ...verifyControllerFactory());
+  router.post(auth.paths.signin(path), ...singinControllerFactory(auth.paths.signin(path)));
+  router.post(auth.paths.refresh(path), ...refreshControllerFactory());
+  router.post(auth.paths.forgotPassword(path), ...forgotPasswordControllerFactory(auth.paths.forgotPassword(path)));
+  router.patch(auth.paths.resetPassword(path), ...resetPasswordControllerFactory(auth.paths.resetPassword(path)));
+  router.delete(auth.paths.logout(path), ...logoutControllerFactory());
+  router.post(auth.paths.factors.enroll(path), ...enrollMFAControllerFactory());
+  router.post(auth.paths.factors.challengeFactor(path), ...challengeMFAControllerFactory());
+  router.post(auth.paths.factors.verifyFactor(path), ...verifyChallangeControllerFactory());
+  router.get(auth.paths.emailVerificationSession(path), ...getVerificationSessionControllerFactory());
+  router.get(user.paths.sessions(path), ...listSessionsControllerFactory());
+  router.patch(user.paths.onboard.update(path), ...onboardControllerFactory());
+  router.get(user.paths.onboard.getStatus(path), ...getOnboardStatusControllerFactory());
+  router.get(user.paths.usernameExists(path), ...getUsernameExistsControllerFactory());
+  router.get(topics.paths.all(path), ...getAllTopicsControllerFactory());
+  router.post(feeds.paths.create(path), ...createFeedControllerFactory());
+  router.get(feeds.paths.all(path), ...getAllFeedControllerFactory());
 
   return router;
 }
