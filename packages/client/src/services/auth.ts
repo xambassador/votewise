@@ -3,12 +3,14 @@ import type {
   ChallengeFactorResponse,
   SigninResponse,
   SignupResponse,
+  VerificationSessionResponse,
   VerifyEmailResponse,
   VerifyResponse
 } from "@votewise/types";
 import type { Client } from "../client";
 import type { Client as ServerClient } from "../server";
 
+import { auth } from "@votewise/constant/routes";
 import { Debugger } from "@votewise/debug";
 
 import { COOKIE_KEYS, jwt } from "../utils";
@@ -39,7 +41,7 @@ export class Auth {
   }
 
   public async signin(data: { username: string; password: string }) {
-    const res = await this.client.post<SigninResponse, { email: string; password: string }>("/v1/auth/signin", {
+    const res = await this.client.post<SigninResponse, { email: string; password: string }>(auth.runtime.signin(""), {
       email: data.username,
       password: data.password
     });
@@ -47,7 +49,7 @@ export class Auth {
   }
 
   public async signup(data: { email: string; password: string }) {
-    const res = await this.client.post<SignupResponse, { email: string; password: string }>("/v1/auth/register", {
+    const res = await this.client.post<SignupResponse, { email: string; password: string }>(auth.runtime.register(""), {
       email: data.email,
       password: data.password
     });
@@ -55,7 +57,7 @@ export class Auth {
   }
 
   public async verifyEmail(data: { otp: string; email: string; verificationCode: string }) {
-    const res = await this.client.patch<VerifyEmailResponse, VerifyEmailBody>("/v1/auth/verify", {
+    const res = await this.client.patch<VerifyEmailResponse, VerifyEmailBody>(auth.runtime.verify(""), {
       email: data.email,
       verification_code: data.verificationCode,
       otp: data.otp
@@ -65,7 +67,7 @@ export class Auth {
 
   public async challengeFactor(factorId: string, token?: string) {
     const res = await this.client.post<ChallengeFactorResponse, object>(
-      `/v1/auth/factors/${factorId}/challenge`,
+      auth.runtime.factors.challengeFactor("", factorId),
       {},
       {
         headers: {
@@ -77,21 +79,31 @@ export class Auth {
   }
 
   public async verifyFactor(data: { code: string; factorId: string; challengeId: string }) {
-    const res = await this.client.post<VerifyResponse, VerifyBody>(`/v1/auth/factors/${data.factorId}/verify`, {
-      challenge_id: data.challengeId,
-      code: data.code
-    });
+    const res = await this.client.post<VerifyResponse, VerifyBody>(
+      auth.runtime.factors.verifyFactor("", data.factorId),
+      {
+        challenge_id: data.challengeId,
+        code: data.code
+      }
+    );
     return res;
   }
 
   public async forgotPassword(email: string) {
-    const res = await this.client.post<{ message: string }, { email: string }>("/v1/auth/forgot-password", { email });
+    const res = await this.client.post<{ message: string }, { email: string }>(auth.runtime.forgotPassword(""), {
+      email
+    });
     return res;
   }
 
   public async resetPassword(data: { password: string; token: string }) {
-    const url = `/v1/auth/reset-password?token=${data.token}`;
+    const url = auth.runtime.resetPassword("") + `?token=${data.token}`;
     const res = await this.client.patch<{ message: string }, { password: string }>(url, { password: data.password });
+    return res;
+  }
+
+  public async getVerificationSession(email: string) {
+    const res = await this.client.get<VerificationSessionResponse>(auth.runtime.emailVerificationSession("", email));
     return res;
   }
 

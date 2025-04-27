@@ -211,9 +211,11 @@ model Post {
 }
 
 model PostAsset {
-    id   String @id @default(cuid())
-    type String
-    url  String
+    id        String  @id @default(cuid())
+    type      String
+    url       String
+    mime_type String?
+    size      Int?
 
     post_id String
     post    Post   @relation(fields: [post_id], references: [id])

@@ -2,6 +2,8 @@ import type { GetOnboardedStatusResponse, GetTopicsResponse, OnboardResponse } f
 import type { Client } from "../client";
 import type { Client as ServerClient } from "../server";
 
+import { topics, user } from "@votewise/constant/routes";
+
 type OnboardOptions = {
   client: Client | ServerClient;
 };
@@ -29,19 +31,19 @@ export class Onboard {
   }
 
   public async isOnboarded(userId: string) {
-    const path = `/v1/users/${userId}/onboard`;
+    const path = user.runtime.onboard.getStatus("", userId);
     const res = await this.client.get<GetOnboardedStatusResponse>(path);
     return res;
   }
 
   public async onboard(userId: string, data: OnboardBody) {
-    const path = `/v1/users/${userId}/onboard`;
+    const path = user.runtime.onboard.update("", userId);
     const res = await this.client.patch<OnboardResponse, OnboardBody>(path, data);
     return res;
   }
 
   public async getTopics() {
-    const path = `/v1/topics`;
+    const path = topics.runtime.all("");
     const res = await this.client.get<GetTopicsResponse>(path);
     return res;
   }

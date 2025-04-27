@@ -2,13 +2,11 @@ import { redirect } from "next/navigation";
 
 import { obfuscateEmail } from "@votewise/text";
 
-import { getClient } from "@/lib/client.server";
+import { getAuth } from "@/lib/client.server";
 import { COOKIE_KEYS, getCookie } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
 import { OTPForm } from "./_components/form";
-
-type VerificationSessionResponse = { user_id: string; ttl: number; total: number; email: string };
 
 export default async function Page() {
   const verificationCode = getCookie(COOKIE_KEYS.verificationCode);
@@ -18,9 +16,8 @@ export default async function Page() {
     return redirect(routes.auth.logout());
   }
 
-  const client = getClient();
-  // TODO: Move this to @votewise/client
-  const verificationResponse = await client.get<VerificationSessionResponse>(`/v1/auth/verify/${email}`);
+  const auth = getAuth();
+  const verificationResponse = await auth.getVerificationSession(email);
 
   if (!verificationResponse.success) {
     return redirect(routes.auth.logout());

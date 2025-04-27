@@ -13,7 +13,6 @@ import {
   NotificationType,
   PostStatus
 } from "@prisma/client";
-import { createSeedClient } from "@snaplet/seed";
 
 import { prisma } from ".";
 
@@ -21,25 +20,37 @@ const args = process.argv.slice(2);
 
 const shouldClean = args.includes("--clean");
 
-async function initClient() {
-  const client = createSeedClient();
-  return client;
+async function resetDatabase() {
+  console.log("🗑️  Clearing database...");
+  await prisma.$queryRaw`TRUNCATE TABLE "User" CASCADE`;
+  await prisma.$queryRaw`TRUNCATE TABLE "Topics" CASCADE`;
+  await prisma.$queryRaw`TRUNCATE TABLE "HashTag" CASCADE`;
+  await prisma.$queryRaw`TRUNCATE TABLE "Group" CASCADE`;
+  await prisma.$queryRaw`TRUNCATE TABLE "GroupMember" CASCADE`;
+  await prisma.$queryRaw`TRUNCATE TABLE "GroupInvitation" CASCADE`;
+  await prisma.$queryRaw`TRUNCATE TABLE "Post" CASCADE`;
+  await prisma.$queryRaw`TRUNCATE TABLE "PostHashTag" CASCADE`;
+  await prisma.$queryRaw`TRUNCATE TABLE "PostAsset" CASCADE`;
+  await prisma.$queryRaw`TRUNCATE TABLE "Comment" CASCADE`;
+  await prisma.$queryRaw`TRUNCATE TABLE "CommentUpvote" CASCADE`;
+  await prisma.$queryRaw`TRUNCATE TABLE "Upvote" CASCADE`;
+  await prisma.$queryRaw`TRUNCATE TABLE "Follow" CASCADE`;
+  await prisma.$queryRaw`TRUNCATE TABLE "Friend" CASCADE`;
+  await prisma.$queryRaw`TRUNCATE TABLE "UserInterests" CASCADE`;
+  await prisma.$queryRaw`TRUNCATE TABLE "Notification" CASCADE`;
+  await prisma.$queryRaw`TRUNCATE TABLE "GroupMember" CASCADE`;
+  await prisma.$queryRaw`TRUNCATE TABLE "GroupInvitation" CASCADE`;
+  console.log("🗑️  Database cleared!");
 }
 
 async function main() {
   if (shouldClean) {
-    console.log("🗑️  Clearing database...");
-    const seed = await initClient();
-    await seed.$resetDatabase();
-    console.log("🗑️  Database cleared!");
+    await resetDatabase();
     process.exit();
   }
 
   console.log("✨ Seeding...");
-  const seed = await initClient();
-
-  console.log("🗑️  Clearing database...");
-  await seed.$resetDatabase();
+  await resetDatabase();
   console.log("🌱 Seeding database...");
 
   const topics = await createTopics();
@@ -85,8 +96,6 @@ async function createTopics() {
     "Environment"
   ];
 
-  console.log("✨ Creating topics...");
-
   const topics: Topics[] = [];
 
   for (const name of topicNames) {
@@ -103,8 +112,6 @@ async function createTopics() {
 }
 
 async function createUsers(count = 100) {
-  console.log(`✨ Creating ${count} users...`);
-
   const users: User[] = [];
   const genders = Object.values(Gender);
 
@@ -115,9 +122,9 @@ async function createUsers(count = 100) {
 
     const user = await prisma.user.create({
       data: {
-        email: faker.internet.email({ firstName, lastName }),
+        email: faker.internet.email({ firstName, lastName }).toLowerCase().trim(),
         user_name: userName,
-        password: faker.internet.password(),
+        password: "$2a$12$WiBdk9VyfUbSb4Ys0ya9Y.3KwbEgDMjWaui9Bfs2pDlBiVdmF/r0u", // Password@123
         first_name: firstName,
         last_name: lastName,
         about: faker.lorem.paragraph(),
@@ -145,8 +152,6 @@ async function createUsers(count = 100) {
 }
 
 async function createUserInterests(users: User[], topics: Topics[]) {
-  console.log("✨ Creating user interests...");
-
   for (const user of users) {
     const userTopics = faker.helpers.arrayElements(topics, { min: 3, max: 7 });
 
@@ -164,8 +169,6 @@ async function createUserInterests(users: User[], topics: Topics[]) {
 }
 
 async function createFollows(users: User[]) {
-  console.log("✨ Creating follows...");
-
   for (const user of users) {
     const followCount = faker.number.int({ min: 5, max: 20 });
     const potentialFollowees = users.filter((u) => u.id !== user.id);
@@ -185,8 +188,6 @@ async function createFollows(users: User[]) {
 }
 
 async function createFriends(users: User[]) {
-  console.log("✨ Creating friendships...");
-
   const friendTypes = Object.values(FriendType);
 
   for (const user of users) {
@@ -220,8 +221,6 @@ async function createFriends(users: User[]) {
 }
 
 async function createHashtags() {
-  console.log("✨ Creating hashtags...");
-
   const hashtagNames = [
     "trending",
     "viral",
@@ -283,8 +282,6 @@ async function createHashtags() {
 }
 
 async function createGroups() {
-  console.log("✨ Creating groups...");
-
   const groupTypes = Object.values(GroupType);
   const groupStatuses = Object.values(GroupStatus);
   const groupNames = [
@@ -330,8 +327,6 @@ async function createGroups() {
 }
 
 async function addUsersToGroups(users: User[], groups: Group[]) {
-  console.log("✨ Adding users to groups...");
-
   for (const group of groups) {
     // Select a random user as admin
     const adminUser = faker.helpers.arrayElement(users);
@@ -378,8 +373,6 @@ async function addUsersToGroups(users: User[], groups: Group[]) {
 }
 
 async function createGroupInvitations(users: User[], groups: Group[]) {
-  console.log("✨ Creating group invitations...");
-
   const invitationTypes = Object.values(GroupInvitationType);
   const statuses = Object.values(GroupInvitationStatus);
 
@@ -413,8 +406,6 @@ async function createGroupInvitations(users: User[], groups: Group[]) {
 }
 
 async function createPosts(users: User[], groups: Group[], hashtags: HashTag[]) {
-  console.log("✨ Creating posts...");
-
   const postStatuses = Object.values(PostStatus);
   const posts: Post[] = [];
 
@@ -503,8 +494,6 @@ async function createPosts(users: User[], groups: Group[], hashtags: HashTag[]) 
 }
 
 async function createComments(users: User[], posts: Post[]) {
-  console.log("✨ Creating comments...");
-
   const comments: Comment[] = [];
 
   for (const post of posts) {
@@ -532,8 +521,6 @@ async function createComments(users: User[], posts: Post[]) {
 }
 
 async function createUpvotes(users: User[], posts: Post[]) {
-  console.log("✨ Creating post upvotes...");
-
   for (const post of posts) {
     const upvoteCount = faker.number.int({ min: 0, max: 20 });
     const upvoters = faker.helpers.arrayElements(users, upvoteCount);
@@ -552,8 +539,6 @@ async function createUpvotes(users: User[], posts: Post[]) {
 }
 
 async function createCommentUpvotes(users: User[], posts: Post[], comments: Comment[]) {
-  console.log("✨ Creating comment upvotes...");
-
   for (const comment of comments) {
     const upvoteCount = faker.number.int({ min: 0, max: 5 });
     const upvoters = faker.helpers.arrayElements(users, upvoteCount);
@@ -575,8 +560,6 @@ async function createCommentUpvotes(users: User[], posts: Post[], comments: Comm
 }
 
 async function createNotifications(users: User[]) {
-  console.log("✨ Creating notifications...");
-
   const notificationTypes = Object.values(NotificationType);
 
   for (let i = 0; i < 300; i++) {

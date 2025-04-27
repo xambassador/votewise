@@ -13,7 +13,7 @@ type ClientOptions = {
 };
 
 const DEFAULT_OPTIONS: ClientOptions = {
-  url: "/api",
+  url: "/api/v1",
   headers: {
     "content-type": "application/json",
     accept: "application/json",

@@ -43,3 +43,5 @@ export type VerifyResponse = {
   expires_in: number;
   expires_at: number;
 };
+
+export type VerificationSessionResponse = { user_id: string; ttl: number; total: number; email: string };
