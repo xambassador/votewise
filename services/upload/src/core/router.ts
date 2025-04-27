@@ -1,5 +1,7 @@
 import { Router } from "express";
 
+import { upload } from "@votewise/constant/routes";
+
 import { getAvatarsControllerFactory, getBgControllerFactory } from "./assets";
 import {
   deleteControllerFactory,
@@ -17,11 +19,11 @@ import {
  */
 export function moduleRouterFactory(basePath: string): Router {
   const router = Router();
-  router.post(basePath + "/upload/handshake", handshakeControllerFactory());
-  router.post(basePath + "/upload", uploadControllerFactory());
-  router.get(basePath + "/upload/:token/status", statusControllerFactory());
-  router.delete(basePath + "/upload/:token", deleteControllerFactory());
-  router.get(basePath + "/upload/assets/avatars", getAvatarsControllerFactory());
-  router.get(basePath + "/upload/assets/backgrounds", getBgControllerFactory());
+  router.post(upload.paths.handshake(basePath), handshakeControllerFactory());
+  router.post(upload.paths.upload(basePath), uploadControllerFactory());
+  router.get(upload.paths.status(basePath), statusControllerFactory());
+  router.delete(upload.paths.delete(basePath), deleteControllerFactory());
+  router.get(upload.paths.getAvatars(basePath), getAvatarsControllerFactory());
+  router.get(upload.paths.getBackgrounds(basePath), getBgControllerFactory());
   return router;
 }

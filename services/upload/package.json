@@ -10,6 +10,7 @@
     "clean:build": "rimraf dist"
   },
   "dependencies": {
+    "@votewise/constant": "*",
     "@votewise/env": "*",
     "@votewise/schemas": "*",
     "busboy": "^1.6.0",
