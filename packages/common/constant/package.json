@@ -11,6 +11,10 @@
     ".": {
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./routes": {
+      "import": "./dist/routes.mjs",
+      "require": "./dist/routes.js"
     }
   },
   "scripts": {
