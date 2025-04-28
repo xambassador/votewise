@@ -1,3 +1,5 @@
+import { yellow } from "chalk";
+
 import { AppContext } from "@/context";
 import { rateLimitMiddlewareFactory } from "@/http/middlewares/rate-limit";
 import { ExceptionLayer } from "@/lib/exception-layer";
@@ -14,7 +16,8 @@ export function resetPasswordControllerFactory(path: string) {
     "cryptoService",
     "sessionManager",
     "queues",
-    "config"
+    "config",
+    "logger"
   ]);
   const controller = new Controller({
     requestParser: ctx.plugins.requestParser,
@@ -32,5 +35,6 @@ export function resetPasswordControllerFactory(path: string) {
     blockDuration: 60 * 60 * 3
   });
   const exceptionLayer = new ExceptionLayer({ name: "reset-password" });
+  ctx.logger.info(`[${yellow("ResetPassword")}] dependencies initialized`);
   return [limiter, exceptionLayer.catch(controller.handle.bind(controller))];
 }

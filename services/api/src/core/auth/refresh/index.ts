@@ -1,10 +1,19 @@
+import { yellow } from "chalk";
+
 import { AppContext } from "@/context";
 import { ExceptionLayer } from "@/lib/exception-layer";
 
 import { Controller } from "./controller";
 
 export function refreshControllerFactory() {
-  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "sessionManager", "jwtService", "plugins"]);
+  const ctx = AppContext.getInjectionTokens([
+    "assert",
+    "repositories",
+    "sessionManager",
+    "jwtService",
+    "plugins",
+    "logger"
+  ]);
   const controller = new Controller({
     assert: ctx.assert,
     useRepository: ctx.repositories.user,
@@ -14,5 +23,6 @@ export function refreshControllerFactory() {
     refreshTokensRepository: ctx.repositories.refreshToken
   });
   const exceptionLayer = new ExceptionLayer({ name: "refresh" });
+  ctx.logger.info(`[${yellow("RefreshController")}] dependencies initialized`);
   return [exceptionLayer.catch(controller.handle.bind(controller))];
 }

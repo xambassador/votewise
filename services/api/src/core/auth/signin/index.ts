@@ -1,3 +1,5 @@
+import { yellow } from "chalk";
+
 import { AppContext } from "@/context";
 import { UserRegisterService } from "@/core/auth/register/service";
 import { rateLimitMiddlewareFactory } from "@/http/middlewares/rate-limit";
@@ -17,7 +19,8 @@ export function singinControllerFactory(path: string) {
     "sessionManager",
     "cache",
     "queues",
-    "config"
+    "config",
+    "logger"
   ]);
   const emailStrategy = new EmailStrategy({ userRepository: ctx.repositories.user });
   const usernameStrategy = new UsernameStrategy({ userRepository: ctx.repositories.user });
@@ -46,5 +49,6 @@ export function singinControllerFactory(path: string) {
     keyPrefix: "rtSignin"
   });
   const exceptionLayer = new ExceptionLayer({ name: "signin" });
+  ctx.logger.info(`[${yellow("SignInController")}] dependencies initialized`);
   return [limiter, exceptionLayer.catch(controller.handle.bind(controller))];
 }

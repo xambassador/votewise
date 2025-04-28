@@ -1,3 +1,5 @@
+import { yellow } from "chalk";
+
 import { AppContext } from "@/context";
 import { authMiddlewareFactory } from "@/http/middlewares/auth";
 import { ExceptionLayer } from "@/lib/exception-layer";
@@ -11,7 +13,8 @@ export function verifyChallangeControllerFactory() {
     "plugins",
     "environment",
     "cryptoService",
-    "sessionManager"
+    "sessionManager",
+    "logger"
   ]);
   const controller = new Controller({
     assert: ctx.assert,
@@ -24,5 +27,6 @@ export function verifyChallangeControllerFactory() {
   });
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "verify-challenge" });
+  ctx.logger.info(`[${yellow("VerifyChallangeController")}] dependencies initialized`);
   return [auth, exceptionLayer.catch(controller.handle.bind(controller))];
 }

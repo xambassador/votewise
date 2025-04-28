@@ -1,3 +1,5 @@
+import { yellow } from "chalk";
+
 import { AppContext } from "@/context";
 import { rateLimitMiddlewareFactory } from "@/http/middlewares/rate-limit";
 import { ExceptionLayer } from "@/lib/exception-layer";
@@ -14,7 +16,8 @@ export function registerControllerFactory(path: string) {
     "cache",
     "cryptoService",
     "plugins",
-    "config"
+    "config",
+    "logger"
   ]);
   const service = new UserRegisterService({
     cache: ctx.cache,
@@ -34,5 +37,6 @@ export function registerControllerFactory(path: string) {
     keyPrefix: "rtRegister"
   });
   const exceptionLayer = new ExceptionLayer({ name: "register" });
+  ctx.logger.info(`[${yellow("RegisterController")}] dependencies initialized`);
   return [limiter, exceptionLayer.catch(controller.handle.bind(controller))];
 }

@@ -1,3 +1,5 @@
+import { yellow } from "chalk";
+
 import { AppContext } from "@/context";
 import { rateLimitMiddlewareFactory } from "@/http/middlewares/rate-limit";
 import { ExceptionLayer } from "@/lib/exception-layer";
@@ -14,7 +16,8 @@ export function forgotPasswordControllerFactory(path: string) {
     "queues",
     "config",
     "plugins",
-    "sessionManager"
+    "sessionManager",
+    "logger"
   ]);
   const controller = new Controller({
     assert: ctx.assert,
@@ -32,5 +35,6 @@ export function forgotPasswordControllerFactory(path: string) {
     blockDuration: 60 * 60 * 3
   });
   const exceptionLayer = new ExceptionLayer({ name: "forgot-password" });
+  ctx.logger.info(`[${yellow("ForgotPassword")}] dependencies initialized`);
   return [limiter, exceptionLayer.catch(controller.handle.bind(controller))];
 }

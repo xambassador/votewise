@@ -1,3 +1,5 @@
+import { yellow } from "chalk";
+
 import { AppContext } from "@/context";
 import { authMiddlewareFactory } from "@/http/middlewares/auth";
 import { ExceptionLayer } from "@/lib/exception-layer";
@@ -5,7 +7,7 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { Controller } from "./controller";
 
 export function createFeedControllerFactory() {
-  const ctx = AppContext.getInjectionTokens(["repositories", "plugins"]);
+  const ctx = AppContext.getInjectionTokens(["repositories", "plugins", "logger"]);
   const controller = new Controller({
     feedRepository: ctx.repositories.feed,
     requestParser: ctx.plugins.requestParser,
@@ -15,5 +17,6 @@ export function createFeedControllerFactory() {
   });
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "create-feed" });
+  ctx.logger.info(`[${yellow("CreateFeedController")}] dependencies initialized`);
   return [auth, exceptionLayer.catch(controller.handle.bind(controller))];
 }

@@ -1,3 +1,5 @@
+import { yellow } from "chalk";
+
 import { Assertions } from "@votewise/errors";
 import logger from "@votewise/log";
 import { prisma } from "@votewise/prisma";
@@ -69,6 +71,8 @@ export class AppContext {
     this.sessionManager = opts.sessionManager;
     this.plugins = opts.plugins;
     this.rateLimiteManager = opts.rateLimiteManager;
+
+    this.logger.info(`[${yellow("AppContext")}] dependencies initialized`);
   }
 
   static async fromConfig(
