@@ -4,6 +4,7 @@ import type { RequestParserPlugin } from "./plugins/request-parser";
 
 import _fs from "node:fs/promises";
 import path from "node:path";
+import { yellow } from "chalk";
 import { ensureDirSync } from "fs-extra";
 import * as Minio from "minio";
 
@@ -66,6 +67,8 @@ export class AppContext {
     this.plugins = opts.plugins;
     this.minio = opts.minio;
     createUploadPath();
+
+    this.logger.info(`[${yellow("AppContext")}] dependencies initialized`);
   }
 
   static async fromConfig(cfg: ServerConfig, overrides?: Partial<AppContextOptions>): Promise<AppContext> {
