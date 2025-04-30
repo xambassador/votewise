@@ -7,13 +7,16 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { Controller } from "./controller";
 
 export function createFeedControllerFactory() {
-  const ctx = AppContext.getInjectionTokens(["repositories", "plugins", "logger"]);
+  const ctx = AppContext.getInjectionTokens(["repositories", "plugins", "logger", "assert"]);
   const controller = new Controller({
     feedRepository: ctx.repositories.feed,
     requestParser: ctx.plugins.requestParser,
     timelineRepository: ctx.repositories.timeline,
     followRepository: ctx.repositories.follow,
-    feedAsset: ctx.repositories.feedAsset
+    feedAsset: ctx.repositories.feedAsset,
+    postTopicRepository: ctx.repositories.postTopic,
+    topicRepository: ctx.repositories.topic,
+    assert: ctx.assert
   });
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "create-feed" });
