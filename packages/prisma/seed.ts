@@ -62,7 +62,7 @@ async function main() {
   const groups = await createGroups();
   await addUsersToGroups(users, groups);
   await createGroupInvitations(users, groups);
-  const posts = await createPosts(users, groups, hashtags);
+  const posts = await createPosts(users, groups, hashtags, topics);
   const comments = await createComments(users, posts);
   await createUpvotes(users, posts);
   await createCommentUpvotes(users, posts, comments);
@@ -405,87 +405,96 @@ async function createGroupInvitations(users: User[], groups: Group[]) {
   console.log("✅ Group invitations created!");
 }
 
-async function createPosts(users: User[], groups: Group[], hashtags: HashTag[]) {
+async function createPosts(users: User[], groups: Group[], hashtags: HashTag[], topics: Topics[]) {
   const postStatuses = Object.values(PostStatus);
   const posts: Post[] = [];
 
-  for (let i = 0; i < 200; i++) {
-    const user = faker.helpers.arrayElement(users);
-    const isGroupPost = faker.datatype.boolean();
-    let group: Group | null | undefined = null;
+  for (const topic of topics) {
+    for (let i = 0; i < 20; i++) {
+      const user = faker.helpers.arrayElement(users);
+      const isGroupPost = faker.datatype.boolean();
+      let group: Group | null | undefined = null;
 
-    if (isGroupPost) {
-      // Find groups this user is a member of
-      const userGroups = await prisma.groupMember.findMany({
-        where: { user_id: user.id },
-        select: { group_id: true }
+      if (isGroupPost) {
+        // Find groups this user is a member of
+        const userGroups = await prisma.groupMember.findMany({
+          where: { user_id: user.id },
+          select: { group_id: true }
+        });
+
+        if (userGroups.length > 0) {
+          const randomGroupId = faker.helpers.arrayElement(userGroups).group_id;
+          group = groups.find((g) => g.id === randomGroupId);
+        }
+      }
+
+      const title = faker.lorem.sentence();
+      const slug =
+        title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-|-$/g, "") +
+        "-" +
+        faker.string.alphanumeric(8);
+
+      const post = await prisma.post.create({
+        data: {
+          title,
+          content: faker.lorem.paragraphs({ min: 2, max: 5 }),
+          slug,
+          type: group ? "GROUP_ONLY" : "PUBLIC",
+          status: faker.helpers.arrayElement(postStatuses),
+          group_id: group?.id || null,
+          author_id: user.id,
+          created_at: faker.date.past()
+        }
       });
 
-      if (userGroups.length > 0) {
-        const randomGroupId = faker.helpers.arrayElement(userGroups).group_id;
-        group = groups.find((g) => g.id === randomGroupId);
-      }
-    }
-
-    const title = faker.lorem.sentence();
-    const slug =
-      title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "") +
-      "-" +
-      faker.string.alphanumeric(8);
-
-    const post = await prisma.post.create({
-      data: {
-        title,
-        content: faker.lorem.paragraphs({ min: 2, max: 5 }),
-        slug,
-        type: group ? "GROUP_ONLY" : "PUBLIC",
-        status: faker.helpers.arrayElement(postStatuses),
-        group_id: group?.id || null,
-        author_id: user.id,
-        created_at: faker.date.past()
-      }
-    });
-
-    posts.push(post);
-
-    // Add 1-3 hashtags to each post
-    const postHashtagCount = faker.number.int({ min: 1, max: 3 });
-    const postHashtags = faker.helpers.arrayElements(hashtags, postHashtagCount);
-
-    for (const hashtag of postHashtags) {
-      await prisma.postHashTag.create({
+      await prisma.postTopic.create({
         data: {
           post_id: post.id,
-          hash_tag_id: hashtag.id
+          topic_id: topic.id
         }
       });
-    }
 
-    // Add 0-3 assets to each post
-    const assetCount = faker.number.int({ min: 0, max: 3 });
+      posts.push(post);
 
-    for (let j = 0; j < assetCount; j++) {
-      const assetType = faker.helpers.arrayElement(["image", "video", "document"]);
-      let url;
+      // Add 1-3 hashtags to each post
+      const postHashtagCount = faker.number.int({ min: 1, max: 3 });
+      const postHashtags = faker.helpers.arrayElements(hashtags, postHashtagCount);
 
-      if (assetType === "image") {
-        url = faker.image.url();
-      } else if (assetType === "video") {
-        url = `https://example.com/videos/${faker.string.uuid()}.mp4`;
-      } else {
-        url = `https://example.com/documents/${faker.string.uuid()}.pdf`;
+      for (const hashtag of postHashtags) {
+        await prisma.postHashTag.create({
+          data: {
+            post_id: post.id,
+            hash_tag_id: hashtag.id
+          }
+        });
       }
 
-      await prisma.postAsset.create({
-        data: {
-          type: assetType,
-          url,
-          post_id: post.id
+      // Add 0-3 assets to each post
+      const assetCount = faker.number.int({ min: 0, max: 3 });
+
+      for (let j = 0; j < assetCount; j++) {
+        const assetType = faker.helpers.arrayElement(["image", "video", "document"]);
+        let url;
+
+        if (assetType === "image") {
+          url = faker.image.url();
+        } else if (assetType === "video") {
+          url = `https://example.com/videos/${faker.string.uuid()}.mp4`;
+        } else {
+          url = `https://example.com/documents/${faker.string.uuid()}.pdf`;
         }
-      });
+
+        await prisma.postAsset.create({
+          data: {
+            type: assetType,
+            url,
+            post_id: post.id
+          }
+        });
+      }
     }
   }
 
