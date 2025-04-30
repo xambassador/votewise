@@ -14,6 +14,9 @@ type ControllerOptions = {
   followRepository: AppContext["repositories"]["follow"];
   timelineRepository: AppContext["repositories"]["timeline"];
   feedAsset: AppContext["repositories"]["feedAsset"];
+  postTopicRepository: AppContext["repositories"]["postTopic"];
+  topicRepository: AppContext["repositories"]["topic"];
+  assert: AppContext["assert"];
 };
 
 export class Controller {
@@ -37,6 +40,16 @@ export class Controller {
       slug,
       status: body.status!
     });
+
+    const validTopicsPromises = body.topics.map((topic) => this.ctx.topicRepository.findById(topic));
+    const validTopics = await Promise.all(validTopicsPromises);
+    const invalidTopics = validTopics.filter((topic) => topic === null);
+    const invalidMessage = body.topics.length > 1 ? "Invalid topics provided" : "Invalid topic provided";
+    this.ctx.assert.unprocessableEntity(invalidTopics.length > 0, invalidMessage);
+
+    const topicsToCreate = body.topics.map((topic) => ({ postId: feed.id, topicId: topic }));
+    await this.ctx.postTopicRepository.createMany(topicsToCreate);
+
     if (body.assets && body.assets.length > 0) {
       const assets = body.assets.map((asset) => ({
         post_id: feed.id,

@@ -14,7 +14,11 @@ export class TopicRepository extends BaseRepository {
     this.db = cfg.db;
   }
 
-  public async findAll() {
+  public findAll() {
     return this.execute(() => this.db.topics.findMany());
+  }
+
+  public findById(id: string) {
+    return this.execute(() => this.db.topics.findUnique({ where: { id }, select: { id: true, name: true } }));
   }
 }

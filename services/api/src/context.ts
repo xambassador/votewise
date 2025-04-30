@@ -98,6 +98,7 @@ export class AppContext {
     const followRepository = new Repositories.FollowRepository({ db });
     const timelineRepository = new Repositories.TimelineRepository({ db });
     const feedAssetRepository = new Repositories.FeedAssetRepository({ db });
+    const postTopicRepository = new Repositories.PostTopicRepository({ db });
     const mailer = new Mailer({ env: environment });
     const tasksQueue = new TasksQueue({ env: environment });
     const sessionManager = new Services.SessionManager({
@@ -135,7 +136,8 @@ export class AppContext {
         feed: feedRepository,
         follow: followRepository,
         timeline: timelineRepository,
-        feedAsset: feedAssetRepository
+        feedAsset: feedAssetRepository,
+        postTopic: postTopicRepository
       },
       queues: { tasksQueue },
       plugins: { requestParser, jwt: jwtPlugin },

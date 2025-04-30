@@ -3,6 +3,7 @@ import { FactorRepository } from "./factor.repository";
 import { FeedAssetRepository } from "./feed-asset.repository";
 import { FeedRepository } from "./feed.repository";
 import { FollowRepository } from "./follow.repository";
+import { PostTopicRepository } from "./post-topic.repository";
 import { RefreshTokenRepository } from "./refresh-token.repository";
 import { SessionRepository } from "./session.repository";
 import { TimelineRepository } from "./timeline.repository";
@@ -21,7 +22,8 @@ export {
   TimelineRepository,
   TopicRepository,
   UserInterestRepository,
-  UserRepository
+  UserRepository,
+  PostTopicRepository
 };
 
 declare global {
@@ -37,5 +39,6 @@ declare global {
     follow: FollowRepository;
     timeline: TimelineRepository;
     feedAsset: FeedAssetRepository;
+    postTopic: PostTopicRepository;
   }
 }

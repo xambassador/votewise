@@ -208,6 +208,7 @@ model Post {
     assets         PostAsset[]
     commentUpvotes CommentUpvote[]
     timelines      Timeline[]
+    postTopics     PostTopic[]
 }
 
 model PostAsset {
@@ -402,13 +403,25 @@ model RefreshToken {
     updated_at DateTime @updatedAt
 }
 
+model PostTopic {
+    id       String @id @default(cuid())
+    post_id  String
+    post     Post   @relation(fields: [post_id], references: [id])
+    topic_id String
+    topic    Topics @relation(fields: [topic_id], references: [id])
+
+    @@unique([post_id, topic_id], name: "post_topic_unique")
+}
+
 model Topics {
-    id   String @id @default(cuid())
-    name String @unique
+    id              String  @id @default(cuid())
+    name            String  @unique
+    is_system_topic Boolean @default(true)
 
     created_at    DateTime        @default(now())
     updated_at    DateTime        @updatedAt
     userInterests UserInterests[]
+    postTopics    PostTopic[]
 }
 
 model UserInterests {
