@@ -5,14 +5,13 @@ import logger from "@votewise/log";
 import { prisma } from "@votewise/prisma";
 
 import { Mailer } from "@/emails/mailer";
+import { RateLimiterManager } from "@/lib/rate-limiter";
 import * as Plugins from "@/plugins";
+import { TasksQueue } from "@/queues";
 import * as Repositories from "@/repository";
 import * as Services from "@/services";
 import { Cache } from "@/storage/redis";
 import { checkEnv } from "@/utils";
-
-import { RateLimiterManager } from "./lib/rate-limiter";
-import { TasksQueue } from "./queues";
 
 type Queue = { tasksQueue: TasksQueue };
 type ServerConfig = ApplicationConfigs["server"];
