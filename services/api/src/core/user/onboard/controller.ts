@@ -14,6 +14,8 @@ type ControllerOptions = {
   requestParser: AppContext["plugins"]["requestParser"];
   taskQueue: AppContext["queues"]["tasksQueue"];
   appUrl: AppContext["config"]["appUrl"];
+  postTopicRepository: AppContext["repositories"]["postTopic"];
+  timelineRepository: AppContext["repositories"]["timeline"];
 };
 
 export class Controller {
@@ -67,6 +69,13 @@ export class Controller {
       }
     });
 
+    await this.hydrateUserTimeline(userId, topics).catch(() => {});
     return res.status(StatusCodes.OK).json({ is_onboarded: user.is_onboarded, ...body });
+  }
+
+  private async hydrateUserTimeline(userId: string, topics: string[]) {
+    const feeds = await this.ctx.postTopicRepository.getInterestedFeedIds(topics);
+    const timeline = feeds.map((feed) => ({ user_id: userId, post_id: feed.post_id }));
+    await this.ctx.timelineRepository.createMany(timeline);
   }
 }

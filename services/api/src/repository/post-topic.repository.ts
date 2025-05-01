@@ -32,4 +32,18 @@ export class PostTopicRepository extends BaseRepository {
       })
     );
   }
+
+  public getInterestedFeedIds(topics: string[], count = 50) {
+    return this.execute(async () => {
+      const feeds = await this.db.postTopic.findMany({
+        where: {
+          topic_id: {
+            in: topics
+          }
+        },
+        take: count
+      });
+      return feeds;
+    });
+  }
 }

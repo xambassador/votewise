@@ -14,7 +14,9 @@ export function onboardControllerFactory() {
     userRepository: ctx.repositories.user,
     userInterestRepository: ctx.repositories.userInterest,
     taskQueue: ctx.queues.tasksQueue,
-    appUrl: ctx.config.appUrl
+    appUrl: ctx.config.appUrl,
+    postTopicRepository: ctx.repositories.postTopic,
+    timelineRepository: ctx.repositories.timeline
   });
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "onboard" });

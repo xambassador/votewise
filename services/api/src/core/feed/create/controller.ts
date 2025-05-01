@@ -62,8 +62,7 @@ export class Controller {
     const followers = await this.ctx.followRepository.findByFollowingId(locals.payload.sub);
     const timelines = followers.map((follower) => ({
       user_id: follower.follower_id,
-      post_id: feed.id,
-      created_at: feed.created_at
+      post_id: feed.id
     }));
     await this.ctx.timelineRepository.createMany(timelines);
     return res.status(StatusCodes.CREATED).json({ id: feed.id, slug });
