@@ -404,7 +404,6 @@ model RefreshToken {
 }
 
 model PostTopic {
-    id       String @id @default(cuid())
     post_id  String
     post     Post   @relation(fields: [post_id], references: [id])
     topic_id String
@@ -425,14 +424,10 @@ model Topics {
 }
 
 model UserInterests {
-    id       String @id @default(cuid())
     user_id  String
     user     User   @relation(fields: [user_id], references: [id])
     topic_id String
     topic    Topics @relation(fields: [topic_id], references: [id])
-
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
 
     @@unique([user_id, topic_id], name: "user_topic_unique")
 }
@@ -446,7 +441,6 @@ model UserSimilarity {
 }
 
 model Timeline {
-    id         String   @id @default(cuid())
     user_id    String
     post_id    String
     created_at DateTime @default(now())
@@ -454,5 +448,5 @@ model Timeline {
     user User @relation(fields: [user_id], references: [id])
     post Post @relation(fields: [post_id], references: [id])
 
-    @@index([user_id, created_at])
+    @@unique([user_id, post_id], name: "user_post_unique")
 }

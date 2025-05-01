@@ -114,6 +114,8 @@ async function createTopics() {
 async function createUsers(count = 100) {
   const users: User[] = [];
   const genders = Object.values(Gender);
+  const avatars = Array.from({ length: 50 }).map((_, index) => "avatars/avatar_" + (index + 1));
+  const backgrounds = Array.from({ length: 10 }).map((_, index) => "backgrounds/bg_" + (index + 1));
 
   for (let i = 0; i < count; i++) {
     const firstName = faker.person.firstName();
@@ -132,8 +134,8 @@ async function createUsers(count = 100) {
         facebook_profile_url: faker.helpers.maybe(() => `https://facebook.com/${userName}`, { probability: 0.5 }),
         instagram_profile_url: faker.helpers.maybe(() => `https://instagram.com/${userName}`, { probability: 0.7 }),
         github_profile_url: faker.helpers.maybe(() => `https://github.com/${userName}`, { probability: 0.4 }),
-        avatar_url: faker.image.avatar(),
-        cover_image_url: faker.image.url(),
+        avatar_url: avatars[faker.number.int(avatars.length - 1)],
+        cover_image_url: backgrounds[faker.number.int(backgrounds.length - 1)],
         location: faker.location.city() + ", " + faker.location.country(),
         gender: faker.helpers.arrayElement(genders),
         last_login: faker.date.recent(),
