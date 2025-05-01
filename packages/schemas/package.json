@@ -32,6 +32,10 @@
     "./feed": {
       "import": "./dist/feed.mjs",
       "require": "./dist/feed.js"
+    },
+    "./pagination": {
+      "import": "./dist/pagination.mjs",
+      "require": "./dist/pagination.js"
     }
   },
   "scripts": {

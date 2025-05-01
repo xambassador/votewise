@@ -3,3 +3,4 @@ export * from "./upload";
 export * from "./onboard";
 export * from "./user";
 export * from "./feed";
+export * from "./pagination";
