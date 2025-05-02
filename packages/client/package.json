@@ -41,6 +41,7 @@
     "clean": "rm -rf dist node_modules"
   },
   "dependencies": {
+    "@votewise/api": "*",
     "@votewise/constant": "*",
     "@votewise/debug": "*",
     "@votewise/env": "*",
