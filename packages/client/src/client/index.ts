@@ -134,13 +134,17 @@ export class Client {
     return this._fetch<T>(url, { method: "TRACE", ...options });
   }
 
-  public async upload(file: File) {
+  public async upload(file: File, options?: RequestInit) {
     const startingByte = 0;
     const chunk = file.slice(startingByte);
     const endingByte = startingByte + chunk.size;
-    const handshakeRes = await this.post<{ file_token: string }, { file_name: string }>("/upload/handshake", {
-      file_name: file.name
-    });
+    const handshakeRes = await this.post<{ file_token: string }, { file_name: string }>(
+      "/upload/handshake",
+      {
+        file_name: file.name
+      },
+      options
+    );
     if (!handshakeRes.success) {
       return handshakeRes;
     }
@@ -152,8 +156,10 @@ export class Client {
       headers: {
         "content-range": `bytes=${startingByte}-${endingByte}/${file.size}`,
         "x-file-token": handshakeRes.data.file_token,
-        "content-type": ""
-      }
+        "content-type": "",
+        ...options?.headers
+      },
+      credentials: "include"
     });
     return uploadRes;
   }

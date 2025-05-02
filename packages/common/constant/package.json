@@ -15,6 +15,10 @@
     "./routes": {
       "import": "./dist/routes.mjs",
       "require": "./dist/routes.js"
+    },
+    "./queue": {
+      "import": "./dist/queue.mjs",
+      "require": "./dist/queue.js"
     }
   },
   "scripts": {
