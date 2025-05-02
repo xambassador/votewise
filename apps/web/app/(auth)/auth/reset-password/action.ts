@@ -1,6 +1,7 @@
 "use server";
 
-import type { TActionResponse } from "@/types";
+import type { ResetPasswordResponse } from "@votewise/client/auth";
+import type { ActionResponse } from "@votewise/types";
 
 import { redirect } from "next/navigation";
 
@@ -11,7 +12,7 @@ import { routes } from "@/lib/routes";
 export async function resetPassword(data: {
   password: string;
   token: string;
-}): Promise<TActionResponse<{ message: string }>> {
+}): Promise<ActionResponse<ResetPasswordResponse>> {
   const { password, token } = data;
   const auth = getAuth();
   const res = await auth.resetPassword({ token, password });

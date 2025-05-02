@@ -1,6 +1,7 @@
 "use server";
 
-import type { TActionResponse } from "@/types";
+import type { ForgotPasswordResponse } from "@votewise/client/auth";
+import type { ActionResponse } from "@votewise/types";
 
 import { redirect } from "next/navigation";
 
@@ -8,7 +9,7 @@ import { getAuth } from "@/lib/client.server";
 import { setFlashMessage } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
-export async function forgotPassword(data: { email: string }): Promise<TActionResponse<{ message: string }>> {
+export async function forgotPassword(data: { email: string }): Promise<ActionResponse<ForgotPasswordResponse>> {
   const auth = getAuth();
   const res = await auth.forgotPassword(data.email);
   if (!res.success) {

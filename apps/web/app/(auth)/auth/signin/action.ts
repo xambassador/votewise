@@ -1,7 +1,7 @@
 "use server";
 
-import type { TActionResponse } from "@/types";
-import type { SigninResponse } from "@votewise/types";
+import type { SigninResponse } from "@votewise/client/auth";
+import type { ActionResponse } from "@votewise/types";
 import type { TSinginForm } from "./_utils";
 
 import { redirect } from "next/navigation";
@@ -12,7 +12,7 @@ import { getAuth } from "@/lib/client.server";
 import { COOKIE_KEYS, forwardCookie, setCookie, setFlashMessage } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
-export async function signin(data: TSinginForm, redirectTo?: string | null): Promise<TActionResponse<SigninResponse>> {
+export async function signin(data: TSinginForm, redirectTo?: string | null): Promise<ActionResponse<SigninResponse>> {
   const auth = getAuth();
   const res = await auth.signin({ username: data.username, password: data.password });
 

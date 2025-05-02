@@ -1,7 +1,7 @@
 "use server";
 
-import type { TActionResponse } from "@/types";
 import type { TOnboard } from "@votewise/schemas/onboard";
+import type { ActionResponse } from "@votewise/types";
 import type { TConnectYourSocials, TTellUsAboutYou, TWhatShouldWeCall } from "./_utils/schema";
 
 import { redirect } from "next/navigation";
@@ -22,7 +22,7 @@ type Props = Partial<TWhatShouldWeCall> &
 
 type OnboardResponse = { is_onboarded: boolean } & TOnboard;
 
-export async function onboard(props: Props): Promise<TActionResponse<OnboardResponse>> {
+export async function onboard(props: Props): Promise<ActionResponse<OnboardResponse>> {
   isAuthorized<true>({ redirect: true });
 
   if (props.step === 1) {

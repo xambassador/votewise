@@ -1,12 +1,12 @@
 "use server";
 
-import type { TActionResponse } from "@/types";
+import type { ActionResponse } from "@votewise/types";
 import type { TSignUpForm } from "./_utils";
 
 import { getAuth } from "@/lib/client.server";
 import { COOKIE_KEYS, setCookie } from "@/lib/cookie";
 
-export async function signup(data: TSignUpForm): Promise<TActionResponse<{ message: string }>> {
+export async function signup(data: TSignUpForm): Promise<ActionResponse<{ message: string }>> {
   const auth = getAuth();
   const response = await auth.signup(data);
 

@@ -18,3 +18,6 @@ export type FetchError = {
 export type FetchResult<T> = FetchSuccess<T> | FetchError;
 export type SafeAction<T> = { success: true; data: T } | { success: false; error: string };
 export type AsyncState = "idle" | "loading" | "success" | "error";
+export type ActionResponse<T> =
+  | { success: true; data: T }
+  | { success: false; error: string; errorData: ApiErrorResponse["error"] };
