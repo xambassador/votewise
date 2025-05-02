@@ -6,11 +6,10 @@ import type { Strategy } from "./strategies";
 
 import { StatusCodes } from "http-status-codes";
 
-import { ERROR_CODES } from "@votewise/constant";
+import { COOKIE_KEYS, ERROR_CODES } from "@votewise/constant";
 import { ZSignin } from "@votewise/schemas";
 import { Day } from "@votewise/times";
 
-import { COOKIE_KEYS } from "@/utils/constant";
 import { getCookieOptions } from "@/utils/cookie";
 
 type ControllerOptions = {

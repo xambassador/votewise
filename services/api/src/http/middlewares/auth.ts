@@ -1,11 +1,10 @@
 import type { Request } from "express";
 
-import { ERROR_CODES } from "@votewise/constant";
+import { COOKIE_KEYS, ERROR_CODES } from "@votewise/constant";
 import { AuthenticationError } from "@votewise/errors";
 
 import { AppContext } from "@/context";
 import { ExceptionLayer } from "@/lib/exception-layer";
-import { COOKIE_KEYS } from "@/utils/constant";
 
 export function authMiddlewareFactory() {
   const ctx = AppContext.getInjectionTokens(["jwtService", "sessionManager", "repositories"]);
