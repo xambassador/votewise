@@ -1,4 +1,5 @@
 import type { AppContext } from "@/context";
+import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
@@ -25,6 +26,9 @@ export class Controller {
     const username = _username!;
     const user = await this.ctx.userRepository.findByUsername(username);
     this.ctx.assert.badRequest(!!user, "Username already exists", USERNAME_ALREADY_EXISTS);
-    return res.status(StatusCodes.OK).json({ is_available: true });
+    const result = { is_available: true };
+    return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 }
+
+export type UsernameExistsResponse = ExtractControllerResponse<Controller>;

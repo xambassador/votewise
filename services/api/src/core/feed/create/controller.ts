@@ -1,4 +1,5 @@
 import type { AppContext } from "@/context";
+import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
@@ -65,6 +66,9 @@ export class Controller {
       post_id: feed.id
     }));
     await this.ctx.timelineRepository.createMany(timelines);
-    return res.status(StatusCodes.CREATED).json({ id: feed.id, slug });
+    const result = { id: feed.id, slug };
+    return res.status(StatusCodes.CREATED).json(result) as Response<typeof result>;
   }
 }
+
+export type CreateFeedResponse = ExtractControllerResponse<Controller>;

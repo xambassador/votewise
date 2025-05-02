@@ -3,7 +3,7 @@
   "private": true,
   "sideEffects": false,
   "version": "0.0.0",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "scripts": {
     "start": "node dist/src/index.js",
     "dev": "NODE_ENV=development nodemon",
@@ -92,5 +92,11 @@
     "tsc-alias": "^1.8.10",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.5.4"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/src/types/api.d.ts",
+      "import": "./dist/src/types/api.js"
+    }
   }
 }

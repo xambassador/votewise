@@ -1,4 +1,5 @@
 import type { AppContext } from "@/context";
+import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
@@ -34,6 +35,9 @@ export class Controller {
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + 5);
     const challenge = await this.ctx.challengeRepository.create({ factor_id: factor.id, ip: meta.ip });
-    return res.status(StatusCodes.OK).json({ id: challenge.id, expires_at: expiresAt, type: factor.factor_type });
+    const result = { id: challenge.id, expires_at: expiresAt, type: factor.factor_type };
+    return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 }
+
+export type ChallengeFactorResponse = ExtractControllerResponse<Controller>;

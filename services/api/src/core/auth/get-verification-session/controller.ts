@@ -1,4 +1,5 @@
 import type { AppContext } from "@/context";
+import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
@@ -25,6 +26,9 @@ export class Controller {
     this.ctx.assert.resourceNotFound(!session, "Verification session not found");
     const data = JSON.parse(session!) as { userId: string; ip: string; email: string };
     const ttl = await this.ctx.cache.getRemainingTime(key);
-    return res.status(StatusCodes.OK).json({ user_id: data.userId, ttl, total: 5 * Minute, email: data.email });
+    const result = { user_id: data.userId, ttl, total: 5 * Minute, email: data.email };
+    return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 }
+
+export type GetVerificationSessionResponse = ExtractControllerResponse<Controller>;

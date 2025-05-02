@@ -1,4 +1,5 @@
 import type { AppContext } from "@/context";
+import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
@@ -92,13 +93,14 @@ export class Controller {
       getCookieOptions({ expires: new Date(Date.now() + 30 * Day) })
     );
 
-    return res.status(StatusCodes.OK).json({
+    const result = {
       access_token: session.accessToken,
       refresh_token: session.refreshToken,
       token_type: "Bearer",
       expires_in: session.expiresInMs,
       expires_at: session.expiresAt
-    });
+    };
+    return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 
   /**
@@ -121,3 +123,5 @@ export class Controller {
     return new Date(date.getTime() + expiryDuration * 1000);
   }
 }
+
+export type VerifyMFAResponse = ExtractControllerResponse<Controller>;

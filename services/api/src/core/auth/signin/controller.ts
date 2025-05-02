@@ -1,5 +1,6 @@
 import type { AppContext } from "@/context";
 import type { UserRegisterService } from "@/core/auth/register/service";
+import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
 import type { Strategy } from "./strategies";
 
@@ -98,7 +99,7 @@ export class Controller {
     );
     res.cookie(refreshToken, session.refreshToken, getCookieOptions({ expires: new Date(Date.now() + 30 * Day) }));
 
-    return res.status(StatusCodes.OK).json({
+    const result = {
       access_token: session.accessToken,
       refresh_token: session.refreshToken,
       token_type: "Bearer",
@@ -115,7 +116,8 @@ export class Controller {
         is_onboarded: user.is_onboarded,
         user_aal_level: aal
       }
-    });
+    };
+    return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 
   private getStrategy(email: string | undefined, username: string | undefined) {
@@ -124,3 +126,5 @@ export class Controller {
     throw new Error("Invalid strategy");
   }
 }
+
+export type SigninResponse = ExtractControllerResponse<Controller>;

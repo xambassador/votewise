@@ -1,4 +1,5 @@
 import type { AppContext } from "@/context";
+import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
@@ -70,7 +71,8 @@ export class Controller {
     });
 
     await this.hydrateUserTimeline(userId, topics).catch(() => {});
-    return res.status(StatusCodes.OK).json({ is_onboarded: user.is_onboarded, ...body });
+    const result = { is_onboarded: user.is_onboarded, ...body };
+    return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 
   private async hydrateUserTimeline(userId: string, topics: string[]) {
@@ -79,3 +81,5 @@ export class Controller {
     await this.ctx.timelineRepository.createMany(timeline);
   }
 }
+
+export type OnboardUserResponse = ExtractControllerResponse<Controller>;

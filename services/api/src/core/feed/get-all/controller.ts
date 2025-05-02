@@ -1,4 +1,5 @@
 import type { AppContext } from "@/context";
+import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
@@ -48,9 +49,12 @@ export class Controller {
       assets: timeline.post.assets.map((asset) => ({ url: asset.url, type: asset.type }))
     }));
     const pagination = new PaginationBuilder({ total, page, limit }).build();
-    return res.status(StatusCodes.OK).json({
+    const result = {
       feeds,
       ...pagination
-    });
+    };
+    return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 }
+
+export type GetAllFeedsResponse = ExtractControllerResponse<Controller>;

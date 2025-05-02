@@ -7033,7 +7033,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@votewise/api@workspace:services/api":
+"@votewise/api@npm:*, @votewise/api@workspace:services/api":
   version: 0.0.0-use.local
   resolution: "@votewise/api@workspace:services/api"
   dependencies:
@@ -7120,6 +7120,7 @@ __metadata:
   resolution: "@votewise/client@workspace:packages/client"
   dependencies:
     "@types/jsonwebtoken": "npm:^9.0.6"
+    "@votewise/api": "npm:*"
     "@votewise/constant": "npm:*"
     "@votewise/debug": "npm:*"
     "@votewise/env": "npm:*"

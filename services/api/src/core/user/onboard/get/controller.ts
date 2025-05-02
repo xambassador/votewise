@@ -1,4 +1,5 @@
 import type { AppContext } from "@/context";
+import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
@@ -26,6 +27,9 @@ export class Controller {
     const _user = await this.ctx.userRepository.findById(locals.payload.sub);
     this.ctx.assert.resourceNotFound(!_user, "User does not exist");
     const user = _user!;
-    return res.status(StatusCodes.OK).json({ is_onboarded: user.is_onboarded });
+    const result = { is_onboarded: user.is_onboarded };
+    return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 }
+
+export type GetUserOnboardStatusResponse = ExtractControllerResponse<Controller>;

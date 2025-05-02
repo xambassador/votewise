@@ -1,4 +1,5 @@
 import type { AppContext } from "@/context";
+import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
@@ -59,6 +60,9 @@ export class Controller {
       secret: this.ctx.cryptoService.generateUUID()
     });
 
-    return res.status(StatusCodes.OK).json({ user_id: user.id, email: user.email, is_email_verify: true });
+    const result = { user_id: user.id, email: user.email, is_email_verify: true };
+    return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 }
+
+export type VerifyEmailResponse = ExtractControllerResponse<Controller>;

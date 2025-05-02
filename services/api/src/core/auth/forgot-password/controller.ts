@@ -1,4 +1,5 @@
 import type { AppContext } from "@/context";
+import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
@@ -56,6 +57,10 @@ export class Controller {
         }
       }
     });
-    return res.status(StatusCodes.OK).json({ message: msg });
+
+    const result = { message: msg };
+    return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 }
+
+export type ForgotPasswordResponse = ExtractControllerResponse<Controller>;
