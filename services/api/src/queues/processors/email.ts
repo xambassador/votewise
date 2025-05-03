@@ -1,38 +1,8 @@
 import type { AppContext } from "@/context";
-import type { ITaskWorker } from "..";
+import type { EmailJob, ITaskWorker } from "@votewise/types";
 
 import path from "node:path";
 import pug from "pug";
-
-type BaseData = {
-  to: string;
-  subject: string;
-};
-type BaseLocals = { logo: string };
-type SignupTemplate = BaseData & {
-  templateName: "signup";
-  locals: {
-    otp: string;
-    expiresIn: number;
-    expiresInUnit: string;
-  } & BaseLocals;
-};
-type WelcomeTemplate = BaseData & { templateName: "welcome"; locals: { name: string } & BaseLocals };
-type ForgotPasswordTemplate = BaseData & {
-  templateName: "forgot-password";
-  locals: {
-    firstName: string;
-    expiresIn: number;
-    expiresInUnit: "hours" | "minutes";
-    email: string;
-    resetLink: string;
-  } & BaseLocals;
-};
-type PasswordResetSuccessTemplate = BaseData & {
-  templateName: "password-reset-success";
-  locals: { name: string; loginUrl: string } & BaseLocals;
-};
-export type EmailJob = SignupTemplate | WelcomeTemplate | ForgotPasswordTemplate | PasswordResetSuccessTemplate;
 
 type EmailProcessorOptions = {
   logger: AppContext["logger"];
