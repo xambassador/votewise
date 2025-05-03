@@ -1,4 +1,5 @@
 import type { AppContext } from "@/context";
+import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
@@ -52,8 +53,13 @@ export class Controller {
       friendlyName: user.first_name,
       factorType: "TOTP"
     });
-    return res
-      .status(StatusCodes.OK)
-      .json({ id: factor.id, type: factor.factor_type, totp: { qr_code: qrCode, uri: keyUri, secret: totpSecret } });
+    const result = {
+      id: factor.id,
+      type: factor.factor_type,
+      totp: { qr_code: qrCode, uri: keyUri, secret: totpSecret }
+    };
+    return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 }
+
+export type EnrollMFAResponse = ExtractControllerResponse<Controller>;

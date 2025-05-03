@@ -1,7 +1,7 @@
 "use server";
 
-import type { TActionResponse } from "@/types";
-import type { VerifyResponse } from "@votewise/types";
+import type { VerifyMFAResponse } from "@votewise/client/auth";
+import type { ActionResponse } from "@votewise/types";
 
 import { redirect } from "next/navigation";
 
@@ -10,7 +10,7 @@ import { getAuth } from "@/lib/client.server";
 import { clearCookie, COOKIE_KEYS, forwardCookie, getCookie } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
-export async function verifyFactor(code: string): Promise<TActionResponse<VerifyResponse>> {
+export async function verifyFactor(code: string): Promise<ActionResponse<VerifyMFAResponse>> {
   isAuthorized<true>({ redirect: true });
   const factorId = getCookie(COOKIE_KEYS.factorId);
   const challengeId = getCookie(COOKIE_KEYS.challengeId);

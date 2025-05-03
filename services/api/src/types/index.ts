@@ -2,6 +2,7 @@
 
 import type { envBaseSchema, TEnv } from "@votewise/env";
 import type { AccessTokenPayload } from "@votewise/types";
+import type { Request, Response } from "express";
 import type { z } from "zod";
 
 declare global {
@@ -31,3 +32,13 @@ declare global {
 
   interface Environment extends TEnv {}
 }
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type ExtractControllerResponse<T extends { handle: Function }> = T["handle"] extends (
+  req: Request,
+  res: Response
+) => Promise<infer R extends Response>
+  ? R["json"] extends (body: infer _B) => Response<infer T>
+    ? T
+    : never
+  : never;

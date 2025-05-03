@@ -1,4 +1,5 @@
 import type { AppContext } from "@/context";
+import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
@@ -15,8 +16,11 @@ export class Controller {
   }
 
   async handle(_: Request, res: Response) {
-    const result = await this.ctx.topicRepository.findAll();
-    const topics = result.map((topic) => ({ id: topic.id, name: topic.name }));
-    return res.status(StatusCodes.OK).json({ topics });
+    const topicsList = await this.ctx.topicRepository.findAll();
+    const topics = topicsList.map((topic) => ({ id: topic.id, name: topic.name }));
+    const result = { topics };
+    return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 }
+
+export type GetAllTopicsResponse = ExtractControllerResponse<Controller>;

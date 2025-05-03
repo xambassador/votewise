@@ -1,4 +1,4 @@
-import type { GetOnboardedStatusResponse, GetTopicsResponse, OnboardResponse } from "@votewise/types";
+import type { GetAllTopicsResponse, GetUserOnboardStatusResponse, OnboardUserResponse } from "@votewise/api";
 import type { Client } from "../client";
 import type { Client as ServerClient } from "../server";
 
@@ -32,19 +32,21 @@ export class Onboard {
 
   public async isOnboarded(userId: string) {
     const path = user.runtime.onboard.getStatus("", userId);
-    const res = await this.client.get<GetOnboardedStatusResponse>(path);
+    const res = await this.client.get<GetUserOnboardStatusResponse>(path);
     return res;
   }
 
   public async onboard(userId: string, data: OnboardBody) {
     const path = user.runtime.onboard.update("", userId);
-    const res = await this.client.patch<OnboardResponse, OnboardBody>(path, data);
+    const res = await this.client.patch<OnboardUserResponse, OnboardBody>(path, data);
     return res;
   }
 
   public async getTopics() {
     const path = topics.runtime.all("");
-    const res = await this.client.get<GetTopicsResponse>(path);
+    const res = await this.client.get<GetAllTopicsResponse>(path);
     return res;
   }
 }
+
+export type { GetAllTopicsResponse, GetUserOnboardStatusResponse, OnboardUserResponse };

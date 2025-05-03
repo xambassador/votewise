@@ -1,4 +1,5 @@
 import type { AppContext } from "@/context";
+import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
 import type { UserRegisterService } from "./service";
 
@@ -51,10 +52,13 @@ export class Controller {
       secret: createdUser.secret
     });
 
-    return res.status(StatusCodes.CREATED).json({
+    const result = {
       user_id: createdUser.id,
       verification_code: verificationCode,
       expires_in: expiresIn
-    });
+    };
+    return res.status(StatusCodes.CREATED).json(result) as Response<typeof result>;
   }
 }
+
+export type SignupResponse = ExtractControllerResponse<Controller>;

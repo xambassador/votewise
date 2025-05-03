@@ -1,12 +1,14 @@
 import type {
-  AccessTokenPayload,
   ChallengeFactorResponse,
+  ForgotPasswordResponse,
+  GetVerificationSessionResponse,
+  ResetPasswordResponse,
   SigninResponse,
   SignupResponse,
-  VerificationSessionResponse,
   VerifyEmailResponse,
-  VerifyResponse
-} from "@votewise/types";
+  VerifyMFAResponse
+} from "@votewise/api";
+import type { AccessTokenPayload } from "@votewise/types";
 import type { Client } from "../client";
 import type { Client as ServerClient } from "../server";
 
@@ -15,9 +17,7 @@ import { Debugger } from "@votewise/debug";
 
 import { COOKIE_KEYS, jwt } from "../utils";
 
-type AuthOptions = {
-  client: Client | ServerClient;
-};
+type AuthOptions = { client: Client | ServerClient };
 
 type VerifyEmailBody = {
   email: string;
@@ -79,7 +79,7 @@ export class Auth {
   }
 
   public async verifyFactor(data: { code: string; factorId: string; challengeId: string }) {
-    const res = await this.client.post<VerifyResponse, VerifyBody>(
+    const res = await this.client.post<VerifyMFAResponse, VerifyBody>(
       auth.runtime.factors.verifyFactor("", data.factorId),
       {
         challenge_id: data.challengeId,
@@ -90,7 +90,7 @@ export class Auth {
   }
 
   public async forgotPassword(email: string) {
-    const res = await this.client.post<{ message: string }, { email: string }>(auth.runtime.forgotPassword(""), {
+    const res = await this.client.post<ForgotPasswordResponse, { email: string }>(auth.runtime.forgotPassword(""), {
       email
     });
     return res;
@@ -98,12 +98,12 @@ export class Auth {
 
   public async resetPassword(data: { password: string; token: string }) {
     const url = auth.runtime.resetPassword("") + `?token=${data.token}`;
-    const res = await this.client.patch<{ message: string }, { password: string }>(url, { password: data.password });
+    const res = await this.client.patch<ResetPasswordResponse, { password: string }>(url, { password: data.password });
     return res;
   }
 
   public async getVerificationSession(email: string) {
-    const res = await this.client.get<VerificationSessionResponse>(auth.runtime.emailVerificationSession("", email));
+    const res = await this.client.get<GetVerificationSessionResponse>(auth.runtime.emailVerificationSession("", email));
     return res;
   }
 
@@ -132,3 +132,14 @@ export class Auth {
     return { user, accessToken };
   }
 }
+
+export type {
+  ChallengeFactorResponse,
+  ForgotPasswordResponse,
+  GetVerificationSessionResponse,
+  ResetPasswordResponse,
+  SigninResponse,
+  SignupResponse,
+  VerifyEmailResponse,
+  VerifyMFAResponse
+};

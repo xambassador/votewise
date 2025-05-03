@@ -1,7 +1,7 @@
 "use server";
 
-import type { TActionResponse } from "@/types";
-import type { VerifyEmailResponse } from "@votewise/types";
+import type { VerifyEmailResponse } from "@votewise/client/auth";
+import type { ActionResponse } from "@votewise/types";
 
 import { redirect } from "next/navigation";
 
@@ -9,7 +9,7 @@ import { getAuth } from "@/lib/client.server";
 import { clearCookie, COOKIE_KEYS, getCookie, setFlashMessage } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
-export async function verifyEmail(otp: string): Promise<TActionResponse<VerifyEmailResponse>> {
+export async function verifyEmail(otp: string): Promise<ActionResponse<VerifyEmailResponse>> {
   const auth = getAuth();
   const email = getCookie(COOKIE_KEYS.email);
   const verificationCode = getCookie(COOKIE_KEYS.verificationCode);
