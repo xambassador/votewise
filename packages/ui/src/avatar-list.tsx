@@ -8,6 +8,7 @@ type Avatar = {
   url: string;
   name: string;
   etag: string;
+  path: string;
 };
 
 const avatarList: Avatar[] = [];
@@ -16,7 +17,7 @@ let error: null | string = null;
 
 function prefetchImages() {
   if (typeof window === "undefined") return;
-  fetch("/api/upload/assets/avatars").then((res) => {
+  fetch("/api/upload/assets/avatars", { credentials: "include" }).then((res) => {
     if (res.ok) {
       res.json().then((data) => {
         avatarList.push(...data);
@@ -31,7 +32,7 @@ function prefetchImages() {
 prefetchImages();
 
 type Props = {
-  onSelect?: (avatar: string) => void;
+  onSelect?: (url: string) => void;
   avatarList?: Avatar[];
 };
 
