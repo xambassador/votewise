@@ -37,6 +37,7 @@ export class Controller {
               "/" +
               r.name,
             name: r.name,
+            path: bucket + "/" + r.name,
             etag: r.etag
           }));
           res.json(urls);

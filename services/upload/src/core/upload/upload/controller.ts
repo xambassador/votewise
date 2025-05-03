@@ -1,11 +1,15 @@
 import type { AppContext } from "@/context";
+import type { AssetType } from "@votewise/types";
 import type { Request, Response } from "express";
 
 import fs from "node:fs";
 import busboy from "busboy";
 import { StatusCodes } from "http-status-codes";
+import sanitize from "sanitize-filename";
 
 import { InvalidInputError } from "@votewise/errors";
+
+import { getAuthenticateLocals } from "@/lib/locals";
 
 type ControllerOptions = {
   ctx: AppContext;
@@ -19,7 +23,8 @@ export class Controller {
   }
 
   public async handle(req: Request, res: Response) {
-    const { fileToken, startingByte } = this.parseHeaders(req);
+    const { fileToken, startingByte, assetType } = this.parseHeaders(req);
+    const locals = getAuthenticateLocals(res);
     const bb = busboy({ headers: req.headers });
 
     bb.on("error", () =>
@@ -32,8 +37,8 @@ export class Controller {
 
     bb.on("file", async (_, file, info) => {
       const { filename: receivedFileName } = info;
-      fileName = receivedFileName;
-      const path = this.ctx.getBlobPath(receivedFileName, fileToken);
+      fileName = sanitize(receivedFileName);
+      const path = this.ctx.getBlobPath(fileName, fileToken);
 
       try {
         const fileInfo = await this.ctx.getFileInfo(path);
@@ -67,12 +72,22 @@ export class Controller {
       const publicUrl = this.ctx.environment.VOTEWISE_BUCKET_URL;
       const url = `${publicUrl}/uploads/${this.ctx.getFileName(fileName, fileToken)}`;
       res.status(StatusCodes.OK).json({ url });
+
+      this.ctx.queues.uploadQueue.add({
+        name: "uploadToS3",
+        payload: {
+          filePath: this.ctx.getBlobPath(fileName, fileToken),
+          path: locals.payload.sub + "/" + this.ctx.getFileName(fileName, fileToken),
+          userId: locals.payload.sub,
+          assetType
+        }
+      });
     });
 
     req.pipe(bb);
   }
 
-  private parseHeaders<P, R, B, Q, L extends Record<string, unknown>>(req: Request<P, R, B, Q, L>) {
+  private parseHeaders(req: Request) {
     const contentRange = req.headers["content-range"];
     if (!contentRange) {
       throw new InvalidInputError("Missing content-range header");
@@ -106,6 +121,17 @@ export class Controller {
       throw new InvalidInputError("Invalid content-range");
     }
 
-    return { startingByte, fileToken };
+    const validAssetTypes = ["avatar", "cover_image"];
+    const assetTypeHeader = this.ctx.config.appHeaders.assetType;
+    const assetTypeFromHeader = req.headers[assetTypeHeader];
+    let assetType: AssetType = "avatar";
+
+    if (typeof assetTypeFromHeader === "string") {
+      if (validAssetTypes.includes(assetTypeFromHeader)) {
+        assetType = assetTypeFromHeader as AssetType;
+      }
+    }
+
+    return { startingByte, fileToken, assetType };
   }
 }

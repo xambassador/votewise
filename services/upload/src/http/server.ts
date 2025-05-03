@@ -2,15 +2,12 @@ import type { ServerConfig } from "@/config";
 import type { HttpTerminator } from "http-terminator";
 
 import http from "http";
-import chrona from "chrona";
-import compression from "compression";
-import cors from "cors";
-import express, { json, static as static_, urlencoded } from "express";
-import helmet from "helmet";
+import express from "express";
 import { createHttpTerminator } from "http-terminator";
 
 import { AppContext } from "../context";
 import * as error from "./error";
+import { AppMiddleware } from "./middlewares";
 import { AppRouter } from "./router";
 
 export class Server {
@@ -30,15 +27,10 @@ export class Server {
     const app = express();
     const ctx = await AppContext.fromConfig(cfg, overrides);
     const router = new AppRouter({});
+    const middleware = new AppMiddleware();
     app.disable("x-powered-by");
     app.set("trust proxy", true);
-    app.use(chrona(":date :incoming :method :url :status :response-time :remote-address", (l) => ctx.logger.info(l)));
-    app.use(compression());
-    app.use(cors(cfg.cors));
-    app.use(helmet());
-    app.use(urlencoded({ extended: true }));
-    app.use(json({ limit: cfg.blobUploadLimit }));
-    app.use(static_("public"));
+    app.use(middleware.register());
     app.use(router.register());
     app.use(error.withAppContext(ctx).handler);
     return new Server({ app, ctx });
