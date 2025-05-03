@@ -32,6 +32,9 @@ const NODE_ENV = z.enum(["development", "production", "test"]).default("developm
 const VOTEWISE_API_PORT = z.string().default(DEFAULT_VOTEWISE_API_PORT.toString());
 const VOTEWISE_APP_PORT = z.string().default(DEFAULT_VOTEWISE_APP_PORT.toString());
 const VOTEWISE_BUCKET_PORT = z.string().default(DEFAULT_VOTEWISE_BUCKET_PORT.toString());
+const VOTEWISE_BUCKET_NAME = z
+  .string({ required_error: "VOTEWISE_BUCKET_NAME is required" })
+  .min(1, { message: "VOTEWISE_BUCKET_NAME is required" });
 const VOTEWISE_API_URL = z
   .string({
     required_error: "VOTEWISE_API_URL is required"
@@ -118,7 +121,8 @@ export const envBaseSchema = z.object({
   MINIO_ENDPOINT,
   MINIO_PORT,
   APP_COOKIE_SECRET,
-  API_COOKIE_SECRET
+  API_COOKIE_SECRET,
+  VOTEWISE_BUCKET_NAME
 });
 
 export const envSchema = z.object({
@@ -157,7 +161,8 @@ export const envSchema = z.object({
   MINIO_ENDPOINT,
   MINIO_PORT: MINIO_PORT.transform((val) => parseInt(val, 10)),
   APP_COOKIE_SECRET,
-  API_COOKIE_SECRET
+  API_COOKIE_SECRET,
+  VOTEWISE_BUCKET_NAME
 });
 
 envSchema.superRefine((data) => {
