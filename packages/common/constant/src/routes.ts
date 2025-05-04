@@ -35,16 +35,18 @@ export const user = {
   paths: {
     sessions: (base: string) => base + "/users/sessions",
     onboard: {
-      getStatus: (base: string) => base + "/users/:user_id/onboard",
-      update: (base: string) => base + "/users/:user_id/onboard"
+      getStatus: (base: string) => base + "/me/onboard",
+      update: (base: string) => base + "/me/onboard",
+      getOnboardSession: (base: string) => base + "/me/onboard/session"
     },
     usernameExists: (base: string) => base + "/users/:username/exists"
   },
   runtime: {
     sessions: (base: string) => base + "/users/sessions",
     onboard: {
-      getStatus: (base: string, userId: string) => base + `/users/${userId}/onboard`,
-      update: (base: string, userId: string) => base + `/users/${userId}/onboard`
+      getStatus: (base: string) => base + "/me/onboard",
+      update: (base: string) => base + "/me/onboard",
+      getOnboardSession: (base: string) => base + "/me/onboard/session"
     },
     usernameExists: (base: string, username: string) => base + `/users/${username}/exists`
   }

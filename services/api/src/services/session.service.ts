@@ -230,4 +230,33 @@ export class SessionManager {
     await Promise.all(keys.map((key) => this.ctx.cache.del(key)));
     await this.ctx.sessionRepository.clearByUserId(userId);
   }
+
+  /**
+   * Save the onboard status of a user
+   */
+  public async saveOnboardStatus(userId: string, status: "ONBOARDED" | "NOT_ONBOARDED") {
+    const key = `onboard-status:${userId}`;
+    await this.ctx.cache.setWithExpiry(key, status, 60 * Minute);
+  }
+
+  /**
+   * Get the onboard status of a user
+   */
+  public async getOnboardStatus(userId: string) {
+    const key = `onboard-status:${userId}`;
+    const status = await this.ctx.cache.get(key);
+    if (!status) return null;
+    return status as "ONBOARDED" | "NOT_ONBOARDED";
+  }
+
+  /**
+   * Update the onboard status of a user
+   */
+  public async updateOnboardStatus(userId: string, status: "ONBOARDED" | "NOT_ONBOARDED") {
+    const key = `onboard-status:${userId}`;
+    const onboardStatus = await this.ctx.cache.get(key);
+    if (!onboardStatus) return null;
+    await this.ctx.cache.setWithExpiry(key, status, 60 * Minute);
+    return status;
+  }
 }

@@ -6,6 +6,8 @@ import { StatusCodes } from "http-status-codes";
 
 import { ERROR_CODES } from "@votewise/constant";
 
+import { getAuthenticateLocals } from "@/utils/locals";
+
 type ControllerOptions = {
   userRepository: AppContext["repositories"]["user"];
   assert: AppContext["assert"];
@@ -21,10 +23,15 @@ export class Controller {
   }
 
   async handle(req: Request, res: Response) {
+    const locals = getAuthenticateLocals(res);
     const _username = req.params.username;
     this.ctx.assert.badRequest(!_username, "Username is required");
     const username = _username!;
     const user = await this.ctx.userRepository.findByUsername(username);
+    if (user && user.id === locals.payload.sub) {
+      const result = { is_available: true };
+      return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
+    }
     this.ctx.assert.badRequest(!!user, "Username already exists", USERNAME_ALREADY_EXISTS);
     const result = { is_available: true };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
