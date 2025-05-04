@@ -1,15 +1,14 @@
 import type { AppContext } from "@/context";
-import type { EmailJob } from "./processors/email";
+import type { ITaskWorker, JobType, Tasks, UploadCompletedEventTask } from "@votewise/types";
 
 import { Queue, Worker } from "bullmq";
+
+import { tasksQueueDefaultJobOptions, tasksQueueName, uploadCompletedEventQueueName } from "@votewise/constant/queue";
 
 import { RedisAdapter } from "@/storage/redis";
 
 import { EmailProcessor } from "./processors/email";
-
-// Add more job types here
-export type JobType = "email";
-export type Tasks = { name: "email"; payload: EmailJob };
+import { UploadCompletedEventProcessor } from "./processors/upload-complete";
 
 type TasksQueueOptions = {
   env: AppContext["environment"];
@@ -28,15 +27,9 @@ export class TasksQueue {
 
   public init() {
     this.redis = new RedisAdapter(this.opts.env.REDIS_URL, { maxRetriesPerRequest: null });
-    this.queue = new Queue<Tasks>("tasks", {
+    this.queue = new Queue<Tasks>(tasksQueueName, {
       connection: this.redis,
-      defaultJobOptions: {
-        attempts: 3,
-        backoff: {
-          type: "exponential",
-          delay: 1000
-        }
-      }
+      defaultJobOptions: tasksQueueDefaultJobOptions
     });
   }
 
@@ -50,7 +43,7 @@ export class TasksQueue {
     });
     this.strategy = { email: emailProcessor };
     this.worker = new Worker<Tasks>(
-      "tasks",
+      tasksQueueName,
       async (job) => {
         const message = `Processor for job ${job.data.name} not found. You probably forgot to add it to the strategy or you forgot to call initWorker`;
         const processor = this.strategy ? this.strategy[job.data.name] : null;
@@ -70,17 +63,26 @@ export class TasksQueue {
       }
       ctx.logger.error(`[Tasks Worker] Job ${job.id} failed with error: ${err.message}`);
     });
-    this.worker.on("active", (job) => {
-      ctx.logger.info(`[Tasks Worker] Job ${job.id} active`);
-    });
     this.worker.on("error", (reason) => {
       ctx.logger.error(`[Tasks Worker] Error: ${reason}`);
     });
     this.worker.on("ready", () => {
       ctx.logger.info("[Tasks Worker] ready");
     });
-    this.worker.on("paused", () => {
-      ctx.logger.info("[Tasks Worker] paused");
+
+    const uploadCompletedEventProcessor = new UploadCompletedEventProcessor({
+      userRepository: ctx.repositories.user
+    });
+    const uploadCompletedEventWorker = new Worker<UploadCompletedEventTask>(
+      uploadCompletedEventQueueName,
+      async (job) => {
+        await uploadCompletedEventProcessor.process(job.data.payload);
+      },
+      { connection: this.redis }
+    );
+
+    uploadCompletedEventWorker.on("completed", () => {
+      ctx.logger.info(`[Upload Completed Event Worker] Job completed`);
     });
   }
 
@@ -88,10 +90,4 @@ export class TasksQueue {
     if (!this.queue) throw new Error("Taks Queue not initialized");
     return this.queue.add(task.name, task);
   }
-}
-
-export abstract class ITaskWorker {
-  constructor() {}
-
-  abstract process<TData>(data: TData): Promise<void>;
 }

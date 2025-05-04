@@ -28,9 +28,11 @@ export class SSL {
 
 export class AppHeaders {
   public fileToken: string;
+  public assetType: string;
 
   constructor(cfg?: AppHeaders) {
     this.fileToken = cfg?.fileToken || "x-file-token";
+    this.assetType = cfg?.assetType || "x-asset-type";
   }
 }
 
@@ -47,6 +49,7 @@ export class ServerConfig {
   public cors?: Cors;
   public ssl?: SSL;
   public appHeaders: AppHeaders;
+  public uploadBucket: string;
 
   constructor(cfg: ServerConfig) {
     this.port = cfg.port;
@@ -61,5 +64,6 @@ export class ServerConfig {
     this.cors = cfg.cors;
     this.ssl = cfg.ssl;
     this.appHeaders = cfg.appHeaders;
+    this.uploadBucket = cfg.uploadBucket;
   }
 }

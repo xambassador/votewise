@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 
 import fs from "node:fs";
 import { StatusCodes } from "http-status-codes";
+import sanitize from "sanitize-filename";
 import { v4 } from "uuid";
 
 import { ZHandshake } from "@votewise/schemas";
@@ -20,8 +21,8 @@ export class Controller {
 
   public async handle(req: Request, res: Response) {
     const { body } = this.ctx.plugins.requestParser.getParser(ZHandshake).parseRequest(req);
-    const fileName = body.file_name;
-    const fileToken = v4();
+    const fileName = sanitize(body.file_name);
+    const fileToken = v4().replace(/-/g, "");
     const filePath = this.ctx.getBlobPath(fileName, fileToken);
     fs.createWriteStream(filePath, { flags: "w" });
     return res.status(StatusCodes.OK).json({ file_token: fileToken });

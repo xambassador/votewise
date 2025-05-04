@@ -15,9 +15,7 @@ export class ExceptionLayer {
     this.ctx = opts.ctx;
   }
 
-  public catch<P, R, B, Q, L extends Record<string, unknown>>(
-    handler: (...arg: Parameters<RequestHandler<P, R, B, Q, L>>) => Promise<unknown>
-  ): RequestHandler<P, R, B, Q, L> {
+  public catch(handler: (...arg: Parameters<RequestHandler>) => Promise<unknown>): RequestHandler {
     const ctx = this.ctx;
     const name = this.name;
     return function routeHandler(req, res, next) {

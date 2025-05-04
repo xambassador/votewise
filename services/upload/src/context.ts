@@ -1,5 +1,4 @@
 import type { ServerConfig } from "@/config";
-import type { TEnv } from "@votewise/env";
 import type { RequestParserPlugin } from "./plugins/request-parser";
 
 import _fs from "node:fs/promises";
@@ -9,23 +8,29 @@ import { ensureDirSync } from "fs-extra";
 import * as Minio from "minio";
 
 import { Assertions } from "@votewise/errors";
+import { JWT } from "@votewise/jwt";
 import logger from "@votewise/log";
 
 import { checkEnv } from "@/env";
+import { UploadCompletedEventQueue, UploadQueue } from "@/queues";
+import { RedisAdapter } from "@/storage/redis";
 
 import { requestParserPluginFactory } from "./plugins/request-parser";
 
 type Plugins = {
   requestParser: RequestParserPlugin;
 };
-
+type Queue = { uploadQueue: UploadQueue; uploadCompletedEventQueue: UploadCompletedEventQueue };
 export type AppContextOptions = {
   config: ServerConfig;
   logger: typeof logger;
-  environment: TEnv;
+  environment: Environment;
   assert: Assertions;
   plugins: Plugins;
   minio: Minio.Client;
+  jwtService: JWT;
+  queues: Queue;
+  cache: RedisAdapter;
 };
 
 const basUploadPath = path.join(__dirname, "../public/uploads");
@@ -51,13 +56,16 @@ export class AppContext {
   private static _instance: AppContext;
   public config: ServerConfig;
   public logger: typeof logger;
-  public environment: TEnv;
+  public environment: Environment;
   public assert: Assertions;
   public getBlobPath = getBlobPath;
   public getFileInfo = getFileInfo;
   public getFileName = getFileName;
   public plugins: Plugins;
   public minio: Minio.Client;
+  public jwtService: JWT;
+  public queues: Queue;
+  public cache: RedisAdapter;
 
   constructor(opts: AppContextOptions) {
     this.config = opts.config;
@@ -66,6 +74,9 @@ export class AppContext {
     this.assert = opts.assert;
     this.plugins = opts.plugins;
     this.minio = opts.minio;
+    this.jwtService = opts.jwtService;
+    this.queues = opts.queues;
+    this.cache = opts.cache;
     createUploadPath();
 
     this.logger.info(`[${yellow("AppContext")}] dependencies initialized`);
@@ -75,6 +86,8 @@ export class AppContext {
     if (this._instance) return this._instance;
     const environment = checkEnv(process.env);
     const assert = new Assertions();
+    const cache = new RedisAdapter({ environment, maxRetriesPerRequest: null });
+    cache.init();
     const requestParser = requestParserPluginFactory();
     const minio = new Minio.Client({
       endPoint: environment.MINIO_ENDPOINT,
@@ -83,6 +96,9 @@ export class AppContext {
       accessKey: environment.MINIO_ACCESS_KEY!,
       secretKey: environment.MINIO_SECRET_KEY!
     });
+    const jwtService = new JWT({ accessTokenSecret: environment.ACCESS_TOKEN_SECRET });
+    const uploadQueue = new UploadQueue();
+    const uploadCompletedEventQueue = new UploadCompletedEventQueue();
     const context = new AppContext({
       config: cfg,
       logger,
@@ -90,9 +106,17 @@ export class AppContext {
       assert,
       plugins: { requestParser },
       minio,
+      jwtService,
+      queues: { uploadQueue, uploadCompletedEventQueue },
+      cache,
       ...overrides
     });
     this._instance = context;
+    cache.onConnect(() => {
+      uploadCompletedEventQueue.init();
+      uploadQueue.init();
+      uploadQueue.initWorker(context);
+    });
     return context;
   }
 

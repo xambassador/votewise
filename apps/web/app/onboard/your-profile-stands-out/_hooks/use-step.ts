@@ -23,7 +23,7 @@ export function useStep() {
   async function onSubmit() {
     if (!savedBg) return;
     if (savedBg instanceof File) {
-      const uploadRes = await uploadClient.upload(savedBg);
+      const uploadRes = await uploadClient.upload(savedBg, { headers: { "X-Asset-Type": "cover_image" } });
       if (!uploadRes.success) {
         makeToast.error("Ooop!", uploadRes.error);
         return;

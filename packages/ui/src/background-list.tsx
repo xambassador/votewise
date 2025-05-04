@@ -8,6 +8,7 @@ type Background = {
   url: string;
   name: string;
   etag: string;
+  path: string;
 };
 
 const backgroundList: Background[] = [];
@@ -16,7 +17,7 @@ let error: null | string = null;
 
 function prefetchImages() {
   if (typeof window === "undefined") return;
-  fetch("/api/upload/assets/backgrounds").then((res) => {
+  fetch("/api/upload/assets/backgrounds", { credentials: "include" }).then((res) => {
     if (res.ok) {
       res.json().then((data) => {
         backgroundList.push(...data);

@@ -11,6 +11,7 @@ const cfg = new ServerConfig({
   hostname: "",
   cors,
   appHeaders,
+  uploadBucket: "uploads",
   publicUrl: environment.VOTEWISE_BUCKET_URL,
   port: environment.VOTEWISE_BUCKET_PORT,
   devMode: environment.NODE_ENV === "development",
