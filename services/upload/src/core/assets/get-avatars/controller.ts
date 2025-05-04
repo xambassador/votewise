@@ -13,7 +13,7 @@ export class Controller {
   }
 
   public async handle(_: Request, res: Response) {
-    const bucket = "avatars";
+    const bucket = this.ctx.config.avatarBucket;
     const results: { url: string; name?: string; etag?: string }[] = [];
     const promises: Promise<string>[] = [];
     this.ctx.minio

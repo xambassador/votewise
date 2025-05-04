@@ -1,10 +1,10 @@
 import { OnboardContainer } from "../_components/container";
 import { OnboardHeader, OnboardSubtitle, OnboardTitle } from "../_components/typography";
-import { getStepOneData } from "../_utils";
+import { shouldNotOnboarded } from "../_utils";
 import { StepTwoForm } from "./_components/form";
 
-export default function Page() {
-  const onboardingData = getStepOneData();
+export default async function Page() {
+  const onboardData = await shouldNotOnboarded();
   return (
     <OnboardContainer>
       <OnboardHeader>
@@ -13,9 +13,9 @@ export default function Page() {
       </OnboardHeader>
       <StepTwoForm
         defaultValues={{
-          firstName: onboardingData ? onboardingData.first_name : "",
-          userName: onboardingData ? onboardingData.user_name : "",
-          lastName: onboardingData ? onboardingData.last_name : ""
+          firstName: onboardData.first_name || "",
+          userName: onboardData.user_name || "",
+          lastName: onboardData.last_name || ""
         }}
       />
     </OnboardContainer>

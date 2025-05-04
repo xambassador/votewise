@@ -6,6 +6,7 @@ import fs from "fs";
 type UploadToS3ProcessorOptions = {
   logger: AppContext["logger"];
   minio: AppContext["minio"];
+  getBlobPath: AppContext["getBlobPath"];
   uploadBucket: string;
 };
 
@@ -18,7 +19,8 @@ export class UploadToS3Processor implements ITaskWorker {
 
   async process<TData>(data: TData): Promise<void> {
     const uploadData = data as UploadToS3Job;
-    const { path, filePath } = uploadData;
+    const { fileName, fileToken, path } = uploadData;
+    const filePath = this.opts.getBlobPath(fileName, fileToken);
     this.opts.logger.info(`Uploading file to S3: ${path}`);
     const fileStream = fs.createReadStream(filePath);
     fs.stat(filePath, (err) => {
@@ -32,6 +34,9 @@ export class UploadToS3Processor implements ITaskWorker {
         this.opts.logger.error(`Error uploading file to S3: ${err.message}`);
         throw err;
       });
+    });
+    fileStream.on("error", (err) => {
+      this.opts.logger.error(`Error reading file: ${filePath}, error: ${err.message}`);
     });
   }
 }

@@ -86,6 +86,7 @@ export class Controller {
 
     await this.ctx.sessionManager.save(session.sessionId, { ip, userAgent, aal, userId: user.id });
     await this.ctx.refreshTokenRepository.create({ token: session.refreshToken, userId: user.id });
+    await this.ctx.sessionManager.saveOnboardStatus(user.id, user.is_onboarded ? "ONBOARDED" : "NOT_ONBOARDED");
 
     const lastLogin = new Date();
     await this.ctx.userRepository.update(user.id, { last_login: lastLogin });

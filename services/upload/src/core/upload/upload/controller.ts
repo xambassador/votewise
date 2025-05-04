@@ -9,8 +9,6 @@ import sanitize from "sanitize-filename";
 
 import { InvalidInputError } from "@votewise/errors";
 
-import { getAuthenticateLocals } from "@/lib/locals";
-
 type ControllerOptions = {
   ctx: AppContext;
 };
@@ -23,8 +21,7 @@ export class Controller {
   }
 
   public async handle(req: Request, res: Response) {
-    const { fileToken, startingByte, assetType } = this.parseHeaders(req);
-    const locals = getAuthenticateLocals(res);
+    const { fileToken, startingByte } = this.parseHeaders(req);
     const bb = busboy({ headers: req.headers });
 
     bb.on("error", () =>
@@ -70,18 +67,10 @@ export class Controller {
 
     bb.on("finish", () => {
       const publicUrl = this.ctx.environment.VOTEWISE_BUCKET_URL;
-      const url = `${publicUrl}/uploads/${this.ctx.getFileName(fileName, fileToken)}`;
+      const url = new URL(
+        `${publicUrl}/uploads/${this.ctx.getFileName(fileName, fileToken)}?file_name=${fileName}&file_token=${fileToken}`
+      ).toString();
       res.status(StatusCodes.OK).json({ url });
-
-      this.ctx.queues.uploadQueue.add({
-        name: "uploadToS3",
-        payload: {
-          filePath: this.ctx.getBlobPath(fileName, fileToken),
-          path: locals.payload.sub + "/" + this.ctx.getFileName(fileName, fileToken),
-          userId: locals.payload.sub,
-          assetType
-        }
-      });
     });
 
     req.pipe(bb);

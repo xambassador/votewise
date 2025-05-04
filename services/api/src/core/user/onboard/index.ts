@@ -7,16 +7,32 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { Controller } from "./controller";
 
 export function onboardControllerFactory() {
-  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "plugins", "queues", "config", "logger"]);
+  const ctx = AppContext.getInjectionTokens([
+    "assert",
+    "repositories",
+    "plugins",
+    "queues",
+    "config",
+    "logger",
+    "cache",
+    "minio",
+    "onboardService",
+    "sessionManager"
+  ]);
   const controller = new Controller({
     assert: ctx.assert,
     requestParser: ctx.plugins.requestParser,
     userRepository: ctx.repositories.user,
     userInterestRepository: ctx.repositories.userInterest,
     taskQueue: ctx.queues.tasksQueue,
+    uploadQueue: ctx.queues.uploadQueue,
     appUrl: ctx.config.appUrl,
+    avatarsBucket: ctx.config.avatarsBucket,
+    backgroundsBucket: ctx.config.backgroundsBucket,
     postTopicRepository: ctx.repositories.postTopic,
-    timelineRepository: ctx.repositories.timeline
+    timelineRepository: ctx.repositories.timeline,
+    onboardService: ctx.onboardService,
+    sessionManager: ctx.sessionManager
   });
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "onboard" });

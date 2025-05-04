@@ -10,16 +10,16 @@ import { Footer } from "@/app/onboard/_components/footer";
 import { useStep } from "../_hooks/use-step";
 import { fields } from "./fields";
 
-type Props = { defaultValues?: TConnectYourSocials & { name?: string } };
+type Props = { defaultValues?: TConnectYourSocials; name?: string };
 
 export function SocialsForm(props?: Props) {
-  const { defaultValues } = props || {};
+  const { defaultValues, name } = props || {};
   const { form, getFormProps, getButtonProps, getBackProps } = useStep({ defaultValues });
   return (
     <Form {...form}>
       <form {...getFormProps({ className: "flex flex-col gap-10" })}>
         <div className="flex flex-col gap-4">
-          {fields({ name: defaultValues?.name }).map((field) => (
+          {fields({ name }).map((field) => (
             <FormField key={field.name} name={field.name}>
               <FormLabel>{field.label}</FormLabel>
               <FormControl>

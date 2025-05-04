@@ -8,6 +8,14 @@ import type {
   VerifyEmailResponse,
   VerifyMFAResponse
 } from "@votewise/api";
+import type {
+  TRegister,
+  TResetPassword,
+  TResetPasswordQuery,
+  TSignin,
+  TVerifyChallenge,
+  TVerifyEmail
+} from "@votewise/schemas/auth";
 import type { AccessTokenPayload } from "@votewise/types";
 import type { Client } from "../client";
 import type { Client as ServerClient } from "../server";
@@ -19,17 +27,6 @@ import { COOKIE_KEYS, jwt } from "../utils";
 
 type AuthOptions = { client: Client | ServerClient };
 
-type VerifyEmailBody = {
-  email: string;
-  verification_code: string;
-  otp: string;
-};
-
-type VerifyBody = {
-  challenge_id: string;
-  code: string;
-};
-
 const debug = new Debugger("auth");
 debug.enable();
 
@@ -40,28 +37,18 @@ export class Auth {
     this.client = opts.client;
   }
 
-  public async signin(data: { username: string; password: string }) {
-    const res = await this.client.post<SigninResponse, { email: string; password: string }>(auth.runtime.signin(""), {
-      email: data.username,
-      password: data.password
-    });
+  public async signin(data: TSignin) {
+    const res = await this.client.post<SigninResponse, TSignin>(auth.runtime.signin(""), data);
     return res;
   }
 
-  public async signup(data: { email: string; password: string }) {
-    const res = await this.client.post<SignupResponse, { email: string; password: string }>(auth.runtime.register(""), {
-      email: data.email,
-      password: data.password
-    });
+  public async signup(data: TRegister) {
+    const res = await this.client.post<SignupResponse, TRegister>(auth.runtime.register(""), data);
     return res;
   }
 
-  public async verifyEmail(data: { otp: string; email: string; verificationCode: string }) {
-    const res = await this.client.patch<VerifyEmailResponse, VerifyEmailBody>(auth.runtime.verify(""), {
-      email: data.email,
-      verification_code: data.verificationCode,
-      otp: data.otp
-    });
+  public async verifyEmail(data: TVerifyEmail) {
+    const res = await this.client.patch<VerifyEmailResponse, TVerifyEmail>(auth.runtime.verify(""), data);
     return res;
   }
 
@@ -78,13 +65,10 @@ export class Auth {
     return res;
   }
 
-  public async verifyFactor(data: { code: string; factorId: string; challengeId: string }) {
-    const res = await this.client.post<VerifyMFAResponse, VerifyBody>(
+  public async verifyFactor(data: TVerifyChallenge & { factorId: string }) {
+    const res = await this.client.post<VerifyMFAResponse, TVerifyChallenge>(
       auth.runtime.factors.verifyFactor("", data.factorId),
-      {
-        challenge_id: data.challengeId,
-        code: data.code
-      }
+      data
     );
     return res;
   }
@@ -96,9 +80,9 @@ export class Auth {
     return res;
   }
 
-  public async resetPassword(data: { password: string; token: string }) {
+  public async resetPassword(data: TResetPassword & TResetPasswordQuery) {
     const url = auth.runtime.resetPassword("") + `?token=${data.token}`;
-    const res = await this.client.patch<ResetPasswordResponse, { password: string }>(url, { password: data.password });
+    const res = await this.client.patch<ResetPasswordResponse, TResetPassword>(url, { password: data.password });
     return res;
   }
 

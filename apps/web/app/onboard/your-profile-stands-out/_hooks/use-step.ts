@@ -15,26 +15,37 @@ import { useGetSavedBg } from "../_utils/store";
 import { onboard } from "../../action";
 
 type LinkProps = React.ComponentProps<typeof Link>;
+type Props = { initialBg?: string };
 
-export function useStep() {
+export function useStep(props: Props) {
+  const { initialBg } = props || {};
   const [isPending, startTransition] = useTransition();
   const savedBg = useGetSavedBg();
 
   async function onSubmit() {
-    if (!savedBg) return;
+    if (!savedBg) {
+      makeToast.error("Oops!", "You forgot to select or upload a cover image.");
+      return;
+    }
     if (savedBg instanceof File) {
       const uploadRes = await uploadClient.upload(savedBg, { headers: { "X-Asset-Type": "cover_image" } });
       if (!uploadRes.success) {
         makeToast.error("Ooop!", uploadRes.error);
         return;
       }
-      startTransition(() => {
-        onboard({ cover: uploadRes.data.url, step: 4 });
+      startTransition(async () => {
+        const res = await onboard({ cover: uploadRes.data.url, step: 4, isDirty: true });
+        if (!res.success) {
+          makeToast.error("Ooop!", res.error);
+        }
       });
       return;
     }
-    startTransition(() => {
-      onboard({ cover: savedBg, step: 4 });
+    startTransition(async () => {
+      const res = await onboard({ cover: savedBg, step: 4, isDirty: initialBg !== savedBg });
+      if (!res.success) {
+        makeToast.error("Ooop!", res.error);
+      }
     });
   }
 

@@ -15,27 +15,40 @@ import { useGetSavedAvatar } from "../_utils/store";
 import { onboard } from "../../action";
 
 type LinkProps = React.ComponentProps<typeof Link>;
+type Props = {
+  initialAvatar?: string;
+};
 
-export function useStep() {
+export function useStep(props: Props) {
+  const { initialAvatar } = props || {};
   const [isPending, startTransition] = useTransition();
   const savedAvatar = useGetSavedAvatar();
 
   async function onSubmit() {
-    if (!savedAvatar) return;
+    if (!savedAvatar) {
+      makeToast.error("Oops!", "You forgot to select or add an avatar.");
+      return;
+    }
     if (savedAvatar instanceof File) {
       const uploadRes = await uploadClient.upload(savedAvatar);
       if (!uploadRes.success) {
         makeToast.error("Oops!", uploadRes.error);
         return;
       }
-      startTransition(() => {
-        onboard({ step: 3, avatar: uploadRes.data.url });
+      startTransition(async () => {
+        const res = await onboard({ step: 3, avatar: uploadRes.data.url, isDirty: true });
+        if (!res.success) {
+          makeToast.error("Ooop!", res.error);
+        }
       });
       return;
     }
 
-    startTransition(() => {
-      onboard({ step: 3, avatar: savedAvatar });
+    startTransition(async () => {
+      const res = await onboard({ step: 3, avatar: savedAvatar, isDirty: initialAvatar !== savedAvatar });
+      if (!res.success) {
+        makeToast.error("Oops!", res.error);
+      }
     });
   }
 

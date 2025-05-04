@@ -6,11 +6,10 @@ export abstract class ITaskWorker {
 
 export type AssetType = "avatar" | "cover_image";
 export type UploadToS3Job = {
-  // Path to the file on the local filesystem
-  filePath: string;
-  // Path to the file in S3
-  path: string;
+  fileName: string;
+  fileToken: string;
   userId: string;
+  path: string;
   assetType: AssetType;
 };
 export type UploadCompletedEventJob = { userId: string; path: string; assetType: AssetType };

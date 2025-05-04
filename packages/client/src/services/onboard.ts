@@ -1,4 +1,10 @@
-import type { GetAllTopicsResponse, GetUserOnboardStatusResponse, OnboardUserResponse } from "@votewise/api";
+import type {
+  GetAllTopicsResponse,
+  GetUserOnboardSessionResponse,
+  GetUserOnboardStatusResponse,
+  OnboardUserResponse
+} from "@votewise/api";
+import type { TOnboard } from "@votewise/schemas/onboard";
 import type { Client } from "../client";
 import type { Client as ServerClient } from "../server";
 
@@ -8,21 +14,6 @@ type OnboardOptions = {
   client: Client | ServerClient;
 };
 
-type OnboardBody = {
-  user_name: string;
-  first_name: string;
-  last_name: string;
-  gender: "MALE" | "FEMALE" | "OTHER";
-  about: string;
-  avatar_url: string;
-  cover_url: string;
-  location: string;
-  facebook_url?: string | undefined;
-  instagram_url?: string | undefined;
-  twitter_url?: string | undefined;
-  topics?: string[] | undefined;
-};
-
 export class Onboard {
   private readonly client: Client | ServerClient;
 
@@ -30,15 +21,21 @@ export class Onboard {
     this.client = opts.client;
   }
 
-  public async isOnboarded(userId: string) {
-    const path = user.runtime.onboard.getStatus("", userId);
+  public async isOnboarded() {
+    const path = user.runtime.onboard.getStatus("");
     const res = await this.client.get<GetUserOnboardStatusResponse>(path);
     return res;
   }
 
-  public async onboard(userId: string, data: OnboardBody) {
-    const path = user.runtime.onboard.update("", userId);
-    const res = await this.client.patch<OnboardUserResponse, OnboardBody>(path, data);
+  public async getOnboardSession() {
+    const path = user.runtime.onboard.getOnboardSession("");
+    const res = await this.client.get<GetUserOnboardSessionResponse>(path);
+    return res;
+  }
+
+  public async onboard(data: TOnboard) {
+    const path = user.runtime.onboard.update("");
+    const res = await this.client.patch<OnboardUserResponse, TOnboard>(path, data);
     return res;
   }
 

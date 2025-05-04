@@ -2,11 +2,11 @@ import { getOnboard } from "@/lib/client.server";
 
 import { OnboardContainer } from "../_components/container";
 import { OnboardHeader, OnboardSubtitle, OnboardTitle } from "../_components/typography";
-import { getStepSixData } from "../_utils";
+import { shouldNotOnboarded } from "../_utils";
 import { Topics } from "./_components/form";
 
 export default async function Page() {
-  const onboardingData = getStepSixData();
+  const onboardingData = await shouldNotOnboarded();
   const name = onboardingData.first_name + " " + onboardingData.last_name;
   const onboard = getOnboard();
   const topicsResult = await onboard.getTopics();

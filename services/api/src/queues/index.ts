@@ -69,11 +69,40 @@ export class TasksQueue {
     this.worker.on("ready", () => {
       ctx.logger.info("[Tasks Worker] ready");
     });
+  }
 
+  public async add(task: Tasks) {
+    if (!this.queue) throw new Error("Taks Queue not initialized");
+    return this.queue.add(task.name, task);
+  }
+}
+
+type UploadCompletedEventQueueOptions = {
+  env: AppContext["environment"];
+};
+
+export class UploadCompletedEventQueue {
+  private readonly opts: UploadCompletedEventQueueOptions;
+  private worker: Worker<UploadCompletedEventTask> | null = null;
+  private redis: RedisAdapter | null = null;
+
+  constructor(opts: UploadCompletedEventQueueOptions) {
+    this.opts = opts;
+  }
+
+  public init() {
+    this.redis = new RedisAdapter(this.opts.env.REDIS_URL, { maxRetriesPerRequest: null });
+  }
+
+  public initWorker(ctx: AppContext) {
+    if (!this.redis) throw new Error("Redis not initialized");
     const uploadCompletedEventProcessor = new UploadCompletedEventProcessor({
-      userRepository: ctx.repositories.user
+      userRepository: ctx.repositories.user,
+      onboardService: ctx.onboardService,
+      minio: ctx.minio,
+      uploadsBucket: ctx.config.uploadBucket
     });
-    const uploadCompletedEventWorker = new Worker<UploadCompletedEventTask>(
+    this.worker = new Worker<UploadCompletedEventTask>(
       uploadCompletedEventQueueName,
       async (job) => {
         await uploadCompletedEventProcessor.process(job.data.payload);
@@ -81,13 +110,8 @@ export class TasksQueue {
       { connection: this.redis }
     );
 
-    uploadCompletedEventWorker.on("completed", () => {
+    this.worker.on("completed", () => {
       ctx.logger.info(`[Upload Completed Event Worker] Job completed`);
     });
-  }
-
-  public async add(task: Tasks) {
-    if (!this.queue) throw new Error("Taks Queue not initialized");
-    return this.queue.add(task.name, task);
   }
 }

@@ -50,6 +50,8 @@ export class ServerConfig {
   public ssl?: SSL;
   public appHeaders: AppHeaders;
   public uploadBucket: string;
+  public avatarBucket: string;
+  public backgroundsBucket: string;
 
   constructor(cfg: ServerConfig) {
     this.port = cfg.port;
@@ -65,5 +67,7 @@ export class ServerConfig {
     this.ssl = cfg.ssl;
     this.appHeaders = cfg.appHeaders;
     this.uploadBucket = cfg.uploadBucket;
+    this.avatarBucket = cfg.avatarBucket;
+    this.backgroundsBucket = cfg.backgroundsBucket;
   }
 }

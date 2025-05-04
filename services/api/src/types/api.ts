@@ -14,3 +14,4 @@ export type { GetAllTopicsResponse } from "@/core/topics/get-all/controller";
 export type { UsernameExistsResponse } from "@/core/user/exists/controller";
 export type { OnboardUserResponse } from "@/core/user/onboard/controller";
 export type { GetUserOnboardStatusResponse } from "@/core/user/onboard/get/controller";
+export type { GetUserOnboardSessionResponse } from "@/core/user/onboard/get-session/controller";

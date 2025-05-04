@@ -19,7 +19,10 @@ const cfg = new ServerConfig({
   blobUploadLimit: 10 * 1024 * 1024, // TODO: Move to env
   appUrl: environment.VOTEWISE_APP_URL,
   bucketUrl: environment.VOTEWISE_BUCKET_URL,
-  appName: "Votewise"
+  appName: "Votewise",
+  avatarsBucket: "avatars",
+  backgroundsBucket: "backgrounds",
+  uploadBucket: "uploads" // TODO: Move to env
 });
 const secrets = new ServerSecrets({
   cronSecret: environment.CRON_SECRET,

@@ -7,10 +7,11 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { Controller } from "./controller";
 
 export function getOnboardStatusControllerFactory() {
-  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "logger"]);
+  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "logger", "sessionManager"]);
   const controller = new Controller({
-    assert: ctx.assert,
-    userRepository: ctx.repositories.user
+    userRepository: ctx.repositories.user,
+    sessionManager: ctx.sessionManager,
+    assert: ctx.assert
   });
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "get-onboard-status" });

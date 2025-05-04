@@ -1,4 +1,5 @@
 import { yellow } from "chalk";
+import * as Minio from "minio";
 
 import { Assertions } from "@votewise/errors";
 import logger from "@votewise/log";
@@ -7,13 +8,14 @@ import { prisma } from "@votewise/prisma";
 import { Mailer } from "@/emails/mailer";
 import { RateLimiterManager } from "@/lib/rate-limiter";
 import * as Plugins from "@/plugins";
-import { TasksQueue } from "@/queues";
+import { TasksQueue, UploadCompletedEventQueue } from "@/queues";
+import { UploadQueue } from "@/queues/upload";
 import * as Repositories from "@/repository";
 import * as Services from "@/services";
 import { Cache } from "@/storage/redis";
 import { checkEnv } from "@/utils";
 
-type Queue = { tasksQueue: TasksQueue };
+type Queue = { tasksQueue: TasksQueue; uploadQueue: UploadQueue };
 type ServerConfig = ApplicationConfigs["server"];
 type ServerSecrets = ApplicationConfigs["secrets"];
 
@@ -28,11 +30,13 @@ export type AppContextOptions = {
   repositories: Repositories;
   jwtService: Services["jwt"];
   cryptoService: Services["crypto"];
+  onboardService: Services["onboard"];
   sessionManager: Services["session"];
   queues: Queue;
   assert: Assertions;
   plugins: Plugins;
   rateLimiteManager: RateLimiterManager;
+  minio: Minio.Client;
 };
 
 export class AppContext {
@@ -53,6 +57,8 @@ export class AppContext {
   public sessionManager: Services["session"];
   public plugins: Plugins;
   public rateLimiteManager: RateLimiterManager;
+  public minio: Minio.Client;
+  public onboardService: Services["onboard"];
 
   constructor(opts: AppContextOptions) {
     this.config = opts.config;
@@ -70,6 +76,8 @@ export class AppContext {
     this.sessionManager = opts.sessionManager;
     this.plugins = opts.plugins;
     this.rateLimiteManager = opts.rateLimiteManager;
+    this.minio = opts.minio;
+    this.onboardService = opts.onboardService;
 
     this.logger.info(`[${yellow("AppContext")}] dependencies initialized`);
   }
@@ -100,6 +108,8 @@ export class AppContext {
     const postTopicRepository = new Repositories.PostTopicRepository({ db });
     const mailer = new Mailer({ env: environment });
     const tasksQueue = new TasksQueue({ env: environment });
+    const uploadQueue = new UploadQueue({ env: environment });
+    const uploadCompletedEventQueue = new UploadCompletedEventQueue({ env: environment });
     const sessionManager = new Services.SessionManager({
       jwtService,
       cache,
@@ -111,6 +121,19 @@ export class AppContext {
     const requestParser = Plugins.requestParserPluginFactory();
     const jwtPlugin = Plugins.jwtPluginFactory({ jwtService });
     const rateLimiteManager = RateLimiterManager.create();
+    const minio = new Minio.Client({
+      endPoint: environment.MINIO_ENDPOINT,
+      port: environment.MINIO_PORT,
+      useSSL: false, // TODO: Get this from env
+      accessKey: environment.MINIO_ACCESS_KEY,
+      secretKey: environment.MINIO_SECRET_KEY
+    });
+    const onboardService = new Services.OnboardService({
+      userRepository,
+      minio,
+      cache,
+      assert
+    });
     const ctx = new AppContext({
       config: cfg,
       secrets,
@@ -124,6 +147,7 @@ export class AppContext {
       assert,
       sessionManager,
       rateLimiteManager,
+      onboardService,
       repositories: {
         user: userRepository,
         factor: factorRepository,
@@ -138,14 +162,18 @@ export class AppContext {
         feedAsset: feedAssetRepository,
         postTopic: postTopicRepository
       },
-      queues: { tasksQueue },
+      queues: { tasksQueue, uploadQueue },
       plugins: { requestParser, jwt: jwtPlugin },
+      minio,
       ...(overrides ?? {})
     });
     this._instance = ctx;
     cache.onConnect(() => {
       tasksQueue.init();
+      uploadQueue.init();
+      uploadCompletedEventQueue.init();
       tasksQueue.initWorker(ctx);
+      uploadCompletedEventQueue.initWorker(ctx);
     });
     return ctx;
   }
