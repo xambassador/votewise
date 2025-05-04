@@ -10,6 +10,7 @@ import { useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
+import { isObjectDirty } from "@/lib/object";
 import { routes } from "@/lib/routes";
 
 import { ZTellUsAboutYou } from "../../_utils/schema";
@@ -30,7 +31,7 @@ export function useStep(props: { defaultValue?: TTellUsAboutYou }) {
 
   const action = form.handleSubmit((data) => {
     startTransition(() => {
-      onboard({ ...data, step: 2 });
+      onboard({ ...data, step: 2, isDirty: isObjectDirty(data, props.defaultValue || {}) });
     });
   });
 

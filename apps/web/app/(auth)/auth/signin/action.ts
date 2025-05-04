@@ -14,7 +14,7 @@ import { routes } from "@/lib/routes";
 
 export async function signin(data: TSinginForm, redirectTo?: string | null): Promise<ActionResponse<SigninResponse>> {
   const auth = getAuth();
-  const res = await auth.signin({ username: data.username, password: data.password });
+  const res = await auth.signin({ email: data.username, password: data.password, username: data.username });
 
   if (!res.success && res.errorData.error_code && res.errorData.error_code === ERROR_CODES.AUTH.EMAIL_NOT_VERIFIED) {
     const verificationCode = res.errorData.verification_code;

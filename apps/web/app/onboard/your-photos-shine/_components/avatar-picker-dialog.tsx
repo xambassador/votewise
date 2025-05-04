@@ -4,15 +4,28 @@ import { Button } from "@votewise/ui/button";
 import { Close, Dialog, DialogContent, DialogDescription, DialogTitle } from "@votewise/ui/dialog";
 import { SeparatorWithLabel } from "@votewise/ui/separator";
 
-import { useGetDialogProps, useGetSelectedAvatar, useSaveAction, useSetChooseAvtarDialogOpen } from "../_utils/store";
+import {
+  useGetDialogProps,
+  useGetSelectedAvatar,
+  useSaveAction,
+  useSetChooseAvtarDialogOpen,
+  useSetSelectedAvatar
+} from "../_utils/store";
 import { AvatarDropZone } from "./avatar-dropzone";
 
 /* ----------------------------------------------------------------------------------------------- */
 
-export function AvatarPickerDialog() {
-  const props = useGetDialogProps();
+type Props = {
+  url?: string;
+};
+
+export function AvatarPickerDialog(props: Props) {
+  const { url } = props;
+  const dialogProps = useGetDialogProps();
+  useSetSelectedAvatar(url);
+
   return (
-    <Dialog {...props}>
+    <Dialog {...dialogProps}>
       <DialogContent className="p-12">
         <DialogTitle className="sr-only">Choose an Avatar</DialogTitle>
         <DialogDescription className="sr-only">Choose an avatar to express your style!</DialogDescription>

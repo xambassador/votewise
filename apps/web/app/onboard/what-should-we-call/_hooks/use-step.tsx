@@ -15,6 +15,7 @@ import { useForm } from "@votewise/ui/form";
 
 import { chain } from "@/lib/chain";
 import { client } from "@/lib/client";
+import { isObjectDirty } from "@/lib/object";
 
 import { ZWhatShouldWeCall } from "../../_utils/schema";
 import { onboard } from "../../action";
@@ -52,8 +53,15 @@ export function useStep(props: { defaultValues?: TWhatShouldWeCall }) {
   }, [debouncedUsername, form]);
 
   const handleSubmit = form.handleSubmit((data) => {
+    const isDirty = isObjectDirty(data, props.defaultValues || {});
     startTransition(() => {
-      onboard({ ...data, step: 1 });
+      onboard({
+        step: 1,
+        user_name: data.userName,
+        last_name: data.lastName,
+        first_name: data.firstName,
+        isDirty
+      });
     });
   });
 
@@ -66,7 +74,14 @@ export function useStep(props: { defaultValues?: TWhatShouldWeCall }) {
   }
 
   function getNextButtonProps(props?: ButtonProps): ButtonProps {
-    return { children: "Next", ...props, onClick: chain(handleSubmit, props?.onClick), loading: isPending };
+    const hasError = Object.keys(form.formState.errors).length > 0;
+    return {
+      children: "Next",
+      ...props,
+      onClick: chain(handleSubmit, props?.onClick),
+      loading: isPending,
+      disabled: isPending || hasError
+    };
   }
 
   function getBackButtonProps(props?: LinkProps): LinkProps {

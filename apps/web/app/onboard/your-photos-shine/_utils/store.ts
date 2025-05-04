@@ -2,6 +2,7 @@
 
 import type { Dialog } from "@votewise/ui/dialog";
 
+import { useEffect } from "react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 
 /* ----------------------------------------------------------------------------------------------- */
@@ -75,6 +76,14 @@ export function useResetSelection() {
     setSelectedAvatar(null);
     setSavedAvatar(null);
   };
+}
+
+export function useSetSelectedAvatar(url: string | File | null | undefined) {
+  const setter = useSetAtom(selectedAvatarAtom);
+  useEffect(() => {
+    if (!url) return;
+    setter(url);
+  }, [setter, url]);
 }
 
 /* -----------------------------------------------------------------------------------------------

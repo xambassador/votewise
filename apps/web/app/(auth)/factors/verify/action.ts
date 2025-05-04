@@ -21,7 +21,7 @@ export async function verifyFactor(code: string): Promise<ActionResponse<VerifyM
   }
 
   const authClient = getAuth();
-  const res = await authClient.verifyFactor({ code, challengeId, factorId });
+  const res = await authClient.verifyFactor({ code, challenge_id: challengeId, factorId });
   if (!res.success) return { success: false, error: res.error, errorData: res.errorData };
 
   clearCookie(COOKIE_KEYS.factorId);

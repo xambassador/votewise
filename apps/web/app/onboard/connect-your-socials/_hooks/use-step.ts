@@ -14,6 +14,7 @@ import { ZConnectYourSocials } from "@/app/onboard/_utils/schema";
 import { onboard } from "@/app/onboard/action";
 
 import { chain } from "@/lib/chain";
+import { isObjectDirty } from "@/lib/object";
 import { routes } from "@/lib/routes";
 
 type LinkProps = React.ComponentProps<typeof Link>;
@@ -30,7 +31,11 @@ export function useStep(props?: Props) {
 
   function onSubmit(data: TConnectYourSocials) {
     startTransition(async () => {
-      const res = await onboard({ step: 5, ...data });
+      const res = await onboard({
+        step: 5,
+        ...data,
+        isDirty: isObjectDirty(data, defaultValues || {})
+      });
       if (!res.success) {
         makeToast.error("Oops!", res.error);
       }

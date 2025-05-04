@@ -1,7 +1,6 @@
 import "server-only";
 
 import type { SigninResponse } from "@votewise/client/auth";
-import type { TOnboard } from "@votewise/schemas/onboard";
 import type { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
 import { cookies } from "next/headers";
@@ -83,23 +82,6 @@ export function getFlashMessage() {
 
 export function setFlashMessage(title: string, message: string, type: "success" | "error") {
   setCookie(COOKIE_KEYS.flash, JSON.stringify({ title, message, type }));
-}
-
-export function getOnboardingData() {
-  const onboardData = getCookie(COOKIE_KEYS.onboard);
-  if (!onboardData) return null;
-  try {
-    const data = JSON.parse(onboardData) as TOnboard;
-    return data;
-  } catch (err) {
-    return null;
-  }
-}
-
-export function setOnboardingData(data: Partial<TOnboard>) {
-  const onboardData = getOnboardingData() || {};
-  const updatedData = { ...onboardData, ...data };
-  setCookie(COOKIE_KEYS.onboard, JSON.stringify(updatedData));
 }
 
 export function getUser() {

@@ -16,7 +16,7 @@ export default async function Layout(props: Props) {
   }
 
   const onboard = getOnboard();
-  const onboardedResult = await onboard.isOnboarded(user.sub);
+  const onboardedResult = await onboard.isOnboarded();
   if (!onboardedResult.success) {
     throw new Error(onboardedResult.error);
   }

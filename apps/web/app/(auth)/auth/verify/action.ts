@@ -20,7 +20,7 @@ export async function verifyEmail(otp: string): Promise<ActionResponse<VerifyEma
       error: "Invalid request"
     };
   }
-  const res = await auth.verifyEmail({ otp, email, verificationCode });
+  const res = await auth.verifyEmail({ otp, email, verification_code: verificationCode });
   if (!res.success) return { success: false, error: res.error, errorData: res.errorData };
   clearCookie(COOKIE_KEYS.email);
   clearCookie(COOKIE_KEYS.verificationCode);

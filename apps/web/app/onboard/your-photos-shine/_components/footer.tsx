@@ -3,7 +3,11 @@
 import { useStep } from "../_hooks/use-step";
 import { Footer } from "../../_components/footer";
 
-export function FooterAction() {
-  const { getBackProps, getButtonProps } = useStep();
+type Props = {
+  url?: string;
+};
+
+export function FooterAction(props: Props) {
+  const { getBackProps, getButtonProps } = useStep({ initialAvatar: props.url });
   return <Footer nextProps={getButtonProps()} backProps={getBackProps()} />;
 }

@@ -15,13 +15,20 @@ import { useGetSavedAvatar } from "../_utils/store";
 import { onboard } from "../../action";
 
 type LinkProps = React.ComponentProps<typeof Link>;
+type Props = {
+  initialAvatar?: string;
+};
 
-export function useStep() {
+export function useStep(props: Props) {
+  const { initialAvatar } = props || {};
   const [isPending, startTransition] = useTransition();
   const savedAvatar = useGetSavedAvatar();
 
   async function onSubmit() {
-    if (!savedAvatar) return;
+    if (!savedAvatar) {
+      makeToast.error("Oops!", "You forgot to select or add an avatar.");
+      return;
+    }
     if (savedAvatar instanceof File) {
       const uploadRes = await uploadClient.upload(savedAvatar);
       if (!uploadRes.success) {
@@ -29,13 +36,13 @@ export function useStep() {
         return;
       }
       startTransition(() => {
-        onboard({ step: 3, avatar: uploadRes.data.url });
+        onboard({ step: 3, avatar: uploadRes.data.url, isDirty: true });
       });
       return;
     }
 
     startTransition(() => {
-      onboard({ step: 3, avatar: savedAvatar });
+      onboard({ step: 3, avatar: savedAvatar, isDirty: initialAvatar !== savedAvatar });
     });
   }
 

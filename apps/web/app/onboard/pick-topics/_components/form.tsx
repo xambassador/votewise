@@ -8,6 +8,8 @@ import { makeToast } from "@votewise/ui/toast";
 import { Footer } from "@/app/onboard/_components/footer";
 import { onboard } from "@/app/onboard/action";
 
+import { routes } from "@/lib/routes";
+
 type Props = { topics: { id: string; name: string }[] };
 
 export function Topics(props: Props) {
@@ -31,7 +33,7 @@ export function Topics(props: Props) {
     }
 
     startTransition(() => {
-      onboard({ topics: selected, step: 6 }).then((res) => {
+      onboard({ topics: selected, step: 6, isDirty: true }).then((res) => {
         if (res && !res.success) {
           makeToast.error("Oops!", res.error);
         }
@@ -58,7 +60,7 @@ export function Topics(props: Props) {
           );
         })}
       </div>
-      <Footer nextProps={{ onClick: onSubmit, loading: isPending }} />
+      <Footer nextProps={{ onClick: onSubmit, loading: isPending }} backProps={{ href: routes.onboard.step5() }} />
     </div>
   );
 }

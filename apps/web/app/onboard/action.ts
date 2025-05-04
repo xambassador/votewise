@@ -2,77 +2,110 @@
 
 import type { TOnboard } from "@votewise/schemas/onboard";
 import type { ActionResponse } from "@votewise/types";
-import type { TConnectYourSocials, TTellUsAboutYou, TWhatShouldWeCall } from "./_utils/schema";
 
 import { redirect } from "next/navigation";
 
 import { isAuthorized } from "@/lib/auth";
 import { getOnboard } from "@/lib/client.server";
-import { COOKIE_KEYS, getUser, setCookie, setFlashMessage, setOnboardingData } from "@/lib/cookie";
+import { setFlashMessage } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
-
-import { getStepSixData } from "./_utils";
-
-type Props = Partial<TWhatShouldWeCall> &
-  Partial<TTellUsAboutYou> &
-  Partial<{ avatar: string }> &
-  Partial<{ cover: string }> &
-  Partial<TConnectYourSocials> &
-  Partial<{ topics: string[] }> & { step: number };
 
 type OnboardResponse = { is_onboarded: boolean } & TOnboard;
 
-export async function onboard(props: Props): Promise<ActionResponse<OnboardResponse>> {
+export async function onboard(props: TOnboard & { isDirty: boolean }): Promise<ActionResponse<OnboardResponse>> {
   isAuthorized<true>({ redirect: true });
+  const onboardClient = getOnboard();
+  const { isDirty } = props;
 
   if (props.step === 1) {
-    setOnboardingData({ user_name: props.userName, first_name: props.firstName, last_name: props.lastName });
+    if (!isDirty) {
+      return redirect(routes.onboard.step2());
+    }
+
+    const res = await onboardClient.onboard({
+      step: 1,
+      first_name: props.first_name,
+      last_name: props.last_name,
+      user_name: props.user_name
+    });
+    if (!res.success) {
+      return { success: false, error: res.error, errorData: res.errorData };
+    }
     return redirect(routes.onboard.step2());
   }
 
   if (props.step === 2) {
-    setOnboardingData({ gender: props.gender, about: props.about });
+    if (!isDirty) {
+      return redirect(routes.onboard.step3());
+    }
+    const res = await onboardClient.onboard({
+      step: 2,
+      about: props.about,
+      gender: props.gender
+    });
+    if (!res.success) {
+      return { success: false, error: res.error, errorData: res.errorData };
+    }
     return redirect(routes.onboard.step3());
   }
 
   if (props.step === 3) {
-    setOnboardingData({ avatar_url: props.avatar });
+    if (!isDirty) {
+      return redirect(routes.onboard.step4());
+    }
+    const res = await onboardClient.onboard({
+      step: 3,
+      avatar: props.avatar
+    });
+    if (!res.success) {
+      return { success: false, error: res.error, errorData: res.errorData };
+    }
     return redirect(routes.onboard.step4());
   }
 
   if (props.step === 4) {
-    setOnboardingData({ cover_url: props.cover });
+    if (!isDirty) {
+      return redirect(routes.onboard.step5());
+    }
+    const res = await onboardClient.onboard({
+      step: 4,
+      cover: props.cover
+    });
+    if (!res.success) {
+      return { success: false, error: res.error, errorData: res.errorData };
+    }
     return redirect(routes.onboard.step5());
   }
 
   if (props.step === 5) {
-    setOnboardingData({
+    if (!isDirty) {
+      return redirect(routes.onboard.step6());
+    }
+    const res = await onboardClient.onboard({
+      step: 5,
       location: props.location,
-      twitter_url: props.twitter,
-      instagram_url: props.instagram,
-      facebook_url: props.facebook
+      facebook: props.facebook,
+      twitter: props.twitter,
+      instagram: props.instagram
     });
+    if (!res.success) {
+      return { success: false, error: res.error, errorData: res.errorData };
+    }
     return redirect(routes.onboard.step6());
   }
 
   if (props.step === 6) {
-    const user = getUser();
-    if (!user) {
-      return {
-        success: false,
-        error: "User not found",
-        errorData: { status_code: 401, name: "Unauthorized", message: "User not found" }
-      };
+    if (!isDirty) {
+      return redirect(routes.app.root());
     }
-    const stepSixData = getStepSixData();
-    const onboardingData = { ...stepSixData, ...props };
-    const onboardClient = getOnboard();
-    const res = await onboardClient.onboard(user.id, onboardingData);
+    const res = await onboardClient.onboard({
+      step: 6,
+      topics: props.topics
+    });
     if (!res.success) {
       return { success: false, error: res.error, errorData: res.errorData };
     }
     setFlashMessage("Onboard complete!", "Welcome to Votewise!", "success");
-    setCookie(COOKIE_KEYS.isOnboarded, "true");
     return redirect(routes.app.root());
   }
 

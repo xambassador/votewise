@@ -46,6 +46,7 @@
     "@votewise/debug": "*",
     "@votewise/env": "*",
     "@votewise/jwt": "*",
+    "@votewise/schemas": "*",
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
