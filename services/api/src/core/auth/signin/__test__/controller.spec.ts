@@ -1,12 +1,11 @@
 import { StatusCodes } from "http-status-codes";
 
-import { ERROR_CODES } from "@votewise/constant";
+import { COOKIE_KEYS, ERROR_CODES } from "@votewise/constant";
 import { Assertions } from "@votewise/errors";
 import { Minute } from "@votewise/times";
 
 import { requestParserPluginFactory } from "@/plugins/request-parser";
 import { mockSessionManager } from "@/services/__mock__/session.service";
-import { COOKIE_KEYS } from "@/utils/constant";
 
 import { buildReq, buildRes } from "../../../../../test/helpers";
 import { UserRegisterService } from "../../register/service";

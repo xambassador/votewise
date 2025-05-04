@@ -4,11 +4,10 @@ import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
-import { ERROR_CODES } from "@votewise/constant";
+import { COOKIE_KEYS, ERROR_CODES } from "@votewise/constant";
 import { ZVerifyChallenge } from "@votewise/schemas";
 import { Day } from "@votewise/times";
 
-import { COOKIE_KEYS } from "@/utils/constant";
 import { getCookieOptions } from "@/utils/cookie";
 import { getAuthenticateLocals } from "@/utils/locals";
 
