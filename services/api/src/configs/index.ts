@@ -65,6 +65,8 @@ export class ServerConfig {
   public bucketUrl: string;
   public appName?: string;
   public uploadBucket: string;
+  public avatarsBucket: string;
+  public backgroundsBucket: string;
 
   constructor(cfg: ServerConfig) {
     this.port = cfg.port;
@@ -83,6 +85,8 @@ export class ServerConfig {
     this.bucketUrl = cfg.bucketUrl;
     this.appName = cfg.appName;
     this.uploadBucket = cfg.uploadBucket;
+    this.avatarsBucket = cfg.avatarsBucket;
+    this.backgroundsBucket = cfg.backgroundsBucket;
   }
 }
 

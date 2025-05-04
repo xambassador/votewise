@@ -27,6 +27,8 @@ export function onboardControllerFactory() {
     taskQueue: ctx.queues.tasksQueue,
     uploadQueue: ctx.queues.uploadQueue,
     appUrl: ctx.config.appUrl,
+    avatarsBucket: ctx.config.avatarsBucket,
+    backgroundsBucket: ctx.config.backgroundsBucket,
     postTopicRepository: ctx.repositories.postTopic,
     timelineRepository: ctx.repositories.timeline,
     onboardService: ctx.onboardService,

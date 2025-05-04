@@ -20,6 +20,8 @@ const cfg = new ServerConfig({
   appUrl: environment.VOTEWISE_APP_URL,
   bucketUrl: environment.VOTEWISE_BUCKET_URL,
   appName: "Votewise",
+  avatarsBucket: "avatars",
+  backgroundsBucket: "backgrounds",
   uploadBucket: "uploads" // TODO: Move to env
 });
 const secrets = new ServerSecrets({
