@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { User } from "@votewise/client/user";
 import { useForm } from "@votewise/ui/form";
+import { makeToast } from "@votewise/ui/toast";
 
 import { chain } from "@/lib/chain";
 import { client } from "@/lib/client";
@@ -54,14 +55,17 @@ export function useStep(props: { defaultValues?: TWhatShouldWeCall }) {
 
   const handleSubmit = form.handleSubmit((data) => {
     const isDirty = isObjectDirty(data, props.defaultValues || {});
-    startTransition(() => {
-      onboard({
+    startTransition(async () => {
+      const res = await onboard({
         step: 1,
         user_name: data.userName,
         last_name: data.lastName,
         first_name: data.firstName,
         isDirty
       });
+      if (!res.success) {
+        makeToast.error("Oops!", res.error);
+      }
     });
   });
 

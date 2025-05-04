@@ -10,6 +10,8 @@ import { useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
+import { makeToast } from "@votewise/ui/toast";
+
 import { isObjectDirty } from "@/lib/object";
 import { routes } from "@/lib/routes";
 
@@ -30,8 +32,11 @@ export function useStep(props: { defaultValue?: TTellUsAboutYou }) {
   });
 
   const action = form.handleSubmit((data) => {
-    startTransition(() => {
-      onboard({ ...data, step: 2, isDirty: isObjectDirty(data, props.defaultValue || {}) });
+    startTransition(async () => {
+      const res = await onboard({ ...data, step: 2, isDirty: isObjectDirty(data, props.defaultValue || {}) });
+      if (!res.success) {
+        makeToast.error("Oops!", res.error);
+      }
     });
   });
 

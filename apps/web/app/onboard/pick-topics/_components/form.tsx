@@ -32,12 +32,11 @@ export function Topics(props: Props) {
       return;
     }
 
-    startTransition(() => {
-      onboard({ topics: selected, step: 6, isDirty: true }).then((res) => {
-        if (res && !res.success) {
-          makeToast.error("Oops!", res.error);
-        }
-      });
+    startTransition(async () => {
+      const res = await onboard({ topics: selected, step: 6, isDirty: true });
+      if (!res.success) {
+        makeToast.error("Oops!", res.error);
+      }
     });
   }
 

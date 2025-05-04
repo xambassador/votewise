@@ -35,14 +35,20 @@ export function useStep(props: Props) {
         makeToast.error("Oops!", uploadRes.error);
         return;
       }
-      startTransition(() => {
-        onboard({ step: 3, avatar: uploadRes.data.url, isDirty: true });
+      startTransition(async () => {
+        const res = await onboard({ step: 3, avatar: uploadRes.data.url, isDirty: true });
+        if (!res.success) {
+          makeToast.error("Ooop!", res.error);
+        }
       });
       return;
     }
 
-    startTransition(() => {
-      onboard({ step: 3, avatar: savedAvatar, isDirty: initialAvatar !== savedAvatar });
+    startTransition(async () => {
+      const res = await onboard({ step: 3, avatar: savedAvatar, isDirty: initialAvatar !== savedAvatar });
+      if (!res.success) {
+        makeToast.error("Oops!", res.error);
+      }
     });
   }
 
