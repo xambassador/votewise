@@ -12,6 +12,8 @@ const cfg = new ServerConfig({
   cors,
   appHeaders,
   uploadBucket: "uploads",
+  avatarBucket: "avatars",
+  backgroundsBucket: "backgrounds",
   publicUrl: environment.VOTEWISE_BUCKET_URL,
   port: environment.VOTEWISE_BUCKET_PORT,
   devMode: environment.NODE_ENV === "development",

@@ -93,8 +93,8 @@ export class AppContext {
       endPoint: environment.MINIO_ENDPOINT,
       port: environment.MINIO_PORT,
       useSSL: false, // TODO: Get this from env
-      accessKey: environment.MINIO_ACCESS_KEY!,
-      secretKey: environment.MINIO_SECRET_KEY!
+      accessKey: environment.MINIO_ACCESS_KEY,
+      secretKey: environment.MINIO_SECRET_KEY
     });
     const jwtService = new JWT({ accessTokenSecret: environment.ACCESS_TOKEN_SECRET });
     const uploadQueue = new UploadQueue();

@@ -7,7 +7,6 @@ import { Queue, Worker } from "bullmq";
 import {
   uploadCompletedEventQueueDefaultJobOptions,
   uploadCompletedEventQueueName,
-  uploadQueueDefaultJobOptions,
   uploadQueueName
 } from "@votewise/constant/queue";
 
@@ -16,25 +15,20 @@ import { RedisAdapter } from "@/storage/redis";
 import { UploadToS3Processor } from "./processor/upload-to-s3";
 
 export class UploadQueue {
-  private queue: Queue<UploadToS3Task> | null = null;
   private worker: Worker<UploadToS3Task> | null = null;
   private redis: Redis | null = null;
 
   public init() {
     this.redis = RedisAdapter.defaultClient;
-    this.queue = new Queue<UploadToS3Task>(uploadQueueName, {
-      connection: this.redis,
-      defaultJobOptions: uploadQueueDefaultJobOptions
-    });
   }
 
   public initWorker(ctx: AppContext) {
-    if (!this.queue) throw new Error("Queue not initialized");
     if (!this.redis) throw new Error("Redis not initialized");
     const uploadToS3Processor = new UploadToS3Processor({
       logger: ctx.logger,
       uploadBucket: ctx.config.uploadBucket,
-      minio: ctx.minio
+      minio: ctx.minio,
+      getBlobPath: ctx.getBlobPath
     });
     this.worker = new Worker<UploadToS3Task>(
       uploadQueueName,
@@ -68,11 +62,6 @@ export class UploadQueue {
     this.worker.on("ready", () => {
       ctx.logger.info(`[${uploadQueueName} worker] ready`);
     });
-  }
-
-  public async add(task: UploadToS3Task) {
-    if (!this.queue) throw new Error("Taks Queue not initialized");
-    return this.queue.add(task.name, task);
   }
 }
 
