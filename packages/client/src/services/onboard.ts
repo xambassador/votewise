@@ -46,4 +46,4 @@ export class Onboard {
   }
 }
 
-export type { GetAllTopicsResponse, GetUserOnboardStatusResponse, OnboardUserResponse };
+export type { GetAllTopicsResponse, GetUserOnboardStatusResponse, OnboardUserResponse, GetUserOnboardSessionResponse };

@@ -32,6 +32,10 @@
     "./user": {
       "import": "./dist/services/user.mjs",
       "require": "./dist/services/user.js"
+    },
+    "./mfa": {
+      "import": "./dist/services/mfa.mjs",
+      "require": "./dist/services/mfa.js"
     }
   },
   "scripts": {

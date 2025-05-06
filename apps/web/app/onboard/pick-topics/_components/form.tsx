@@ -10,11 +10,11 @@ import { onboard } from "@/app/onboard/action";
 
 import { routes } from "@/lib/routes";
 
-type Props = { topics: { id: string; name: string }[] };
+type Props = { topics: { id: string; name: string }[]; selected?: string[] };
 
 export function Topics(props: Props) {
-  const { topics } = props;
-  const [selected, setSelected] = useState<string[]>([]);
+  const { topics, selected: defaultSelected = [] } = props;
+  const [selected, setSelected] = useState<string[]>(defaultSelected);
   const [isPending, startTransition] = useTransition();
 
   function onSelect(id: string) {

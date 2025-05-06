@@ -1,6 +1,6 @@
 import { OnboardContainer } from "../_components/container";
 import { OnboardHeader, OnboardSubtitle, OnboardTitle } from "../_components/typography";
-import { shouldNotOnboarded } from "../_utils";
+import { shouldNotOnboarded, verifyStep } from "../_utils";
 import { AvatarPicker } from "./_components/avatar-picker";
 import { AvatarPickerDialog } from "./_components/avatar-picker-dialog";
 import { ChooseAvatarDialog } from "./_components/choose-avatar-dialog";
@@ -10,6 +10,7 @@ import { FooterAction } from "./_components/footer";
 
 export default async function Page() {
   const onboardingData = await shouldNotOnboarded();
+  verifyStep(2, onboardingData);
   const name = onboardingData.first_name + " " + onboardingData.last_name;
   return (
     <OnboardContainer>

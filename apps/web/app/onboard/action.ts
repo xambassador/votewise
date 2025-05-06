@@ -7,7 +7,6 @@ import { redirect } from "next/navigation";
 
 import { isAuthorized } from "@/lib/auth";
 import { getOnboard } from "@/lib/client.server";
-import { setFlashMessage } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
 type OnboardResponse = { is_onboarded: boolean } & TOnboard;
@@ -105,8 +104,7 @@ export async function onboard(props: TOnboard & { isDirty: boolean }): Promise<A
     if (!res.success) {
       return { success: false, error: res.error, errorData: res.errorData };
     }
-    setFlashMessage("Onboard complete!", "Welcome to Votewise!", "success");
-    return redirect(routes.app.root());
+    return redirect(routes.onboard.step7());
   }
 
   return redirect(routes.onboard.step1());

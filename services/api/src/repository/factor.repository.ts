@@ -63,7 +63,9 @@ export class FactorRepository extends BaseRepository {
 
   public findByUserIdAndType(userId: string, type: TFactorCreate["factor_type"]) {
     return this.execute(async () => {
-      const factor = await this.db.factor.findFirst({ where: { user_id: userId, factor_type: type } });
+      const factor = await this.db.factor.findFirst({
+        where: { user_id: userId, factor_type: type, status: "VERIFIED" }
+      });
       return factor;
     });
   }

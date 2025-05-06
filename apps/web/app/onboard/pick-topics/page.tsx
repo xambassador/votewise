@@ -2,11 +2,12 @@ import { getOnboard } from "@/lib/client.server";
 
 import { OnboardContainer } from "../_components/container";
 import { OnboardHeader, OnboardSubtitle, OnboardTitle } from "../_components/typography";
-import { shouldNotOnboarded } from "../_utils";
+import { shouldNotOnboarded, verifyStep } from "../_utils";
 import { Topics } from "./_components/form";
 
 export default async function Page() {
   const onboardingData = await shouldNotOnboarded();
+  verifyStep(5, onboardingData);
   const name = onboardingData.first_name + " " + onboardingData.last_name;
   const onboard = getOnboard();
   const topicsResult = await onboard.getTopics();
@@ -19,7 +20,7 @@ export default async function Page() {
         <OnboardSubtitle>Hello 👋, {name}</OnboardSubtitle>
         <OnboardTitle>Topics you may interested</OnboardTitle>
       </OnboardHeader>
-      <Topics topics={topics} />
+      <Topics topics={topics} selected={onboardingData.topics} />
     </OnboardContainer>
   );
 }

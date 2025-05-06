@@ -38,9 +38,22 @@ export const ZChooseYourTopics = z.object({
   topics: z.array(z.string()).min(3, { message: "Please select at least 3 topics" })
 });
 
+export const ZSecureYourAccount = z.object({
+  step: z.literal(7),
+  has_setup_2fa: z.boolean().default(false)
+});
+
 export const ZOnboard = z.discriminatedUnion(
   "step",
-  [ZWhatShouldWeCall, ZTellUsAboutYou, ZYourPhotoShine, ZYourProfileStandOut, ZConnectYourSocials, ZChooseYourTopics],
+  [
+    ZWhatShouldWeCall,
+    ZTellUsAboutYou,
+    ZYourPhotoShine,
+    ZYourProfileStandOut,
+    ZConnectYourSocials,
+    ZChooseYourTopics,
+    ZSecureYourAccount
+  ],
   {
     errorMap: (issue, ctx) => {
       if (issue.code === "invalid_union_discriminator") {
@@ -61,3 +74,4 @@ export type TConnectYourSocials = z.infer<typeof ZConnectYourSocials>;
 export type TChooseYourTopics = z.infer<typeof ZChooseYourTopics>;
 export type TYourPhotoShine = z.infer<typeof ZYourPhotoShine>;
 export type TYourProfileStandOut = z.infer<typeof ZYourProfileStandOut>;
+export type TSecureYourAccount = z.infer<typeof ZSecureYourAccount>;
