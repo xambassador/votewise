@@ -1,10 +1,11 @@
 import { OnboardContainer } from "../_components/container";
 import { OnboardHeader, OnboardSubtitle, OnboardTitle } from "../_components/typography";
-import { shouldNotOnboarded } from "../_utils";
+import { shouldNotOnboarded, verifyStep } from "../_utils";
 import { SetupMFAForm } from "./_components/form";
 
 export default async function Page() {
   const onboardData = await shouldNotOnboarded();
+  verifyStep(6, onboardData);
   return (
     <OnboardContainer className="max-w-[calc((530/16)*1rem)] min-w-[calc((530/16)*1rem)]">
       <OnboardHeader className="items-center">

@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 
 import { Auth } from "@votewise/client/auth";
+import { MFA } from "@votewise/client/mfa";
 import { Onboard } from "@votewise/client/onboard";
 import { Client } from "@votewise/client/server";
 
@@ -32,4 +33,9 @@ export function getAuth() {
 export function getOnboard() {
   const client = getClient();
   return new Onboard({ client });
+}
+
+export function getMFA() {
+  const client = getClient();
+  return new MFA({ client });
 }
