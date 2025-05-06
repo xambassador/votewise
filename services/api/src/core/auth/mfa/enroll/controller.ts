@@ -20,7 +20,7 @@ type ControllerOptions = {
 const { USER_NOT_FOUND } = ERROR_CODES.AUTH;
 const { CONFLICTING_FACTOR } = ERROR_CODES["2FA"];
 const USER_NOT_FOUND_MSG = "A valid session and a registered user are required to enroll a factor";
-const CONFLICTING_FACTOR_MSG = "User already has a TOTP factor";
+const CONFLICTING_FACTOR_MSG = "You are already enrolled in this factor. Please remove it before enrolling again";
 
 export class Controller {
   private readonly ctx: ControllerOptions;

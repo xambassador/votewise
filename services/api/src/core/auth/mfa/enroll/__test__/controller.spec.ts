@@ -39,7 +39,7 @@ describe("MFA Enroll Controller", () => {
     expect(error.message).toBe("A valid session and a registered user are required to enroll a factor");
   });
 
-  test("should throw error if user already has a TOTP factor", async () => {
+  test("should throw error if user already has a verified TOTP factor", async () => {
     const req = buildReq({ params });
     const res = buildRes({ locals });
 
@@ -47,7 +47,7 @@ describe("MFA Enroll Controller", () => {
     mockFactorRepository.findByUserIdAndType.mockResolvedValue(factor);
 
     const error = await controller.handle(req, res).catch((e) => e);
-    expect(error.message).toBe("User already has a TOTP factor");
+    expect(error.message).toBe("You are already enrolled in this factor. Please remove it before enrolling again");
   });
 
   test("should enroll a TOTP factor", async () => {
