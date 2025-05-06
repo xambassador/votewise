@@ -168,10 +168,8 @@ export class Controller {
           const isAlreadyAdded = userTopics.some((userTopic) => userTopic.topic_id === topic);
           if (!isAlreadyAdded) topics.push(topic);
         });
-        await this.ctx.userRepository.update(userId, { is_onboarded: true });
         await this.ctx.userInterestRepository.create(userId, topics);
-        await this.ctx.sessionManager.updateOnboardStatus(userId, "ONBOARDED");
-        await this.ctx.onboardService.clearUserOnboardCache(userId);
+        await this.ctx.onboardService.updateUserOnboardCache(userId, { topics });
         this.ctx.taskQueue.add({
           name: "email",
           payload: {
@@ -184,7 +182,15 @@ export class Controller {
             }
           }
         });
-        await this.hydrateUserTimeline(userId, topics).catch(() => {});
+        this.hydrateUserTimeline(userId, topics).catch(() => {});
+        const result = { is_onboarded: user.is_onboarded };
+        return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
+      }
+
+      case 7: {
+        await this.ctx.userRepository.update(userId, { is_onboarded: true });
+        await this.ctx.sessionManager.updateOnboardStatus(userId, "ONBOARDED");
+        await this.ctx.onboardService.clearUserOnboardCache(userId);
         const result = { is_onboarded: true };
         return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
       }
