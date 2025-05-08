@@ -36,6 +36,10 @@
     "./mfa": {
       "import": "./dist/services/mfa.mjs",
       "require": "./dist/services/mfa.js"
+    },
+    "./feed": {
+      "import": "./dist/services/feed.mjs",
+      "require": "./dist/services/feed.js"
     }
   },
   "scripts": {

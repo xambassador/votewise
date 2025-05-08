@@ -52,6 +52,9 @@ export class Auth {
     return res;
   }
 
+  /**
+   * @deprecated - use `challenge` from the MFA module instead.
+   */
   public async challengeFactor(factorId: string, token?: string) {
     const res = await this.client.post<ChallengeFactorResponse, object>(
       auth.runtime.factors.challengeFactor("", factorId),
@@ -65,6 +68,9 @@ export class Auth {
     return res;
   }
 
+  /**
+   * @deprecated - use `verify` from the MFA module instead.
+   */
   public async verifyFactor(data: TVerifyChallenge & { factorId: string }) {
     const res = await this.client.post<VerifyMFAResponse, TVerifyChallenge>(
       auth.runtime.factors.verifyFactor("", data.factorId),
