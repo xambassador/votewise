@@ -5,15 +5,19 @@ import { Spinner } from "@votewise/ui/ring-spinner";
 import { FlashProvider } from "@/components/flash-provider";
 import { NavTabs } from "@/components/nav-tabs";
 
+import { getFeedClient } from "@/lib/client.server";
+
 import { FeedList } from "./_components/feed-list";
 
 export default async function Home() {
   return (
     <FlashProvider>
-      <NavTabs />
-      <Suspense fallback={<Loading />}>
-        <RetrieveFeed />
-      </Suspense>
+      <div className="pb-5">
+        <NavTabs />
+        <Suspense fallback={<Loading />}>
+          <RetrieveFeed />
+        </Suspense>
+      </div>
     </FlashProvider>
   );
 }
@@ -27,5 +31,10 @@ function Loading() {
 }
 
 async function RetrieveFeed() {
-  return <FeedList />;
+  const feed = getFeedClient();
+  const feedResult = await feed.get();
+  if (!feedResult.success) {
+    return <div>{feedResult.error}</div>;
+  }
+  return <FeedList feeds={feedResult.data} />;
 }

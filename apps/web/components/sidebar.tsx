@@ -12,7 +12,7 @@ import { Users } from "@votewise/ui/icons/users";
 
 export function Sidebar() {
   return (
-    <aside className="flex-1 max-w-[calc((200/16)*1rem)] border-r border-nobelBlack-200 pt-7">
+    <aside className="flex-1 max-w-[calc((200/16)*1rem)] border-r border-nobelBlack-200 pt-7 max-h-screen sticky top-0">
       <div className="flex flex-col gap-6">
         <div className="pl-2 pr-1">
           <Avatar>
