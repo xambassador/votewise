@@ -6,7 +6,7 @@ import type { ActionResponse } from "@votewise/types";
 import { redirect } from "next/navigation";
 
 import { getMFA, getOnboard } from "@/lib/client.server";
-import { setFlashMessage } from "@/lib/cookie";
+import { clearAllCookies, setFlashMessage } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
 export async function enrollMultiFactorAction(): Promise<ActionResponse<EnrollMFAResponse>> {
@@ -37,8 +37,10 @@ export async function verifyMultiFactorAction(
   if (!res.success) {
     return { success: false, error: res.error, errorData: res.errorData };
   }
-  setFlashMessage("Onboard complete!", "Welcome to Votewise!", "success");
-  return redirect(routes.app.root());
+  const msg = "Welcome to Votewise! Your account is now secure. Please login again to continue.";
+  setFlashMessage("Onboard complete!", msg, "success");
+  clearAllCookies();
+  return redirect(routes.auth.signIn());
 }
 
 export async function skipMultiFactorAction(): Promise<ActionResponse<{ is_onboarded: boolean }>> {

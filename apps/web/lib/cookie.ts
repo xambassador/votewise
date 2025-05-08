@@ -53,13 +53,14 @@ export function clearAllCookies(list: string[] = []) {
   const cookieStore = cookies();
   if (list.length > 0) {
     cookieStore.getAll().forEach((cookie) => {
-      if (list.includes(cookie.name)) {
+      if (list.includes(cookie.name) && !cookie.name.includes(COOKIE_KEYS.flash)) {
         cookieStore.delete(cookie.name);
       }
     });
     return;
   }
   cookieStore.getAll().forEach((cookie) => {
+    if (cookie.name.includes(COOKIE_KEYS.flash)) return;
     cookieStore.delete(cookie.name);
   });
 }
