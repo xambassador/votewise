@@ -7,8 +7,12 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { Controller } from "./controller";
 
 export function getAllFeedControllerFactory() {
-  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "logger"]);
-  const controller = new Controller({ assert: ctx.assert, timelineRepository: ctx.repositories.timeline });
+  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "logger", "bucketService"]);
+  const controller = new Controller({
+    assert: ctx.assert,
+    timelineRepository: ctx.repositories.timeline,
+    bucketService: ctx.bucketService
+  });
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "get-all-feed" });
   ctx.logger.info(`[${yellow("GetAllFeedController")}] dependencies initialized`);

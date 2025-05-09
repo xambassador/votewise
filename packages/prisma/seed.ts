@@ -114,8 +114,8 @@ async function createTopics() {
 async function createUsers(count = 100) {
   const users: User[] = [];
   const genders = Object.values(Gender);
-  const avatars = Array.from({ length: 50 }).map((_, index) => "avatars/avatar_" + (index + 1));
-  const backgrounds = Array.from({ length: 10 }).map((_, index) => "backgrounds/bg_" + (index + 1));
+  const avatars = Array.from({ length: 50 }).map((_, index) => "avatars/avatar_" + (index + 1) + ".png");
+  const backgrounds = Array.from({ length: 10 }).map((_, index) => "backgrounds/bg_" + (index + 1) + ".png");
 
   for (let i = 0; i < count; i++) {
     const firstName = faker.person.firstName();

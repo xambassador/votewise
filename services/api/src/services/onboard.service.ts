@@ -8,7 +8,7 @@ type ServiceOptions = {
   assert: AppContext["assert"];
   userRepository: AppContext["repositories"]["user"];
   cache: AppContext["cache"];
-  minio: AppContext["minio"];
+  bucketService: AppContext["bucketService"];
 };
 
 const schema = z.object({
@@ -46,50 +46,10 @@ export class OnboardService {
     if (onboardDataFromDb.first_name !== "INVALID_FIRST_NAME" && onboardDataFromDb.user_name !== "INVALID_USER_NAME") {
       hasValidFirstStep = true;
     }
-    let avatarUrl = onboardDataFromDb.avatar_url;
-    let backgroundUrl = onboardDataFromDb.cover_image_url;
-    const avatarBucket = "avatars";
-    const backgroundBucket = "backgrounds";
-    const uploadBucket = "uploads";
-    if (avatarUrl) {
-      if (!avatarUrl.startsWith("https://") && !avatarUrl.startsWith("http://")) {
-        if (avatarUrl.startsWith(avatarBucket)) {
-          try {
-            avatarUrl = await this.ctx.minio.presignedGetObject(avatarBucket, avatarUrl);
-          } catch (err) {
-            // --
-          }
-        }
-
-        if (!avatarUrl.startsWith(avatarBucket)) {
-          try {
-            avatarUrl = await this.ctx.minio.presignedGetObject(uploadBucket, avatarUrl);
-          } catch (err) {
-            // --
-          }
-        }
-      }
-    }
-
-    if (backgroundUrl) {
-      if (!backgroundUrl.startsWith("https://") && !backgroundUrl.startsWith("http://")) {
-        if (backgroundUrl.startsWith(backgroundBucket)) {
-          try {
-            backgroundUrl = await this.ctx.minio.presignedGetObject(backgroundBucket, backgroundUrl);
-          } catch (err) {
-            // --
-          }
-        }
-
-        if (!backgroundUrl.startsWith(backgroundBucket)) {
-          try {
-            backgroundUrl = await this.ctx.minio.presignedGetObject(uploadBucket, backgroundUrl);
-          } catch (err) {
-            // --
-          }
-        }
-      }
-    }
+    const [avatarUrl, backgroundUrl] = await Promise.all([
+      this.ctx.bucketService.getUrlForType(onboardDataFromDb.avatar_url ?? "", "avatar"),
+      this.ctx.bucketService.getUrlForType(onboardDataFromDb.cover_image_url ?? "", "background")
+    ]);
 
     const data: OnboardData = {
       user_name: hasValidFirstStep ? onboardDataFromDb.user_name : "",

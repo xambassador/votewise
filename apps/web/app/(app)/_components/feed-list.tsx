@@ -23,7 +23,6 @@ import {
   FeedHeader,
   FeedImages,
   FeedTimeAgo,
-  FeedUserHandle,
   FeedUserName
 } from "@votewise/ui/cards/feed";
 import { Confetti } from "@votewise/ui/confetti";
@@ -93,7 +92,6 @@ function FeedItem(props: { feed: GetAllFeedsResponse["feeds"][0] }) {
           <FeedContent>
             <FeedHeader>
               <FeedUserName>{feed.author.first_name + " " + feed.author.last_name}</FeedUserName>
-              <FeedUserHandle>{feed.author.user_name}</FeedUserHandle>
               <FeedTimeAgo>{dayjs(feed.created_at).fromNow()}</FeedTimeAgo>
             </FeedHeader>
             <FeedContentText>{truncateOnWord(feed.content, 128)}</FeedContentText>

@@ -37,6 +37,7 @@ export type AppContextOptions = {
   plugins: Plugins;
   rateLimiteManager: RateLimiterManager;
   minio: Minio.Client;
+  bucketService: Services["bucket"];
 };
 
 export class AppContext {
@@ -59,6 +60,7 @@ export class AppContext {
   public rateLimiteManager: RateLimiterManager;
   public minio: Minio.Client;
   public onboardService: Services["onboard"];
+  public bucketService: Services["bucket"];
 
   constructor(opts: AppContextOptions) {
     this.config = opts.config;
@@ -78,6 +80,7 @@ export class AppContext {
     this.rateLimiteManager = opts.rateLimiteManager;
     this.minio = opts.minio;
     this.onboardService = opts.onboardService;
+    this.bucketService = opts.bucketService;
 
     this.logger.info(`[${yellow("AppContext")}] dependencies initialized`);
   }
@@ -128,11 +131,19 @@ export class AppContext {
       accessKey: environment.MINIO_ACCESS_KEY,
       secretKey: environment.MINIO_SECRET_KEY
     });
+    const bucketService = new Services.BucketService({
+      minio,
+      uploadBucket: cfg.uploadBucket,
+      backgroundBucket: cfg.backgroundsBucket,
+      avatarBucket: cfg.avatarsBucket,
+      minioPort: environment.MINIO_PORT,
+      minioEndpoint: environment.MINIO_ENDPOINT
+    });
     const onboardService = new Services.OnboardService({
       userRepository,
-      minio,
       cache,
-      assert
+      assert,
+      bucketService
     });
     const ctx = new AppContext({
       config: cfg,
@@ -148,6 +159,7 @@ export class AppContext {
       sessionManager,
       rateLimiteManager,
       onboardService,
+      bucketService,
       repositories: {
         user: userRepository,
         factor: factorRepository,
