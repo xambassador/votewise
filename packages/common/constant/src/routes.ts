@@ -39,7 +39,10 @@ export const user = {
       update: (base: string) => base + "/me/onboard",
       getOnboardSession: (base: string) => base + "/me/onboard/session"
     },
-    usernameExists: (base: string) => base + "/users/:username/exists"
+    usernameExists: (base: string) => base + "/users/:username/exists",
+    me: {
+      get: (base: string) => base + "/me"
+    }
   },
   runtime: {
     sessions: (base: string) => base + "/users/sessions",
@@ -48,7 +51,10 @@ export const user = {
       update: (base: string) => base + "/me/onboard",
       getOnboardSession: (base: string) => base + "/me/onboard/session"
     },
-    usernameExists: (base: string, username: string) => base + `/users/${username}/exists`
+    usernameExists: (base: string, username: string) => base + `/users/${username}/exists`,
+    me: {
+      get: (base: string) => base + "/me"
+    }
   }
 };
 

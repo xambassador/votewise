@@ -86,7 +86,7 @@ function FeedItem(props: { feed: GetAllFeedsResponse["feeds"][0] }) {
       <FeedContainer>
         <div className="flex gap-2">
           <Avatar className="size-12">
-            <AvatarFallback>JD</AvatarFallback>
+            <AvatarFallback name={feed.author.first_name + " " + feed.author.last_name} />
             <AvatarImage src={feed.author.avatar_url || ""} alt={feed.author.first_name} />
           </Avatar>
           <FeedContent>

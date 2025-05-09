@@ -5,6 +5,7 @@ import { Feed } from "@votewise/client/feed";
 import { MFA } from "@votewise/client/mfa";
 import { Onboard } from "@votewise/client/onboard";
 import { Client } from "@votewise/client/server";
+import { User } from "@votewise/client/user";
 
 import { clearCookie, getCookie, setCookie } from "./cookie";
 
@@ -44,4 +45,9 @@ export function getMFA() {
 export function getFeedClient() {
   const client = getClient();
   return new Feed({ client });
+}
+
+export function getUserClient() {
+  const client = getClient();
+  return new User({ client });
 }

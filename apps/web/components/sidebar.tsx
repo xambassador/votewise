@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
@@ -9,18 +10,17 @@ import { Pencile } from "@votewise/ui/icons/pencile";
 import { Search } from "@votewise/ui/icons/search";
 import { User } from "@votewise/ui/icons/user";
 import { Users } from "@votewise/ui/icons/users";
+import { Spinner } from "@votewise/ui/ring-spinner";
+
+import { getUserClient } from "@/lib/client.server";
 
 export function Sidebar() {
   return (
     <aside className="flex-1 max-w-[calc((200/16)*1rem)] border-r border-nobelBlack-200 pt-7 max-h-screen sticky top-0">
       <div className="flex flex-col gap-6">
-        <div className="pl-2 pr-1">
-          <Avatar>
-            <AvatarFallback>JD</AvatarFallback>
-            <AvatarImage src="/votewise-bucket/votewise/assets/avatars/default_avatar.png" alt="John doe" />
-          </Avatar>
-        </div>
-
+        <Suspense fallback={<Spinner className="size-8" />}>
+          <UserProfile />
+        </Suspense>
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-3 pr-1">
             <Link
@@ -73,5 +73,22 @@ export function Sidebar() {
         </div>
       </div>
     </aside>
+  );
+}
+
+async function UserProfile() {
+  const user = getUserClient();
+  const meResult = await user.getMe();
+  if (!meResult.success) {
+    return <div>{meResult.error}</div>;
+  }
+
+  return (
+    <div className="pl-2 pr-1">
+      <Avatar>
+        <AvatarFallback name={meResult.data.first_name + " " + meResult.data.last_name} />
+        <AvatarImage src={meResult.data.avatar_url} alt={meResult.data.first_name} />
+      </Avatar>
+    </div>
   );
 }

@@ -17,6 +17,7 @@ import { createFeedControllerFactory } from "./feed/create";
 import { getAllFeedControllerFactory } from "./feed/get-all";
 import { getAllTopicsControllerFactory } from "./topics/get-all";
 import { getUsernameExistsControllerFactory } from "./user/exists";
+import { getMeControllerFactory } from "./user/me";
 import { onboardControllerFactory } from "./user/onboard";
 import { getOnboardStatusControllerFactory } from "./user/onboard/get";
 import { getOnboardSessionControllerFactory } from "./user/onboard/get-session";
@@ -49,6 +50,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.get(user.paths.onboard.getStatus(path), ...getOnboardStatusControllerFactory());
   router.get(user.paths.onboard.getOnboardSession(path), ...getOnboardSessionControllerFactory());
   router.get(user.paths.usernameExists(path), ...getUsernameExistsControllerFactory());
+  router.get(user.paths.me.get(path), ...getMeControllerFactory());
   router.get(topics.paths.all(path), ...getAllTopicsControllerFactory());
   router.post(feeds.paths.create(path), ...createFeedControllerFactory());
   router.get(feeds.paths.all(path), ...getAllFeedControllerFactory());

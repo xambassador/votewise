@@ -1,4 +1,4 @@
-import type { UsernameExistsResponse } from "@votewise/api";
+import type { GetMeResponse, UsernameExistsResponse } from "@votewise/api";
 import type { Client } from "../client";
 import type { Client as ServerClient } from "../server";
 
@@ -18,6 +18,12 @@ export class User {
   public async isUsernameAvailable(username: string) {
     const path = user.runtime.usernameExists("", username);
     const res = await this.client.get<UsernameExistsResponse>(path);
+    return res;
+  }
+
+  public async getMe() {
+    const path = user.runtime.me.get("");
+    const res = await this.client.get<GetMeResponse>(path);
     return res;
   }
 }
