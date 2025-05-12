@@ -9,7 +9,7 @@ import { useStep } from "../_hooks/use-step";
 import { Footer } from "../../_components/footer";
 
 export function StepTwoForm(props: { defaultValues?: TWhatShouldWeCall }) {
-  const { getFormFieldProps, form, getInputProps, getBackButtonProps, getNextButtonProps } = useStep(props);
+  const { getFormFieldProps, form, getInputProps, getNextButtonProps } = useStep(props);
   return (
     <Form {...form}>
       <div className="flex flex-col gap-7">
@@ -37,7 +37,7 @@ export function StepTwoForm(props: { defaultValues?: TWhatShouldWeCall }) {
           <FormMessage />
         </FormField>
       </div>
-      <Footer nextProps={getNextButtonProps()} backProps={getBackButtonProps()} />
+      <Footer nextProps={getNextButtonProps()} shouldShowBackButton={false} />
     </Form>
   );
 }
