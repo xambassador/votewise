@@ -31,13 +31,14 @@ export type AppContextOptions = {
   jwtService: Services["jwt"];
   cryptoService: Services["crypto"];
   onboardService: Services["onboard"];
+  bucketService: Services["bucket"];
+  mlService: Services["ml"];
   sessionManager: Services["session"];
   queues: Queue;
   assert: Assertions;
   plugins: Plugins;
   rateLimiteManager: RateLimiterManager;
   minio: Minio.Client;
-  bucketService: Services["bucket"];
 };
 
 export class AppContext {
@@ -49,10 +50,12 @@ export class AppContext {
   public logger: typeof logger;
   public environment: Environment;
   public cache: Cache;
-  public jwtService: Services["jwt"];
-  public repositories: Repositories;
   public mailer: Mailer;
+  public repositories: Repositories;
+  public jwtService: Services["jwt"];
   public cryptoService: Services["crypto"];
+  public bucketService: Services["bucket"];
+  public mlService: Services["ml"];
   public queues: Queue;
   public assert: Assertions;
   public sessionManager: Services["session"];
@@ -60,7 +63,6 @@ export class AppContext {
   public rateLimiteManager: RateLimiterManager;
   public minio: Minio.Client;
   public onboardService: Services["onboard"];
-  public bucketService: Services["bucket"];
 
   constructor(opts: AppContextOptions) {
     this.config = opts.config;
@@ -73,14 +75,15 @@ export class AppContext {
     this.repositories = opts.repositories;
     this.mailer = opts.mailer;
     this.cryptoService = opts.cryptoService;
+    this.onboardService = opts.onboardService;
+    this.bucketService = opts.bucketService;
+    this.mlService = opts.mlService;
     this.queues = opts.queues;
     this.assert = opts.assert;
     this.sessionManager = opts.sessionManager;
     this.plugins = opts.plugins;
     this.rateLimiteManager = opts.rateLimiteManager;
     this.minio = opts.minio;
-    this.onboardService = opts.onboardService;
-    this.bucketService = opts.bucketService;
 
     this.logger.info(`[${yellow("AppContext")}] dependencies initialized`);
   }
@@ -145,6 +148,7 @@ export class AppContext {
       assert,
       bucketService
     });
+    const mlService = new Services.MLService("http://localhost:5003"); // TODO: Move to env
     const ctx = new AppContext({
       config: cfg,
       secrets,
@@ -160,6 +164,7 @@ export class AppContext {
       rateLimiteManager,
       onboardService,
       bucketService,
+      mlService,
       repositories: {
         user: userRepository,
         factor: factorRepository,

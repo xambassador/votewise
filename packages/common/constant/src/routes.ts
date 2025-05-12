@@ -42,6 +42,9 @@ export const user = {
     usernameExists: (base: string) => base + "/users/:username/exists",
     me: {
       get: (base: string) => base + "/me"
+    },
+    recommendations: {
+      get: (base: string) => base + "/users/recommendations"
     }
   },
   runtime: {
@@ -54,6 +57,9 @@ export const user = {
     usernameExists: (base: string, username: string) => base + `/users/${username}/exists`,
     me: {
       get: (base: string) => base + "/me"
+    },
+    recommendations: {
+      get: (base: string) => base + "/users/recommendations"
     }
   }
 };

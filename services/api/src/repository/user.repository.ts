@@ -60,5 +60,22 @@ export class UserRepository extends BaseRepository {
     });
   }
 
+  public findManyByIds(ids: string[]) {
+    return this.execute(async () => {
+      const users = await this.db.user.findMany({
+        where: { id: { in: ids } },
+        select: {
+          id: true,
+          user_name: true,
+          first_name: true,
+          last_name: true,
+          avatar_url: true,
+          about: true
+        }
+      });
+      return users;
+    });
+  }
+
   delete() {}
 }
