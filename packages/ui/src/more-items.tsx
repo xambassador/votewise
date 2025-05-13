@@ -14,7 +14,7 @@ export function MoreItemsWithSummary(props: UserAvatarsSummaryProps) {
       <div className="flex -space-x-4">
         {avatars.map((item) => (
           <Avatar {...avatarProps} key={item.url} className={cn("bg-gray-500 size-6", avatarProps?.className)}>
-            <AvatarFallback>JD</AvatarFallback>
+            <AvatarFallback name={item.name} />
             <AvatarImage src={item.url} alt={item.name} />
           </Avatar>
         ))}

@@ -22,7 +22,7 @@ export function RecommendedUserCardHeader(props: React.HTMLAttributes<HTMLDivEle
   const { className, children, ...rest } = props;
   useProvider("RecommendedUserCardHeader");
   return (
-    <div {...rest} className={cn("flex gap-1", className)}>
+    <div {...rest} className={cn("flex gap-1 flex-wrap", className)}>
       {children}
     </div>
   );

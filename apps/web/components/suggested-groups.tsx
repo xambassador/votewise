@@ -48,7 +48,7 @@ export function SuggestedGroups() {
             <SuggestedGroupCard.Header>
               <div className="flex-1 flex gap-1">
                 <Avatar className="rounded size-10">
-                  <AvatarFallback>JD</AvatarFallback>
+                  <AvatarFallback name={group.user.name} />
                   <AvatarImage src={group.user.avatar} alt={group.user.name} />
                 </Avatar>
                 <div className="flex flex-col">

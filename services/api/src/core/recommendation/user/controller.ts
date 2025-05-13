@@ -24,7 +24,9 @@ export class Controller {
     const locals = getAuthenticateLocals(res);
     const recommendationResult = await this.ctx.mlService.getUserRecommendations({ user_id: locals.payload.sub });
     if (!recommendationResult.success) {
-      return this.ctx.assert.internalServer(!recommendationResult.success, "Failed to get user recommendations");
+      this.ctx.assert.internalServer(!recommendationResult.success, "Failed to get user recommendations");
+      // This is just to make typescript happy. I dont have idea about how to type `assert` correctly
+      throw new Error("Failed to get user recommendations");
     }
     const recommendations = recommendationResult.data.recommended_users;
     if (!recommendations || !recommendations.length) {
@@ -38,9 +40,10 @@ export class Controller {
         first_name: u.first_name,
         last_name: u.last_name,
         about: u.about,
-        avatar_url: ""
+        avatar_url: "",
+        user_name: u.user_name
       };
-      return new Promise((resolve) => {
+      return new Promise<typeof user>((resolve) => {
         this.ctx.bucketService
           .getUrlForType(u.avatar_url || "", "avatar")
           .then((url) => {
@@ -55,7 +58,7 @@ export class Controller {
     });
     const users = await Promise.all(usersPromises);
     const result = { users };
-    return res.status(StatusCodes.OK).json({ users }) as Response<typeof result>;
+    return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 }
 

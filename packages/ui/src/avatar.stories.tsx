@@ -13,7 +13,7 @@ const meta = {
   render: (args) => (
     <Avatar {...args}>
       <AvatarImage src="https://avatars.githubusercontent.com/u/14010357?v=4" />
-      <AvatarFallback>JD</AvatarFallback>
+      <AvatarFallback name="John doe" />
     </Avatar>
   )
 } satisfies Meta<typeof Avatar>;
@@ -28,7 +28,7 @@ export const WithFallback: Story = {
   render: (args) => (
     <Avatar {...args}>
       <AvatarImage src="https://notfound.com" />
-      <AvatarFallback>JD</AvatarFallback>
+      <AvatarFallback name="John doe" />
     </Avatar>
   )
 };
