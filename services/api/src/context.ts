@@ -112,6 +112,7 @@ export class AppContext {
     const timelineRepository = new Repositories.TimelineRepository({ db });
     const feedAssetRepository = new Repositories.FeedAssetRepository({ db });
     const postTopicRepository = new Repositories.PostTopicRepository({ db });
+    const groupRepository = new Repositories.GroupRepository({ db });
     const mailer = new Mailer({ env: environment });
     const tasksQueue = new TasksQueue({ env: environment });
     const uploadQueue = new UploadQueue({ env: environment });
@@ -177,7 +178,8 @@ export class AppContext {
         follow: followRepository,
         timeline: timelineRepository,
         feedAsset: feedAssetRepository,
-        postTopic: postTopicRepository
+        postTopic: postTopicRepository,
+        group: groupRepository
       },
       queues: { tasksQueue, uploadQueue },
       plugins: { requestParser, jwt: jwtPlugin },

@@ -15,6 +15,7 @@ import { singinControllerFactory } from "./auth/signin";
 import { verifyControllerFactory } from "./auth/verify";
 import { createFeedControllerFactory } from "./feed/create";
 import { getAllFeedControllerFactory } from "./feed/get-all";
+import { getGroupRecommendationsControllerFactory } from "./recommendation/group";
 import { getRecommendateUserControllerFactory } from "./recommendation/user";
 import { getAllTopicsControllerFactory } from "./topics/get-all";
 import { getUsernameExistsControllerFactory } from "./user/exists";
@@ -53,6 +54,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.get(user.paths.usernameExists(path), ...getUsernameExistsControllerFactory());
   router.get(user.paths.me.get(path), ...getMeControllerFactory());
   router.get(user.paths.recommendations.get(path), ...getRecommendateUserControllerFactory());
+  router.get(user.paths.recommendations.getGroupRecommendations(path), ...getGroupRecommendationsControllerFactory());
   router.get(topics.paths.all(path), ...getAllTopicsControllerFactory());
   router.post(feeds.paths.create(path), ...createFeedControllerFactory());
   router.get(feeds.paths.all(path), ...getAllFeedControllerFactory());
