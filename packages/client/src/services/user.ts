@@ -1,4 +1,9 @@
-import type { GetMeResponse, GetUserRecommendationsResponse, UsernameExistsResponse } from "@votewise/api";
+import type {
+  GetGroupRecommendationsResponse,
+  GetMeResponse,
+  GetUserRecommendationsResponse,
+  UsernameExistsResponse
+} from "@votewise/api";
 import type { Client } from "../client";
 import type { Client as ServerClient } from "../server";
 
@@ -30,6 +35,12 @@ export class User {
   public async getRecommendateUsers() {
     const path = user.runtime.recommendations.get("");
     const res = await this.client.get<GetUserRecommendationsResponse>(path);
+    return res;
+  }
+
+  public async getRecommendateGroups() {
+    const path = user.runtime.recommendations.getGroupRecommendations("");
+    const res = await this.client.get<GetGroupRecommendationsResponse>(path);
     return res;
   }
 }

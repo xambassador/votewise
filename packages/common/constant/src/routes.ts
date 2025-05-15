@@ -44,7 +44,8 @@ export const user = {
       get: (base: string) => base + "/me"
     },
     recommendations: {
-      get: (base: string) => base + "/users/recommendations"
+      get: (base: string) => base + "/users/recommendations",
+      getGroupRecommendations: (base: string) => base + "/users/recommendations/groups"
     }
   },
   runtime: {
@@ -59,7 +60,8 @@ export const user = {
       get: (base: string) => base + "/me"
     },
     recommendations: {
-      get: (base: string) => base + "/users/recommendations"
+      get: (base: string) => base + "/users/recommendations",
+      getGroupRecommendations: (base: string) => base + "/users/recommendations/groups"
     }
   }
 };
