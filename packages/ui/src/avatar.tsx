@@ -6,12 +6,16 @@ import * as AvatarPrimitive from "@radix-ui/react-avatar";
 import { cn } from "./cn";
 
 type AvatarRef = React.ElementRef<typeof AvatarPrimitive.Root>;
-export type AvatarProps = React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>;
+export type AvatarProps = React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root> & { isOnline?: boolean };
 
-export const Avatar = forwardRef<AvatarRef, AvatarProps>(({ className, ...props }, ref) => (
+export const Avatar = forwardRef<AvatarRef, AvatarProps>(({ className, isOnline, ...props }, ref) => (
   <AvatarPrimitive.Root
     ref={ref}
-    className={cn("relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-red-200", className)}
+    className={cn(
+      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-red-200 bg-nobelBlack-100",
+      isOnline && "border-green-600",
+      className
+    )}
     {...props}
   />
 ));

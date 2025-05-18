@@ -5,8 +5,8 @@ import type { StateSnapshot, VirtuosoHandle } from "react-virtuoso";
 
 import styles from "./feed-list.module.css";
 
-import { useRef, useState } from "react";
-import dayjs from "dayjs";
+import { useRef } from "react";
+import dayjs, { extend } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Virtuoso } from "react-virtuoso";
 
@@ -19,19 +19,23 @@ import {
   FeedContentTags,
   FeedContentText,
   FeedFooter,
+  FeedFooterActions,
   FeedFooterItem,
   FeedHeader,
-  FeedImages,
   FeedTimeAgo,
-  FeedUserName
+  FeedUserName,
+  VoteContainer,
+  VoteCount,
+  VoteLabel,
+  Voters,
+  VotersCount,
+  VotersStack
 } from "@votewise/ui/cards/feed";
-import { Confetti } from "@votewise/ui/confetti";
 import { Comment } from "@votewise/ui/icons/comment";
 import { PaperPlane } from "@votewise/ui/icons/paper-plane";
 import { Separator } from "@votewise/ui/separator";
-import { VoteButton, VoteCount, VoteProvider } from "@votewise/ui/vote-button";
 
-dayjs.extend(relativeTime);
+extend(relativeTime);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let virtuosoState: any = { ranges: [], screenTop: 0 };
@@ -72,17 +76,13 @@ export function FeedList(props: { feeds: GetAllFeedsResponse }) {
 
 function FeedItem(props: { feed: GetAllFeedsResponse["feeds"][0] }) {
   const { feed } = props;
-
-  const [isVoted, setIsVoted] = useState(false);
-
   return (
     <Feed>
-      <VoteProvider>
-        <VoteCount />
-        {isVoted && <Confetti amount={30} />}
-        <VoteButton onClick={() => setIsVoted(true)}>Vote</VoteButton>
-      </VoteProvider>
-      <Separator orientation="vertical" className="min-h-[200px] h-auto" />
+      <VoteContainer>
+        <VoteCount>{feed.votes}</VoteCount>
+        <VoteLabel>Votes</VoteLabel>
+      </VoteContainer>
+      <Separator orientation="vertical" className="h-auto" />
       <FeedContainer>
         <div className="flex gap-2">
           <Avatar className="size-12">
@@ -94,25 +94,37 @@ function FeedItem(props: { feed: GetAllFeedsResponse["feeds"][0] }) {
               <FeedUserName>{feed.author.first_name + " " + feed.author.last_name}</FeedUserName>
               <FeedTimeAgo>{dayjs(feed.created_at).fromNow()}</FeedTimeAgo>
             </FeedHeader>
-            <FeedContentText>{truncateOnWord(feed.content, 128)}</FeedContentText>
+            <FeedContentText>{truncateOnWord(feed.title, 128)}</FeedContentText>
             <FeedContentTags>
               {feed.hash_tags.map((tag) => (
                 <span key={tag.name}>#{tag.name}</span>
               ))}
             </FeedContentTags>
-            <FeedImages className="mt-2" images={feed.assets.map((asset) => asset.url)} />
           </FeedContent>
         </div>
 
         <FeedFooter>
-          <FeedFooterItem>
-            <Comment className="text-gray-400" />
-            <span className="text-gray-400 text-xs">3 discussions</span>
-          </FeedFooterItem>
-          <FeedFooterItem>
-            <PaperPlane className="text-gray-400" />
-            <span className="text-gray-400 text-xs">Share</span>
-          </FeedFooterItem>
+          <FeedFooterActions>
+            <FeedFooterItem>
+              <Comment className="text-gray-400" />
+              <span className="text-gray-400 text-xs">{feed.comments} Discussions</span>
+            </FeedFooterItem>
+            <FeedFooterItem>
+              <PaperPlane className="text-gray-400" />
+              <span className="text-gray-400 text-xs">Share</span>
+            </FeedFooterItem>
+          </FeedFooterActions>
+          <VotersStack>
+            <Voters>
+              {feed.voters.map((voter) => (
+                <Avatar className="size-6" key={voter.id}>
+                  <AvatarFallback name="Voter" />
+                  <AvatarImage src={voter.avatar_url || ""} alt={voter.id} />
+                </Avatar>
+              ))}
+            </Voters>
+            {feed.votes - feed.voters.length > 0 && <VotersCount>+{feed.votes - feed.voters.length}</VotersCount>}
+          </VotersStack>
         </FeedFooter>
       </FeedContainer>
     </Feed>
