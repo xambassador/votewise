@@ -27,7 +27,7 @@ export const PasswordInput = forwardRef<InputRef, PasswordInputProps>((props, re
   return (
     <InputField {...wrapperProps} hasError={hasError}>
       <Padlock className="text-gray-600" />
-      <Input {...inputProps} type={type} ref={ref} />
+      <Input autoComplete="current-password" {...inputProps} type={type} ref={ref} />
       <button type="button" className="absolute top-1/2 right-2 -translate-y-1/2" onClick={onToggle}>
         {showPassword && <EyeCross className="text-gray-600" />}
         {!showPassword && <Eye className="text-gray-600" />}

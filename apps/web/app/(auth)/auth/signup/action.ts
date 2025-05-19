@@ -3,6 +3,8 @@
 import type { ActionResponse } from "@votewise/types";
 import type { TSignUpForm } from "./_utils";
 
+import { obfuscateEmail } from "@votewise/text";
+
 import { getAuth } from "@/lib/client.server";
 import { COOKIE_KEYS, setCookie } from "@/lib/cookie";
 
@@ -23,7 +25,7 @@ export async function signup(data: TSignUpForm): Promise<ActionResponse<{ messag
   return {
     success: true,
     data: {
-      message: `Verification code sent to ${data.email}. Please check your email to verify your account.`
+      message: `Verification code sent to ${obfuscateEmail(data.email)}. Please check your email to verify your account.`
     }
   };
 }

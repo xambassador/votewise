@@ -18,7 +18,7 @@ export const EmailInput = forwardRef<InputRef, EmailInputProps>((props, ref) => 
   return (
     <InputField {...wrapperProps} hasError={hasError}>
       <Mail className="text-gray-600" />
-      <Input {...inputProps} type="email" ref={ref} />
+      <Input autoComplete="email" {...inputProps} type="email" ref={ref} />
     </InputField>
   );
 });
@@ -35,7 +35,7 @@ export const UsernameInput = forwardRef<InputRef, UsernameInputProps>((props, re
   return (
     <InputField {...wrapperProps} hasError={hasError}>
       <User className="text-gray-600" />
-      <Input type="email" ref={ref} {...inputProps} />
+      <Input autoComplete="email" type="email" ref={ref} {...inputProps} />
     </InputField>
   );
 });

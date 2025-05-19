@@ -87,7 +87,7 @@ async function UserProfile() {
     <div className="pl-2 pr-1">
       <Avatar>
         <AvatarFallback name={meResult.data.first_name + " " + meResult.data.last_name} />
-        <AvatarImage src={meResult.data.avatar_url} alt={meResult.data.first_name} />
+        <AvatarImage className="object-cover" src={meResult.data.avatar_url} alt={meResult.data.first_name} />
       </Avatar>
     </div>
   );
