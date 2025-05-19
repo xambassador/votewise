@@ -37,7 +37,6 @@ export class TimelineRepository extends BaseRepository {
               id: true,
               slug: true,
               title: true,
-              content: true,
               created_at: true,
               updated_at: true,
               hashTags: {
@@ -52,10 +51,14 @@ export class TimelineRepository extends BaseRepository {
                   avatar_url: true
                 }
               },
-              assets: {
+              upvotes: {
+                select: { user: { select: { id: true, avatar_url: true } } },
+                take: 5
+              },
+              _count: {
                 select: {
-                  url: true,
-                  type: true
+                  upvotes: true,
+                  comments: true
                 }
               }
             }

@@ -8,7 +8,7 @@ export function Feed(props: FeedProps) {
     <div
       {...props}
       className={cn(
-        "p-4 rounded-xl bg-nobelBlack-100 border border-nobelBlack-200 flex items-stretch gap-6 max-w-[calc((600/16)*1rem)] min-h-[calc((200/16)*1rem)] max-h-[calc((400/16)*1rem)]",
+        "p-4 rounded-xl bg-nobelBlack-100 border border-nobelBlack-200 flex items-stretch gap-6 max-w-[calc((600/16)*1rem)]",
         props.className
       )}
     />
@@ -19,7 +19,7 @@ export type FeedContainerProps = React.HTMLAttributes<HTMLDivElement>;
 export function FeedContainer(props: FeedContainerProps) {
   const { children, className, ...rest } = props;
   return (
-    <div {...rest} className={cn("flex flex-col gap-6", className)}>
+    <div {...rest} className={cn("flex flex-col gap-6 w-full", className)}>
       {children}
     </div>
   );
@@ -79,7 +79,7 @@ export type FeedContentTextProps = React.HTMLAttributes<HTMLParagraphElement>;
 export function FeedContentText(props: FeedContentTextProps) {
   const { children, className, ...rest } = props;
   return (
-    <p {...rest} className={cn("text-base text-gray-300 font-normal", className)}>
+    <p {...rest} className={cn("text-xl font-medium text-gray-300", className)}>
       {children}
     </p>
   );
@@ -99,10 +99,14 @@ export type FeedFooterProps = React.HTMLAttributes<HTMLDivElement>;
 export function FeedFooter(props: FeedFooterProps) {
   const { children, className, ...rest } = props;
   return (
-    <div {...rest} className={cn("flex items-center gap-5", className)}>
+    <div {...rest} className={cn("flex items-center justify-between w-full", className)}>
       {children}
     </div>
   );
+}
+
+export function FeedFooterActions(props: React.HTMLAttributes<HTMLDivElement>) {
+  return <div {...props} className={cn("flex items-center gap-5", props.className)} />;
 }
 
 export function FeedFooterItem(props: React.HTMLAttributes<HTMLDivElement>) {
@@ -135,4 +139,57 @@ export function FeedImages(props: React.HTMLAttributes<HTMLDivElement> & { image
       )}
     </div>
   );
+}
+
+export function VoteContainer(props: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      {...props}
+      className={cn(
+        "flex flex-col gap-3 items-center justify-center max-w-[calc((82/16)*1rem)] min-w-[calc((82/16)*1rem)]",
+        props.className
+      )}
+    />
+  );
+}
+
+export type VoteCountProps = React.HTMLAttributes<HTMLSpanElement> & { isVoted?: boolean };
+export function VoteCount(props: VoteCountProps) {
+  const { isVoted, ...rest } = props;
+  return (
+    <span
+      {...rest}
+      className={cn(
+        "size-8 rounded-lg bg-nobelBlack-100 border border-nobelBlack-200 text-sm text-blue-100 flex items-center justify-center",
+        isVoted && "border-green-600 text-green-100",
+        rest.className
+      )}
+    />
+  );
+}
+
+export function VoteLabel(props: React.HTMLAttributes<HTMLSpanElement> & { isVoted?: boolean }) {
+  const { isVoted, ...rest } = props;
+  return (
+    <span
+      {...rest}
+      className={cn(
+        "text-sm",
+        isVoted ? "text-transparent bg-clip-text bg-gradient-to-r from-[#B1D766] to-[#F15DD6]" : "text-gray-200",
+        rest.className
+      )}
+    />
+  );
+}
+
+export function VotersStack(props: React.HTMLAttributes<HTMLDivElement>) {
+  return <div {...props} className={cn("flex items-center gap-1 relative", props.className)} />;
+}
+
+export function Voters(props: React.HTMLAttributes<HTMLDivElement>) {
+  return <div {...props} className={cn("flex items-center -space-x-3", props.className)} />;
+}
+
+export function VotersCount(props: React.HTMLAttributes<HTMLSpanElement>) {
+  return <span {...props} className="text-xs text-gray-400" />;
 }

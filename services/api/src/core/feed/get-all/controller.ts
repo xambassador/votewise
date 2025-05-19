@@ -36,7 +36,6 @@ export class Controller {
         id: timeline.post.id,
         title: timeline.post.title,
         slug: timeline.post.slug,
-        content: timeline.post.content,
         created_at: timeline.post.created_at,
         updated_at: timeline.post.updated_at,
         hash_tags: timeline.post.hashTags.map((tag) => ({
@@ -49,9 +48,14 @@ export class Controller {
           last_name: timeline.post.author.last_name,
           avatar_url: ""
         },
-        assets: timeline.post.assets.map((asset) => ({ url: asset.url, type: asset.type }))
+        votes: timeline.post._count.upvotes,
+        voters: timeline.post.upvotes.map((vote) => ({
+          id: vote.user.id,
+          avatar_url: vote.user.avatar_url
+        })),
+        comments: timeline.post._count.comments
       };
-      return new Promise<typeof item>((resolve) => {
+      const authorAvatarPromise = new Promise<typeof item>((resolve) => {
         bucketService
           .getUrlForType(timeline.post.author.avatar_url ?? "", "avatar")
           .then((url) => {
@@ -62,6 +66,26 @@ export class Controller {
             item.author.avatar_url = timeline.post.author.avatar_url ?? "";
             resolve(item);
           });
+      });
+      const votersAvatarPromises = item.voters.map(
+        (vote) =>
+          new Promise<typeof item>((resolve) => {
+            bucketService
+              .getUrlForType(vote.avatar_url ?? "", "avatar")
+              .then((url) => {
+                vote.avatar_url = url;
+                resolve(item);
+              })
+              .catch(() => {
+                vote.avatar_url = vote.avatar_url ?? "";
+                resolve(item);
+              });
+          })
+      );
+      return new Promise<typeof item>((resolve) => {
+        Promise.all([authorAvatarPromise, ...votersAvatarPromises]).then(() => {
+          resolve(item);
+        });
       });
     });
     const feeds = await Promise.all(timelineFeedPromises);
