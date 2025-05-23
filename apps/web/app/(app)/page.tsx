@@ -1,40 +1,22 @@
 import { Suspense } from "react";
 
-import { Spinner } from "@votewise/ui/ring-spinner";
-
+import { Container } from "@/components/container";
 import { FlashProvider } from "@/components/flash-provider";
-import { NavTabs } from "@/components/nav-tabs";
+import { FeedTabs } from "@/components/nav-tabs";
 
-import { getFeedClient } from "@/lib/client.server";
-
+import { FeedFetcher } from "./_components/feed-fetcher";
 import { FeedList } from "./_components/feed-list";
+import Loading from "./loading";
 
-export default async function Home() {
+export default function Home() {
   return (
     <FlashProvider>
-      <div className="pb-5">
-        <NavTabs />
+      <FeedTabs />
+      <Container>
         <Suspense fallback={<Loading />}>
-          <RetrieveFeed />
+          <FeedFetcher>{(feeds) => <FeedList feeds={feeds} />}</FeedFetcher>
         </Suspense>
-      </div>
+      </Container>
     </FlashProvider>
   );
-}
-
-function Loading() {
-  return (
-    <div className="min-h-[calc(100vh-58px)] flex flex-col items-center justify-center">
-      <Spinner />
-    </div>
-  );
-}
-
-async function RetrieveFeed() {
-  const feed = getFeedClient();
-  const feedResult = await feed.get();
-  if (!feedResult.success) {
-    return <div>{feedResult.error}</div>;
-  }
-  return <FeedList feeds={feedResult.data} />;
 }

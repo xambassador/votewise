@@ -65,5 +65,64 @@ input[data-autocompleted] {
     --white-50: 0 0% 89.8%; /* hsla(0, 0%, 89.8%, 1) */
 
     --orange-50: 18 27% 49.4%; /* hsla(18, 27%, 49.4%, 1) */
+
+    --sidebar-max-width: calc((200 / 16) * 1rem);
+    --suggestions-panel-width: calc((270 / 16) * 1rem);
+    --container-max-width: calc((664 / 16) * 1rem);
+    --tab-container-height: calc((70 / 16) * 1rem);
+    --tab-container-bottom-margin: 1rem;
+    --feed-card-width: calc((600 / 16) * 1rem);
+    --content-height: calc(100vh - var(--tab-container-height) - var(--tab-container-bottom-margin));
+  }
+}
+
+@layer utilities {
+  .sidebar-max-width {
+    max-width: var(--sidebar-max-width);
+  }
+
+  .suggestions-panel-max-width {
+    max-width: var(--suggestions-panel-width);
+  }
+
+  .container-max-width {
+    max-width: var(--container-max-width);
+  }
+
+  .tab-container-height {
+    max-height: var(--tab-container-height);
+    height: var(--tab-container-height);
+  }
+
+  .tab-wrapper-width {
+    width: var(--feed-card-width);
+    max-width: var(--feed-card-width);
+  }
+
+  .feed-card-width {
+    max-width: var(--feed-card-width);
+  }
+
+  .center {
+    display: grid;
+    place-items: center;
+  }
+
+  .content-height {
+    min-height: var(--content-height);
+  }
+}
+
+@layer components {
+  .tab-container {
+    @apply bg-nobelBlack-50/70 tab-container-height sticky top-0 z-10 mb-[var(--tab-container-bottom-margin)] flex w-full flex-col justify-center backdrop-blur-lg;
+  }
+
+  .spinner-text {
+    @apply text-black-200 text-lg;
+  }
+
+  .spinner-with-text-wrapper {
+    @apply flex flex-col items-center gap-3;
   }
 }

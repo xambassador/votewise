@@ -8,7 +8,7 @@ export function Feed(props: FeedProps) {
     <div
       {...props}
       className={cn(
-        "p-4 rounded-xl bg-nobelBlack-100 border border-nobelBlack-200 flex items-stretch gap-6 max-w-[calc((600/16)*1rem)]",
+        "p-4 rounded-xl bg-nobelBlack-100 border border-nobelBlack-200 flex items-stretch gap-6 feed-card-width",
         props.className
       )}
     />

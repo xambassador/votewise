@@ -27,7 +27,7 @@ export default async function Layout(props: Props) {
   return (
     <div className="min-h-screen max-w-8xl mx-auto flex justify-between">
       <Sidebar />
-      <main className="flex-1 max-w-[calc((664/16)*1rem)] mx-auto pt-7 px-8">{props.children}</main>
+      <main className="flex-1">{props.children}</main>
       <SuggestionPanel />
     </div>
   );

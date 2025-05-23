@@ -4,37 +4,27 @@ import { truncateOnWord } from "@votewise/text";
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
 import * as SuggestedUserCard from "@votewise/ui/cards/suggested-user";
 import { ErrorBoundary } from "@votewise/ui/error-boundary";
-import { AlertCircleSolid } from "@votewise/ui/icons/alert-circle-solid";
 import { MoreItemsWithSummary } from "@votewise/ui/more-items";
-import { Spinner } from "@votewise/ui/ring-spinner";
 
 import { getUserClient } from "@/lib/client.server";
 
-const maxSuggestedUsers = 3;
-const fallbackSpinner = (
-  <div className="grid place-items-center h-24">
-    <Spinner className="size-8" />
-  </div>
-);
+import { ContentWrapper, ErrorMessage, fallbackSpinner, maxListItems, Title } from "./utils";
+
+const maxSuggestedUsers = maxListItems;
 const fallbackError = (
-  <div className="grid place-items-center h-24">
-    <div className="flex flex-col items-center gap-1">
-      <AlertCircleSolid className="text-red-500" />
-      <span className="text-sm text-red-500">Failed to load suggested users</span>
-    </div>
-  </div>
+  <ErrorMessage message=" Our AI tried to find your perfect matches but got distracted by cat videos instead." />
 );
 
 export function SuggestedUsers() {
   return (
-    <div className="flex flex-col gap-3 pb-4 border-b border-nobelBlack-200">
-      <span className="text-sm font-medium text-gray-300">Suggested Users</span>
+    <ContentWrapper>
+      <Title>Suggested Users</Title>
       <ErrorBoundary>
         <Suspense fallback={fallbackSpinner}>
           <SuggestedUsersList />
         </Suspense>
       </ErrorBoundary>
-    </div>
+    </ContentWrapper>
   );
 }
 

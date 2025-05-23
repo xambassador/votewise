@@ -51,10 +51,12 @@ export function Error(props: Props) {
             )}
           </div>
 
-          <Button onClick={resetErrorBoundary} className="w-full group">
-            <RotateRightIcon className="mr-2 group-hover:rotate-[-60deg] transition-transform group-hover:transition-transform group-active:rotate-0 duration-300 group-hover:duration-300" />
-            Try again
-          </Button>
+          {resetErrorBoundary && (
+            <Button onClick={resetErrorBoundary} className="w-full group">
+              <RotateRightIcon className="mr-2 group-hover:rotate-[-60deg] transition-transform group-hover:transition-transform group-active:rotate-0 duration-300 group-hover:duration-300" />
+              Try again
+            </Button>
+          )}
         </div>
       </div>
     </div>

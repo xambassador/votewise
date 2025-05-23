@@ -3,37 +3,27 @@ import { Suspense } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
 import * as SuggestedGroupCard from "@votewise/ui/cards/suggested-group";
 import { ErrorBoundary } from "@votewise/ui/error-boundary";
-import { AlertCircleSolid } from "@votewise/ui/icons/alert-circle-solid";
 import { MoreItemsWithSummary } from "@votewise/ui/more-items";
-import { Spinner } from "@votewise/ui/ring-spinner";
 
 import { getUserClient } from "@/lib/client.server";
 
-const maxSuggestedGroups = 3;
-const fallbackSpinner = (
-  <div className="grid place-items-center h-24">
-    <Spinner className="size-8" />
-  </div>
-);
+import { ContentWrapper, ErrorMessage, fallbackSpinner, maxListItems, Title, VerticalList } from "./utils";
+
+const maxSuggestedGroups = maxListItems;
 const fallbackError = (
-  <div className="grid place-items-center h-24">
-    <div className="flex flex-col items-center gap-1">
-      <AlertCircleSolid className="text-red-500" />
-      <span className="text-sm text-red-500">Failed to load suggested users</span>
-    </div>
-  </div>
+  <ErrorMessage message="Our suggestion engine ran out of gas somewhere between the server and your screen." />
 );
 
 export function SuggestedGroups() {
   return (
-    <div className="flex flex-col gap-3 pb-4 border-b border-nobelBlack-200">
-      <span className="text-sm font-medium text-gray-300">Suggested Groups</span>
+    <ContentWrapper>
+      <Title>Suggested Groups</Title>
       <ErrorBoundary>
         <Suspense fallback={fallbackSpinner}>
           <SuggestedGroupsList />
         </Suspense>
       </ErrorBoundary>
-    </div>
+    </ContentWrapper>
   );
 }
 
@@ -45,7 +35,7 @@ async function SuggestedGroupsList() {
   const suggestedGroups = result.data.groups.slice(0, maxSuggestedGroups);
   const remainingSuggestedGroups = result.data.groups.slice(maxSuggestedGroups);
   return (
-    <div className="flex flex-col gap-4">
+    <VerticalList>
       {suggestedGroups.map((group) => (
         <SuggestedGroupCard.SuggestedGroupCard key={group.id}>
           <SuggestedGroupCard.Header>
@@ -72,6 +62,6 @@ async function SuggestedGroupsList() {
         }))}
         avatarProps={{ className: "rounded" }}
       />
-    </div>
+    </VerticalList>
   );
 }

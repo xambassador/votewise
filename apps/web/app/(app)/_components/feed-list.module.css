@@ -1,7 +1,3 @@
-.virtual-feed-list {
-  @apply mt-5;
-}
-
 .virtual-feed-list > div > div {
   @apply flex flex-col gap-5;
 }
