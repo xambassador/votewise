@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
+import { getRandomImage } from "./_story-helpers";
 import { ImagePicker, ImagePickerButton, ImagePreview, ResetPreviewButton } from "./image-picker";
 
 const meta = {
@@ -7,9 +8,9 @@ const meta = {
   tags: ["autodocs"],
   component: ImagePicker,
   subcomponents: {
-    ImagePickerButton,
-    ImagePreview,
-    ResetPreviewButton
+    ImagePickerButton: ImagePickerButton as React.ComponentType<unknown>,
+    ImagePreview: ImagePreview as React.ComponentType<unknown>,
+    ResetPreviewButton: ResetPreviewButton as React.ComponentType<unknown>
   },
   args: {
     url: "",
@@ -32,9 +33,7 @@ type Story = StoryObj<typeof ImagePicker>;
 export const Default: Story = {};
 
 export const WithPreview: Story = {
-  args: {
-    url: "https://i.chzbgr.com/full/9112752128/h94C6655E/cute-cat-looking-at-the-camera-with-its-ears-hiding"
-  },
+  args: { url: getRandomImage().url },
   render: (args) => (
     <ImagePicker {...args}>
       <ImagePreview />
@@ -45,7 +44,7 @@ export const WithPreview: Story = {
 
 export const WithInitialLoading: Story = {
   args: {
-    url: "https://i.chzbgr.com/full/9112752128/h94C6655E/cute-cat-looking-at-the-camera-with-its-ears-hiding",
+    url: getRandomImage().url,
     spinner: true
   },
   render: (args) => (
@@ -58,7 +57,7 @@ export const WithInitialLoading: Story = {
 
 export const WithReset: Story = {
   args: {
-    url: "https://i.chzbgr.com/full/9112752128/h94C6655E/cute-cat-looking-at-the-camera-with-its-ears-hiding"
+    url: getRandomImage().url
   },
   render: (args) => (
     <ImagePicker {...args}>

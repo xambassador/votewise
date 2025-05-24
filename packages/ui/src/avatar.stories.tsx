@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
+import { getRandomImage } from "./_story-helpers";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 
 const meta = {
@@ -12,7 +13,7 @@ const meta = {
   args: {},
   render: (args) => (
     <Avatar {...args}>
-      <AvatarImage src="https://avatars.githubusercontent.com/u/14010357?v=4" />
+      <AvatarImage src={getRandomImage().url} />
       <AvatarFallback name="John doe" />
     </Avatar>
   )

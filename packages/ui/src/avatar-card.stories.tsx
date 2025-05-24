@@ -1,14 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
+import { getRandomImage } from "./_story-helpers";
 import { AvatarBackCards, AvatarCard, AvatarClearButton } from "./avatar-card";
 
 const meta = {
   title: "ui/AvatarCard",
   component: AvatarCard,
   tags: ["autodocs", "avatar"],
-  args: {
-    url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjSKoyOjhKTNOkbuXv8zhtxMwtpt39UaMmLA&s"
-  },
+  args: { url: getRandomImage().url },
   argTypes: {
     figureProps: { table: { disable: true } }
   },
@@ -22,9 +21,7 @@ type Story = StoryObj<typeof AvatarCard>;
 export const Default: Story = {};
 
 export const WithBackCards: Story = {
-  args: {
-    url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjSKoyOjhKTNOkbuXv8zhtxMwtpt39UaMmLA&s"
-  },
+  args: { url: getRandomImage().url },
   render: (args) => (
     <AvatarCard {...args}>
       <AvatarBackCards />
@@ -33,9 +30,7 @@ export const WithBackCards: Story = {
 };
 
 export const WithClearButton: Story = {
-  args: {
-    url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjSKoyOjhKTNOkbuXv8zhtxMwtpt39UaMmLA&s"
-  },
+  args: { url: getRandomImage().url },
   render: (args) => (
     <AvatarCard {...args}>
       <AvatarBackCards />

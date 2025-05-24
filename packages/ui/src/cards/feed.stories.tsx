@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
+import { getRandomImage } from "../_story-helpers";
 import { Avatar, AvatarFallback, AvatarImage } from "../avatar";
 import { Comment } from "../icons/comment";
 import { PaperPlane } from "../icons/paper-plane";
@@ -25,25 +26,25 @@ import {
 } from "./feed";
 
 const voters = [
-  { name: "John doe", url: "https://i.pinimg.com/736x/e3/24/f7/e324f790cfe0a51d76f98356475cc408.jpg", isOnline: true },
+  { name: "John doe", url: getRandomImage().url, isOnline: true },
   {
     name: "Tina methew",
-    url: "https://i.pinimg.com/736x/39/6d/f5/396df568a4325fe46c4a4801e198e7ef.jpg",
+    url: getRandomImage().url,
     isOnline: true
   },
   {
     name: "Alexander",
-    url: "https://assets.tiltify.com/uploads/media_type/image/203025/blob-09636982-a21a-494b-bbe4-3692c2720ae3.jpeg",
+    url: getRandomImage().url,
     isOnline: false
   },
   {
     name: "George Smith",
-    url: "https://i0.wp.com/katzenworld.co.uk/wp-content/uploads/2019/06/funny-cat.jpeg?fit=1020%2C1020&ssl=1",
+    url: getRandomImage().url,
     isOnline: false
   },
   {
     name: "Charlie Brown",
-    url: "https://media.istockphoto.com/id/1128004359/photo/close-up-scottish-fold-cat-head-with-shocking-face-and-wide-open-eyes-frighten-or-surprised.jpg?s=612x612&w=0&k=20&c=HglQ8Nf1PslTuI91T-dfhkln-iEbchjqfhGKCWTbaxg=",
+    url: getRandomImage().url,
     isOnline: true
   }
 ];
@@ -63,10 +64,7 @@ const meta = {
         <div className="flex gap-2">
           <Avatar className="size-12">
             <AvatarFallback name="John doe" />
-            <AvatarImage
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjSKoyOjhKTNOkbuXv8zhtxMwtpt39UaMmLA&s"
-              alt="John doe"
-            />
+            <AvatarImage src={getRandomImage().url} alt="John doe" />
           </Avatar>
           <FeedContent>
             <FeedHeader>
@@ -127,10 +125,7 @@ export const Voted: Story = {
         <div className="flex gap-2">
           <Avatar className="size-12">
             <AvatarFallback name="John doe" />
-            <AvatarImage
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjSKoyOjhKTNOkbuXv8zhtxMwtpt39UaMmLA&s"
-              alt="John doe"
-            />
+            <AvatarImage src={getRandomImage().url} alt="John doe" />
           </Avatar>
           <FeedContent>
             <FeedHeader>
