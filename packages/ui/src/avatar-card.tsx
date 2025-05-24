@@ -1,43 +1,15 @@
 import { cn } from "./cn";
 import { Cross } from "./icons/cross";
+import { ImageBackCards, ImageCard } from "./image-card";
 
-type Props = React.HTMLProps<HTMLDivElement> & {
-  url: string;
-  figureProps?: React.ComponentProps<"figure">;
-};
+type Props = React.ComponentProps<typeof ImageCard>;
 
 export function AvatarCard(props: Props) {
-  const { url, children, figureProps, ...rest } = props;
-  return (
-    <div
-      {...rest}
-      className={cn(
-        "relative max-w-[calc((200/16)*1rem)] flex items-center justify-center group cursor-pointer",
-        rest.className
-      )}
-    >
-      <figure
-        {...figureProps}
-        className={cn(
-          "relative z-[3] w-[calc((100/16)*1rem)] h-[calc((140/16)*1rem)] bg-nobelBlack-200 rounded-2xl border border-black-400 shadow-image-card p-3 group-hover:translate-y-[-5px] transition-transform duration-300",
-          figureProps?.className
-        )}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={url} alt="Avatar" className="size-full object-cover rounded-2xl" />
-      </figure>
-      {children}
-    </div>
-  );
+  return <ImageCard {...props} />;
 }
 
 export function AvatarBackCards() {
-  return (
-    <>
-      <div className="absolute z-[1] rotate-[15deg] top-[4px] left-[24px] w-[calc((100/16)*1rem)] h-[calc((140/16)*1rem)] bg-nobelBlack-100 rounded-2xl border border-black-400 shadow-image-card p-3 group-hover:rotate-[25deg] group-hover:translate-x-3 group-hover:border-blue-400 group-hover:bg-nobelBlack-50 transition-all duration-300" />
-      <div className="absolute z-[1] rotate-[-15deg] top-[4px] right-[24px] w-[calc((100/16)*1rem)] h-[calc((140/16)*1rem)] bg-nobelBlack-100 rounded-2xl border border-black-400 shadow-image-card p-3 group-hover:rotate-[-25deg] group-hover:-translate-x-3 group-hover:border-blue-400 group-hover:bg-nobelBlack-50 transition-all duration-300" />
-    </>
-  );
+  return <ImageBackCards />;
 }
 
 export function AvatarClearButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
