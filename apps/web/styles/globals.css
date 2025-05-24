@@ -73,6 +73,7 @@ input[data-autocompleted] {
     --tab-container-bottom-margin: 1rem;
     --feed-card-width: calc((600 / 16) * 1rem);
     --content-height: calc(100vh - var(--tab-container-height) - var(--tab-container-bottom-margin));
+    --create-post-modal-width: calc((600 / 16) * 1rem);
   }
 }
 

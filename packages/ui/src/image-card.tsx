@@ -1,4 +1,9 @@
+import type { VariantProps } from "class-variance-authority";
+
+import { cva } from "class-variance-authority";
+
 import { cn } from "./cn";
+import { Cross } from "./icons/cross";
 
 type Props = React.HTMLProps<HTMLDivElement> & {
   url: string;
@@ -39,9 +44,48 @@ export function ImageBackCards() {
   );
 }
 
+const clearButtonVariants = cva(
+  "absolute z-10 flex opacity-0 items-center justify-center p-1 rounded-full bg-nobelBlack-200 border border-black-400 group-hover:opacity-100 transition-[transform_,_opacity] duration-300 hover:scale-125 hover:rotate-180",
+  {
+    variants: {
+      variant: {
+        topLeft: "-top-1 -left-1",
+        topRight: "-top-1 right-1",
+        bottomLeft: "bottom-1 -left-1",
+        bottomRight: "bottom-1 right-1",
+        bottomCenter: "bottom-1 left-1/2 -translate-x-1/2 group-hover:translate-y-8",
+        topCenter: "-top-1 left-1/2 -translate-x-1/2 group-hover:-translate-y-8"
+      },
+      size: {
+        sm: "size-4",
+        md: "size-6",
+        lg: "size-8"
+      }
+    },
+    defaultVariants: {
+      variant: "bottomCenter",
+      size: "md"
+    }
+  }
+);
+
+export interface ClearButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof clearButtonVariants> {}
+
+export function ClearButton(props: ClearButtonProps) {
+  const { variant, className, size, ...rest } = props;
+  return (
+    <button {...rest} className={cn(clearButtonVariants({ variant, size, className }))}>
+      <Cross className="size-4" />
+    </button>
+  );
+}
+
+type Img = { url: string; alt?: string; id: string | number };
 type ZigZagListProps = React.HTMLProps<HTMLDivElement> & {
-  imageCardProps?: Omit<React.ComponentProps<typeof ImageCard>, "url">;
-  images: { url: string; alt?: string }[];
+  imageCardProps?: (props: { image: Img }) => Omit<React.ComponentProps<typeof ImageCard>, "url">;
+  images: Img[];
 };
 
 function getRotation(index: number) {
@@ -49,25 +93,28 @@ function getRotation(index: number) {
 }
 
 export function ZigZagList(props: ZigZagListProps) {
-  const { images, imageCardProps, ...rest } = props;
-
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error - I know url is omitted.. 😛
-  const { url: _omittedUrl, ...restProps } = imageCardProps || {};
-
+  const { images, imageCardProps, children, ...rest } = props;
   return (
     <div {...rest} className={cn("flex items-center -space-x-16", rest.className)}>
       {images.map((image, index) => (
         <ImageCard
-          {...restProps}
-          style={{
-            transform: `rotate(${getRotation(index)}deg)`,
-            ...imageCardProps?.style
-          }}
+          {...imageCardProps?.({ image })}
+          className={cn(
+            "peer rotate-[var(--rotate)] transition-all duration-300",
+            "hover:rotate-0 peer-hover:translate-x-[4rem] peer-hover:rotate-0",
+            imageCardProps?.({ image }).className
+          )}
+          style={
+            {
+              "--rotate": `${getRotation(index)}deg`,
+              ...(imageCardProps?.({ image }).style || {})
+            } as React.CSSProperties
+          }
           url={image.url}
           key={index}
         />
       ))}
+      {children}
     </div>
   );
 }

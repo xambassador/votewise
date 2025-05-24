@@ -1,12 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { getRandomImage, images } from "./_story-helpers";
-import { ImageBackCards, ImageCard, ZigZagList } from "./image-card";
+import { ClearButton, ImageBackCards, ImageCard, ZigZagList } from "./image-card";
 
 const meta = {
   title: "ui/ImageCard",
   component: ImageCard,
   tags: ["autodocs"],
+  subcomponents: {
+    ImageBackCards,
+    ClearButton: ClearButton as React.ComponentType<unknown>
+  },
   args: { url: getRandomImage().url },
   argTypes: {
     figureProps: { table: { disable: true } }
@@ -25,6 +29,15 @@ export const WithBackCards: Story = {
   render: (args) => (
     <ImageCard {...args}>
       <ImageBackCards />
+    </ImageCard>
+  )
+};
+
+export const WithClearButton: Story = {
+  args: { url: getRandomImage().url },
+  render: (args) => (
+    <ImageCard {...args}>
+      <ClearButton />
     </ImageCard>
   )
 };

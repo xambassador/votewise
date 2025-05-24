@@ -6,8 +6,12 @@ const meta = {
   title: "ui/FloatingCounter",
   tags: ["autodocs"],
   component: FloatingCounter,
-  args: {
-    children: "100"
+  args: { children: "100", variant: "center" },
+  argTypes: {
+    variant: {
+      control: { type: "select" },
+      options: ["topRight", "topLeft", "bottomRight", "bottomLeft", "leftCenter", "rightCenter", "center"]
+    }
   },
   render: (args) => <FloatingCounter {...args} />
 } satisfies Meta<typeof FloatingCounter>;

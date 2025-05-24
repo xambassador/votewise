@@ -45,4 +45,4 @@ export class User {
   }
 }
 
-export type { UsernameExistsResponse };
+export type { UsernameExistsResponse, GetMeResponse, GetUserRecommendationsResponse, GetGroupRecommendationsResponse };
