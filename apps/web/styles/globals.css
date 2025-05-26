@@ -79,38 +79,39 @@ input[data-autocompleted] {
 
 @layer utilities {
   .sidebar-max-width {
-    max-width: var(--sidebar-max-width);
+    @apply max-w-[var(--sidebar-max-width)];
   }
 
   .suggestions-panel-max-width {
-    max-width: var(--suggestions-panel-width);
+    @apply max-w-[var(--suggestions-panel-width)];
   }
 
   .container-max-width {
-    max-width: var(--container-max-width);
+    @apply max-w-[var(--container-max-width)];
   }
 
   .tab-container-height {
-    max-height: var(--tab-container-height);
-    height: var(--tab-container-height);
+    @apply h-[var(--tab-container-height)] max-h-[var(--tab-container-height)];
   }
 
   .tab-wrapper-width {
-    width: var(--feed-card-width);
-    max-width: var(--feed-card-width);
+    @apply w-[var(--feed-card-width)] max-w-[var(--feed-card-width)];
   }
 
   .feed-card-width {
-    max-width: var(--feed-card-width);
+    @apply min-w-[var(--feed-card-width)];
   }
 
   .center {
-    display: grid;
-    place-items: center;
+    @apply grid place-items-center;
   }
 
   .content-height {
-    min-height: var(--content-height);
+    @apply min-h-[var(--content-height)];
+  }
+
+  .at-max-viewport {
+    @apply max-h-screen min-h-screen;
   }
 }
 
