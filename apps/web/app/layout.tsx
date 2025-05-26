@@ -7,7 +7,7 @@ import { Toaster } from "@votewise/ui/toast";
 
 import "@/styles/globals.css";
 
-import Providers, { MotionProvider } from "@/components/providers";
+import Providers from "@/components/providers";
 
 /* ----------------------------------------------------------------------------------------------- */
 
@@ -30,9 +30,7 @@ export default function RootLayout(props: Props) {
     <html lang="en">
       <body className={poppins.className + " bg-nobelBlack-50 text-gray-200"}>
         <Toaster />
-        <Providers>
-          <MotionProvider>{props.children}</MotionProvider>
-        </Providers>
+        <Providers>{props.children}</Providers>
       </body>
     </html>
   );

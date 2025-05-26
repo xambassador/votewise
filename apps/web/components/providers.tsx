@@ -22,14 +22,11 @@ type Props = { children: React.ReactNode };
 export default function Providers(props: Props) {
   const { children } = props;
   const queryClient = getQueryClient();
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
-}
-
-export function MotionProvider(props: Props) {
-  const { children } = props;
   return (
-    <LazyMotion strict features={domAnimation}>
-      {children}
-    </LazyMotion>
+    <QueryClientProvider client={queryClient}>
+      <LazyMotion strict features={domAnimation}>
+        {children}
+      </LazyMotion>
+    </QueryClientProvider>
   );
 }
