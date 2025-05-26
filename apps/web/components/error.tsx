@@ -2,7 +2,7 @@
 
 import { Error } from "@votewise/ui/error";
 
-type Props = {
+export type Props = {
   error: Error & { digest?: string };
   reset?: () => void;
 };

@@ -4,10 +4,12 @@ import type { Props } from "@/components/error";
 
 import Error from "@/components/error";
 
+import { OnboardContainer } from "./container";
+
 export default function ErrorBoundary(props: Props) {
   return (
-    <div className="flex flex-col gap-10">
+    <OnboardContainer>
       <Error {...props} />
-    </div>
+    </OnboardContainer>
   );
 }
