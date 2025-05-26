@@ -5,12 +5,12 @@ import type { ActionResponse } from "@votewise/types";
 
 import { redirect } from "next/navigation";
 
-import { getMFA, getOnboard } from "@/lib/client.server";
+import { getMFAClient, getOnboardClient } from "@/lib/client.server";
 import { clearAllCookies, setFlashMessage } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
 export async function enrollMultiFactorAction(): Promise<ActionResponse<EnrollMFAResponse>> {
-  const mfa = getMFA();
+  const mfa = getMFAClient();
   const res = await mfa.enroll();
   if (!res.success) {
     return { success: false, error: res.error, errorData: res.errorData };
@@ -22,7 +22,7 @@ export async function verifyMultiFactorAction(
   factorId: string,
   otp: string
 ): Promise<ActionResponse<{ is_onboarded: boolean }>> {
-  const mfa = getMFA();
+  const mfa = getMFAClient();
   const challengeRes = await mfa.challenge(factorId);
   if (!challengeRes.success) {
     return { success: false, error: challengeRes.error, errorData: challengeRes.errorData };
@@ -32,7 +32,7 @@ export async function verifyMultiFactorAction(
     return { success: false, error: verifyRes.error, errorData: verifyRes.errorData };
   }
 
-  const onboard = getOnboard();
+  const onboard = getOnboardClient();
   const res = await onboard.onboard({ step: 7, has_setup_2fa: true });
   if (!res.success) {
     return { success: false, error: res.error, errorData: res.errorData };
@@ -44,7 +44,7 @@ export async function verifyMultiFactorAction(
 }
 
 export async function skipMultiFactorAction(): Promise<ActionResponse<{ is_onboarded: boolean }>> {
-  const onboard = getOnboard();
+  const onboard = getOnboardClient();
   const res = await onboard.onboard({ step: 7, has_setup_2fa: false });
   if (!res.success) {
     return { success: false, error: res.error, errorData: res.errorData };

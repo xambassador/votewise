@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { obfuscateEmail } from "@votewise/text";
 
-import { getAuth } from "@/lib/client.server";
+import { getAuthClient } from "@/lib/client.server";
 import { COOKIE_KEYS, getCookie } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
@@ -16,7 +16,7 @@ export default async function Page() {
     return redirect(routes.auth.logout());
   }
 
-  const auth = getAuth();
+  const auth = getAuthClient();
   const verificationResponse = await auth.getVerificationSession(email);
 
   if (!verificationResponse.success) {

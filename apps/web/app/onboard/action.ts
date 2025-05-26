@@ -6,14 +6,14 @@ import type { ActionResponse } from "@votewise/types";
 import { redirect } from "next/navigation";
 
 import { isAuthorized } from "@/lib/auth";
-import { getOnboard } from "@/lib/client.server";
+import { getOnboardClient } from "@/lib/client.server";
 import { routes } from "@/lib/routes";
 
 type OnboardResponse = { is_onboarded: boolean } & TOnboard;
 
 export async function onboard(props: TOnboard & { isDirty: boolean }): Promise<ActionResponse<OnboardResponse>> {
   isAuthorized<true>({ redirect: true });
-  const onboardClient = getOnboard();
+  const onboardClient = getOnboardClient();
   const { isDirty } = props;
 
   if (props.step === 1) {

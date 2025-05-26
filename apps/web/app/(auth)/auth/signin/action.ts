@@ -8,12 +8,12 @@ import { redirect } from "next/navigation";
 
 import { ERROR_CODES } from "@votewise/constant";
 
-import { getAuth } from "@/lib/client.server";
+import { getAuthClient } from "@/lib/client.server";
 import { COOKIE_KEYS, forwardCookie, setCookie, setFlashMessage } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
 export async function signin(data: TSinginForm, redirectTo?: string | null): Promise<ActionResponse<SigninResponse>> {
-  const auth = getAuth();
+  const auth = getAuthClient();
   const res = await auth.signin({ email: data.username, password: data.password, username: data.username });
 
   if (!res.success && res.errorData.error_code && res.errorData.error_code === ERROR_CODES.AUTH.EMAIL_NOT_VERIFIED) {

@@ -6,7 +6,7 @@ import type { ActionResponse } from "@votewise/types";
 import { redirect } from "next/navigation";
 
 import { isAuthorized } from "@/lib/auth";
-import { getAuth } from "@/lib/client.server";
+import { getAuthClient } from "@/lib/client.server";
 import { clearCookie, COOKIE_KEYS, forwardCookie, getCookie } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
@@ -20,7 +20,7 @@ export async function verifyFactor(code: string): Promise<ActionResponse<VerifyM
     return redirect(routes.auth.logout());
   }
 
-  const authClient = getAuth();
+  const authClient = getAuthClient();
   const res = await authClient.verifyFactor({ code, challenge_id: challengeId, factorId });
   if (!res.success) return { success: false, error: res.error, errorData: res.errorData };
 

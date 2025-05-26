@@ -3,7 +3,7 @@ import type { Me } from "@/types";
 import { redirect } from "next/navigation";
 
 import { isAuthorized } from "@/lib/auth";
-import { getOnboard, getUserClient } from "@/lib/client.server";
+import { getOnboardClient, getUserClient } from "@/lib/client.server";
 import { routes } from "@/lib/routes";
 
 type Props = {
@@ -17,7 +17,7 @@ export async function AuthenticatedLayout(props: Props) {
     return redirect(routes.auth.verify2FA());
   }
 
-  const onboard = getOnboard();
+  const onboard = getOnboardClient();
   const onboardedResult = await onboard.isOnboarded();
   if (!onboardedResult.success) {
     throw new Error(onboardedResult.error);

@@ -5,11 +5,11 @@ import type { TSignUpForm } from "./_utils";
 
 import { obfuscateEmail } from "@votewise/text";
 
-import { getAuth } from "@/lib/client.server";
+import { getAuthClient } from "@/lib/client.server";
 import { COOKIE_KEYS, setCookie } from "@/lib/cookie";
 
 export async function signup(data: TSignUpForm): Promise<ActionResponse<{ message: string }>> {
-  const auth = getAuth();
+  const auth = getAuthClient();
   const response = await auth.signup(data);
 
   if (!response.success) {

@@ -27,17 +27,17 @@ export function getClient() {
   });
 }
 
-export function getAuth() {
+export function getAuthClient() {
   const client = getClient();
   return new Auth({ client });
 }
 
-export function getOnboard() {
+export function getOnboardClient() {
   const client = getClient();
   return new Onboard({ client });
 }
 
-export function getMFA() {
+export function getMFAClient() {
   const client = getClient();
   return new MFA({ client });
 }

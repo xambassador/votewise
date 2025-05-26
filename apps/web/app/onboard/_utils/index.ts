@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { ZOnboard } from "@votewise/schemas/onboard";
 
 import { isAuthorized } from "@/lib/auth";
-import { getOnboard } from "@/lib/client.server";
+import { getOnboardClient } from "@/lib/client.server";
 import { getUser } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
@@ -13,7 +13,7 @@ export async function shouldNotOnboarded() {
   isAuthorized<true>({ redirect: true });
   const user = getUser();
   if (!user) throw new Error("User not found");
-  const onboard = getOnboard();
+  const onboard = getOnboardClient();
   const res = await onboard.isOnboarded();
   if (!res.success) throw new Error(res.error);
   if (res.data.is_onboarded) {
