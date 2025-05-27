@@ -33,7 +33,7 @@
     "seed:sync": "npx @snaplet/seed sync",
     "clean": "rimraf --glob ./dist ./zod ./node_modules",
     "clean:build": "rm -rf dist",
-    "dev": "rm -rf dist && tsup",
+    "dev": "tsup",
     "build": "rm -rf ./dist && tsup"
   },
   "devDependencies": {

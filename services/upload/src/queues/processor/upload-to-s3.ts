@@ -23,20 +23,27 @@ export class UploadToS3Processor implements ITaskWorker {
     const filePath = this.opts.getBlobPath(fileName, fileToken);
     this.opts.logger.info(`Uploading file to S3: ${path}`);
     const fileStream = fs.createReadStream(filePath);
-    fs.stat(filePath, (err) => {
-      if (err) {
-        this.opts.logger.error(`File not found: ${filePath}`);
-        // We should not retry the job since the file is not found and it will never succeed
-        return;
-      }
 
-      this.opts.minio.putObject(this.opts.uploadBucket, path, fileStream).catch((err) => {
-        this.opts.logger.error(`Error uploading file to S3: ${err.message}`);
-        throw err;
-      });
-    });
     fileStream.on("error", (err) => {
       this.opts.logger.error(`Error reading file: ${filePath}, error: ${err.message}`);
+    });
+
+    return new Promise<void>((resolve, reject) => {
+      fs.stat(filePath, (err) => {
+        if (err) {
+          this.opts.logger.error(`File not found: ${filePath}`);
+          // We should not retry the job since the file is not found and it will never succeed
+          return;
+        }
+
+        this.opts.minio
+          .putObject(this.opts.uploadBucket, path, fileStream)
+          .then(() => resolve())
+          .catch((err) => {
+            this.opts.logger.error(`Error uploading file to S3: ${err.message}`);
+            reject(err);
+          });
+      });
     });
   }
 }

@@ -43,7 +43,7 @@
     }
   },
   "scripts": {
-    "dev": "rm -rf dist && tsup --watch",
+    "dev": "tsup --watch",
     "build": "tsup",
     "clean:build": "rm -rf dist",
     "clean": "rm -rf dist node_modules"

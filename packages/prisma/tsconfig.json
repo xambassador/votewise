@@ -11,5 +11,5 @@
     "incremental": false
   },
   "include": ["**/*.ts", "**/*.d.ts"],
-  "exclude": ["./seed.ts", "./seed.config.ts"]
+  "exclude": ["./seed.ts", "./seed.config.ts", "./dist/**/*"]
 }
