@@ -6,12 +6,13 @@ import { isAuthorized } from "@/lib/auth";
 import { getOnboardClient, getUserClient } from "@/lib/client.server";
 import { routes } from "@/lib/routes";
 
-type Props = {
-  children: (props: { user: Me }) => React.ReactNode;
+import { UserProvider } from "./user-provider";
+
+export type AuthorizedProps = {
+  children: React.ReactNode | ((props: { user: Me }) => React.ReactNode);
 };
 
-export async function AuthenticatedLayout(props: Props) {
-  const { children } = props;
+export async function Authorized(props: AuthorizedProps) {
   const user = isAuthorized<true>({ redirect: true });
   if (user.aal !== user.user_aal_level) {
     return redirect(routes.auth.verify2FA());
@@ -31,5 +32,14 @@ export async function AuthenticatedLayout(props: Props) {
   if (!res.success) throw new Error(res.error);
   const me = res.data;
 
-  return <>{children({ user: me })}</>;
+  if (typeof props.children === "function") {
+    return <UserProvider user={me}>{props.children({ user: me })}</UserProvider>;
+  }
+  return <UserProvider user={me}>{props.children}</UserProvider>;
+}
+
+export function Unauthorized(props: React.PropsWithChildren) {
+  const user = isAuthorized();
+  if (user) return redirect(routes.app.root());
+  return <>{props.children}</>;
 }
