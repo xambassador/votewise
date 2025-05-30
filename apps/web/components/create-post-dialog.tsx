@@ -60,7 +60,7 @@ function UserProfile() {
   return (
     <Avatar className="size-12">
       <AvatarFallback name={first_name + " " + last_name} />
-      <AvatarImage src={avatar_url} alt={first_name + " " + last_name} />
+      <AvatarImage src={avatar_url} alt={first_name + " " + last_name} className="object-cover" />
     </Avatar>
   );
 }
@@ -113,6 +113,8 @@ function ProgressTracker() {
 
 function AssetPicker() {
   const setFilesToAtom = useSetAtom(filesAtom);
+  const files = useAtomValue(filesAtom);
+
   return (
     <label
       className="flex items-center gap-2 text-black-300 cursor-pointer"
@@ -129,15 +131,15 @@ function AssetPicker() {
         multiple
         id="asset-picker"
         onChange={(e) => {
-          const files = e.target.files;
-          if (files) {
-            const fileArray = Array.from(files).map((file, index) => ({
-              file,
-              preview: URL.createObjectURL(file),
-              id: `${file.name}-${index}-${Date.now()}`
-            }));
-            setFilesToAtom(fileArray);
-          }
+          const selectedFiles = e.target.files;
+          if (!selectedFiles || !selectedFiles.length) return;
+          const fileArray = Array.from(selectedFiles).map((file, index) => ({
+            file,
+            preview: URL.createObjectURL(file),
+            id: `${file.name}-${index}-${Date.now()}`
+          }));
+          setFilesToAtom([...files, ...fileArray]);
+          e.target.value = "";
         }}
       />
     </label>
@@ -171,7 +173,7 @@ function Assets() {
       {remainingFiles > 0 && (
         <FloatingCounter
           variant="rightCenter"
-          className="-right-5 peer-hover:opacity-0 transition-opacity duration-300"
+          className="-right-5 peer-hover:opacity-0 peer-hover:delay-0 transition-opacity peer-hover:duration-100 duration-300 delay-300"
         >
           {remainingFiles}
         </FloatingCounter>
