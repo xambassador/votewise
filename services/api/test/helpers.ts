@@ -107,4 +107,19 @@ export function buildAccessToken(data: Partial<AccessTokenPayload>): AccessToken
   };
 }
 
+export function getLocals() {
+  const ip = "192.34.24.45";
+  const userId = "user-id";
+  const accessTokenPayload = buildAccessToken({ sub: userId });
+  const session = {
+    ip,
+    userAgent: "user-agent",
+    aal: "aal1"
+  };
+  const body = { code: "123456", challenge_id: "challenge-id" };
+  const locals = { meta: { ip }, payload: accessTokenPayload, session };
+  const user = buildUser({ id: userId, is_onboarded: false });
+  return { locals, body, ip, user };
+}
+
 export type { User };

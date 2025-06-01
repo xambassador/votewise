@@ -9,7 +9,7 @@ import { mockFactorRepository } from "@/repository/__mock__/factor.repository";
 import { mockCryptoService } from "@/services/__mock__/crypto.service";
 import { mockSessionManagerWithoutCtx } from "@/services/__mock__/session.service";
 
-import { buildAccessToken, buildChallenge, buildFactor, buildReq, buildRes } from "../../../../../../test/helpers";
+import { buildChallenge, buildFactor, buildReq, buildRes, getLocals } from "../../../../../../test/helpers";
 import { Controller } from "../controller";
 
 const controller = new Controller({
@@ -28,18 +28,12 @@ beforeEach(() => {
 
 const ip = "192.34.24.45";
 const userId = "user-id";
-const accessTokenPayload = buildAccessToken({ sub: userId });
-const session = {
-  ip,
-  userAgent: "user-agent",
-  aal: "aal1"
-};
 const body = {
   code: "123456",
   challenge_id: "challenge-id"
 };
 const factorId = "factor-id";
-const locals = { meta: { ip }, payload: accessTokenPayload, session };
+const { locals } = getLocals();
 
 describe("Verify MFA Challenge Controller", () => {
   it("should throw error if body is invalid", async () => {

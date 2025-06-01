@@ -1,0 +1,266 @@
+import { Assertions } from "@votewise/errors";
+
+import { requestParserPluginFactory } from "@/plugins";
+import { mockTaskQueue } from "@/queues/__mock__";
+import { mockUploadQueue } from "@/queues/__mock__/upload";
+import { mockPostTopicRepository } from "@/repository/__mock__/post-topic.repository";
+import { mockTimelineRepository } from "@/repository/__mock__/timeline.repository";
+import { mockUserInterestRepository } from "@/repository/__mock__/user-interest.repository";
+import { mockUserRepository } from "@/repository/__mock__/user.repository";
+import { mockOnboardService } from "@/services/__mock__/onboard.service";
+import { mockSessionManagerWithoutCtx } from "@/services/__mock__/session.service";
+
+import { buildReq, buildRes, buildUser, getLocals } from "../../../../../test/helpers";
+import { Controller } from "../controller";
+
+const controller = new Controller({
+  requestParser: requestParserPluginFactory(),
+  assert: new Assertions(),
+  appUrl: "http://localhost:3000",
+  avatarsBucket: "avatars",
+  backgroundsBucket: "backgrounds",
+  userRepository: mockUserRepository,
+  onboardService: mockOnboardService,
+  sessionManager: mockSessionManagerWithoutCtx,
+  taskQueue: mockTaskQueue,
+  uploadQueue: mockUploadQueue,
+  postTopicRepository: mockPostTopicRepository,
+  timelineRepository: mockTimelineRepository,
+  userInterestRepository: mockUserInterestRepository
+});
+
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
+const { locals, user } = getLocals();
+const getOnboardBody = (step: number) => ({
+  step,
+  user_name: "testuser",
+  first_name: "Test",
+  last_name: "User",
+  gender: "MALE",
+  about: "This is a test user.",
+  avatar: "http://example.com/avatars/avatar.jpg",
+  cover: "http://example.com/backgrounds/cover.jpg",
+  location: "Test City",
+  topics: ["topic1", "topic2", "topic3"],
+  has_setup_2fa: false
+});
+
+describe("Onboard Controller", () => {
+  it("should throw an error if the body is invalid", async () => {
+    const req = buildReq({ body: { step: 1 } });
+    const res = buildRes({ locals });
+    const error = await controller.handle(req, res).catch((err) => err);
+    expect(mockUserRepository.findById).not.toHaveBeenCalled();
+    expect(error.message).toBe("username is required");
+  });
+
+  it("should throw an error if the user is not found", async () => {
+    const req = buildReq({ body: getOnboardBody(1) });
+    const res = buildRes({ locals });
+    mockUserRepository.findById.mockResolvedValue(null);
+    const error = await controller.handle(req, res).catch((err) => err);
+    expect(error.message).toBe("User not found");
+  });
+
+  it("should throw an error if the username is already taken", async () => {
+    const body = getOnboardBody(1);
+    body.user_name = "existing_username";
+    const existingUser = buildUser({ user_name: body.user_name });
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
+    mockUserRepository.findById.mockResolvedValue(user);
+    mockUserRepository.findByUsername.mockResolvedValue(existingUser);
+    const error = await controller.handle(req, res).catch((err) => err);
+    expect(mockUserRepository.update).not.toHaveBeenCalled();
+    expect(error.message).toBe("Username already exists");
+  });
+
+  it("should successfully update user information for step 1", async () => {
+    const body = getOnboardBody(1);
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
+    mockUserRepository.findById.mockResolvedValue(user);
+    mockUserRepository.findByUsername.mockResolvedValue(null);
+
+    const data = { user_name: body.user_name, first_name: body.first_name, last_name: body.last_name };
+    await controller.handle(req, res);
+    expect(mockUserRepository.update).toHaveBeenCalledWith(user.id, data);
+    expect(mockOnboardService.updateUserOnboardCache).toHaveBeenCalledWith(user.id, data);
+  });
+
+  it("should successfully update user information for step 2", async () => {
+    const body = getOnboardBody(2);
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
+    mockUserRepository.findById.mockResolvedValue(user);
+    mockUserRepository.findByUsername.mockResolvedValue(null);
+
+    const data = { gender: body.gender, about: body.about };
+    await controller.handle(req, res);
+    expect(mockUserRepository.update).toHaveBeenCalledWith(user.id, data);
+    expect(mockOnboardService.updateUserOnboardCache).toHaveBeenCalledWith(user.id, data);
+  });
+
+  it("should throw an error if the avatar URL is invalid", async () => {
+    const body = getOnboardBody(3);
+    body.avatar = "http://example.com/avatar.jpg";
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
+    mockUserRepository.findById.mockResolvedValue(user);
+    mockUserRepository.findByUsername.mockResolvedValue(null);
+
+    const error = await controller.handle(req, res).catch((err) => err);
+    expect(mockUserRepository.update).not.toHaveBeenCalled();
+    expect(error.message).toBe("Invalid avatar url");
+  });
+
+  it("should successfully update user information for step 3 and schedule avatar upload", async () => {
+    const body = getOnboardBody(3);
+    const fileName = "avatar.jpg";
+    const fileToken = "some_random_token";
+    body.avatar = `http://example.com/avatar.jpg?file_name=${fileName}&file_token=${fileToken}`;
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
+    mockUserRepository.findById.mockResolvedValue(user);
+    mockUserRepository.findByUsername.mockResolvedValue(null);
+
+    const data = { avatar_url: body.avatar };
+    await controller.handle(req, res);
+    expect(mockUserRepository.update).toHaveBeenCalledWith(user.id, data);
+    expect(mockOnboardService.updateUserOnboardCache).toHaveBeenCalledWith(user.id, data);
+    expect(mockUploadQueue.add).toHaveBeenCalledWith({
+      name: "uploadToS3",
+      payload: {
+        fileName,
+        fileToken,
+        assetType: "avatar",
+        userId: user.id,
+        path: user.id + "/" + fileName
+      }
+    });
+  });
+
+  it("should successfully update user information for step 3 without schedule avatar upload", async () => {
+    const body = getOnboardBody(3);
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
+    mockUserRepository.findById.mockResolvedValue(user);
+    mockUserRepository.findByUsername.mockResolvedValue(null);
+
+    const data = { avatar_url: body.avatar };
+    await controller.handle(req, res);
+    expect(mockUploadQueue.add).not.toHaveBeenCalled();
+    expect(mockUserRepository.update).toHaveBeenCalledWith(user.id, data);
+    expect(mockOnboardService.updateUserOnboardCache).toHaveBeenCalledWith(user.id, data);
+  });
+
+  it("should throw an error if the cover URL is invalid", async () => {
+    const body = getOnboardBody(4);
+    body.cover = "http://example.com/background.jpg";
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
+    mockUserRepository.findById.mockResolvedValue(user);
+    mockUserRepository.findByUsername.mockResolvedValue(null);
+
+    const error = await controller.handle(req, res).catch((err) => err);
+    expect(mockUserRepository.update).not.toHaveBeenCalled();
+    expect(error.message).toBe("Invalid cover url");
+  });
+
+  it("should successfully update user information for step 4 and schedule cover upload", async () => {
+    const body = getOnboardBody(4);
+    const fileName = "background.jpg";
+    const fileToken = "some_random_token";
+    body.cover = `http://example.com/background.jpg?file_name=${fileName}&file_token=${fileToken}`;
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
+    mockUserRepository.findById.mockResolvedValue(user);
+    mockUserRepository.findByUsername.mockResolvedValue(null);
+
+    const data = { cover_image_url: body.cover };
+    await controller.handle(req, res);
+    expect(mockUserRepository.update).toHaveBeenCalledWith(user.id, data);
+    expect(mockOnboardService.updateUserOnboardCache).toHaveBeenCalledWith(user.id, data);
+    expect(mockUploadQueue.add).toHaveBeenCalledWith({
+      name: "uploadToS3",
+      payload: {
+        fileName,
+        fileToken,
+        assetType: "cover_image",
+        userId: user.id,
+        path: user.id + "/" + fileName
+      }
+    });
+  });
+
+  it("should successfully update user information for step 4 without schedual cover upload", async () => {
+    const body = getOnboardBody(4);
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
+    mockUserRepository.findById.mockResolvedValue(user);
+    mockUserRepository.findByUsername.mockResolvedValue(null);
+
+    const data = { cover_image_url: body.cover };
+    await controller.handle(req, res);
+    expect(mockUploadQueue.add).not.toHaveBeenCalled();
+    expect(mockUserRepository.update).toHaveBeenCalledWith(user.id, data);
+    expect(mockOnboardService.updateUserOnboardCache).toHaveBeenCalledWith(user.id, data);
+  });
+
+  it("should successfully update user information for step 5", async () => {
+    const body = getOnboardBody(5);
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
+    mockUserRepository.findById.mockResolvedValue(user);
+    mockUserRepository.findByUsername.mockResolvedValue(null);
+
+    const data = { location: body.location };
+    await controller.handle(req, res);
+    expect(mockUserRepository.update).toHaveBeenCalledWith(user.id, data);
+    expect(mockOnboardService.updateUserOnboardCache).toHaveBeenCalledWith(user.id, data);
+  });
+
+  it("should successfully update user information for step 6 and schedual welcome email", async () => {
+    const body = getOnboardBody(6);
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
+    mockUserRepository.findById.mockResolvedValue(user);
+    mockUserRepository.findByUsername.mockResolvedValue(null);
+    mockUserInterestRepository.findByUserId.mockResolvedValue([]);
+    mockPostTopicRepository.getInterestedFeedIds.mockResolvedValue([{ post_id: "post1", topic_id: "topic1" }]);
+
+    await controller.handle(req, res);
+    expect(mockUserInterestRepository.create).toHaveBeenCalledWith(user.id, body.topics);
+    expect(mockOnboardService.updateUserOnboardCache).toHaveBeenCalledWith(user.id, { topics: body.topics });
+    expect(mockTaskQueue.add).toHaveBeenCalledWith({
+      name: "email",
+      payload: {
+        templateName: "welcome",
+        to: user.email,
+        subject: "Welcome to VoteWise",
+        locals: {
+          name: `${user.first_name} ${user.last_name}`,
+          logo: "http://localhost:3000/assets/logo.png"
+        }
+      }
+    });
+    expect(mockPostTopicRepository.getInterestedFeedIds).toHaveBeenCalledWith(body.topics);
+    expect(mockTimelineRepository.createMany).toHaveBeenCalledWith([{ post_id: "post1", user_id: user.id }]);
+  });
+
+  it("should successfully update onboard status", async () => {
+    const body = getOnboardBody(7);
+    const req = buildReq({ body });
+    const res = buildRes({ locals });
+    mockUserRepository.findById.mockResolvedValue(user);
+    mockUserRepository.findByUsername.mockResolvedValue(null);
+
+    await controller.handle(req, res);
+    expect(mockUserRepository.update).toHaveBeenCalledWith(user.id, { is_onboarded: true });
+    expect(mockSessionManagerWithoutCtx.updateOnboardStatus).toHaveBeenCalledWith(user.id, "ONBOARDED");
+    expect(mockOnboardService.clearUserOnboardCache).toHaveBeenCalledWith(user.id);
+  });
+});
