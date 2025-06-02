@@ -113,6 +113,10 @@ input[data-autocompleted] {
   .at-max-viewport {
     @apply max-h-screen min-h-screen;
   }
+
+  .scroller {
+    @apply scrollbar scrollbar-thumb-nobelBlack-200 scrollbar-track-transparent;
+  }
 }
 
 @layer components {

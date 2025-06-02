@@ -96,7 +96,7 @@ const config = {
       }
     }
   },
-  plugins: [require("tailwindcss-animate"), grid]
+  plugins: [require("tailwindcss-animate"), require("tailwind-scrollbar"), grid]
 } satisfies Config;
 
 function grid({ matchUtilities, theme }: PluginAPI) {
