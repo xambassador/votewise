@@ -21,7 +21,7 @@ import {
   useTransitionStyles
 } from "@floating-ui/react";
 
-interface TooltipOptions {
+export interface TooltipOptions {
   initialOpen?: boolean;
   placement?: Placement;
   open?: boolean;
