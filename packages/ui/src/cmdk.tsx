@@ -14,7 +14,7 @@ export function Command(props: CommandProps) {
       data-slot="command"
       {...rest}
       className={cn(
-        "bg-popover text-popover-foreground flex h-full w-full flex-col overflow-hidden rounded-md",
+        "flex h-full w-full flex-col overflow-hidden rounded-md bg-nobelBlack-100 text-gray-200",
         className
       )}
     />
@@ -41,7 +41,7 @@ export function CommandList(props: CommandListProps) {
   return (
     <Cmdk.List
       data-slot="command-list"
-      className={cn("pl-4 max-h-[300px] scroll-py-1 overflow-x-hidden overflow-y-auto", className)}
+      className={cn("px-4 max-h-[300px] scroll-py-1 overflow-x-hidden overflow-y-auto", className)}
       {...rest}
     />
   );
@@ -91,7 +91,7 @@ export function CommandItem(props: CommandItemProps) {
     <Cmdk.Item
       data-slot="command-item"
       className={cn(
-        "data-[selected=true]:bg-nobelBlack-200 data-[selected=true]:text-blue-200 [&_svg:not([class*='text-'])]:text-gray-300 relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "data-[selected=true]:bg-nobelBlack-200 data-[selected=true]:text-blue-200 [&_svg:not([class*='text-'])]:text-gray-300 relative flex cursor-default items-center gap-2 rounded-lg px-2 py-1.5 text-sm outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...rest}

@@ -30,13 +30,15 @@ const DialogOverlay = forwardRef<DialogOverlayRef, DialogOverlayProps>((props, r
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 type DialogContentRef = React.ElementRef<typeof DialogPrimitive.Content>;
-type DialogContentProps = React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>;
+type DialogContentProps = React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+  overlayProps?: React.ComponentPropsWithoutRef<typeof DialogOverlay>;
+};
 
 export const DialogContent = forwardRef<DialogContentRef, DialogContentProps>((props, ref) => {
-  const { className, children, ...rest } = props;
+  const { className, children, overlayProps, ...rest } = props;
   return (
     <DialogPortal>
-      <DialogOverlay />
+      <DialogOverlay {...overlayProps} />
       <DialogPrimitive.Content
         {...rest}
         ref={ref}

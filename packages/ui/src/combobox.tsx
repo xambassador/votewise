@@ -75,12 +75,18 @@ export function ComboBoxTrigger(props: ComboBoxTriggerProps) {
     <PopoverTrigger
       {...rest}
       className={cn(
-        "flex min-h-10 w-full flex-wrap items-center gap-1 rounded-full bg-transparent px-3 py-2 text-sm ring-offset-background",
+        "flex w-full flex-wrap items-center gap-1 rounded-full bg-transparent text-sm ring-offset-background",
         className
       )}
       asChild
     >
-      <div role="combobox" aria-controls="popover-content" aria-expanded={open} onClick={() => onOpenChange?.(true)}>
+      <div
+        role="combobox"
+        aria-controls="popover-content"
+        aria-expanded={open}
+        onClick={() => onOpenChange?.(true)}
+        className="max-w-fit"
+      >
         {children}
       </div>
     </PopoverTrigger>
@@ -137,7 +143,7 @@ export type ComboBoxContentProps = React.ComponentProps<typeof PopoverContent>;
 export function ComboBoxContent(props: ComboBoxContentProps) {
   const { className, children, ...rest } = props;
   return (
-    <PopoverContent align="start" {...rest} className={cn("w-full p-0", className)}>
+    <PopoverContent {...rest} className={cn("w-full p-0 pb-4", className)}>
       <Command>{children}</Command>
     </PopoverContent>
   );
@@ -146,7 +152,7 @@ export function ComboBoxContent(props: ComboBoxContentProps) {
 export type ComboBoxInputProps = React.ComponentProps<typeof CommandInput>;
 export function ComboBoxInput(props: ComboBoxInputProps) {
   const { className, ...rest } = props;
-  return <CommandInput placeholder="Search options..." {...rest} className={cn("h-10", className)} />;
+  return <CommandInput placeholder="Search options..." autoFocus {...rest} className={cn("h-10", className)} />;
 }
 
 export type ComboBoxListProps = React.ComponentProps<typeof CommandList>;
