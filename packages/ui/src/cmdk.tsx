@@ -41,7 +41,7 @@ export function CommandList(props: CommandListProps) {
   return (
     <Cmdk.List
       data-slot="command-list"
-      className={cn("px-4 max-h-[300px] scroll-py-1 overflow-x-hidden overflow-y-auto", className)}
+      className={cn("px-4 pb-4 max-h-[300px] scroll-py-1 overflow-x-hidden overflow-y-auto", className)}
       {...rest}
     />
   );
@@ -66,7 +66,7 @@ export function CommandGroup(props: CommandGroupProps) {
     <Cmdk.Group
       data-slot="command-group"
       className={cn(
-        "text-black-200 [&_[cmdk-group-heading]]:text-black-300 overflow-hidden [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-medium",
+        "text-black-200 pb-1 [&_[cmdk-group-heading]]:text-black-300 overflow-hidden [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-medium",
         className
       )}
       {...rest}
