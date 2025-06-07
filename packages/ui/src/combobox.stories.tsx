@@ -9,6 +9,7 @@ import {
   ComboBoxItem,
   ComboBoxList,
   ComboBoxPlaceholder,
+  ComboBoxPortal,
   ComboBoxRoot,
   ComboBoxSelection,
   ComboBoxTrigger
@@ -93,6 +94,38 @@ export const WithControlledValues: Story = {
             <ComboBoxEmpty>No topics found</ComboBoxEmpty>
           </ComboBoxList>
         </ComboBoxContent>
+      </ComboBoxRoot>
+    );
+  }
+};
+
+export const WithoutPopover: Story = {
+  render: (args) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+    return (
+      <ComboBoxRoot
+        {...args}
+        selected={selectedTopics}
+        onChange={(selected) => {
+          setSelectedTopics(selected);
+        }}
+      >
+        <ComboBoxSelection />
+        <ComboBoxPlaceholder>Select topics</ComboBoxPlaceholder>
+        <ComboBoxPortal>
+          <ComboBoxInput placeholder="Search topics..." />
+          <ComboBoxList className="scroller">
+            {topics
+              .filter((topic) => !selectedTopics.includes(topic.value))
+              .map((topic) => (
+                <ComboBoxItem key={topic.value} value={topic.value}>
+                  {topic.label}
+                </ComboBoxItem>
+              ))}
+            <ComboBoxEmpty>No topics found</ComboBoxEmpty>
+          </ComboBoxList>
+        </ComboBoxPortal>
       </ComboBoxRoot>
     );
   }

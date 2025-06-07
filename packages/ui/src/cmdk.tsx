@@ -41,7 +41,7 @@ export function CommandList(props: CommandListProps) {
   return (
     <Cmdk.List
       data-slot="command-list"
-      className={cn("px-4 pb-4 max-h-[300px] scroll-py-1 overflow-x-hidden overflow-y-auto", className)}
+      className={cn("px-4 max-h-[300px] scroll-py-1 overflow-x-hidden overflow-y-auto", className)}
       {...rest}
     />
   );

@@ -62,15 +62,35 @@ export function ComboBoxRoot(props: ComboBoxRootProps) {
 
   return (
     <Provider selected={selected} onSelect={onSelect} onUnselect={onUnselect} open={open} onOpenChange={onOpenChange}>
+      {/* TODO: How to handle `WithoutPopover` story case. */}
       <Popover {...rest} open={open} onOpenChange={onOpenChange} />
     </Provider>
   );
 }
 
+export function useComboBoxTrigger(componentName?: string) {
+  const { onOpenChange, open } = useProvider(componentName || "useComboBoxTrigger");
+
+  function getTriggerProps(props?: React.HTMLAttributes<HTMLElement>): React.HTMLAttributes<HTMLElement> {
+    return {
+      ...props,
+      role: "combobox",
+      "aria-controls": "popover-content",
+      "aria-expanded": open,
+      onClick: (e) => {
+        onOpenChange?.(true);
+        props?.onClick?.(e);
+      }
+    };
+  }
+
+  return { getTriggerProps };
+}
+
 export type ComboBoxTriggerProps = Omit<React.ComponentProps<typeof PopoverTrigger>, "asChild">;
 export function ComboBoxTrigger(props: ComboBoxTriggerProps) {
   const { className, children, ...rest } = props;
-  const { onOpenChange, open } = useProvider("ComboboxTrigger");
+  const { getTriggerProps } = useComboBoxTrigger("ComboBoxTrigger");
   return (
     <PopoverTrigger
       {...rest}
@@ -80,28 +100,22 @@ export function ComboBoxTrigger(props: ComboBoxTriggerProps) {
       )}
       asChild
     >
-      <div
-        role="combobox"
-        aria-controls="popover-content"
-        aria-expanded={open}
-        onClick={() => onOpenChange?.(true)}
-        className="max-w-fit"
-      >
-        {children}
-      </div>
+      <div {...getTriggerProps({ className: "max-w-fit" })}>{children}</div>
     </PopoverTrigger>
   );
 }
 
-export type ComboBoxSelectionProps = Omit<React.ComponentProps<typeof Badge>, "children">;
+export type ComboBoxSelectionProps = Omit<React.ComponentProps<typeof Badge>, "children"> & {
+  getLabel?: (value: string) => string;
+};
 export function ComboBoxSelection(props: ComboBoxSelectionProps) {
-  const { className, ...rest } = props;
+  const { className, getLabel, ...rest } = props;
   const { selected, onUnselect } = useProvider("ComboboxSelection");
   return (
     <>
       {selected.map((item) => (
         <Badge key={item} variant="outline" {...rest} className={cn("text-blue-400 border-blue-400", className)}>
-          {item}
+          {getLabel ? getLabel(item) : item}
           <button
             className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2"
             onKeyDown={(e) => {
@@ -139,12 +153,18 @@ export function ComboBoxPlaceholder(props: ComboBoxPlaceholderProps) {
   );
 }
 
+export type ComboBoxPortalProps = React.ComponentProps<typeof Command>;
+export function ComboBoxPortal(props: ComboBoxPortalProps) {
+  const { children, ...rest } = props;
+  return <Command {...rest}>{children}</Command>;
+}
+
 export type ComboBoxContentProps = React.ComponentProps<typeof PopoverContent>;
 export function ComboBoxContent(props: ComboBoxContentProps) {
   const { className, children, ...rest } = props;
   return (
-    <PopoverContent {...rest} className={cn("w-full p-0 pb-4", className)}>
-      <Command>{children}</Command>
+    <PopoverContent {...rest} className={cn("w-full p-0", className)}>
+      <ComboBoxPortal>{children}</ComboBoxPortal>
     </PopoverContent>
   );
 }
@@ -157,8 +177,12 @@ export function ComboBoxInput(props: ComboBoxInputProps) {
 
 export type ComboBoxListProps = React.ComponentProps<typeof CommandList>;
 export function ComboBoxList(props: ComboBoxListProps) {
-  const { children, ...rest } = props;
-  return <CommandList {...rest}>{children}</CommandList>;
+  const { children, className, ...rest } = props;
+  return (
+    <CommandList {...rest} className={cn("pb-4", className)}>
+      {children}
+    </CommandList>
+  );
 }
 
 export type ComboBoxEmptyProps = React.ComponentProps<typeof CommandEmpty>;
