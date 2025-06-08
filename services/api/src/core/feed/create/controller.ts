@@ -65,6 +65,7 @@ export class Controller {
       user_id: follower.follower_id,
       post_id: feed.id
     }));
+    timelines.unshift({ user_id: locals.payload.sub, post_id: feed.id });
     await this.ctx.timelineRepository.createMany(timelines);
     const result = { id: feed.id, slug };
     return res.status(StatusCodes.CREATED).json(result) as Response<typeof result>;

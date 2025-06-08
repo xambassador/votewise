@@ -1,10 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { atom, useAtomValue, useSetAtom } from "jotai";
+import type { Topics } from "@/types";
+import type { AsyncState } from "@votewise/types";
+
+import { useEffect, useState } from "react";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
 import { Button } from "@votewise/ui/button";
+import {
+  ComboBoxEmpty,
+  ComboBoxInput,
+  ComboBoxItem,
+  ComboBoxList,
+  ComboBoxPlaceholder,
+  ComboBoxPortal,
+  ComboBoxRoot,
+  ComboBoxSelection,
+  useComboBoxTrigger
+} from "@votewise/ui/combobox";
 import { Close, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@votewise/ui/dialog";
 import { FloatingCounter } from "@votewise/ui/floating-counter";
 import { Image as ImageIcon } from "@votewise/ui/icons/image";
@@ -12,17 +26,29 @@ import { Pencile } from "@votewise/ui/icons/pencile";
 import { ClearButton, ZigZagList } from "@votewise/ui/image-card";
 import { Input } from "@votewise/ui/input-basic";
 import { Progress, ProgressBar, ProgressTrack } from "@votewise/ui/progress";
+import { Spinner } from "@votewise/ui/ring-spinner";
 import { Textarea } from "@votewise/ui/textarea-autosize";
+import { makeToast } from "@votewise/ui/toast";
+
+import { feedClient, onboardClinet } from "@/lib/client";
 
 import { useMe } from "./user-provider";
 
+const maxFilesToShow = 8;
 const maxLength = 300;
 const postContentAtom = atom("");
+const titleAtom = atom("");
 const filesAtom = atom<{ file: File; preview: string; id: string }[]>([]);
+const isTopicModalOpenAtom = atom(false);
+const topicsAtom = atom<Topics>([]);
+const selectedTopicsAtom = atom<string[]>([]);
+const topicsPromise = onboardClinet.getTopics();
+const isCreatePostDialogOpenAtom = atom(false);
 
 export function CreatePostDialog() {
+  const [isOpen, setIsOpen] = useAtom(isCreatePostDialogOpenAtom);
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="w-fit gap-1">
           <Pencile className="text-gray-200" />
@@ -32,26 +58,28 @@ export function CreatePostDialog() {
       <DialogContent className="p-12 max-w-[var(--create-post-modal-width)] flex flex-col gap-8">
         <DialogTitle className="sr-only">Create a New Post</DialogTitle>
         <DialogDescription className="sr-only">Share your thoughts and ideas with the community!</DialogDescription>
-        <Close className="absolute top-4 right-5" />
+        <Close className="absolute top-4 right-5 outline-none focus:ring-2" />
         <div className="flex flex-col gap-5">
-          <div className="flex gap-3 min-h-[calc((200/16)*1rem)]">
-            <UserProfile />
-            <div className="flex flex-col gap-5 flex-1">
-              <TitleInput />
-              <ContentInput />
-              <Assets />
-            </div>
-          </div>
-          <div className="flex flex-col gap-5">
-            <div className="flex items-center justify-between">
-              <AssetPicker />
-              <ProgressTracker />
-            </div>
-          </div>
+          <FormArea />
+          <ComboBox />
+          <Footer />
         </div>
-        <Button>Post</Button>
+        <SubmitButton />
       </DialogContent>
     </Dialog>
+  );
+}
+
+function FormArea() {
+  return (
+    <div className="flex gap-3 min-h-[calc((200/16)*1rem)]">
+      <UserProfile />
+      <div className="flex flex-col gap-5 flex-1">
+        <TitleInput />
+        <ContentInput />
+        <Assets />
+      </div>
+    </div>
   );
 }
 
@@ -66,32 +94,47 @@ function UserProfile() {
 }
 
 function TitleInput() {
+  const [title, setPostTitleToAtom] = useAtom(titleAtom);
   return (
     <Input
       className="placeholder:text-black-300 placeholder:text-base text-base text-gray-300"
       placeholder="Headline of your post"
+      value={title}
+      onChange={(e) => {
+        if (e.target.value.length > 100) {
+          e.target.value = e.target.value.slice(0, 100);
+        }
+        setPostTitleToAtom(e.target.value);
+      }}
     />
   );
 }
 
 function ContentInput() {
-  const [value, setValue] = useState("");
-  const setPostContentToAtom = useSetAtom(postContentAtom);
+  const [postContent, setPostContentToAtom] = useAtom(postContentAtom);
   return (
     <Textarea
       className="placeholder:text-black-300 placeholder:text-base text-base text-gray-300 w-full"
       placeholder="Share your thoughts here..."
-      value={value}
+      value={postContent}
       maxRows={25}
       cacheMeasurements
       onChange={(e) => {
         if (e.target.value.length > 300) {
           e.target.value = e.target.value.slice(0, 300);
         }
-        setValue(e.target.value);
         setPostContentToAtom(e.target.value);
       }}
     />
+  );
+}
+
+function Footer() {
+  return (
+    <div className="flex items-center justify-between">
+      <AssetPicker />
+      <ProgressTracker />
+    </div>
   );
 }
 
@@ -146,8 +189,6 @@ function AssetPicker() {
   );
 }
 
-const maxFilesToShow = 8;
-
 function Assets() {
   const files = useAtomValue(filesAtom);
   const setFilesToAtom = useSetAtom(filesAtom);
@@ -179,5 +220,145 @@ function Assets() {
         </FloatingCounter>
       )}
     </ZigZagList>
+  );
+}
+
+function SubmitButton() {
+  const [status, setStatus] = useState<AsyncState>("idle");
+  const [postContent, setPostContent] = useAtom(postContentAtom);
+  const [title, setTitle] = useAtom(titleAtom);
+  const [topics, setTopics] = useAtom(selectedTopicsAtom);
+  const setCreatePostDialogOpen = useSetAtom(isCreatePostDialogOpenAtom);
+  const isDisabled = !(title && postContent && topics.length > 0);
+
+  // TODO: Handle file uploads
+
+  async function handleSubmit() {
+    if (isDisabled) return;
+
+    setStatus("loading");
+    const res = await feedClient.create({
+      title,
+      topics,
+      content: postContent,
+      status: "OPEN",
+      type: "PUBLIC"
+    });
+    if (!res.success) {
+      makeToast.error("Oops! Failed to create post.", res.error);
+      setStatus("error");
+      return;
+    }
+
+    setStatus("success");
+    setPostContent("");
+    setTitle("");
+    setTopics([]);
+    setCreatePostDialogOpen(false);
+  }
+
+  return (
+    <Button disabled={isDisabled} onClick={handleSubmit} loading={status === "loading"}>
+      Post
+    </Button>
+  );
+}
+
+function ComboBox() {
+  const [selectedTopics, setSelectedTopics] = useAtom(selectedTopicsAtom);
+  return (
+    <ComboBoxRoot selected={selectedTopics} onChange={setSelectedTopics}>
+      <PickTopicsModalTrigger />
+      <PickTopicsModal />
+    </ComboBoxRoot>
+  );
+}
+
+function PickTopicsModal() {
+  const [status, setStats] = useState<AsyncState>("idle");
+  const [error, setError] = useState<string | null>(null);
+  const [isOpen, setIsOpen] = useAtom(isTopicModalOpenAtom);
+  const [topics, setTopics] = useAtom(topicsAtom);
+  const selectedTopics = useAtomValue(selectedTopicsAtom);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setStats("loading");
+    topicsPromise.then((res) => {
+      if (!res.success) {
+        setError(res.error);
+        return;
+      }
+      setTopics(res.data.topics);
+      setStats("success");
+    });
+  }, [isOpen, setTopics]);
+
+  const nonSelectedTopics = topics.filter((topic) => !selectedTopics.includes(topic.id));
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent className="p-12 max-w-[var(--create-post-modal-width)] flex flex-col gap-8">
+        <DialogTitle className="sr-only">Pick Topics</DialogTitle>
+        <DialogDescription className="sr-only">Select topics relevant to your post</DialogDescription>
+        <Close className="absolute top-4 right-5 outline-none focus:ring-2" />
+        <div className="flex flex-col">
+          <div className="flex items-center gap-1 pl-4 flex-wrap w-full">
+            <ComboBoxSelection
+              getLabel={(v) => {
+                const topic = topics.find((t) => t.id === v);
+                return topic ? topic.name : v;
+              }}
+            />
+          </div>
+          <ComboBoxPortal>
+            <ComboBoxInput placeholder="Search topics..." autoFocus />
+            <ComboBoxList className="scroller">
+              {status === "loading" && (
+                <div className="flex items-center justify-center min-h-[300px]">
+                  <Spinner className="size-5" />
+                </div>
+              )}
+              {status === "error" && (
+                <ComboBoxEmpty className="text-red-500">{error || "Failed to load topics"}</ComboBoxEmpty>
+              )}
+              {status === "success" && topics.length > 0 ? (
+                <>
+                  {nonSelectedTopics.map((topic) => (
+                    <ComboBoxItem key={topic.id} value={topic.id} className="cursor-pointer">
+                      {topic.name}
+                    </ComboBoxItem>
+                  ))}
+                  <ComboBoxEmpty>No topics found</ComboBoxEmpty>
+                </>
+              ) : null}
+              {status === "success" && topics.length === 0 && <ComboBoxEmpty>No topics available</ComboBoxEmpty>}
+            </ComboBoxList>
+          </ComboBoxPortal>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function PickTopicsModalTrigger() {
+  const { getTriggerProps } = useComboBoxTrigger();
+  const setPickTopicModal = useSetAtom(isTopicModalOpenAtom);
+  const topics = useAtomValue(topicsAtom);
+  return (
+    <div
+      {...getTriggerProps({
+        className: "flex items-center gap-1 w-fit flex-wrap outline-none focus:ring-2",
+        onClick: () => setPickTopicModal(true)
+      })}
+    >
+      <ComboBoxSelection
+        getLabel={(v) => {
+          const topic = topics.find((t) => t.id === v);
+          return topic ? topic.name : v;
+        }}
+      />
+      <ComboBoxPlaceholder className="text-black-300">Select topic(s)</ComboBoxPlaceholder>
+    </div>
   );
 }

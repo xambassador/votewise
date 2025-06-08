@@ -47,7 +47,7 @@ export function FeedMolecule(props: Props) {
         <div className="flex gap-2">
           <Avatar className="size-12">
             <AvatarFallback name={feed.author.first_name + " " + feed.author.last_name} />
-            <AvatarImage src={feed.author.avatar_url || ""} alt={feed.author.first_name} />
+            <AvatarImage src={feed.author.avatar_url || ""} alt={feed.author.first_name} className="object-cover" />
           </Avatar>
           <FeedContent>
             <FeedHeader>
