@@ -30,7 +30,7 @@ import { Spinner } from "@votewise/ui/ring-spinner";
 import { Textarea } from "@votewise/ui/textarea-autosize";
 import { makeToast } from "@votewise/ui/toast";
 
-import { feedClient, onboardClinet } from "@/lib/client";
+import { feedClient, onboardClinet, uploadClient } from "@/lib/client";
 
 import { useMe } from "./user-provider";
 
@@ -230,19 +230,31 @@ function SubmitButton() {
   const [topics, setTopics] = useAtom(selectedTopicsAtom);
   const setCreatePostDialogOpen = useSetAtom(isCreatePostDialogOpenAtom);
   const isDisabled = !(title && postContent && topics.length > 0);
-
-  // TODO: Handle file uploads
+  const [files, setFiles] = useAtom(filesAtom);
 
   async function handleSubmit() {
     if (isDisabled) return;
 
     setStatus("loading");
+    const urls: string[] = [];
+
+    if (files.length > 0) {
+      const promises = files.map((file) => uploadClient.upload(file.file));
+      const res = await Promise.all(promises);
+      res.map((r) => {
+        if (r.success) {
+          urls.push(r.data.url);
+        }
+      });
+    }
+
     const res = await feedClient.create({
       title,
       topics,
       content: postContent,
       status: "OPEN",
-      type: "PUBLIC"
+      type: "PUBLIC",
+      assets: urls.map((url) => ({ url, type: "image" }))
     });
     if (!res.success) {
       makeToast.error("Oops! Failed to create post.", res.error);
@@ -254,6 +266,7 @@ function SubmitButton() {
     setPostContent("");
     setTitle("");
     setTopics([]);
+    setFiles([]);
     setCreatePostDialogOpen(false);
   }
 
@@ -325,7 +338,12 @@ function PickTopicsModal() {
               {status === "success" && topics.length > 0 ? (
                 <>
                   {nonSelectedTopics.map((topic) => (
-                    <ComboBoxItem key={topic.id} value={topic.id} className="cursor-pointer">
+                    <ComboBoxItem
+                      key={topic.id}
+                      value={topic.id}
+                      className="cursor-pointer"
+                      disabled={selectedTopics.length >= 5}
+                    >
                       {topic.name}
                     </ComboBoxItem>
                   ))}
