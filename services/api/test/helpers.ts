@@ -2,6 +2,13 @@ import type { Challange, Factor, RefreshToken, User } from "@votewise/prisma/cli
 import type { AccessTokenPayload } from "@votewise/types";
 import type { Request, Response } from "express";
 
+import { faker } from "@faker-js/faker";
+
+export const appUrl = "http://localhost:3000";
+export const ip = "192.168.4.45";
+export const session = { ip, userAgent: faker.internet.userAgent(), aal: "aal1" };
+export const locals = { meta: { ip }, session };
+
 export function buildReq(overrides: Partial<Request> = {}) {
   const req = { body: {}, query: {}, params: {}, headers: {}, ...overrides };
   return req as jest.Mocked<Request>;
@@ -24,27 +31,27 @@ export function buildNext(impl: () => void) {
 
 export function buildUser(overrides: Partial<User> = {}): User {
   return {
-    id: "clzy0090n000013gtnqrebopz",
-    email: "johndoe@gmail.com",
-    user_name: "john_doe",
-    password: "hashed-password",
-    first_name: "john",
-    last_name: "doe",
-    about: null,
-    avatar_url: null,
-    cover_image_url: null,
-    created_at: new Date(),
+    id: faker.string.uuid(),
+    email: faker.internet.email(),
+    user_name: faker.internet.userName(),
+    password: faker.internet.password(),
+    first_name: faker.person.firstName(),
+    last_name: faker.person.lastName(),
+    about: faker.lorem.sentence(),
+    avatar_url: faker.image.avatar(),
+    cover_image_url: faker.image.urlLoremFlickr({ category: "nature" }),
+    created_at: faker.date.past(),
     twitter_profile_url: null,
-    location: null,
-    last_login: null,
+    location: faker.location.city(),
+    last_login: faker.date.recent(),
     is_onboarded: false,
     is_email_verify: false,
     instagram_profile_url: null,
     github_profile_url: null,
-    gender: "MALE",
+    gender: faker.person.sexType() === "male" ? "MALE" : "FEMALE",
     facebook_profile_url: null,
     updated_at: new Date(),
-    secret: "clzy0090n000013gtnqrebopz",
+    secret: faker.string.alphanumeric(32),
     banned_until: null,
     email_confirmation_sent_at: null,
     email_confirmed_at: null,
@@ -54,10 +61,10 @@ export function buildUser(overrides: Partial<User> = {}): User {
 
 export function buildRefreshToken(overrides: Partial<RefreshToken> = {}): RefreshToken {
   return {
-    user_id: "user_id",
-    id: "id",
+    user_id: faker.string.uuid(),
+    id: faker.string.uuid(),
     updated_at: new Date(),
-    token: "token",
+    token: faker.string.alphanumeric(64),
     revoked: false,
     created_at: new Date(),
     ...overrides
@@ -66,14 +73,14 @@ export function buildRefreshToken(overrides: Partial<RefreshToken> = {}): Refres
 
 export function buildFactor(overrides: Partial<Factor> = {}): Factor {
   return {
-    id: "factor_id",
-    user_id: "user_id",
+    id: faker.string.uuid(),
+    user_id: faker.string.uuid(),
     updated_at: new Date(),
     status: "UNVERIFIED",
-    secret: "secret",
+    secret: faker.string.alphanumeric(32),
     phone: null,
     last_challenged_at: null,
-    friendly_name: "friendly_name",
+    friendly_name: faker.person.firstName(),
     factor_type: "TOTP",
     created_at: new Date(),
     ...overrides
@@ -82,11 +89,11 @@ export function buildFactor(overrides: Partial<Factor> = {}): Factor {
 
 export function buildChallenge(overrides: Partial<Challange> = {}): Challange {
   return {
-    id: "challenge_id",
+    id: faker.string.uuid(),
     ip: "",
-    otp_code: "otp_code",
+    otp_code: faker.string.numeric(6),
     verified_at: null,
-    factor_id: "factor_id",
+    factor_id: faker.string.uuid(),
     created_at: new Date(),
     ...overrides
   };
@@ -99,24 +106,23 @@ export function buildAccessToken(data: Partial<AccessTokenPayload>): AccessToken
     user_metadata: {},
     app_metadata: {},
     sub: "sub",
-    session_id: "session_id",
+    session_id: faker.string.uuid(),
     role: "user",
-    email: "test@gmail.com",
+    email: faker.internet.email(),
     user_aal_level: "aal1",
     ...data
   };
 }
 
 export function getLocals() {
-  const ip = "192.34.24.45";
-  const userId = "user-id";
+  const userId = faker.string.uuid();
   const accessTokenPayload = buildAccessToken({ sub: userId });
   const session = {
     ip,
-    userAgent: "user-agent",
+    userAgent: faker.internet.userAgent(),
     aal: "aal1"
   };
-  const body = { code: "123456", challenge_id: "challenge-id" };
+  const body = { code: "123456", challenge_id: faker.string.uuid() };
   const locals = { meta: { ip }, payload: accessTokenPayload, session };
   const user = buildUser({ id: userId, is_onboarded: false });
   return { locals, body, ip, user };

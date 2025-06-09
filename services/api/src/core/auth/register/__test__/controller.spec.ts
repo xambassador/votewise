@@ -5,14 +5,12 @@ import { Minute } from "@votewise/times";
 
 import { requestParserPluginFactory } from "@/plugins/request-parser";
 
-import { buildReq, buildRes, buildUser } from "../../../../../test/helpers";
+import { appUrl, buildReq, buildRes, ip, locals } from "../../../../../test/helpers";
 import { Controller } from "../controller";
 import { UserRegisterService } from "../service";
 import * as helpers from "./helpers";
 
-const user = buildUser();
-const ip = "192.168.2.45";
-const locals = { meta: { ip } };
+const user = helpers.user;
 const body = {
   email: user.email,
   password: "Johndoe@123"
@@ -22,7 +20,7 @@ const service = new UserRegisterService({
   cache: helpers.mockCache,
   cryptoService: helpers.mockCryptoService,
   tasksQueue: helpers.mockTaskQueue,
-  appUrl: "http://localhost:3000"
+  appUrl
 });
 const controller = new Controller({
   assert,
@@ -63,12 +61,12 @@ describe("Register Controller", () => {
   it("should create user and send verification email", async () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
-    const { otp, uuid: verificationCode, defaultUserName } = helpers.setupHappyPath();
+    const { otp, uuid: verificationCode, defaultUserName, hashedPassword } = helpers.setupHappyPath();
     const windowExpiryIn = 5 * Minute;
     const data = JSON.stringify({ userId: user.id, ip, email: body.email, verificationCode });
     const createBody = {
       email: body.email,
-      password: "hashed-password",
+      password: hashedPassword,
       user_name: "user_" + defaultUserName,
       first_name: "INVALID_FIRST_NAME",
       last_name: "INVALID_LAST_NAME"
@@ -81,7 +79,7 @@ describe("Register Controller", () => {
         templateName: "signup",
         locals: {
           otp,
-          logo: "http://localhost:3000/assets/logo.png",
+          logo: `${appUrl}/assets/logo.png`,
           expiresIn: windowExpiryIn / Minute,
           expiresInUnit: "minutes"
         }

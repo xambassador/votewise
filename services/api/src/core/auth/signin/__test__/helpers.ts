@@ -1,6 +1,8 @@
 import type { User } from "../../../../../test/helpers";
 import type { EmailStrategy, UsernameStrategy } from "../strategies";
 
+import { faker } from "@faker-js/faker";
+
 import { mockTaskQueue } from "@/queues/__mock__";
 import { mockFactorRepository } from "@/repository/__mock__/factor.repository";
 import { mockRefreshTokenRepository } from "@/repository/__mock__/refresh-token.repository";
@@ -20,16 +22,19 @@ export const mockEmailStrategy = {
 } as unknown as jest.Mocked<EmailStrategy>;
 
 export function setupHappyPath(overrides?: Partial<User>) {
+  const sessionId = faker.string.uuid();
+  const accessToken = faker.string.alphanumeric(64);
+  const refreshToken = faker.string.alphanumeric(64);
   const user = buildUser({ is_email_verify: true });
   mockUserRepository.findByEmail.mockResolvedValue({ ...user, ...overrides });
   mockUserRepository.findByUsername.mockResolvedValue({ ...user, ...overrides });
   mockEmailStrategy.handle.mockResolvedValue({ ...user, ...overrides });
   mockUsernameStrategy.handle.mockResolvedValue({ ...user, ...overrides });
   mockCryptoService.comparePassword.mockResolvedValue(true);
-  mockCryptoService.generateUUID.mockReturnValue("session_id");
-  mockJWTService.signAccessToken.mockReturnValue("access_token");
+  mockCryptoService.generateUUID.mockReturnValue(sessionId);
+  mockJWTService.signAccessToken.mockReturnValue(accessToken);
   mockCache.keys.mockResolvedValue([]);
-  return { user };
+  return { user, accessToken, sessionId, refreshToken };
 }
 
 export function clearAllMocks() {

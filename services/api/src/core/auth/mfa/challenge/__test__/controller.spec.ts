@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker";
 import { StatusCodes } from "http-status-codes";
 
 import { Assertions } from "@votewise/errors";
@@ -5,13 +6,10 @@ import { Assertions } from "@votewise/errors";
 import { mockChallengeRepository } from "@/repository/__mock__/challenge.repository";
 import { mockFactorRepository } from "@/repository/__mock__/factor.repository";
 
-import { buildChallenge, buildFactor, buildReq, buildRes } from "../../../../../../test/helpers";
+import { buildChallenge, buildFactor, buildReq, buildRes, ip, locals } from "../../../../../../test/helpers";
 import { Controller } from "../controller";
 
-const ip = "192.168.2.25";
-const params = { factor_id: "factor_id" };
-const session = { ip, userAgent: "userAgent", aal: "aal1" };
-const locals = { meta: { ip }, session };
+const params = { factor_id: faker.string.uuid() };
 const controller = new Controller({
   factorRepository: mockFactorRepository,
   challengeRepository: mockChallengeRepository,

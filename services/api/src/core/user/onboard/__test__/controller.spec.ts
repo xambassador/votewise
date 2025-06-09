@@ -1,3 +1,5 @@
+import { faker } from "@faker-js/faker";
+
 import { Assertions } from "@votewise/errors";
 
 import { requestParserPluginFactory } from "@/plugins";
@@ -10,13 +12,13 @@ import { mockUserRepository } from "@/repository/__mock__/user.repository";
 import { mockOnboardService } from "@/services/__mock__/onboard.service";
 import { mockSessionManagerWithoutCtx } from "@/services/__mock__/session.service";
 
-import { buildReq, buildRes, buildUser, getLocals } from "../../../../../test/helpers";
+import { appUrl, buildReq, buildRes, buildUser, getLocals } from "../../../../../test/helpers";
 import { Controller } from "../controller";
 
 const controller = new Controller({
   requestParser: requestParserPluginFactory(),
   assert: new Assertions(),
-  appUrl: "http://localhost:3000",
+  appUrl,
   avatarsBucket: "avatars",
   backgroundsBucket: "backgrounds",
   userRepository: mockUserRepository,
@@ -36,14 +38,14 @@ beforeEach(() => {
 const { locals, user } = getLocals();
 const getOnboardBody = (step: number) => ({
   step,
-  user_name: "testuser",
-  first_name: "Test",
-  last_name: "User",
+  user_name: faker.internet.userName(),
+  first_name: faker.person.firstName(),
+  last_name: faker.person.lastName(),
   gender: "MALE",
-  about: "This is a test user.",
+  about: faker.lorem.paragraph(),
   avatar: "http://example.com/avatars/avatar.jpg",
   cover: "http://example.com/backgrounds/cover.jpg",
-  location: "Test City",
+  location: faker.location.city(),
   topics: ["topic1", "topic2", "topic3"],
   has_setup_2fa: false
 });

@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker";
 import { StatusCodes } from "http-status-codes";
 
 import { Assertions } from "@votewise/errors";
@@ -80,10 +81,12 @@ describe("Refresh Controller", () => {
     const res = buildRes({ locals: helpers.locals });
     const { session_id } = helpers.setupHappyPath();
     const key = `session:${session_id}`;
-
+    const newSessionId = faker.string.uuid();
+    const newRefreshToken = faker.string.alphanumeric(64);
+    const newAccessToken = faker.string.alphanumeric(64);
     const { refreshToken } = helpers.setupHappyPath();
-    helpers.mockCryptoService.generateUUID.mockReturnValueOnce("new_session_id").mockReturnValue("new_refresh_token");
-    helpers.mockJWTService.signAccessToken.mockReturnValueOnce("new_access_token");
+    helpers.mockCryptoService.generateUUID.mockReturnValueOnce(newSessionId).mockReturnValue(newRefreshToken);
+    helpers.mockJWTService.signAccessToken.mockReturnValueOnce(newAccessToken);
 
     await controller.handle(req, res);
 
@@ -99,7 +102,7 @@ describe("Refresh Controller", () => {
         amr: helpers.amr,
         app_metadata: helpers.appMetaData,
         user_metadata: {},
-        session_id: "new_session_id",
+        session_id: newSessionId,
         user_aal_level: "aal1"
       },
       { expiresIn: 30 * Minute }

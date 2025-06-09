@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker";
 import { StatusCodes } from "http-status-codes";
 
 import { COOKIE_KEYS, ERROR_CODES } from "@votewise/constant";
@@ -7,7 +8,7 @@ import { Minute } from "@votewise/times";
 import { requestParserPluginFactory } from "@/plugins/request-parser";
 import { mockSessionManager } from "@/services/__mock__/session.service";
 
-import { buildReq, buildRes } from "../../../../../test/helpers";
+import { appUrl, buildReq, buildRes, ip, locals } from "../../../../../test/helpers";
 import { UserRegisterService } from "../../register/service";
 import { Controller } from "../controller";
 import { EmailStrategy, UsernameStrategy } from "../strategies";
@@ -15,16 +16,14 @@ import * as helpers from "./helpers";
 
 /* ----------------------------------------------------------------------------------------------- */
 
-const body = { email: "test@gmail.com", password: "password" };
-const userNameBody = { username: "test", password: "password" };
-const ip = "192.34.24.45";
-const locals = { meta: { ip } };
+const body = { email: faker.internet.email(), password: "password" };
+const userNameBody = { username: faker.internet.userName(), password: "password" };
 
 const userRegisterService = new UserRegisterService({
   tasksQueue: helpers.mockTaskQueue,
   cache: helpers.mockCache,
   cryptoService: helpers.mockCryptoService,
-  appUrl: "http://localhost:3000"
+  appUrl
 });
 const controller = new Controller({
   requestParser: requestParserPluginFactory(),
@@ -120,12 +119,8 @@ describe("Signin Controller", () => {
   it("should create a session and return JWT", async () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
-    const { user } = helpers.setupHappyPath();
+    const { user, accessToken, sessionId, refreshToken } = helpers.setupHappyPath();
 
-    const accessToken = "access_token";
-    const refreshToken = "refresh_token";
-    const sessionId = "session_id";
-    helpers.mockJWTService.signAccessToken.mockReturnValue(accessToken);
     helpers.mockCryptoService.generateUUID.mockReturnValueOnce(sessionId).mockReturnValueOnce(refreshToken);
     helpers.mockFactorRepository.findByUserId.mockResolvedValue([]);
 
@@ -152,7 +147,7 @@ describe("Signin Controller", () => {
       userAgent: "",
       userId: user.id
     });
-    expect(helpers.mockRefreshTokenRepository.create).toHaveBeenCalledWith({ token: "refresh_token", userId: user.id });
+    expect(helpers.mockRefreshTokenRepository.create).toHaveBeenCalledWith({ token: refreshToken, userId: user.id });
     expect(helpers.mockUserRepository.update).toHaveBeenCalledWith(user.id, { last_login: expect.any(Date) });
     expect(res.status).toHaveBeenCalledWith(StatusCodes.OK);
     expect(res.json.mock.calls[0]?.[0]).toEqual({

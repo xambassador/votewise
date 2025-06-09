@@ -1,5 +1,7 @@
 import type { AppContext } from "@/context";
 
+import { faker } from "@faker-js/faker";
+
 import { Assertions } from "@votewise/errors";
 import { Minute } from "@votewise/times";
 
@@ -26,14 +28,9 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-const ip = "192.34.24.45";
-const userId = "user-id";
-const body = {
-  code: "123456",
-  challenge_id: "challenge-id"
-};
-const factorId = "factor-id";
-const { locals } = getLocals();
+const factorId = faker.string.uuid();
+const { locals, user, body, ip } = getLocals();
+const userId = user.id;
 
 describe("Verify MFA Challenge Controller", () => {
   it("should throw error if body is invalid", async () => {
@@ -149,9 +146,9 @@ describe("Verify MFA Challenge Controller", () => {
     mockFactorRepository.verifyFactor.mockResolvedValue({ ...factor, status: "VERIFIED" });
 
     const sessionData = {
-      sessionId: "session-id",
-      accessToken: "new-access-token",
-      refreshToken: "new-refresh-token",
+      sessionId: faker.string.uuid(),
+      accessToken: faker.string.uuid(),
+      refreshToken: faker.string.uuid(),
       expiresAt: Date.now() + 30 * Minute,
       expiresInMs: 30 * Minute
     };
@@ -161,7 +158,7 @@ describe("Verify MFA Challenge Controller", () => {
 
     expect(mockChallengeRepository.verifyChallenge).toHaveBeenCalledWith(body.challenge_id);
     expect(mockFactorRepository.verifyFactor).toHaveBeenCalledWith(factorId);
-    expect(mockSessionManagerWithoutCtx.update).toHaveBeenCalledWith("session-id", { aal: "aal2", factorId });
+    expect(mockSessionManagerWithoutCtx.update).toHaveBeenCalledWith(sessionData.sessionId, { aal: "aal2", factorId });
     expect(res.json).toHaveBeenCalledWith({
       access_token: sessionData.accessToken,
       refresh_token: sessionData.refreshToken,

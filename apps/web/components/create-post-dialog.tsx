@@ -366,7 +366,7 @@ function PickTopicsModalTrigger() {
   return (
     <div
       {...getTriggerProps({
-        className: "flex items-center gap-1 w-fit flex-wrap outline-none focus:ring-2",
+        className: "flex items-center gap-1 w-fit flex-wrap outline-none focus:ring-2 cursor-pointer",
         onClick: () => setPickTopicModal(true)
       })}
     >

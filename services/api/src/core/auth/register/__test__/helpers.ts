@@ -1,3 +1,5 @@
+import { faker } from "@faker-js/faker";
+
 import { mockTaskQueue } from "@/queues/__mock__";
 import { mockUserRepository } from "@/repository/__mock__/user.repository";
 import { mockCryptoService } from "@/services/__mock__/crypto.service";
@@ -8,17 +10,20 @@ import { buildUser } from "../../../../../test/helpers";
 export const user = buildUser();
 
 export function setupHappyPath() {
+  const hashedPassword = faker.string.alphanumeric(32);
+  const otp = faker.string.numeric(6);
+  const uuid = faker.string.uuid();
   mockUserRepository.findByEmail.mockResolvedValue(null);
   mockUserRepository.findByUsername.mockResolvedValue(null);
   mockUserRepository.create.mockResolvedValue(user);
-  mockCryptoService.hashPassword.mockResolvedValue("hashed-password");
-  mockCryptoService.getOtp.mockReturnValue("123456");
-  mockCryptoService.generateUUID.mockReturnValue("some-random-uuid");
+  mockCryptoService.hashPassword.mockResolvedValue(hashedPassword);
+  mockCryptoService.getOtp.mockReturnValue(otp);
+  mockCryptoService.generateUUID.mockReturnValue(uuid);
   mockCryptoService.generateNanoId.mockReturnValue("some-random-username");
   return {
-    hashedPassword: "hashed-password",
-    otp: "123456",
-    uuid: "some-random-uuid".replace(/-/g, ""),
+    hashedPassword,
+    otp,
+    uuid: uuid.replace(/-/g, ""),
     defaultUserName: "some-random-username"
   };
 }

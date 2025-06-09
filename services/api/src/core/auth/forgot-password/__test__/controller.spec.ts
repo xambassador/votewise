@@ -8,13 +8,10 @@ import { mockCryptoService } from "@/services/__mock__/crypto.service";
 import { mockJWTService } from "@/services/__mock__/jwt.service";
 import { mockSessionManager, sessionManagerMockDeps } from "@/services/__mock__/session.service";
 
-import { buildReq, buildRes, buildUser } from "../../../../../test/helpers";
+import { appUrl, buildReq, buildRes, buildUser, locals } from "../../../../../test/helpers";
 import { Controller } from "../controller";
 
 const user = buildUser();
-const ip = "192.168.4.45";
-const locals = { meta: { ip } };
-const appUrl = "http://localhost:3000";
 const controller = new Controller({
   userRepository: mockUserRepository,
   assert: new Assertions(),

@@ -1,12 +1,21 @@
 import type { AppContext } from "@/context";
 
+import { faker } from "@faker-js/faker";
+
 import { Assertions } from "@votewise/errors";
 
 import { mockFactorRepository } from "@/repository/__mock__/factor.repository";
 import { mockUserRepository } from "@/repository/__mock__/user.repository";
 import { mockCryptoService } from "@/services/__mock__/crypto.service";
 
-import { buildAccessToken, buildFactor, buildReq, buildRes, buildUser } from "../../../../../../test/helpers";
+import {
+  buildAccessToken,
+  buildFactor,
+  buildReq,
+  buildRes,
+  buildUser,
+  locals as defaultLocals
+} from "../../../../../../test/helpers";
 import { Controller } from "../controller";
 
 /* ----------------------------------------------------------------------------------------------- */
@@ -20,13 +29,11 @@ const controller = new Controller({
   assert: new Assertions()
 });
 
-const ip = "192.168.2.25";
-const params = { factor_id: "factor_id" };
-const session = { ip, userAgent: "userAgent", aal: "aal1" };
+const params = { factor_id: faker.string.uuid() };
 const user = buildUser();
 const factor = buildFactor({ user_id: user.id });
 const payload = buildAccessToken({ sub: user.id, email: user.email });
-const locals = { meta: { ip }, session, payload };
+const locals = { ...defaultLocals, payload };
 
 describe("MFA Enroll Controller", () => {
   test("should throw error if user is not found", async () => {
