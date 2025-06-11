@@ -77,6 +77,10 @@ export const rateLimitStrategies = {
     points: 5,
     duration: 60 * 60
   },
+  FIVE_PER_MINUTE: {
+    points: 5,
+    duration: 60
+  },
   THREE_PER_HOUR: {
     points: 3,
     duration: 60 * 60

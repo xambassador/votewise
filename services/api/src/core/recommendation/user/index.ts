@@ -2,11 +2,13 @@ import { yellow } from "chalk";
 
 import { AppContext } from "@/context";
 import { authMiddlewareFactory } from "@/http/middlewares/auth";
+import { rateLimitMiddlewareFactory } from "@/http/middlewares/rate-limit";
 import { ExceptionLayer } from "@/lib/exception-layer";
+import { rateLimitStrategies } from "@/lib/rate-limiter";
 
 import { Controller } from "./controller";
 
-export function getRecommendateUserControllerFactory() {
+export function getRecommendateUserControllerFactory(path: string) {
   const ctx = AppContext.getInjectionTokens(["repositories", "logger", "mlService", "assert", "bucketService"]);
   const controller = new Controller({
     userRepository: ctx.repositories.user,
@@ -15,7 +17,11 @@ export function getRecommendateUserControllerFactory() {
     bucketService: ctx.bucketService
   });
   const auth = authMiddlewareFactory();
+  const limiter = rateLimitMiddlewareFactory(path, {
+    ...rateLimitStrategies.FIFTEEN_PER_MINUTE,
+    keyPrefix: "rtGetRecommendateUser"
+  });
   const exceptionLayer = new ExceptionLayer({ name: "get-recommendate-user" });
   ctx.logger.info(`[${yellow("GetRecommendateUserController")}] dependencies initialized`);
-  return [auth, exceptionLayer.catch(controller.handle.bind(controller))];
+  return [limiter, auth, exceptionLayer.catch(controller.handle.bind(controller))];
 }
