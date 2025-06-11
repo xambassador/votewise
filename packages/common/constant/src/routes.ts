@@ -78,10 +78,12 @@ export const topics = {
 export const feeds = {
   paths: {
     all: (base: string) => base + "/feeds",
+    get: (base: string) => base + "/feeds/:id",
     create: (base: string) => base + "/feeds"
   },
   runtime: {
     all: (base: string) => base + "/feeds",
+    get: (base: string, id: string) => base + `/feeds/${id}`,
     create: (base: string) => base + "/feeds"
   }
 };

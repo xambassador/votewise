@@ -39,4 +39,44 @@ export class FeedRepository extends BaseRepository {
       return feed;
     });
   }
+
+  public findById(id: string) {
+    return this.execute(() =>
+      this.db.post.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          content: true,
+          slug: true,
+          status: true,
+          title: true,
+          type: true,
+          created_at: true,
+          updated_at: true,
+          author: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+              user_name: true,
+              avatar_url: true
+            }
+          },
+          assets: {
+            select: {
+              id: true,
+              url: true,
+              type: true
+            }
+          },
+          _count: {
+            select: {
+              upvotes: true,
+              comments: true
+            }
+          }
+        }
+      })
+    );
+  }
 }

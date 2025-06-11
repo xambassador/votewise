@@ -14,6 +14,7 @@ import { resetPasswordControllerFactory } from "./auth/reset-password";
 import { singinControllerFactory } from "./auth/signin";
 import { verifyControllerFactory } from "./auth/verify";
 import { createFeedControllerFactory } from "./feed/create";
+import { getFeedControllerFactory } from "./feed/get";
 import { getAllFeedControllerFactory } from "./feed/get-all";
 import { getGroupRecommendationsControllerFactory } from "./recommendation/group";
 import { getRecommendateUserControllerFactory } from "./recommendation/user";
@@ -58,6 +59,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.get(topics.paths.all(path), ...getAllTopicsControllerFactory());
   router.post(feeds.paths.create(path), ...createFeedControllerFactory());
   router.get(feeds.paths.all(path), ...getAllFeedControllerFactory());
+  router.get(feeds.paths.get(path), ...getFeedControllerFactory(feeds.paths.get(path)));
 
   return router;
 }
