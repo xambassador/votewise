@@ -28,7 +28,13 @@ export const PasswordInput = forwardRef<InputRef, PasswordInputProps>((props, re
     <InputField {...wrapperProps} hasError={hasError}>
       <Padlock className="text-gray-600" />
       <Input autoComplete="current-password" {...inputProps} type={type} ref={ref} />
-      <button type="button" className="absolute top-1/2 right-2 -translate-y-1/2" onClick={onToggle}>
+      <button
+        type="button"
+        className="absolute top-1/2 right-2 -translate-y-1/2"
+        onClick={onToggle}
+        aria-label="Toggle password visibility"
+        title="Toggle password visibility"
+      >
         {showPassword && <EyeCross className="text-gray-600" />}
         {!showPassword && <Eye className="text-gray-600" />}
       </button>

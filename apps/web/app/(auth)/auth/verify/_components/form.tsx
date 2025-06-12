@@ -13,7 +13,7 @@ export function OTPForm(props: Props) {
   const { loading, onSubmit, onChange } = useOTP();
   return (
     <>
-      <InputOTP maxLength={6} onChange={onChange} disabled={loading}>
+      <InputOTP maxLength={6} onChange={onChange} disabled={loading} aria-label="OTP Input">
         <InputOTPGroup>
           {Array.from({ length: 6 }).map((_, index) => (
             <InputOTPSlot key={index} index={index} />

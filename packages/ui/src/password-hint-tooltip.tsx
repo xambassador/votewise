@@ -15,7 +15,7 @@ export function PasswordHintTooltip(props: PasswordHintTooltipProps) {
 
   return (
     <Tooltip>
-      <TooltipTrigger>
+      <TooltipTrigger title="Password requirements" aria-label="Password requirements">
         <InforCircleSolid className="text-gray-400" />
       </TooltipTrigger>
       <TooltipContent className="bg-nobelBlack-200 border border-nobelBlack-100 rounded p-4 shadow-lg">
