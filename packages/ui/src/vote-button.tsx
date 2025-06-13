@@ -1,6 +1,9 @@
 "use client";
 
+import type { VariantProps } from "class-variance-authority";
+
 import { useState } from "react";
+import { cva } from "class-variance-authority";
 
 import { cn } from "./cn";
 import { createContext } from "./context";
@@ -13,7 +16,6 @@ type State = {
 const [Provider, useVoteButton] = createContext<State>("VoteProvider");
 
 export type VoteProviderProps = React.HTMLAttributes<HTMLDivElement> & { count?: number };
-export type VoteCountProps = React.HTMLAttributes<HTMLDivElement>;
 export type VoteButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & { isVoted?: boolean };
 
 export function VoteProvider(props: VoteProviderProps) {
@@ -34,16 +36,25 @@ export function VoteProvider(props: VoteProviderProps) {
   );
 }
 
+const voteCountVariants = cva("text-sm text-blue-100", {
+  variants: {
+    variant: {
+      default: "size-8 rounded-lg bg-nobelBlack-100 border border-nobelBlack-200 flex items-center justify-center",
+      minimal: ""
+    }
+  },
+  defaultVariants: {
+    variant: "default"
+  }
+});
+
+export interface VoteCountProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof voteCountVariants> {}
+
 export function VoteCount(props: VoteCountProps) {
+  const { variant, className, ...rest } = props;
   const { count } = useVoteButton("VoteCount");
   return (
-    <div
-      {...props}
-      className={cn(
-        "size-8 rounded-lg bg-nobelBlack-100 border border-nobelBlack-200 text-sm text-blue-100 flex items-center justify-center",
-        props.className
-      )}
-    >
+    <div {...rest} className={cn(voteCountVariants({ className, variant }))}>
       {count}
     </div>
   );
@@ -57,7 +68,11 @@ export function VoteButton(props: VoteButtonProps) {
   const [isVoted, setIsVoted] = useState(_isVoted);
 
   if (isVoted) {
-    return <button className="px-5 bg-nobelBlack-100 text-sm h-12 max-w-20 w-full font-medium">{voted}</button>;
+    return (
+      <button className="px-5 bg-nobelBlack-100 text-sm h-12 max-w-20 w-full font-medium flex items-center justify-center">
+        {voted}
+      </button>
+    );
   }
 
   return (
@@ -70,7 +85,7 @@ export function VoteButton(props: VoteButtonProps) {
       }}
       className={
         // Don't know why, but cn is not working on shadow classes and it is removing them from the output list
-        "shadow-vote-button shadow-nobelBlack-200 hover:shadow-vote-button-hover hover:shadow-nobelBlack-200 hover:translate-y-[-2px] active:shadow-vote-button-active active:shadow-nobelBlack-200 active:translate-y-[2px] " +
+        "flex items-center justify-center shadow-vote-button shadow-nobelBlack-200 hover:shadow-vote-button-hover hover:shadow-nobelBlack-200 hover:translate-y-[-2px] active:shadow-vote-button-active active:shadow-nobelBlack-200 active:translate-y-[2px] " +
         cn(
           "px-5 rounded-xl bg-nobelBlack-100 border border-nobelBlack-200 text-sm text-gray-50 h-12 max-w-20 w-full transition-[shadow_transform]",
           className

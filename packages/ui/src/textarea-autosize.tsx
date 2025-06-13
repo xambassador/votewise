@@ -16,7 +16,7 @@ export function Textarea(props: TextareaProps) {
     <TextareaAutosize
       {...rest}
       className={cn(
-        "bg-nobelBlack-100 placeholder:text-gray-500 resize-none text-base focus-within:border-0 focus-within:outline-none",
+        "bg-nobelBlack-100 text-gray-300 placeholder:text-gray-500 resize-none text-base focus-within:border-0 focus-within:outline-none",
         isError && inputWrapper.error,
         className
       )}

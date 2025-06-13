@@ -75,6 +75,11 @@ export function FeedTimeAgo(props: FeedTimeAgoProps) {
   );
 }
 
+export type FeedTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
+export function FeedTitle(props: FeedTitleProps) {
+  return <h1 {...props} className={cn("text-lg font-medium text-gray-200", props.className)} />;
+}
+
 export type FeedContentTextProps = React.HTMLAttributes<HTMLParagraphElement>;
 export function FeedContentText(props: FeedContentTextProps) {
   const { children, className, ...rest } = props;
