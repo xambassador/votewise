@@ -17,7 +17,7 @@ export function getMeControllerFactory(path: string) {
   });
   const auth = authMiddlewareFactory();
   const limiter = rateLimitMiddlewareFactory(path, {
-    ...rateLimitStrategies.TEN_PER_MINUTE,
+    ...rateLimitStrategies.FIFTEEN_PER_MINUTE,
     keyPrefix: "rtGetMe"
   });
   const exceptionLayer = new ExceptionLayer({ name: "get-me" });

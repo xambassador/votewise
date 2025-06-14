@@ -23,7 +23,12 @@ export const routes = {
     step6: () => "/onboard/pick-topics",
     step7: () => "/onboard/secure-your-account"
   },
-  app: {
-    root: () => "/"
+  app: { root: () => "/" },
+  feeds: {
+    root: () => "/feeds",
+    view: (id: string) => `/feeds/${id}`
+  },
+  user: {
+    profile: (id: string) => `/profile/${id}`
   }
 };

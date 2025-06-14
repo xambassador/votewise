@@ -16,7 +16,10 @@ type State = {
 const [Provider, useVoteButton] = createContext<State>("VoteProvider");
 
 export type VoteProviderProps = React.HTMLAttributes<HTMLDivElement> & { count?: number };
-export type VoteButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & { isVoted?: boolean };
+export type VoteButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  isVoted?: boolean;
+  showCount?: boolean;
+};
 
 export function VoteProvider(props: VoteProviderProps) {
   const { count: defaultCount, children, ...rest } = props;
@@ -64,13 +67,15 @@ const voted = <span className="text-transparent bg-clip-text bg-gradient-to-r fr
 
 export function VoteButton(props: VoteButtonProps) {
   const { setCount, count } = useVoteButton("VoteButton");
-  const { children, className, isVoted: _isVoted = false, onClick, ...rest } = props;
+  const { children, className, isVoted: _isVoted = false, onClick, showCount = false, ...rest } = props;
   const [isVoted, setIsVoted] = useState(_isVoted);
 
   if (isVoted) {
     return (
-      <button className="px-5 bg-nobelBlack-100 text-sm h-12 max-w-20 w-full font-medium flex items-center justify-center">
-        {voted}
+      <button className="px-5 bg-nobelBlack-100 text-sm h-12 font-medium flex items-center justify-center w-full">
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B1D766] to-[#F15DD6]">
+          {showCount ? `${count} Votes` : voted}
+        </span>
       </button>
     );
   }

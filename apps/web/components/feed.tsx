@@ -1,5 +1,6 @@
 import type { Feed as TFeed } from "@/types";
 
+import Link from "next/link";
 import dayjs, { extend } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
@@ -28,6 +29,8 @@ import { Comment } from "@votewise/ui/icons/comment";
 import { PaperPlane } from "@votewise/ui/icons/paper-plane";
 import { Separator } from "@votewise/ui/separator";
 
+import { routes } from "@/lib/routes";
+
 extend(relativeTime);
 
 type Props = {
@@ -45,16 +48,22 @@ export function FeedMolecule(props: Props) {
       <Separator orientation="vertical" className="h-auto" />
       <FeedContainer>
         <div className="flex gap-2">
-          <Avatar className="size-12">
-            <AvatarFallback name={feed.author.first_name + " " + feed.author.last_name} />
-            <AvatarImage src={feed.author.avatar_url || ""} alt={feed.author.first_name} className="object-cover" />
-          </Avatar>
+          <Link href={routes.user.profile(feed.author.id)}>
+            <Avatar className="size-12">
+              <AvatarFallback name={feed.author.first_name + " " + feed.author.last_name} />
+              <AvatarImage src={feed.author.avatar_url || ""} alt={feed.author.first_name} className="object-cover" />
+            </Avatar>
+          </Link>
           <FeedContent>
             <FeedHeader>
-              <FeedUserName>{feed.author.first_name + " " + feed.author.last_name}</FeedUserName>
+              <Link href={routes.user.profile(feed.author.id)}>
+                <FeedUserName>{feed.author.first_name + " " + feed.author.last_name}</FeedUserName>
+              </Link>
               <FeedTimeAgo>{dayjs(feed.created_at).fromNow()}</FeedTimeAgo>
             </FeedHeader>
-            <FeedContentText>{truncateOnWord(feed.title, 128)}</FeedContentText>
+            <Link href={routes.feeds.view(feed.id)}>
+              <FeedContentText>{truncateOnWord(feed.title, 128)}</FeedContentText>
+            </Link>
             <FeedContentTags>
               {feed.hash_tags.map((tag) => (
                 <span key={tag.name}>#{tag.name}</span>
