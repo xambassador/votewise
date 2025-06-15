@@ -1,6 +1,7 @@
-import { OnboardContainer } from "../_components/container";
-import { OnboardHeader, OnboardSubtitle, OnboardTitle } from "../_components/typography";
-import { shouldNotOnboarded, verifyStep } from "../_utils";
+import { OnboardContainer } from "@/app/onboard/_components/container";
+import { OnboardHeader, OnboardSubtitle, OnboardTitle } from "@/app/onboard/_components/typography";
+import { shouldNotOnboarded, verifyStep } from "@/app/onboard/_utils";
+
 import { AvatarPicker } from "./_components/avatar-picker";
 import { AvatarPickerDialog } from "./_components/avatar-picker-dialog";
 import { ChooseAvatarDialog } from "./_components/choose-avatar-dialog";

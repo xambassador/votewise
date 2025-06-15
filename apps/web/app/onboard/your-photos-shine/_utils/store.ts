@@ -12,7 +12,7 @@ type DialogProps = React.ComponentProps<typeof Dialog>;
  * Atoms
  * -----------------------------------------------------------------------------------------------*/
 const isDialogOpen = atom(false);
-const isChooseAvtarDialogOpen = atom(false);
+const isChooseAvatarDialogOpen = atom(false);
 
 /**
  * Atom used to store the image URL of the image either from choosing from the list or from file drop.
@@ -35,7 +35,7 @@ const onSaveActionAtom = atom(null, (get, set) => {
 });
 const onSelectAvatarFromList = atom(null, (_, set, avatar: string) => {
   set(selectedAvatarAtom, avatar);
-  set(isChooseAvtarDialogOpen, false);
+  set(isChooseAvatarDialogOpen, false);
 });
 const onFileDropAtom = atom(null, (_, set, files: File[]) => {
   const file = files[0];
@@ -49,8 +49,8 @@ export function useSetDialogOpen() {
   return useSetAtom(isDialogOpen);
 }
 
-export function useSetChooseAvtarDialogOpen() {
-  return useSetAtom(isChooseAvtarDialogOpen);
+export function useSetChooseAvatarDialogOpen() {
+  return useSetAtom(isChooseAvatarDialogOpen);
 }
 
 export function useSaveAction() {
@@ -111,8 +111,8 @@ export function useGetDialogProps(props?: DialogProps): DialogProps {
   return { ...props, open, onOpenChange: setDialogOpen };
 }
 
-export function useGetChooseAvtarDialogProps(props?: DialogProps): DialogProps {
-  const open = useAtomValue(isChooseAvtarDialogOpen);
-  const setDialogOpen = useSetChooseAvtarDialogOpen();
+export function useGetChooseAvatarDialogProps(props?: DialogProps): DialogProps {
+  const open = useAtomValue(isChooseAvatarDialogOpen);
+  const setDialogOpen = useSetChooseAvatarDialogOpen();
   return { ...props, open, onOpenChange: setDialogOpen };
 }

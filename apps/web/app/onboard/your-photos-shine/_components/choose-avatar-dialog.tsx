@@ -3,10 +3,10 @@
 import { AvatarList } from "@votewise/ui/avatar-list";
 import { Close, Dialog, DialogContent, DialogDescription, DialogTitle } from "@votewise/ui/dialog";
 
-import { useGetChooseAvtarDialogProps, useSelectAvatarFromList } from "../_utils/store";
+import { useGetChooseAvatarDialogProps, useSelectAvatarFromList } from "../_utils/store";
 
 export function ChooseAvatarDialog() {
-  const props = useGetChooseAvtarDialogProps();
+  const props = useGetChooseAvatarDialogProps();
   const selectAvatar = useSelectAvatarFromList();
 
   return (

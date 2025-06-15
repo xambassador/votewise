@@ -1,8 +1,9 @@
+import { OnboardContainer } from "@/app/onboard/_components/container";
+import { OnboardHeader, OnboardSubtitle, OnboardTitle } from "@/app/onboard/_components/typography";
+import { shouldNotOnboarded, verifyStep } from "@/app/onboard/_utils";
+
 import { getOnboardClient } from "@/lib/client.server";
 
-import { OnboardContainer } from "../_components/container";
-import { OnboardHeader, OnboardSubtitle, OnboardTitle } from "../_components/typography";
-import { shouldNotOnboarded, verifyStep } from "../_utils";
 import { Topics } from "./_components/form";
 
 export default async function Page() {

@@ -1,6 +1,7 @@
-import { OnboardContainer } from "../_components/container";
-import { OnboardHeader, OnboardSubtitle, OnboardTitle } from "../_components/typography";
-import { shouldNotOnboarded } from "../_utils";
+import { OnboardContainer } from "@/app/onboard/_components/container";
+import { OnboardHeader, OnboardSubtitle, OnboardTitle } from "@/app/onboard/_components/typography";
+import { shouldNotOnboarded } from "@/app/onboard/_utils";
+
 import { StepTwoForm } from "./_components/form";
 
 export default async function Page() {

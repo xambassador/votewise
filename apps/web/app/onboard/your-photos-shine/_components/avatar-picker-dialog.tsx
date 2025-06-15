@@ -8,7 +8,7 @@ import {
   useGetDialogProps,
   useGetSelectedAvatar,
   useSaveAction,
-  useSetChooseAvtarDialogOpen,
+  useSetChooseAvatarDialogOpen,
   useSetSelectedAvatar
 } from "../_utils/store";
 import { AvatarDropZone } from "./avatar-dropzone";
@@ -44,7 +44,7 @@ export function AvatarPickerDialog(props: Props) {
 }
 
 function ChooseAvatarButton() {
-  const setDialogOpen = useSetChooseAvtarDialogOpen();
+  const setDialogOpen = useSetChooseAvatarDialogOpen();
   return (
     <Button variant="secondary" onClick={() => setDialogOpen(true)}>
       Or choose from our awesome avatars to express your style!

@@ -1,10 +1,10 @@
 "use client";
 
+import type { TTellUsAboutYou } from "@/app/onboard/_utils/schema";
 import type { ButtonProps } from "@votewise/ui/button";
 import type { FormFieldProps, TFieldControllerProps } from "@votewise/ui/form";
 import type { TextareaProps } from "@votewise/ui/textarea";
 import type Link from "next/link";
-import type { TTellUsAboutYou } from "../../_utils/schema";
 
 import { useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,11 +12,11 @@ import { useForm } from "react-hook-form";
 
 import { makeToast } from "@votewise/ui/toast";
 
+import { ZTellUsAboutYou } from "@/app/onboard/_utils/schema";
+import { onboard } from "@/app/onboard/action";
+
 import { isObjectDirty } from "@/lib/object";
 import { routes } from "@/lib/routes";
-
-import { ZTellUsAboutYou } from "../../_utils/schema";
-import { onboard } from "../../action";
 
 /* ----------------------------------------------------------------------------------------------- */
 

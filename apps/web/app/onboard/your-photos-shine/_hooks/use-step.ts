@@ -7,12 +7,13 @@ import { useTransition } from "react";
 
 import { makeToast } from "@votewise/ui/toast";
 
+import { onboard } from "@/app/onboard/action";
+
 import { chain } from "@/lib/chain";
 import { uploadClient } from "@/lib/client";
 import { routes } from "@/lib/routes";
 
 import { useGetSavedAvatar } from "../_utils/store";
-import { onboard } from "../../action";
 
 type LinkProps = React.ComponentProps<typeof Link>;
 type Props = {

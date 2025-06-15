@@ -1,7 +1,8 @@
 "use client";
 
+import { Footer } from "@/app/onboard/_components/footer";
+
 import { useStep } from "../_hooks/use-step";
-import { Footer } from "../../_components/footer";
 
 type Props = { url?: string };
 

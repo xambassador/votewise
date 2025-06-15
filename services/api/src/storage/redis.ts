@@ -3,7 +3,7 @@ import type { RedisOptions } from "ioredis";
 import { Redis } from "ioredis";
 import { defaults } from "lodash";
 
-import { Milisecond } from "@votewise/times";
+import { Millisecond } from "@votewise/times";
 
 /* ----------------------------------------------------------------------------------------------- */
 
@@ -153,7 +153,7 @@ export class Cache {
    * @returns {Promise<"Ok">} Redis response
    */
   public async setWithExpiry(key: string, value: string | Buffer | number, expiry: number) {
-    const seconds = Math.floor(expiry / Milisecond);
+    const seconds = Math.floor(expiry / Millisecond);
     return this.client.set(key, value, "EX", seconds);
   }
 
@@ -215,7 +215,7 @@ export class Cache {
    * - _complexity_: O(1)
    */
   public async expire(key: string, ms: number) {
-    const seconds = Math.floor(ms / Milisecond);
+    const seconds = Math.floor(ms / Millisecond);
     return await this.client.expire(key, seconds);
   }
 

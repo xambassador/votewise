@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 
-import { Milisecond, Minute, Second } from "@votewise/times";
+import { Millisecond, Minute, Second } from "@votewise/times";
 
 type Props = { remainingTime: number; total: number };
 
@@ -20,7 +20,7 @@ export function useTimer(props: Props) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const remainingTime = totalRemainingTime - Milisecond;
+      const remainingTime = totalRemainingTime - Millisecond;
       const remainingMinutes = remainingTime / Minute;
       const str = dayjs().startOf("day").add(remainingMinutes, "minute").format("m:ss");
       const progress = 100 - (remainingTime * 100) / total;

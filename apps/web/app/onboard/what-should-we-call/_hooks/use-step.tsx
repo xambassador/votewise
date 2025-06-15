@@ -1,10 +1,10 @@
 "use client";
 
+import type { TWhatShouldWeCall } from "@/app/onboard/_utils/schema";
 import type { ButtonProps } from "@votewise/ui/button";
 import type { FormFieldProps } from "@votewise/ui/form";
 import type { InputProps } from "@votewise/ui/input";
 import type Link from "next/link";
-import type { TWhatShouldWeCall } from "../../_utils/schema";
 
 import { useEffect, useTransition } from "react";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -14,12 +14,12 @@ import { User } from "@votewise/client/user";
 import { useForm } from "@votewise/ui/form";
 import { makeToast } from "@votewise/ui/toast";
 
+import { ZWhatShouldWeCall } from "@/app/onboard/_utils/schema";
+import { onboard } from "@/app/onboard/action";
+
 import { chain } from "@/lib/chain";
 import { client } from "@/lib/client";
 import { isObjectDirty } from "@/lib/object";
-
-import { ZWhatShouldWeCall } from "../../_utils/schema";
-import { onboard } from "../../action";
 
 type LinkProps = React.ComponentProps<typeof Link>;
 type Keys = keyof TWhatShouldWeCall;

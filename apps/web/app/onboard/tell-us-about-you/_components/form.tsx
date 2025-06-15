@@ -1,13 +1,14 @@
 "use client";
 
-import type { TTellUsAboutYou } from "../../_utils/schema";
+import type { TTellUsAboutYou } from "@/app/onboard/_utils/schema";
 
 import { FieldController, Form, FormControl, FormField, FormLabel, FormMessage } from "@votewise/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@votewise/ui/select";
 import { Textarea } from "@votewise/ui/textarea";
 
+import { Footer } from "@/app/onboard/_components/footer";
+
 import { useStep } from "../_hooks/use-step";
-import { Footer } from "../../_components/footer";
 
 export function OnboardForm(props: { defaultValue?: TTellUsAboutYou }) {
   const {

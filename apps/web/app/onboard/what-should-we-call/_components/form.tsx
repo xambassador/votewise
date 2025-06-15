@@ -1,12 +1,13 @@
 "use client";
 
-import type { TWhatShouldWeCall } from "../../_utils/schema";
+import type { TWhatShouldWeCall } from "@/app/onboard/_utils/schema";
 
 import { Form, FormControl, FormField, FormLabel, FormMessage } from "@votewise/ui/form";
 import { Input } from "@votewise/ui/input";
 
+import { Footer } from "@/app/onboard/_components/footer";
+
 import { useStep } from "../_hooks/use-step";
-import { Footer } from "../../_components/footer";
 
 export function StepTwoForm(props: { defaultValues?: TWhatShouldWeCall }) {
   const { getFormFieldProps, form, getInputProps, getNextButtonProps } = useStep(props);

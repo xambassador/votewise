@@ -1,7 +1,8 @@
-import { OnboardContainer } from "../_components/container";
-import { OnboardHeader, OnboardSubtitle, OnboardTitle } from "../_components/typography";
-import { shouldNotOnboarded, verifyStep } from "../_utils";
-import { BackgrondPicker } from "./_components/bg-picker";
+import { OnboardContainer } from "@/app/onboard/_components/container";
+import { OnboardHeader, OnboardSubtitle, OnboardTitle } from "@/app/onboard/_components/typography";
+import { shouldNotOnboarded, verifyStep } from "@/app/onboard/_utils";
+
+import { BackgroundPicker } from "./_components/bg-picker";
 import { BackgroundPickerDialog } from "./_components/bg-picker-dialog";
 import { FooterAction } from "./_components/footer";
 
@@ -15,7 +16,7 @@ export default async function Page() {
         <OnboardSubtitle>Hello 👋, {name}</OnboardSubtitle>
         <OnboardTitle>Showcase your best background and make your profile stand out!</OnboardTitle>
       </OnboardHeader>
-      <BackgrondPicker url={onboardingData.cover_image_url || undefined} />
+      <BackgroundPicker url={onboardingData.cover_image_url || undefined} />
       <BackgroundPickerDialog />
       <FooterAction url={onboardingData.cover_image_url || undefined} />
     </OnboardContainer>

@@ -10,7 +10,7 @@ import {
 
 import { useBackgroundPicker } from "../_hooks/use-background-picker";
 
-export function BackgrondPicker(props?: { url?: string }) {
+export function BackgroundPicker(props?: { url?: string }) {
   const { url } = props || {};
   const { getResetButtonProps, getPickerButtonProps, getImagePickerProps } = useBackgroundPicker({ url });
   return (

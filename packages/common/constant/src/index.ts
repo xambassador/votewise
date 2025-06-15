@@ -32,6 +32,9 @@ export const ERROR_CODES = {
   },
   USER: {
     USERNAME_ALREADY_EXISTS: 4000
+  },
+  FEED: {
+    FEED_NOT_FOUND: 5000
   }
 };
 
