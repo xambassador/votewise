@@ -69,6 +69,10 @@ export class FeedRepository extends BaseRepository {
               type: true
             }
           },
+          upvotes: {
+            select: { user: { select: { id: true, avatar_url: true } } },
+            take: 10
+          },
           _count: {
             select: {
               upvotes: true,

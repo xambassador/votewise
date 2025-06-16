@@ -4,11 +4,14 @@ import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
+import { ERROR_CODES } from "@votewise/constant";
+
 import { getAuthenticateLocals } from "@/utils/locals";
 
 type ControllerOptions = {
   feedRepository: AppContext["repositories"]["feed"];
   assert: AppContext["assert"];
+  bucketService: AppContext["bucketService"];
 };
 
 export class Controller {
@@ -23,7 +26,7 @@ export class Controller {
     const id = req.params.id as string;
     this.ctx.assert.badRequest(typeof id !== "string", "Invalid id provided");
     const _feed = await this.ctx.feedRepository.findById(id);
-    this.ctx.assert.resourceNotFound(!_feed, `Feed with id ${id} not found`);
+    this.ctx.assert.resourceNotFound(!_feed, `Feed with id ${id} not found`, ERROR_CODES.FEED.FEED_NOT_FOUND);
     const feed = _feed!;
     const result = {
       id: feed.id,
@@ -38,8 +41,39 @@ export class Controller {
       assets: feed.assets,
       ...(feed.author.id === locals.payload.sub ? { is_self: true } : {}),
       upvote_count: feed._count.upvotes,
-      comment_count: feed._count.comments
+      comment_count: feed._count.comments,
+      voters: feed.upvotes.map((v) => ({
+        id: v.user.id,
+        avatar_url: v.user.avatar_url
+      }))
     };
+    const authorAvatarPromise = new Promise<typeof result>((resolve) => {
+      this.ctx.bucketService
+        .getUrlForType(result.author.avatar_url ?? "", "avatar")
+        .then((url) => {
+          result.author.avatar_url = url;
+          resolve(result);
+        })
+        .catch(() => {
+          result.author.avatar_url = "";
+          resolve(result);
+        });
+    });
+    const votersAvatarPromises = result.voters
+      .filter((v) => v.avatar_url)
+      .map(
+        (upvote) =>
+          new Promise<typeof result>((resolve) => {
+            this.ctx.bucketService
+              .getUrlForType(upvote.avatar_url || "", "avatar")
+              .then((url) => {
+                upvote.avatar_url = url;
+                resolve(result);
+              })
+              .catch(() => resolve(result));
+          })
+      );
+    await Promise.all([authorAvatarPromise, ...votersAvatarPromises]);
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 }

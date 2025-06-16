@@ -1,4 +1,4 @@
-import type { CreateFeedResponse, GetAllFeedsResponse } from "@votewise/api";
+import type { CreateFeedResponse, GetAllFeedsResponse, GetFeedResponse } from "@votewise/api";
 import type { TFeedCreate } from "@votewise/schemas/feed";
 import type { Client } from "../client";
 import type { Client as ServerClient } from "../server";
@@ -14,7 +14,7 @@ export class Feed {
     this.client = opts.client;
   }
 
-  public async get() {
+  public async getAll() {
     const res = await this.client.get<GetAllFeedsResponse>(feeds.runtime.all(""));
     return res;
   }
@@ -23,6 +23,11 @@ export class Feed {
     const res = await this.client.post<CreateFeedResponse, TFeedCreate>(feeds.runtime.create(""), data);
     return res;
   }
+
+  public async get(id: string) {
+    const res = await this.client.get<GetFeedResponse>(feeds.runtime.get("", id));
+    return res;
+  }
 }
 
-export type { GetAllFeedsResponse, CreateFeedResponse };
+export type { GetAllFeedsResponse, CreateFeedResponse, GetFeedResponse };

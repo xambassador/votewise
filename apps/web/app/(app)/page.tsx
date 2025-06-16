@@ -1,13 +1,13 @@
 import { Suspense } from "react";
 
-import { FeedFetcher } from "./_components/feed-fetcher";
+import { FeedListFetcher } from "./_components/feed-fetcher";
 import { FeedList } from "./_components/feed-list";
 import Loading from "./loading";
 
 export default function Home() {
   return (
     <Suspense fallback={<Loading />}>
-      <FeedFetcher>{(feeds) => <FeedList feeds={feeds} />}</FeedFetcher>
+      <FeedListFetcher>{(feeds) => <FeedList feeds={feeds} />}</FeedListFetcher>
     </Suspense>
   );
 }
