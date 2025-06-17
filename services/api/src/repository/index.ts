@@ -1,4 +1,5 @@
 import { ChallengeRepository } from "./challenge.repository";
+import { CommentRepository } from "./comment.repository";
 import { FactorRepository } from "./factor.repository";
 import { FeedAssetRepository } from "./feed-asset.repository";
 import { FeedRepository } from "./feed.repository";
@@ -25,7 +26,8 @@ export {
   UserInterestRepository,
   UserRepository,
   PostTopicRepository,
-  GroupRepository
+  GroupRepository,
+  CommentRepository
 };
 
 declare global {
@@ -43,5 +45,6 @@ declare global {
     feedAsset: FeedAssetRepository;
     postTopic: PostTopicRepository;
     group: GroupRepository;
+    comment: CommentRepository;
   }
 }

@@ -40,6 +40,10 @@
     "./feed": {
       "import": "./dist/services/feed.mjs",
       "require": "./dist/services/feed.js"
+    },
+    "./comment": {
+      "import": "./dist/services/comment.mjs",
+      "require": "./dist/services/comment.js"
     }
   },
   "scripts": {

@@ -23,7 +23,7 @@ export async function FeedListFetcher(props: FeedListFetcherProps) {
 
 type FeedFetcherProps = {
   id: string;
-  children: (result: GetFeedResponse) => React.ReactNode;
+  children: (feed: GetFeedResponse) => React.ReactNode;
 };
 
 export async function FeedFetcher(props: FeedFetcherProps) {

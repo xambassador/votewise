@@ -164,3 +164,14 @@ export const upload = {
     getBackgrounds: (base: string) => base + "/upload/assets/backgrounds"
   }
 };
+
+export const comments = {
+  paths: {
+    /** Get all comments for a feed */
+    getAll: (base: string) => base + "/feeds/:feedId/comments"
+  },
+  runtime: {
+    /** Get all comments for a feed */
+    getAll: (base: string, feedId: string) => base + `/feeds/${feedId}/comments`
+  }
+};

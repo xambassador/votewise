@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { auth, feeds, topics, user } from "@votewise/constant/routes";
+import { auth, comments, feeds, topics, user } from "@votewise/constant/routes";
 
 import { forgotPasswordControllerFactory } from "./auth/forgot-password";
 import { getVerificationSessionControllerFactory } from "./auth/get-verification-session";
@@ -13,6 +13,7 @@ import { registerControllerFactory } from "./auth/register";
 import { resetPasswordControllerFactory } from "./auth/reset-password";
 import { singinControllerFactory } from "./auth/signin";
 import { verifyControllerFactory } from "./auth/verify";
+import { getCommentsControllerFactory } from "./comment/get-all";
 import { createFeedControllerFactory } from "./feed/create";
 import { getFeedControllerFactory } from "./feed/get";
 import { getAllFeedControllerFactory } from "./feed/get-all";
@@ -78,6 +79,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.post(feeds.paths.create(path), ...createFeedControllerFactory(feeds.paths.create(path)));
   router.get(feeds.paths.all(path), ...getAllFeedControllerFactory(feeds.paths.all(path)));
   router.get(feeds.paths.get(path), ...getFeedControllerFactory(feeds.paths.get(path)));
+  router.get(comments.paths.getAll(path), ...getCommentsControllerFactory());
 
   return router;
 }

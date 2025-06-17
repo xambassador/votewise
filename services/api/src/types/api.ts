@@ -19,3 +19,4 @@ export type { GetUserOnboardSessionResponse } from "@/core/user/onboard/get-sess
 export type { GetMeResponse } from "@/core/user/me/controller";
 export type { GetUserRecommendationsResponse } from "@/core/recommendation/user/controller";
 export type { GetGroupRecommendationsResponse } from "@/core/recommendation/group/controller";
+export type { GetCommentsResponse } from "@/core/comment/get-all/controller";

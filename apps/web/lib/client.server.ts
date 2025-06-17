@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 
 import { Auth } from "@votewise/client/auth";
+import { Comment } from "@votewise/client/comment";
 import { Feed } from "@votewise/client/feed";
 import { MFA } from "@votewise/client/mfa";
 import { Onboard } from "@votewise/client/onboard";
@@ -50,4 +51,9 @@ export function getFeedClient() {
 export function getUserClient() {
   const client = getClient();
   return new User({ client });
+}
+
+export function getCommentClient() {
+  const client = getClient();
+  return new Comment({ client });
 }
