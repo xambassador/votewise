@@ -36,6 +36,10 @@
     "./pagination": {
       "import": "./dist/pagination.mjs",
       "require": "./dist/pagination.js"
+    },
+    "./comment": {
+      "import": "./dist/comment.mjs",
+      "require": "./dist/comment.js"
     }
   },
   "scripts": {

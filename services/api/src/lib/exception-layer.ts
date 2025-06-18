@@ -23,7 +23,7 @@ export class ExceptionLayer {
           if (error instanceof Error) {
             ctx.logger.error(`[${name} Exception Layer]: ${error.message}`);
           } else {
-            ctx.logger.error(`[${name} Exception Layer]: Unknow error`);
+            ctx.logger.error(`[${name} Exception Layer]: Unknown error`);
           }
         }
         next(error);

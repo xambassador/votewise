@@ -20,3 +20,4 @@ export type { GetMeResponse } from "@/core/user/me/controller";
 export type { GetUserRecommendationsResponse } from "@/core/recommendation/user/controller";
 export type { GetGroupRecommendationsResponse } from "@/core/recommendation/group/controller";
 export type { GetCommentsResponse } from "@/core/comment/get-all/controller";
+export type { CreateCommentResponse } from "@/core/comment/create/controller";

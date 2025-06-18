@@ -239,15 +239,18 @@ model Upvote {
 }
 
 model Comment {
-    id        String @id @default(cuid())
-    text      String @db.Text
-    parent_id Int?
+    id        String  @id @default(cuid())
+    text      String  @db.Text
+    parent_id String?
 
     post_id String
     post    Post   @relation(fields: [post_id], references: [id])
 
     user_id String
     user    User   @relation(fields: [user_id], references: [id])
+
+    replies Comment[] @relation("Replies")
+    parent  Comment?  @relation("Replies", fields: [parent_id], references: [id])
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt

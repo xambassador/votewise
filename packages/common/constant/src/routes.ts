@@ -168,10 +168,14 @@ export const upload = {
 export const comments = {
   paths: {
     /** Get all comments for a feed */
-    getAll: (base: string) => base + "/feeds/:feedId/comments"
+    getAll: (base: string) => base + "/feeds/:feedId/comments",
+    /** Create a new comment for a feed */
+    create: (base: string) => base + "/feeds/:feedId/comments"
   },
   runtime: {
     /** Get all comments for a feed */
-    getAll: (base: string, feedId: string) => base + `/feeds/${feedId}/comments`
+    getAll: (base: string, feedId: string) => base + `/feeds/${feedId}/comments`,
+    /** Create a new comment for a feed */
+    create: (base: string, feedId: string) => base + `/feeds/${feedId}/comments`
   }
 };

@@ -2,7 +2,7 @@ import { DatabaseError } from "@votewise/errors";
 import { Prisma } from "@votewise/prisma";
 
 export class BaseRepository {
-  async execute<T>(fn: () => Promise<T>) {
+  protected async execute<T>(fn: () => Promise<T>) {
     try {
       return await fn();
     } catch (err) {

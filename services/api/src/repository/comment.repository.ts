@@ -6,6 +6,13 @@ type Dependencies = {
   db: AppContext["db"];
 };
 
+type TCommentCreate = {
+  text: string;
+  postId: string;
+  userId: string;
+  parentId?: string | null;
+};
+
 export class CommentRepository extends BaseRepository {
   private readonly db: Dependencies["db"];
 
@@ -40,6 +47,20 @@ export class CommentRepository extends BaseRepository {
           created_at: "desc"
         },
         take: 20
+      })
+    );
+  }
+
+  public create(data: TCommentCreate) {
+    return this.execute(async () =>
+      this.db.comment.create({
+        data: {
+          text: data.text,
+          post_id: data.postId,
+          user_id: data.userId,
+          parent_id: data.parentId
+        },
+        select: { id: true }
       })
     );
   }

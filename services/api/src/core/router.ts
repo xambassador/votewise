@@ -13,6 +13,7 @@ import { registerControllerFactory } from "./auth/register";
 import { resetPasswordControllerFactory } from "./auth/reset-password";
 import { singinControllerFactory } from "./auth/signin";
 import { verifyControllerFactory } from "./auth/verify";
+import { createCommentControllerFactory } from "./comment/create";
 import { getCommentsControllerFactory } from "./comment/get-all";
 import { createFeedControllerFactory } from "./feed/create";
 import { getFeedControllerFactory } from "./feed/get";
@@ -80,6 +81,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.get(feeds.paths.all(path), ...getAllFeedControllerFactory(feeds.paths.all(path)));
   router.get(feeds.paths.get(path), ...getFeedControllerFactory(feeds.paths.get(path)));
   router.get(comments.paths.getAll(path), ...getCommentsControllerFactory());
+  router.post(comments.paths.create(path), ...createCommentControllerFactory(path));
 
   return router;
 }
