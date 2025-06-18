@@ -42,6 +42,8 @@ import { FeedFetcher } from "@/app/(app)/_components/feed-fetcher";
 
 import { getCommentClient } from "@/lib/client.server";
 
+import { CreateComment } from "./_components/create-comment";
+
 extend(relativeTime);
 
 type Props = {
@@ -132,7 +134,7 @@ async function CommentsFetcher(props: { id: string }) {
   }
   return (
     <Comments>
-      <CommentInput />
+      <CreateComment postId={props.id} />
       <CommentList>
         {commentsResult.data.comments.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 w-full">

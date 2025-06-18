@@ -47,7 +47,7 @@ export function CommentInput(props: CommentInputProps) {
         {...buttonProps}
         className={cn("focus:ring-1 focus:outline-none", buttonProps?.className)}
       >
-        <PaperPlane className="text-gray-500" />
+        {buttonProps?.children ?? <PaperPlane className="text-gray-500" />}
       </button>
     </InputField>
   );

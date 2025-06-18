@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
 import { Bell } from "@votewise/ui/icons/bell";
 import { Cog } from "@votewise/ui/icons/cog";
@@ -9,11 +7,26 @@ import { User } from "@votewise/ui/icons/user";
 import { Users } from "@votewise/ui/icons/users";
 
 import { CreatePostDialog } from "./create-post-dialog";
+import { Link } from "./link";
 
 type Props = {
   name: string;
   avatarUrl: string;
 };
+
+const links: {
+  id: string;
+  href: string;
+  icon: React.ReactNode;
+  name: string;
+}[] = [
+  { id: "home", href: "/", icon: <Home className="text-inherit" />, name: "Home" },
+  { id: "groups", href: "/groups", icon: <Users className="text-inherit" />, name: "Groups" },
+  { id: "search", href: "/search", icon: <Search className="text-inherit" />, name: "Search" },
+  { id: "notifications", href: "/notifications", icon: <Bell className="text-inherit" />, name: "Notifications" },
+  { id: "profile", href: "/profile", icon: <User className="text-inherit" />, name: "Profile" },
+  { id: "settings", href: "/settings", icon: <Cog className="text-inherit" />, name: "Settings" }
+];
 
 export function Sidebar(props: Props) {
   const { name, avatarUrl } = props;
@@ -28,48 +41,12 @@ export function Sidebar(props: Props) {
         </div>
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-3 pr-1">
-            <Link
-              href="/"
-              className="py-2 pl-2 pr-1 rounded flex items-center gap-2 hover:bg-nobelBlack-200 transition-colors"
-            >
-              <Home className="text-blue-200" />
-              <span className="text-sm font-medium text-blue-200">Home</span>
-            </Link>
-            <Link
-              href="/"
-              className="py-2 pl-2 pr-1 rounded flex items-center gap-2 hover:bg-nobelBlack-200 transition-colors"
-            >
-              <Users className="text-black-200" />
-              <span className="text-sm font-medium text-black-200">Groups</span>
-            </Link>
-            <Link
-              href="/"
-              className="py-2 pl-2 pr-1 rounded flex items-center gap-2 hover:bg-nobelBlack-200 transition-colors"
-            >
-              <Search className="text-black-200" />
-              <span className="text-sm font-medium text-black-200">Search</span>
-            </Link>
-            <Link
-              href="/"
-              className="py-2 pl-2 pr-1 rounded flex items-center gap-2 hover:bg-nobelBlack-200 transition-colors"
-            >
-              <Bell className="text-black-200" />
-              <span className="text-sm font-medium text-black-200">Notifications</span>
-            </Link>
-            <Link
-              href="/"
-              className="py-2 pl-2 pr-1 rounded flex items-center gap-2 hover:bg-nobelBlack-200 transition-colors"
-            >
-              <User className="text-black-200" />
-              <span className="text-sm font-medium text-black-200">Profile</span>
-            </Link>
-            <Link
-              href="/"
-              className="py-2 pl-2 pr-1 rounded flex items-center gap-2 hover:bg-nobelBlack-200 transition-colors"
-            >
-              <Cog className="text-black-200" />
-              <span className="text-sm font-medium text-black-200">Settings</span>
-            </Link>
+            {links.map((link) => (
+              <Link key={link.id} href={link.href}>
+                {link.icon}
+                {link.name}
+              </Link>
+            ))}
           </div>
           <CreatePostDialog />
         </div>
