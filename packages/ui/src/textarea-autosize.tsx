@@ -1,5 +1,6 @@
 "use client";
 
+import { forwardRef } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 
 import { cn } from "./cn";
@@ -9,12 +10,14 @@ export interface TextareaProps extends React.ComponentProps<typeof TextareaAutos
   hasError?: boolean;
 }
 
-export function Textarea(props: TextareaProps) {
+type TextareaRef = HTMLTextAreaElement;
+export const Textarea = forwardRef<TextareaRef, TextareaProps>((props, ref) => {
   const { className, hasError, ...rest } = props;
   const isError = hasError || !!props["data-has-error" as keyof typeof props];
   return (
     <TextareaAutosize
       {...rest}
+      ref={ref}
       className={cn(
         "bg-nobelBlack-100 text-gray-300 placeholder:text-gray-500 resize-none text-base focus-within:border-0 focus-within:outline-none",
         isError && inputWrapper.error,
@@ -22,4 +25,6 @@ export function Textarea(props: TextareaProps) {
       )}
     />
   );
-}
+});
+
+Textarea.displayName = "Textarea";

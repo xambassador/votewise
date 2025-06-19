@@ -3,21 +3,7 @@ import dayjs, { extend } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
-import {
-  Comment,
-  CommentActions,
-  CommentAuthor,
-  CommentConnectorLine,
-  CommentContent,
-  CommentDate,
-  CommentHeader,
-  CommentInput,
-  CommentList,
-  CommentReplyButton,
-  CommentReplyInput,
-  Comments,
-  CommentText
-} from "@votewise/ui/cards/comment";
+import { CommentInput, CommentList, Comments } from "@votewise/ui/cards/comment";
 import {
   Feed,
   FeedContent,
@@ -33,7 +19,6 @@ import {
   VotersStack
 } from "@votewise/ui/cards/feed";
 import { Error } from "@votewise/ui/error";
-import { Comment as CommentIcon } from "@votewise/ui/icons/comment";
 import { ZigZagList } from "@votewise/ui/image-card";
 import { Spinner } from "@votewise/ui/ring-spinner";
 import { VoteButton, VoteCount, VoteProvider } from "@votewise/ui/vote-button";
@@ -42,7 +27,7 @@ import { FeedFetcher } from "@/app/(app)/_components/feed-fetcher";
 
 import { getCommentClient } from "@/lib/client.server";
 
-import { CreateComment } from "./_components/create-comment";
+import { DiscussionPanel } from "./_components/discussion-panel";
 
 extend(relativeTime);
 
@@ -132,41 +117,5 @@ async function CommentsFetcher(props: { id: string }) {
   if (!commentsResult.success) {
     return <Error error={commentsResult.error} />;
   }
-  return (
-    <Comments>
-      <CreateComment postId={props.id} />
-      <CommentList>
-        {commentsResult.data.comments.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-2 w-full">
-            <CommentIcon className="text-gray-400" />
-            <span className="text-gray-400 text-base">Drop the first thought bomb! 💣</span>
-          </div>
-        ) : null}
-        {commentsResult.data.comments.map((comment) => (
-          <Comment key={comment.id}>
-            <Avatar className="size-8">
-              <AvatarFallback name={comment.user.first_name + " " + comment.user.last_name} />
-              <AvatarImage
-                src={comment.user.avatar_url || ""}
-                alt={comment.user.first_name + " " + comment.user.last_name}
-                className="object-cover"
-              />
-            </Avatar>
-            <CommentContent>
-              <CommentHeader>
-                <CommentAuthor>{comment.user.first_name + " " + comment.user.last_name}</CommentAuthor>
-                <CommentDate>{dayjs(comment.created_at).fromNow()}</CommentDate>
-              </CommentHeader>
-              <CommentText>{comment.text}</CommentText>
-              <CommentActions>
-                <CommentReplyButton />
-              </CommentActions>
-              <CommentReplyInput />
-            </CommentContent>
-            <CommentConnectorLine />
-          </Comment>
-        ))}
-      </CommentList>
-    </Comments>
-  );
+  return <DiscussionPanel id={props.id} comments={commentsResult.data.comments} />;
 }

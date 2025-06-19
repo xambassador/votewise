@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useState } from "react";
+import { forwardRef, memo, useState } from "react";
 
 import { cn } from "../cn";
 import { createContext } from "../context";
@@ -17,16 +17,19 @@ type CommentState = {
 const [CommentProvider, useComment] = createContext<CommentState>("Comment");
 CommentProvider.displayName = "CommentProvider";
 
+type CommentsRef = HTMLDivElement;
 export type CommentsProps = React.HTMLAttributes<HTMLDivElement>;
-export function Comments(props: CommentsProps) {
-  return <div {...props} className={cn("flex flex-col gap-5", props.className)} />;
-}
+export const Comments = forwardRef<CommentsRef, CommentsProps>((props, ref) => (
+  <div {...props} ref={ref} className={cn("flex flex-col gap-5", props.className)} />
+));
+Comments.displayName = "Comments";
 
 export type CommentInputProps = React.ComponentProps<typeof Textarea> & {
   inputFieldProps?: React.ComponentProps<typeof InputField>;
   buttonProps?: React.ComponentProps<"button">;
 };
-export function CommentInput(props: CommentInputProps) {
+type CommentInputRef = HTMLTextAreaElement;
+export const CommentInput = forwardRef<CommentInputRef, CommentInputProps>((props, ref) => {
   const { inputFieldProps, buttonProps, ...textareaProps } = props;
   return (
     <InputField
@@ -39,6 +42,7 @@ export function CommentInput(props: CommentInputProps) {
         name="comment"
         id="comment-input"
         maxRows={4}
+        ref={ref}
         {...textareaProps}
       />
       <button
@@ -51,66 +55,79 @@ export function CommentInput(props: CommentInputProps) {
       </button>
     </InputField>
   );
-}
-
-export type CommentListProps = React.HTMLAttributes<HTMLDivElement>;
-export function CommentList(props: CommentListProps) {
-  return <div {...props} className={cn("flex flex-col gap-5", props.className)} />;
-}
-
-export type CommentProps = React.HTMLAttributes<HTMLDivElement>;
-export const Comment = memo(function Comment(props: CommentProps) {
-  const [isReplyOpen, setIsReplyOpen] = useState(false);
-  const toggle = () => {
-    setIsReplyOpen((prev) => !prev);
-  };
-
-  return (
-    <CommentProvider isReplyOpen={isReplyOpen} toggle={toggle}>
-      <div {...props} className={cn("flex gap-3 relative", props.className)} />
-    </CommentProvider>
-  );
 });
+CommentInput.displayName = "CommentInput";
 
-export function CommentContent(props: React.HTMLAttributes<HTMLDivElement>) {
-  return <div {...props} className={cn("flex flex-col gap-1", props.className)} />;
-}
+type CommentListRef = HTMLDivElement;
+export type CommentListProps = React.HTMLAttributes<HTMLDivElement>;
+export const CommentList = forwardRef<CommentListRef, CommentListProps>((props, ref) => (
+  <div {...props} ref={ref} className={cn("flex flex-col gap-5", props.className)} />
+));
+CommentList.displayName = "CommentList";
+
+type CommentRef = HTMLDivElement;
+export type CommentProps = React.HTMLAttributes<HTMLDivElement>;
+export const Comment = memo(
+  forwardRef<CommentRef, CommentProps>((props, ref) => {
+    const [isReplyOpen, setIsReplyOpen] = useState(false);
+    const toggle = () => {
+      setIsReplyOpen((prev) => !prev);
+    };
+
+    return (
+      <CommentProvider isReplyOpen={isReplyOpen} toggle={toggle}>
+        <div {...props} ref={ref} className={cn("flex gap-3 relative", props.className)} />
+      </CommentProvider>
+    );
+  })
+);
+
+export const CommentContent = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>((props, ref) => (
+  <div {...props} ref={ref} className={cn("flex flex-col gap-1 w-full", props.className)} />
+));
+CommentContent.displayName = "CommentContent";
 
 export type CommentHeaderProps = React.HTMLAttributes<HTMLDivElement>;
-export function CommentHeader(props: CommentHeaderProps) {
-  return <div {...props} className={cn("flex items-center gap-2", props.className)} />;
-}
+export const CommentHeader = forwardRef<HTMLDivElement, CommentHeaderProps>((props, ref) => (
+  <div {...props} ref={ref} className={cn("flex items-center gap-2", props.className)} />
+));
+CommentHeader.displayName = "CommentHeader";
 
 export type CommentAuthorProps = React.HTMLAttributes<HTMLSpanElement>;
-export function CommentAuthor(props: CommentAuthorProps) {
-  return <span {...props} className={cn("text-sm text-gray-200", props.className)} />;
-}
+export const CommentAuthor = forwardRef<HTMLSpanElement, CommentAuthorProps>((props, ref) => (
+  <span {...props} ref={ref} className={cn("text-sm text-gray-200", props.className)} />
+));
+CommentAuthor.displayName = "CommentAuthor";
 
 export type CommentDateProps = React.HTMLAttributes<HTMLSpanElement>;
-export function CommentDate(props: CommentDateProps) {
-  return <span {...props} className={cn("text-xs text-gray-400", props.className)} />;
-}
+export const CommentDate = forwardRef<HTMLSpanElement, CommentDateProps>((props, ref) => (
+  <span {...props} ref={ref} className={cn("text-xs text-gray-400", props.className)} />
+));
+CommentDate.displayName = "CommentDate";
 
 export type CommentTextProps = React.HTMLAttributes<HTMLParagraphElement>;
-export function CommentText(props: CommentTextProps) {
-  return <p {...props} className={cn("text-base text-gray-300", props.className)} />;
-}
+export const CommentText = forwardRef<HTMLParagraphElement, CommentTextProps>((props, ref) => (
+  <p {...props} ref={ref} className={cn("text-base text-gray-300", props.className)} />
+));
+CommentText.displayName = "CommentText";
 
 export type CommentActionsProps = React.HTMLAttributes<HTMLDivElement>;
-export function CommentActions(props: CommentActionsProps) {
-  return <div {...props} className={cn("flex items-center gap-3 mt-4", props.className)} />;
-}
+export const CommentActions = forwardRef<HTMLDivElement, CommentActionsProps>((props, ref) => (
+  <div {...props} ref={ref} className={cn("flex items-center gap-3 mt-4", props.className)} />
+));
+CommentActions.displayName = "CommentActions";
 
 export type CommentReplyButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   leftSlot?: React.ReactNode;
   rightSlot?: React.ReactNode;
 };
-export function CommentReplyButton(props: CommentReplyButtonProps) {
+export const CommentReplyButton = forwardRef<HTMLButtonElement, CommentReplyButtonProps>((props, ref) => {
   const { className, children, leftSlot, rightSlot, ...rest } = props;
   const { toggle } = useComment("CommentReplyButton");
   return (
     <button
       {...rest}
+      ref={ref}
       className={cn(
         "flex items-center justify-center gap-1 text-gray-400 text-sm outline-none focus:ring-1",
         className
@@ -125,28 +142,32 @@ export function CommentReplyButton(props: CommentReplyButtonProps) {
       {rightSlot}
     </button>
   );
-}
+});
+CommentReplyButton.displayName = "CommentReplyButton";
 
-export function CommentReplyInput(props: CommentInputProps) {
+export const CommentReplyInput = forwardRef<CommentInputRef, CommentInputProps>((props, ref) => {
   const { isReplyOpen } = useComment("CommentReplyInput");
   if (!isReplyOpen) return null;
   return (
     <CommentInput
       {...props}
+      ref={ref}
       inputFieldProps={{ ...props.inputFieldProps, className: cn("mt-1", props.inputFieldProps?.className) }}
     />
   );
-}
+});
+CommentReplyInput.displayName = "CommentReplyInput";
 
 export type CommentConnectorLineProps = React.HTMLAttributes<HTMLDivElement> & {
   hasReplies?: boolean;
 };
-export function CommentConnectorLine(props: CommentConnectorLineProps) {
+export const CommentConnectorLine = forwardRef<HTMLDivElement, CommentConnectorLineProps>((props, ref) => {
   const { hasReplies = false, ...rest } = props;
   if (!hasReplies) return null;
   return (
     <div
       {...rest}
+      ref={ref}
       className={cn(
         "bg-nobelBlack-200 absolute left-8 -translate-x-4 top-9 w-[2px] rounded-full h-[calc(100%-3rem)]",
         rest.className
@@ -157,7 +178,8 @@ export function CommentConnectorLine(props: CommentConnectorLineProps) {
       </button>
     </div>
   );
-}
+});
+CommentConnectorLine.displayName = "CommentConnectorLine";
 
 export type ReplyConnectorProps = React.SVGProps<SVGSVGElement>;
 export function ReplyConnector(props: ReplyConnectorProps) {
