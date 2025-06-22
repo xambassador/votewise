@@ -1,56 +1,60 @@
 "use client";
 
-import type { CreateCommentResponse } from "@votewise/client/comment";
-import type { AsyncState } from "@votewise/types";
-
 import { useRef, useState } from "react";
+import { useCreateComment } from "@/hooks/use-create-comment";
 
 import { CommentInput } from "@votewise/ui/cards/comment";
 import { Spinner } from "@votewise/ui/ring-spinner";
 import { makeToast } from "@votewise/ui/toast";
 
-import { commentClient } from "@/lib/client";
-
 const spinner = <Spinner className="size-5" />;
 
-type Props = { postId: string; onCommentCreated?: (data: CreateCommentResponse & { text: string }) => void };
+type Props = { postId: string };
+type CommentInputProps = React.ComponentProps<typeof CommentInput>;
 
 export function CreateComment(props: Props) {
-  const inputRef = useRef<HTMLTextAreaElement | null>(null);
-  const [status, setStatus] = useState<AsyncState>("idle");
-  const [error, setError] = useState<string | null>(null);
+  const { getInputProps } = useCreateCommentBase(props);
+  return <CommentInput {...getInputProps()} />;
+}
 
-  async function handleCreateComment() {
+function useCreateCommentBase(props: Props) {
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const mutation = useCreateComment(props.postId);
+  const status = mutation.status;
+
+  function tryToResetError() {
+    if (error) setError(null);
+  }
+
+  function handleCreateComment() {
     const value = inputRef.current?.value.trim();
     if (!value) {
       setError("Comment cannot be empty.");
       return;
     }
-    setStatus("loading");
-    const res = await commentClient.createComment(props.postId, { text: value });
-    if (!res.success) {
-      makeToast.error("Oops! Failed to create comment.", res.error);
-      setStatus("error");
-      return;
-    }
-    setStatus("success");
-    props.onCommentCreated?.({ ...res.data, text: value });
+    mutation.mutate(
+      { text: value },
+      { onError: (err) => makeToast.error("Oops! Failed to create comment.", err.message) }
+    );
     inputRef.current!.value = "";
   }
 
-  return (
-    <CommentInput
-      ref={inputRef}
-      buttonProps={{
+  function getInputProps(props?: CommentInputProps): CommentInputProps {
+    return {
+      ...props,
+      ref: inputRef,
+      disabled: status === "pending",
+      inputFieldProps: { hasError: !!error },
+      buttonProps: {
         onClick: handleCreateComment,
-        children: status === "loading" ? spinner : null,
-        disabled: status === "loading"
-      }}
-      disabled={status === "loading"}
-      inputFieldProps={{ hasError: !!error }}
-      onChange={() => {
-        if (error) setError(null);
-      }}
-    />
-  );
+        ...props?.buttonProps,
+        children: status === "pending" ? spinner : props?.buttonProps?.children,
+        disabled: status === "pending" || props?.buttonProps?.disabled
+      },
+      onChange: () => tryToResetError()
+    };
+  }
+
+  return { getInputProps };
 }

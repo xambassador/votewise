@@ -6224,21 +6224,40 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/query-core@npm:5.52.0":
-  version: 5.52.0
-  resolution: "@tanstack/query-core@npm:5.52.0"
-  checksum: 6f2309294d23721e4508241a4e109d6134bd125b732271217181ae99cc7994ec02ff964397e08bc5e9af5302e3838a3f3259d6e49fdf6fc8aaf324bc4fde4939
+"@tanstack/query-core@npm:5.81.2":
+  version: 5.81.2
+  resolution: "@tanstack/query-core@npm:5.81.2"
+  checksum: 36a6bddec2e7512015bcfbb0d7b0876fab418de9e0ef21ad403598276960e0b7d53efd62832ce462738ad22d9883e31cb5403eafc65dfd9b2f6744c22a9d8e42
   languageName: node
   linkType: hard
 
-"@tanstack/react-query@npm:^5.52.1":
-  version: 5.52.1
-  resolution: "@tanstack/react-query@npm:5.52.1"
+"@tanstack/query-devtools@npm:5.81.2":
+  version: 5.81.2
+  resolution: "@tanstack/query-devtools@npm:5.81.2"
+  checksum: f942cba7bd3ecb471063cd472eeebb2ec76005feeb7e0f357b191da5ab9f769aa767bc88d4da82b2b39c4fcbb16dfed38ce3c77b6eea4d4c30405368c1120207
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query-devtools@npm:^5.81.2":
+  version: 5.81.2
+  resolution: "@tanstack/react-query-devtools@npm:5.81.2"
   dependencies:
-    "@tanstack/query-core": "npm:5.52.0"
+    "@tanstack/query-devtools": "npm:5.81.2"
+  peerDependencies:
+    "@tanstack/react-query": ^5.81.2
+    react: ^18 || ^19
+  checksum: 69ccd39a202b9e029e44f1bd1afb46673620c23990f20612f617979548afebb7943ba51f32acfca73564cd71ccc7e848cdc0be6ee9441885b0e1c43b87c73a14
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query@npm:^5.81.2":
+  version: 5.81.2
+  resolution: "@tanstack/react-query@npm:5.81.2"
+  dependencies:
+    "@tanstack/query-core": "npm:5.81.2"
   peerDependencies:
     react: ^18 || ^19
-  checksum: a07697446311e908173bcce25ccbf019d7ffde19a7607b6791195414f1b337754f48d3d40b8100283e0fea556295240ecf9fe7bb39b3c1f3040d1ac38da03485
+  checksum: a80a2e7401a02bfc8d7a926c9e48b0a108cae21a2c47691632e754de44ca08838c105fb0c30804f4ccbf173bee04ad9a3e45a8bebdfc1d1a32468bbb9d960e19
   languageName: node
   linkType: hard
 
@@ -7820,7 +7839,8 @@ __metadata:
     "@hookform/error-message": "npm:^2.0.1"
     "@hookform/resolvers": "npm:^3.9.0"
     "@next/bundle-analyzer": "npm:^14.2.6"
-    "@tanstack/react-query": "npm:^5.52.1"
+    "@tanstack/react-query": "npm:^5.81.2"
+    "@tanstack/react-query-devtools": "npm:^5.81.2"
     "@testing-library/react": "npm:^16.0.0"
     "@types/async": "npm:^3.2.24"
     "@types/cookie": "npm:^0.6.0"

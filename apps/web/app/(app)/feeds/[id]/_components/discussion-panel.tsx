@@ -1,8 +1,9 @@
 "use client";
 
-import type { Comments as TComments } from "@/types";
+import type { GetCommentsResponse } from "@votewise/client/comment";
 
-import { useState } from "react";
+import { memo, useMemo } from "react";
+import { useFetchComments } from "@/hooks/use-fetch-comments";
 import dayjs, { extend } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
@@ -21,79 +22,87 @@ import {
   Comments,
   CommentText
 } from "@votewise/ui/cards/comment";
+import { Error } from "@votewise/ui/error";
 import { Comment as CommentIcon } from "@votewise/ui/icons/comment";
 
-import { useMe } from "@/components/user-provider";
-
 import { CreateComment } from "./create-comment";
+import { CommentsFetcherFallback } from "./skeleton";
 
 extend(relativeTime);
 
 type Props = {
-  comments: TComments;
+  comments: GetCommentsResponse;
   id: string;
 };
 
 export function DiscussionPanel(props: Props) {
-  const { comments: _comments } = props;
-  const [comments, setComments] = useState(_comments);
-  const currentUser = useMe("DiscussionPanel");
+  const { comments: initialData } = props;
+  const { status, error, data } = useFetchComments(props.id, { initialData });
+  const memoizedInput = useMemo(() => <CreateComment postId={props.id} />, [props.id]);
+
+  switch (status) {
+    case "pending":
+      return <CommentsFetcherFallback />;
+    case "error":
+      return <Error error={error.message} errorInfo={{ componentStack: error.stack }} />;
+  }
+
+  if (!data) return noDataElement;
+
+  const comments = data.comments;
 
   return (
     <Comments>
-      <CreateComment
-        postId={props.id}
-        onCommentCreated={(data) => {
-          setComments((prev) => [
-            {
-              id: data.id,
-              text: data.text,
-              created_at: new Date(),
-              updated_at: new Date(),
-              user: {
-                avatar_url: currentUser.avatar_url,
-                first_name: currentUser.first_name,
-                last_name: currentUser.last_name,
-                user_name: currentUser.username,
-                id: currentUser.id
-              }
-            },
-            ...prev
-          ]);
-        }}
-      />
+      {memoizedInput}
       <CommentList>
-        {comments.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-2 w-full">
-            <CommentIcon className="text-gray-400" />
-            <span className="text-gray-400 text-base">Drop the first thought bomb! 💣</span>
-          </div>
-        ) : null}
+        {comments.length === 0 ? noCommentsElement : null}
         {comments.map((comment) => (
-          <Comment key={comment.id}>
-            <Avatar className="size-8">
-              <AvatarFallback name={comment.user.first_name + " " + comment.user.last_name} />
-              <AvatarImage
-                src={comment.user.avatar_url || ""}
-                alt={comment.user.first_name + " " + comment.user.last_name}
-                className="object-cover"
-              />
-            </Avatar>
-            <CommentContent>
-              <CommentHeader>
-                <CommentAuthor>{comment.user.first_name + " " + comment.user.last_name}</CommentAuthor>
-                <CommentDate>{dayjs(comment.created_at).fromNow()}</CommentDate>
-              </CommentHeader>
-              <CommentText>{comment.text}</CommentText>
-              <CommentActions>
-                <CommentReplyButton />
-              </CommentActions>
-              <CommentReplyInput />
-            </CommentContent>
-            <CommentConnectorLine />
-          </Comment>
+          <MemoizedComment
+            key={comment.id}
+            avatarUrl={comment.user.avatar_url || undefined}
+            createdAt={comment.created_at}
+            name={comment.user.first_name + " " + comment.user.user_name}
+            text={comment.text}
+          />
         ))}
       </CommentList>
     </Comments>
   );
 }
+
+const MemoizedComment = memo(function _Comment(props: {
+  name: string;
+  avatarUrl: string | undefined;
+  createdAt: Date;
+  text: string;
+}) {
+  const { name, avatarUrl, createdAt, text } = props;
+  return (
+    <Comment>
+      <Avatar className="size-8">
+        <AvatarFallback name={name} />
+        <AvatarImage src={avatarUrl || ""} alt={name} className="object-cover" />
+      </Avatar>
+      <CommentContent>
+        <CommentHeader>
+          <CommentAuthor>{name}</CommentAuthor>
+          <CommentDate>{dayjs(createdAt).fromNow()}</CommentDate>
+        </CommentHeader>
+        <CommentText>{text}</CommentText>
+        <CommentActions>
+          <CommentReplyButton />
+        </CommentActions>
+        <CommentReplyInput />
+      </CommentContent>
+      <CommentConnectorLine />
+    </Comment>
+  );
+});
+
+const noDataElement = <Error error="Failed to get comments!" />;
+const noCommentsElement = (
+  <div className="flex flex-col items-center justify-center gap-2 w-full">
+    <CommentIcon className="text-gray-400" />
+    <span className="text-gray-400 text-base">Drop the first thought bomb! 💣</span>
+  </div>
+);

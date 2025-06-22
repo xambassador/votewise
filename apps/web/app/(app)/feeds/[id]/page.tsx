@@ -3,7 +3,6 @@ import dayjs, { extend } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
-import { CommentInput, CommentList, Comments } from "@votewise/ui/cards/comment";
 import {
   Feed,
   FeedContent,
@@ -20,7 +19,6 @@ import {
 } from "@votewise/ui/cards/feed";
 import { Error } from "@votewise/ui/error";
 import { ZigZagList } from "@votewise/ui/image-card";
-import { Spinner } from "@votewise/ui/ring-spinner";
 import { VoteButton, VoteCount, VoteProvider } from "@votewise/ui/vote-button";
 
 import { FeedFetcher } from "@/app/(app)/_components/feed-fetcher";
@@ -28,6 +26,7 @@ import { FeedFetcher } from "@/app/(app)/_components/feed-fetcher";
 import { getCommentClient } from "@/lib/client.server";
 
 import { DiscussionPanel } from "./_components/discussion-panel";
+import { CommentsFetcherFallback } from "./_components/skeleton";
 
 extend(relativeTime);
 
@@ -90,7 +89,7 @@ export default function Page(props: Props) {
             </VotersStack>
           </div>
 
-          <Suspense fallback={commentsFetcherFallback}>
+          <Suspense fallback={<CommentsFetcherFallback />}>
             <CommentsFetcher id={props.params.id} />
           </Suspense>
         </Feed>
@@ -99,23 +98,11 @@ export default function Page(props: Props) {
   );
 }
 
-const commentsFetcherFallback = (
-  <Comments>
-    <CommentInput disabled style={{ height: 40 }} />
-    <CommentList className="min-h-28 justify-center">
-      <div className="flex flex-col gap-1 items-center">
-        <span className="text-sm text-gray-400">Retrieving thoughts that people typed and didn&apos;t delete...</span>
-        <Spinner className="size-5" />
-      </div>
-    </CommentList>
-  </Comments>
-);
-
 async function CommentsFetcher(props: { id: string }) {
   const comment = getCommentClient();
   const commentsResult = await comment.getComments(props.id);
   if (!commentsResult.success) {
     return <Error error={commentsResult.error} />;
   }
-  return <DiscussionPanel id={props.id} comments={commentsResult.data.comments} />;
+  return <DiscussionPanel id={props.id} comments={commentsResult.data} />;
 }

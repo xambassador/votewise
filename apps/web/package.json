@@ -13,7 +13,7 @@
   "dependencies": {
     "@hookform/error-message": "^2.0.1",
     "@hookform/resolvers": "^3.9.0",
-    "@tanstack/react-query": "^5.52.1",
+    "@tanstack/react-query": "^5.81.2",
     "@votewise/client": "*",
     "@votewise/constant": "*",
     "@votewise/crypto": "*",
@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^14.2.6",
+    "@tanstack/react-query-devtools": "^5.81.2",
     "@testing-library/react": "^16.0.0",
     "@types/async": "^3.2.24",
     "@types/cookie": "^0.6.0",
