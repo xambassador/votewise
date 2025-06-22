@@ -35,7 +35,7 @@ export class DevelopmentRouter {
 
   public mount() {
     if (!this.baseRouter && !this.devRouter) {
-      throw new Error(`DevelopmentRouter is not registered. Make sure to call register() befor mount()`);
+      throw new Error(`DevelopmentRouter is not registered. Make sure to call register() before mount()`);
     }
     if (this.devMode) {
       this.baseRouter!.use(this.basePath, this.devRouter!);

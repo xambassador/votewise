@@ -3,6 +3,7 @@
 import type { GetCommentsResponse } from "@votewise/client/comment";
 
 import { memo, useMemo } from "react";
+import Link from "next/link";
 import { useFetchComments } from "@/hooks/use-fetch-comments";
 import dayjs, { extend } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -24,6 +25,8 @@ import {
 } from "@votewise/ui/cards/comment";
 import { Error } from "@votewise/ui/error";
 import { Comment as CommentIcon } from "@votewise/ui/icons/comment";
+
+import { routes } from "@/lib/routes";
 
 import { CreateComment } from "./create-comment";
 import { CommentsFetcherFallback } from "./skeleton";
@@ -61,8 +64,9 @@ export function DiscussionPanel(props: Props) {
             key={comment.id}
             avatarUrl={comment.user.avatar_url || undefined}
             createdAt={comment.created_at}
-            name={comment.user.first_name + " " + comment.user.user_name}
+            name={comment.user.first_name + " " + comment.user.last_name}
             text={comment.text}
+            userId={comment.user.id}
           />
         ))}
       </CommentList>
@@ -75,17 +79,22 @@ const MemoizedComment = memo(function _Comment(props: {
   avatarUrl: string | undefined;
   createdAt: Date;
   text: string;
+  userId: string;
 }) {
-  const { name, avatarUrl, createdAt, text } = props;
+  const { name, avatarUrl, createdAt, text, userId } = props;
   return (
     <Comment>
-      <Avatar className="size-8">
-        <AvatarFallback name={name} />
-        <AvatarImage src={avatarUrl || ""} alt={name} className="object-cover" />
-      </Avatar>
+      <Link href={routes.user.profile(userId)}>
+        <Avatar className="size-8">
+          <AvatarFallback name={name} />
+          <AvatarImage src={avatarUrl || ""} alt={name} className="object-cover" />
+        </Avatar>
+      </Link>
       <CommentContent>
         <CommentHeader>
-          <CommentAuthor>{name}</CommentAuthor>
+          <Link href={routes.user.profile(userId)} className="hover:underline">
+            <CommentAuthor>{name}</CommentAuthor>
+          </Link>
           <CommentDate>{dayjs(createdAt).fromNow()}</CommentDate>
         </CommentHeader>
         <CommentText>{text}</CommentText>

@@ -47,4 +47,13 @@ export class FollowRepository extends BaseRepository {
       return follows;
     });
   }
+
+  public isFollowing(followerId: string, followingId: string) {
+    return this.execute(async () => {
+      const follow = await this.db.follow.findFirst({
+        where: { follower_id: followerId, following_id: followingId }
+      });
+      return follow !== null;
+    });
+  }
 }

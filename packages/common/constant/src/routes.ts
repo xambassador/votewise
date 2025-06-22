@@ -179,3 +179,18 @@ export const comments = {
     create: (base: string, feedId: string) => base + `/feeds/${feedId}/comments`
   }
 };
+
+export const follow = {
+  paths: {
+    /** Follow a user */
+    followUser: (base: string) => base + "/follow/user/:id",
+    /** Unfollow a user */
+    unfollowUser: (base: string) => base + "/follow/user/:id"
+  },
+  runtime: {
+    /** Follow a user */
+    followUser: (base: string, username: string) => base + `/follow/user/${username}`,
+    /** Unfollow a user */
+    unfollowUser: (base: string, username: string) => base + `/follow/user/${username}`
+  }
+};
