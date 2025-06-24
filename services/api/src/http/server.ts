@@ -26,10 +26,12 @@ export class Server {
   public server?: http.Server;
   public app: express.Application;
   private terminator!: HttpTerminator;
+  private readonly serverConfig: ServerConfig;
 
-  constructor(opts: { app: express.Application; ctx: AppContext }) {
+  constructor(opts: { app: express.Application; ctx: AppContext; cfg: ServerConfig }) {
     this.ctx = opts.ctx;
     this.app = opts.app;
+    this.serverConfig = opts.cfg;
     this.setupGracefulShutdown();
   }
 
@@ -45,7 +47,7 @@ export class Server {
     app.use(middleware.register());
     app.use(routers.register());
     app.use(error.withAppContext(ctx).handler);
-    return new Server({ app, ctx });
+    return new Server({ app, ctx, cfg });
   }
 
   public async start(): Promise<http.Server> {
@@ -59,7 +61,10 @@ export class Server {
       this.terminator = createHttpTerminator({ server });
     });
     this.server = server;
-    this.server.keepAliveTimeout = 61 * 1000;
+    this.server.keepAliveTimeout = this.serverConfig.keepAliveTimeout ?? 61 * 1000;
+    this.server.headersTimeout = this.serverConfig.headersTimeout ?? 65 * 1000;
+    this.server.requestTimeout = this.serverConfig.requestTimeout ?? 60 * 1000;
+    this.server.timeout = this.serverConfig.serverTimeout ?? 60 * 1000;
     this.healthCheck();
     server.on("error", (err) => {
       const error = err as NodeJS.ErrnoException;

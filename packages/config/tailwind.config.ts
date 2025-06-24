@@ -3,8 +3,6 @@ import type { PluginAPI } from "tailwindcss/types/config";
 
 import svgToDataUri from "mini-svg-data-uri";
 import colors from "tailwindcss/colors";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
 import { default as flattenColorPalette } from "tailwindcss/lib/util/flattenColorPalette";
 
 const config = {

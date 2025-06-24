@@ -6,8 +6,13 @@ import { json, urlencoded } from "express";
 import helmet from "helmet";
 
 import { AppContext } from "@/context";
+import { ChaosMonkey } from "@/lib/chaos-monkey";
 
 import { extractIpMiddlewareFactory } from "./ip";
+
+const chaosMonkey = new ChaosMonkey({
+  logChaos: (message) => AppContext.getInjectionToken("logger").info(message)
+});
 
 export class AppMiddleware {
   constructor() {}
@@ -15,6 +20,7 @@ export class AppMiddleware {
   public register() {
     const extractIp = extractIpMiddlewareFactory();
     const ctx = AppContext.getInjectionTokens(["config", "logger", "environment"]);
+    const isDevelopment = ctx.config.devMode;
     return [
       chrona(":date :incoming :method :url :status :response-time :remote-address", (l) => ctx.logger.info(l)),
       cookieParser(ctx.environment.API_COOKIE_SECRET),
@@ -23,7 +29,8 @@ export class AppMiddleware {
       helmet(),
       urlencoded({ extended: true }),
       json({ limit: ctx.config.blobUploadLimit }),
-      extractIp
+      extractIp,
+      ...(isDevelopment ? [chaosMonkey.register()] : [])
     ];
   }
 }

@@ -22,12 +22,14 @@ type ClientOptions = {
   headers?: Record<string, string>;
   headersFactory: () => Record<string, string>;
   storage?: Storage;
+  timeout?: number;
 };
 
 const VOTEWISE_API = env.API_URL;
 
 const DEFAULT_OPTIONS: ClientOptions = {
   url: VOTEWISE_API,
+  timeout: 30_000, // 30 seconds
   headersFactory: () => ({}),
   headers: {
     "content-type": "application/json",
@@ -64,7 +66,7 @@ export class Client {
     this.storage = settings.storage;
   }
 
-  private async _fetch<T>(url: string, options: RequestInit): Promise<FetchResult<T>> {
+  private async _fetch<T>(url: string, options: RequestInit & { timeout?: number }): Promise<FetchResult<T>> {
     const headersList = this.headersFactory();
     const forwardedHeaders: Record<string, string> = {};
     Object.entries(headersList).forEach(([key, value]) => {
@@ -72,9 +74,24 @@ export class Client {
         forwardedHeaders[key.toLowerCase()] = value;
       }
     });
+    const signal = options.signal;
+    const controller = new AbortController();
+    const timeoutInMs = options.timeout ?? 30_000;
+
+    if (signal) {
+      signal.addEventListener("abort", () => controller.abort(signal.reason));
+    }
+
+    const timeoutHandler = () => controller.abort(new Error("Request timed out"));
+    const timeoutId = setTimeout(timeoutHandler, timeoutInMs);
+
     try {
       const endpoint = `${this.url}${url}`;
-      const _options = { ...options, headers: { ...forwardedHeaders, ...this.headers, ...options.headers } };
+      const _options = {
+        ...options,
+        headers: { ...forwardedHeaders, ...this.headers, ...options.headers },
+        signal: controller.signal
+      };
       const response = await this.fetch(endpoint, _options);
       const isJson = response.headers.get("content-type")?.includes("application/json");
       const responseHeaders: Record<string, string | string[]> = {};
@@ -121,6 +138,19 @@ export class Client {
         message = err.message;
       }
 
+      if (err instanceof Error && err.name === "AbortError") {
+        return {
+          status: 408,
+          success: false,
+          error: "Request takes too long to respond.",
+          errorData: {
+            message: "Request takes too long to respond.",
+            name: "AbortError",
+            status_code: 408
+          }
+        };
+      }
+
       return {
         success: false,
         error: message,
@@ -131,6 +161,9 @@ export class Client {
         },
         status: 500
       };
+    } finally {
+      clearTimeout(timeoutId);
+      if (signal) signal.removeEventListener("abort", timeoutHandler);
     }
   }
 

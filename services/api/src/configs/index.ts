@@ -1,3 +1,5 @@
+import { Millisecond } from "@votewise/times";
+
 export class ServerSecrets {
   public jwtSecret: string;
   public jwtRefreshSecret: string;
@@ -67,6 +69,10 @@ export class ServerConfig {
   public uploadBucket: string;
   public avatarsBucket: string;
   public backgroundsBucket: string;
+  public keepAliveTimeout?: number = 61 * Millisecond;
+  public headersTimeout?: number = 61 * Millisecond;
+  public requestTimeout?: number = 30 * Millisecond;
+  public serverTimeout?: number = 30 * Millisecond;
 
   constructor(cfg: ServerConfig) {
     this.port = cfg.port;
@@ -87,6 +93,10 @@ export class ServerConfig {
     this.uploadBucket = cfg.uploadBucket;
     this.avatarsBucket = cfg.avatarsBucket;
     this.backgroundsBucket = cfg.backgroundsBucket;
+    this.keepAliveTimeout = cfg.keepAliveTimeout ?? this.keepAliveTimeout;
+    this.headersTimeout = cfg.headersTimeout ?? this.headersTimeout;
+    this.requestTimeout = cfg.requestTimeout ?? this.requestTimeout;
+    this.serverTimeout = cfg.serverTimeout ?? this.serverTimeout;
   }
 }
 
