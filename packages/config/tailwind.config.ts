@@ -1,3 +1,6 @@
+// eslint-disable-next-line spaced-comment
+/// <reference types="./tailwind.d.ts" />
+
 import type { Config } from "tailwindcss";
 import type { PluginAPI } from "tailwindcss/types/config";
 

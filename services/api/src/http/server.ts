@@ -27,11 +27,13 @@ export class Server {
   public app: express.Application;
   private terminator!: HttpTerminator;
   private readonly serverConfig: ServerConfig;
+  private isAlreadyShuttingDown = false;
 
   constructor(opts: { app: express.Application; ctx: AppContext; cfg: ServerConfig }) {
     this.ctx = opts.ctx;
     this.app = opts.app;
     this.serverConfig = opts.cfg;
+    this.isAlreadyShuttingDown = false;
     this.setupGracefulShutdown();
   }
 
@@ -66,6 +68,7 @@ export class Server {
     this.server.requestTimeout = this.serverConfig.requestTimeout ?? 60 * 1000;
     this.server.timeout = this.serverConfig.serverTimeout ?? 60 * 1000;
     this.healthCheck();
+    this.registerShutdownHandlers();
     server.on("error", (err) => {
       const error = err as NodeJS.ErrnoException;
       if (error.syscall !== "listen") {
@@ -125,16 +128,23 @@ export class Server {
 
   private setupGracefulShutdown() {
     process.on("SIGTERM", async () => {
+      this.ctx.logger.logSync("Received SIGTERM signal, shutting down Votewise API");
       await this.shutdown();
     });
     process.on("SIGINT", async () => {
+      this.ctx.logger.logSync("Received SIGINT signal, shutting down Votewise API");
       await this.shutdown();
     });
   }
 
   public async shutdown() {
     this.ctx.logger.logSync("Shutting down Votewise API");
+    if (this.isAlreadyShuttingDown) {
+      this.ctx.logger.logSync("Votewise API is already shutting down.... ignoring this request");
+      return;
+    }
     try {
+      this.isAlreadyShuttingDown = true;
       await this.shutdownServer();
       await this.disconnectDB();
       await this.disconnectCache();
@@ -150,8 +160,11 @@ export class Server {
   private async disconnectDB() {
     return new Promise((resolve, reject) => {
       this.ctx.db
-        .$connect()
-        .then(resolve)
+        .$disconnect()
+        .then(() => {
+          this.ctx.logger.logSync("✅ 🐘 Postgres has been disconnected");
+          resolve(true);
+        })
         .catch((err) => {
           this.ctx.logger.errorSync(`❌ 🐘 Postgres is unreachable at ${this.ctx.environment.DATABASE_URL}`, err);
           reject(err);
@@ -163,7 +176,10 @@ export class Server {
     return new Promise((resolve, reject) => {
       this.ctx.cache
         .disconnect()
-        .then(resolve)
+        .then(() => {
+          this.ctx.logger.logSync("✅ 🚀 Redis has been disconnected");
+          resolve(true);
+        })
         .catch((err) => {
           this.ctx.logger.errorSync(`❌ 🚀 Redis is unreachable at ${this.ctx.environment.REDIS_URL}`, err);
           reject(err);
@@ -180,6 +196,19 @@ export class Server {
           this.ctx.logger.errorSync("Failed to terminate HTTP server", err);
           reject(err);
         });
+    });
+  }
+
+  private registerShutdownHandlers() {
+    process.on("unhandledRejection", async (reason) => {
+      this.ctx.logger.errorSync("Unhandled Rejection Receive....", reason);
+      this.ctx.logger.errorSync("Shutting down Votewise API due to unhandled rejection");
+      await this.shutdown();
+    });
+    process.on("uncaughtException", async (err) => {
+      this.ctx.logger.errorSync("Uncaught Exception Receive....", err);
+      this.ctx.logger.errorSync("Shutting down Votewise API due to uncaught exception");
+      await this.shutdown();
     });
   }
 }
