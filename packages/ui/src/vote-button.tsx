@@ -72,7 +72,7 @@ export function VoteButton(props: VoteButtonProps) {
 
   if (isVoted) {
     return (
-      <button className="px-5 bg-nobelBlack-100 text-sm h-12 font-medium flex items-center justify-center w-full">
+      <button className="px-5 bg-nobelBlack-100 text-sm h-12 font-medium flex items-center justify-center w-full focus-secondary outline-none focus:ring-0 rounded-xl focus:border focus:border-blue-500">
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B1D766] to-[#F15DD6]">
           {showCount ? `${count} Votes` : voted}
         </span>
@@ -92,7 +92,7 @@ export function VoteButton(props: VoteButtonProps) {
         // Don't know why, but cn is not working on shadow classes and it is removing them from the output list
         "flex items-center justify-center shadow-vote-button shadow-nobelBlack-200 hover:shadow-vote-button-hover hover:shadow-nobelBlack-200 hover:translate-y-[-2px] active:shadow-vote-button-active active:shadow-nobelBlack-200 active:translate-y-[2px] " +
         cn(
-          "px-5 rounded-xl bg-nobelBlack-100 border border-nobelBlack-200 text-sm text-gray-50 h-12 max-w-20 w-full transition-[shadow_transform]",
+          "px-5 rounded-xl bg-nobelBlack-100 border border-nobelBlack-200 text-sm text-gray-50 h-12 max-w-20 w-full transition-[shadow_transform] outline-none focus:ring-0 focus:border-blue-500",
           className
         )
       }

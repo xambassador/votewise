@@ -48,7 +48,7 @@ export function FeedMolecule(props: Props) {
       <Separator orientation="vertical" className="h-auto" />
       <FeedContainer>
         <div className="flex gap-2">
-          <Link href={routes.user.profile(feed.author.id)}>
+          <Link href={routes.user.profile(feed.author.id)} className="focus-visible h-fit">
             <Avatar className="size-12">
               <AvatarFallback name={feed.author.first_name + " " + feed.author.last_name} />
               <AvatarImage src={feed.author.avatar_url || ""} alt={feed.author.first_name} className="object-cover" />
@@ -56,12 +56,12 @@ export function FeedMolecule(props: Props) {
           </Link>
           <FeedContent>
             <FeedHeader>
-              <Link href={routes.user.profile(feed.author.id)}>
+              <Link href={routes.user.profile(feed.author.id)} className="focus-visible rounded">
                 <FeedUserName>{feed.author.first_name + " " + feed.author.last_name}</FeedUserName>
               </Link>
               <FeedTimeAgo>{dayjs(feed.created_at).fromNow()}</FeedTimeAgo>
             </FeedHeader>
-            <Link href={routes.feeds.view(feed.id)}>
+            <Link href={routes.feeds.view(feed.id)} className="focus-visible rounded">
               <FeedContentText>{truncateOnWord(feed.title, 128)}</FeedContentText>
             </Link>
             <FeedContentTags>

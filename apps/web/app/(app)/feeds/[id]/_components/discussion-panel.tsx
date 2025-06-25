@@ -84,7 +84,7 @@ const MemoizedComment = memo(function _Comment(props: {
   const { name, avatarUrl, createdAt, text, userId } = props;
   return (
     <Comment>
-      <Link href={routes.user.profile(userId)}>
+      <Link href={routes.user.profile(userId)} className="focus-visible h-fit">
         <Avatar className="size-8">
           <AvatarFallback name={name} />
           <AvatarImage src={avatarUrl || ""} alt={name} className="object-cover" />
@@ -92,7 +92,7 @@ const MemoizedComment = memo(function _Comment(props: {
       </Link>
       <CommentContent>
         <CommentHeader>
-          <Link href={routes.user.profile(userId)} className="hover:underline">
+          <Link href={routes.user.profile(userId)} className="hover:underline focus-visible">
             <CommentAuthor>{name}</CommentAuthor>
           </Link>
           <CommentDate>{dayjs(createdAt).fromNow()}</CommentDate>

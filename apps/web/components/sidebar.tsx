@@ -42,7 +42,7 @@ export function Sidebar(props: Props) {
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-3 pr-1">
             {links.map((link) => (
-              <Link key={link.id} href={link.href}>
+              <Link key={link.id} href={link.href} className="focus-visible rounded">
                 {link.icon}
                 {link.name}
               </Link>

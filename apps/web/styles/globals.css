@@ -117,6 +117,26 @@ input[data-autocompleted] {
   .scroller {
     @apply scrollbar scrollbar-thumb-nobelBlack-200 scrollbar-track-transparent;
   }
+
+  .focus-presets {
+    @apply focus:shadow-input-ring focus:ring-offset-nobelBlack-50 outline-none focus:outline-none focus:outline-0 focus:ring-offset-2 focus-visible:outline-0;
+  }
+
+  .focus-primary {
+    @apply focus:border-blue-500 focus:ring-blue-500/30;
+  }
+
+  .focus-visible {
+    @apply focus-visible:shadow-input-ring focus-visible:ring-offset-nobelBlack-50 outline-none transition-shadow duration-100 focus:ring-offset-2 focus-visible:border-blue-500 focus-visible:outline-none focus-visible:outline-0 focus-visible:ring-blue-500/30;
+  }
+
+  .focus-secondary {
+    @apply focus:border-nobelBlack-200 focus:ring-gray-700;
+  }
+
+  .focus-danger {
+    @apply focus:border-red-500 focus:ring-red-500/30;
+  }
 }
 
 @layer components {

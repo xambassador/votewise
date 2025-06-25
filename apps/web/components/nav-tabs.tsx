@@ -19,8 +19,8 @@ export function NavTabs() {
 }
 
 const tabsWrapperClass = "flex items-center gap-4 border-b border-nobelBlack-200 tab-wrapper-width mx-auto";
-const activeButtonClass = "h-7 text-blue-200 text-sm font-medium border-b border-blue-600";
-const inActiveButtonClass = "h-7 text-black-200 text-sm font-medium";
+const activeButtonClass = "h-7 text-blue-200 text-sm font-medium border-b border-blue-600 focus-visible";
+const inActiveButtonClass = "h-7 text-black-200 text-sm font-medium focus-visible";
 
 function FeedTabs() {
   return (

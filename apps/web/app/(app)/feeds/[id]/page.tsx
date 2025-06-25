@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import dayjs, { extend } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
@@ -24,6 +25,7 @@ import { VoteButton, VoteCount, VoteProvider } from "@votewise/ui/vote-button";
 import { FeedFetcher } from "@/app/(app)/_components/feed-fetcher";
 
 import { getCommentClient } from "@/lib/client.server";
+import { routes } from "@/lib/routes";
 
 import { DiscussionPanel } from "./_components/discussion-panel";
 import { CommentsFetcherFallback } from "./_components/skeleton";
@@ -40,18 +42,24 @@ export default function Page(props: Props) {
       {(feed) => (
         <Feed className="gap-5 flex-col">
           <FeedHeader>
-            <Avatar className="size-12">
-              <AvatarFallback name={feed.author.first_name + " " + feed.author.last_name} />
-              <AvatarImage
-                src={feed.author.avatar_url || ""}
-                alt={feed.author.first_name + " " + feed.author.last_name}
-                className="object-cover"
-              />
-            </Avatar>
+            <Link href={routes.user.profile(feed.author.id)} className="focus-visible">
+              <Avatar className="size-12">
+                <AvatarFallback name={feed.author.first_name + " " + feed.author.last_name} />
+                <AvatarImage
+                  src={feed.author.avatar_url || ""}
+                  alt={feed.author.first_name + " " + feed.author.last_name}
+                  className="object-cover"
+                />
+              </Avatar>
+            </Link>
             <div className="flex gap-3">
               <div className="flex flex-col">
-                <FeedUserName>{feed.author.first_name + " " + feed.author.last_name}</FeedUserName>
-                <FeedUserHandle>@{feed.author.user_name}</FeedUserHandle>
+                <Link href={routes.user.profile(feed.author.id)} className="focus-visible">
+                  <FeedUserName>{feed.author.first_name + " " + feed.author.last_name}</FeedUserName>
+                </Link>
+                <Link href={routes.user.profile(feed.author.id)} className="focus-visible">
+                  <FeedUserHandle>@{feed.author.user_name}</FeedUserHandle>
+                </Link>
               </div>
               <FeedTimeAgo className="pt-1">{dayjs(feed.created_at).fromNow()}</FeedTimeAgo>
             </div>

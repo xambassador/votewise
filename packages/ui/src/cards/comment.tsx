@@ -49,7 +49,7 @@ export const CommentInput = forwardRef<CommentInputRef, CommentInputProps>((prop
         aria-label="Send comment"
         title="Send comment"
         {...buttonProps}
-        className={cn("focus:ring-1 focus:outline-none", buttonProps?.className)}
+        className={cn("focus-primary focus-presets rounded", buttonProps?.className)}
       >
         {buttonProps?.children ?? <PaperPlane className="text-gray-500" />}
       </button>
@@ -129,7 +129,7 @@ export const CommentReplyButton = forwardRef<HTMLButtonElement, CommentReplyButt
       {...rest}
       ref={ref}
       className={cn(
-        "flex items-center justify-center gap-1 text-gray-400 text-sm outline-none focus:ring-1",
+        "flex items-center justify-center gap-1 text-gray-400 text-sm focus-primary focus-presets rounded",
         className
       )}
       onClick={(e) => {
