@@ -10,17 +10,24 @@ import { ChaosMonkey } from "@/lib/chaos-monkey";
 
 import { extractIpMiddlewareFactory } from "./ip";
 
-const chaosMonkey = new ChaosMonkey({
-  logChaos: (message) => AppContext.getInjectionToken("logger").info(message)
-});
-
 export class AppMiddleware {
   constructor() {}
 
   public register() {
     const extractIp = extractIpMiddlewareFactory();
     const ctx = AppContext.getInjectionTokens(["config", "logger", "environment"]);
-    const isDevelopment = ctx.config.devMode;
+    const shouldEnableChaosMonkey = ctx.environment.ENABLE_CHAOS_MONKEY;
+    const isProduction = ctx.environment.NODE_ENV === "production";
+
+    if (isProduction && shouldEnableChaosMonkey) {
+      ctx.logger.warn("Chaos Monkey is enabled in production! This may cause unexpected behavior.");
+    }
+
+    const chaosMonkey = new ChaosMonkey({
+      logChaos: (message) => ctx.logger.info(message),
+      enabled: ctx.environment.ENABLE_CHAOS_MONKEY
+    });
+
     return [
       chrona(":date :incoming :method :url :status :response-time :remote-address", (l) => ctx.logger.info(l)),
       cookieParser(ctx.environment.API_COOKIE_SECRET),
@@ -30,7 +37,7 @@ export class AppMiddleware {
       urlencoded({ extended: true }),
       json({ limit: ctx.config.blobUploadLimit }),
       extractIp,
-      ...(isDevelopment ? [chaosMonkey.register()] : [])
+      ...(shouldEnableChaosMonkey ? [chaosMonkey.register()] : [])
     ];
   }
 }

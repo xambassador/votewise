@@ -89,6 +89,11 @@ const APP_COOKIE_SECRET = z
 const API_COOKIE_SECRET = z
   .string({ required_error: "API_COOKIE_SECRET is required" })
   .min(1, { message: "API_COOKIE_SECRET is required" });
+const ENABLE_CHAOS_MONKEY = z
+  .string()
+  .default("false")
+  .optional()
+  .transform((val) => val === "true" || val === "1" || val === "yes" || val === "y" || val === "Y");
 
 export const envBaseSchema = z.object({
   ACCESS_TOKEN_SECRET,
@@ -122,7 +127,8 @@ export const envBaseSchema = z.object({
   MINIO_PORT,
   APP_COOKIE_SECRET,
   API_COOKIE_SECRET,
-  VOTEWISE_BUCKET_NAME
+  VOTEWISE_BUCKET_NAME,
+  ENABLE_CHAOS_MONKEY
 });
 
 export const envSchema = z.object({
@@ -162,7 +168,8 @@ export const envSchema = z.object({
   MINIO_PORT: MINIO_PORT.transform((val) => parseInt(val, 10)),
   APP_COOKIE_SECRET,
   API_COOKIE_SECRET,
-  VOTEWISE_BUCKET_NAME
+  VOTEWISE_BUCKET_NAME,
+  ENABLE_CHAOS_MONKEY
 });
 
 envSchema.superRefine((data) => {

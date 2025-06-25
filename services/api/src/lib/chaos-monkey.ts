@@ -74,7 +74,7 @@ export class ChaosMonkey {
    * @param {Options["excludeRoutes"]} opts.excludeRoutes - Array of routes to exclude from chaos scenarios
    * @param {Options["enabled"]} opts.enabled - Enable or disable Chaos Monkey (default: true)
    * @param {Options["sendJsonResponse"]} opts.sendJsonResponse - Whether to send JSON responses for chaos scenarios (default: true)
-   *  @param {Options["createError"]} opts.createError - Function to return custom error response for chaos scenarios
+   * @param {Options["createError"]} opts.createError - Function to return custom error response for chaos scenarios
    * @param {Options["corruptionRate"]} opts.corruptionRate - Rate of data corruption in corruptedResponse and partialFailure scenarios (default: 0.1)
    * @param {Options["serverTimeout"]} opts.serverTimeout - Server timeout for chaos scenarios. Set this value to your server's timeout setting to test the timeout scenario (default: 60000)
    */
@@ -90,9 +90,9 @@ export class ChaosMonkey {
       scenarioStats
     };
 
-    setInterval(() => {
-      this.reportChaos();
-    }, 60000);
+    if (this.options.enabled) {
+      setInterval(() => this.reportChaos(), 60000);
+    }
   }
 
   /**
