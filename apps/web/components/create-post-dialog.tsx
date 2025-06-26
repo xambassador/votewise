@@ -22,7 +22,7 @@ import {
 import { Close, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@votewise/ui/dialog";
 import { FloatingCounter } from "@votewise/ui/floating-counter";
 import { Image as ImageIcon } from "@votewise/ui/icons/image";
-import { Pencile } from "@votewise/ui/icons/pencile";
+import { Pencil } from "@votewise/ui/icons/pencil";
 import { ClearButton, ZigZagList } from "@votewise/ui/image-card";
 import { Input } from "@votewise/ui/input-basic";
 import { Progress, ProgressBar, ProgressTrack } from "@votewise/ui/progress";
@@ -30,7 +30,7 @@ import { Spinner } from "@votewise/ui/ring-spinner";
 import { Textarea } from "@votewise/ui/textarea-autosize";
 import { makeToast } from "@votewise/ui/toast";
 
-import { feedClient, onboardClinet, uploadClient } from "@/lib/client";
+import { feedClient, onboardClient, uploadClient } from "@/lib/client";
 
 import { useMe } from "./user-provider";
 
@@ -42,7 +42,7 @@ const filesAtom = atom<{ file: File; preview: string; id: string }[]>([]);
 const isTopicModalOpenAtom = atom(false);
 const topicsAtom = atom<Topics>([]);
 const selectedTopicsAtom = atom<string[]>([]);
-const topicsPromise = onboardClinet.getTopics();
+const topicsPromise = onboardClient.getTopics();
 const isCreatePostDialogOpenAtom = atom(false);
 
 export function CreatePostDialog() {
@@ -51,7 +51,7 @@ export function CreatePostDialog() {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="w-fit gap-1">
-          <Pencile className="text-gray-200" />
+          <Pencil className="text-gray-200" />
           <span>Share Idea</span>
         </Button>
       </DialogTrigger>
