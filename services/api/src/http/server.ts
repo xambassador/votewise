@@ -4,6 +4,7 @@ import type { HttpTerminator } from "http-terminator";
 
 import http from "http";
 import https from "https";
+import chalk from "chalk";
 import express from "express";
 import { createHttpTerminator } from "http-terminator";
 
@@ -59,9 +60,10 @@ export class Server {
     const useHTTPs = !!sslConfig.key && !!sslConfig.cert;
     useHTTPs ? https.createServer(sslConfig, this.app) : http.createServer(this.app);
     const server = this.app.listen(port, () => {
+      this.ctx.logger.logSync(chalk.blue("Press Ctrl+C to shutdown Votewise API\n\n"));
       this.ctx.logger.logSync(`Votewise API is running on port ${port}`);
-      this.terminator = createHttpTerminator({ server });
     });
+    this.terminator = createHttpTerminator({ server });
     this.server = server;
     this.server.keepAliveTimeout = this.serverConfig.keepAliveTimeout ?? 61 * 1000;
     this.server.headersTimeout = this.serverConfig.headersTimeout ?? 65 * 1000;
@@ -95,9 +97,9 @@ export class Server {
   private async healthCheck() {
     try {
       await Promise.all([this.connectDB(), this.connectCache()]);
-      this.ctx.logger.logSync("✅ All services are up and running");
+      this.ctx.logger.logSync(chalk.green("All good!\n"));
     } catch (err) {
-      this.ctx.logger.errorSync("❌ Some services are down");
+      this.ctx.logger.errorSync(chalk.red("❌ Health check failed!\n"));
       process.exit(1);
     }
   }
@@ -108,7 +110,10 @@ export class Server {
         .$connect()
         .then(resolve)
         .catch((err) => {
-          this.ctx.logger.errorSync(`❌ 🐘 Postgres is unreachable at ${this.ctx.environment.DATABASE_URL}`, err);
+          this.ctx.logger.errorSync(
+            chalk.bgRed.bold(` Postgres is unreachable at ${this.ctx.environment.DATABASE_URL}  `)
+          );
+          this.ctx.logger.errorSync(err);
           reject(err);
         });
     });
@@ -118,7 +123,8 @@ export class Server {
     return new Promise((resolve, reject) => {
       this.ctx.cache.connect();
       this.ctx.cache.onError((err) => {
-        this.ctx.logger.errorSync(`❌ 🚀 Redis is unreachable at ${this.ctx.environment.REDIS_URL}`, err);
+        this.ctx.logger.errorSync(chalk.bgRed.bold(`  Redis is unreachable at ${this.ctx.environment.REDIS_URL}  `));
+        this.ctx.logger.errorSync(err);
         reject(err);
       });
       this.ctx.cache.onConnect(() => resolve(true));
@@ -128,31 +134,25 @@ export class Server {
 
   private setupGracefulShutdown() {
     process.on("SIGTERM", async () => {
-      this.ctx.logger.logSync("Received SIGTERM signal, shutting down Votewise API");
+      this.ctx.logger.logSync(chalk.bgRed("  SIGTERM signal received...  "));
       await this.shutdown();
     });
     process.on("SIGINT", async () => {
-      this.ctx.logger.logSync("Received SIGINT signal, shutting down Votewise API");
+      this.ctx.logger.logSync(chalk.bgRed("  SIGINT signal received...  "));
       await this.shutdown();
     });
   }
 
   public async shutdown() {
-    this.ctx.logger.logSync("Shutting down Votewise API");
-    if (this.isAlreadyShuttingDown) {
-      this.ctx.logger.logSync("Votewise API is already shutting down.... ignoring this request");
-      return;
-    }
+    if (this.isAlreadyShuttingDown) return;
     try {
       this.isAlreadyShuttingDown = true;
-      await this.shutdownServer();
-      await this.disconnectDB();
-      await this.disconnectCache();
+      await Promise.all([this.shutdownServer(), this.disconnectDB(), this.disconnectCache()]);
       this.server = undefined;
-      this.ctx.logger.logSync("✅ Votewise API has been shutdown");
+      this.ctx.logger.logSync(chalk.green("Votewise API has been shutdown"));
       process.exit(0);
     } catch (err) {
-      this.ctx.logger.errorSync("Failed to shutdown Votewise API", err);
+      this.ctx.logger.errorSync(chalk.red("Failed to shutdown Votewise API"), err);
       process.exit(1);
     }
   }
@@ -161,12 +161,10 @@ export class Server {
     return new Promise((resolve, reject) => {
       this.ctx.db
         .$disconnect()
-        .then(() => {
-          this.ctx.logger.logSync("✅ 🐘 Postgres has been disconnected");
-          resolve(true);
-        })
+        .then(resolve)
         .catch((err) => {
-          this.ctx.logger.errorSync(`❌ 🐘 Postgres is unreachable at ${this.ctx.environment.DATABASE_URL}`, err);
+          this.ctx.logger.errorSync(chalk.red(`❌ Failed to disconnect from Postgres`));
+          this.ctx.logger.errorSync(err);
           reject(err);
         });
     });
@@ -176,12 +174,10 @@ export class Server {
     return new Promise((resolve, reject) => {
       this.ctx.cache
         .disconnect()
-        .then(() => {
-          this.ctx.logger.logSync("✅ 🚀 Redis has been disconnected");
-          resolve(true);
-        })
+        .then(resolve)
         .catch((err) => {
-          this.ctx.logger.errorSync(`❌ 🚀 Redis is unreachable at ${this.ctx.environment.REDIS_URL}`, err);
+          this.ctx.logger.errorSync(chalk.red(`❌ Failed to disconnect from Redis`));
+          this.ctx.logger.errorSync(err);
           reject(err);
         });
     });
@@ -193,7 +189,7 @@ export class Server {
         ?.terminate()
         .then(resolve)
         .catch((err) => {
-          this.ctx.logger.errorSync("Failed to terminate HTTP server", err);
+          this.ctx.logger.errorSync(chalk.red("Failed to terminate HTTP server"), err);
           reject(err);
         });
     });
