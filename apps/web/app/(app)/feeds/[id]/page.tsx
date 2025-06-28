@@ -83,18 +83,23 @@ export default function Page(props: Props) {
                 <VoteCount variant="minimal" />
               </VoteButton>
             </VoteProvider>
-            <VotersStack>
-              <span className="text-sm text-black-200 inline-block mr-3">Voters:</span>
-              <Voters>
-                {feed.voters.map((voter) => (
-                  <Avatar className="size-8" key={voter.id}>
-                    <AvatarFallback name="Jane Smith" />
-                    <AvatarImage src={voter.avatar_url || ""} alt="Voter" className="object-cover" />
-                  </Avatar>
-                ))}
-              </Voters>
-              {feed.upvote_count - 10 > 0 ? <VotersCount>+{feed.upvote_count - 10}</VotersCount> : null}
-            </VotersStack>
+            {feed.voters.length > 0 && (
+              <VotersStack>
+                <span className="text-sm text-black-200 inline-block mr-3">Voters:</span>
+                <Voters>
+                  {feed.voters.map((voter) => (
+                    <Avatar className="size-8" key={voter.id}>
+                      <AvatarFallback name="Jane Smith" />
+                      <AvatarImage src={voter.avatar_url || ""} alt="Voter" className="object-cover" />
+                    </Avatar>
+                  ))}
+                </Voters>
+                {feed.upvote_count - 10 > 0 ? <VotersCount>+{feed.upvote_count - 10}</VotersCount> : null}
+              </VotersStack>
+            )}
+            {feed.voters.length === 0 && (
+              <span className="text-sm text-gray-500">No voters yet... Be the first one</span>
+            )}
           </div>
 
           <Suspense fallback={<CommentsFetcherFallback />}>

@@ -20,7 +20,7 @@ CommentProvider.displayName = "CommentProvider";
 type CommentsRef = HTMLDivElement;
 export type CommentsProps = React.HTMLAttributes<HTMLDivElement>;
 export const Comments = forwardRef<CommentsRef, CommentsProps>((props, ref) => (
-  <div {...props} ref={ref} className={cn("flex flex-col gap-5", props.className)} />
+  <div {...props} ref={ref} className={cn("flex flex-col gap-5 relative", props.className)} />
 ));
 Comments.displayName = "Comments";
 
@@ -145,6 +145,13 @@ export const CommentReplyButton = forwardRef<HTMLButtonElement, CommentReplyButt
 });
 CommentReplyButton.displayName = "CommentReplyButton";
 
+export type ReplyContainerProps = React.HTMLAttributes<HTMLDivElement>;
+export const ReplyContainer = forwardRef<HTMLDivElement, ReplyContainerProps>((props, ref) => {
+  const { className, ...rest } = props;
+  return <div ref={ref} {...rest} className={cn("relative mt-5", className)} />;
+});
+ReplyContainer.displayName = "ReplyContainer";
+
 export const CommentReplyInput = forwardRef<CommentInputRef, CommentInputProps>((props, ref) => {
   const { isReplyOpen } = useComment("CommentReplyInput");
   if (!isReplyOpen) return null;
@@ -169,11 +176,11 @@ export const CommentConnectorLine = forwardRef<HTMLDivElement, CommentConnectorL
       {...rest}
       ref={ref}
       className={cn(
-        "bg-nobelBlack-200 absolute left-8 -translate-x-4 top-9 w-[2px] rounded-full h-[calc(100%-3rem)]",
+        "CommentConnectorLine bg-nobelBlack-200 absolute left-8 -translate-x-4 top-9 w-[2px] rounded-full h-[calc(100%-3rem)]",
         rest.className
       )}
     >
-      <button className="size-6 rounded-full border border-black-300 bg-nobelBlack-200 border-dashed flex items-center justify-center relative -left-3 top-4">
+      <button className="size-6 rounded-full border border-black-300 bg-nobelBlack-200 border-dashed flex items-center justify-center relative -left-3 top-4 focus-presets">
         <Plus className="text-gray-400 size-4" />
       </button>
     </div>

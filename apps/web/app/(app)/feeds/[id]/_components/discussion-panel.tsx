@@ -101,7 +101,7 @@ const MemoizedComment = memo(function _Comment(props: {
         <CommentActions>
           <CommentReplyButton />
         </CommentActions>
-        <CommentReplyInput />
+        <CommentReplyInput disableFocusIndicator />
       </CommentContent>
       <CommentConnectorLine />
     </Comment>
