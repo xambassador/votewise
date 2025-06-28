@@ -6,7 +6,7 @@ import { Search } from "@votewise/ui/icons/search";
 import { User } from "@votewise/ui/icons/user";
 import { Users } from "@votewise/ui/icons/users";
 
-import { CreatePostDialog } from "./create-post-dialog";
+import { CreatePostDialog } from "./create-post";
 import { Link } from "./link";
 
 type Props = {
