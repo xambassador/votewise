@@ -14,7 +14,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({ className, hasE
   return (
     <input
       className={cn(
-        "bg-nobelBlack-100 text-base text-gray-500 placeholder:text-gray-500 focus-within:border-0 focus-within:outline-none",
+        "bg-nobelBlack-100 text-base text-gray-500 placeholder:text-gray-500 focus-within:border-0 focus-within:outline-none rounded",
+        inputWrapper.focus,
         className,
         error && inputWrapper.error
       )}

@@ -3,7 +3,7 @@
 import type { Topics } from "@/types";
 import type { AsyncState } from "@votewise/types";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
@@ -58,7 +58,7 @@ export function CreatePostDialog() {
       <DialogContent className="p-12 max-w-[var(--create-post-modal-width)] flex flex-col gap-8">
         <DialogTitle className="sr-only">Create a New Post</DialogTitle>
         <DialogDescription className="sr-only">Share your thoughts and ideas with the community!</DialogDescription>
-        <Close className="absolute top-4 right-5 outline-none focus:ring-2" />
+        <Close className="absolute top-4 right-5 outline-none focus:ring-2 rounded-full" />
         <div className="flex flex-col gap-5">
           <FormArea />
           <ComboBox />
@@ -157,17 +157,28 @@ function ProgressTracker() {
 function AssetPicker() {
   const setFilesToAtom = useSetAtom(filesAtom);
   const files = useAtomValue(filesAtom);
+  const ref = useRef<HTMLInputElement>(null);
+
+  function handleLabelKeyDown(event: React.KeyboardEvent<HTMLLabelElement>) {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      ref.current?.click();
+    }
+  }
 
   return (
     <label
-      className="flex items-center gap-2 text-black-300 cursor-pointer"
+      className="flex items-center gap-2 text-black-300 cursor-pointer focus-visible focus-preset rounded"
       htmlFor="asset-picker"
       aria-label="Add Photos or Videos"
       aria-describedby="asset-picker"
+      tabIndex={0}
+      onKeyDown={handleLabelKeyDown}
     >
       <ImageIcon />
       <span>Photo / Video</span>
       <input
+        ref={ref}
         type="file"
         accept="image/*,video/*"
         className="sr-only"
@@ -366,8 +377,11 @@ function PickTopicsModalTrigger() {
   return (
     <div
       {...getTriggerProps({
-        className: "flex items-center gap-1 w-fit flex-wrap outline-none focus:ring-2 cursor-pointer",
-        onClick: () => setPickTopicModal(true)
+        className:
+          "flex items-center gap-1 w-fit flex-wrap outline-none focus:ring-2 cursor-pointer focus-primary rounded-full",
+        onClick: () => setPickTopicModal(true),
+        role: "button",
+        tabIndex: 0
       })}
     >
       <ComboBoxSelection

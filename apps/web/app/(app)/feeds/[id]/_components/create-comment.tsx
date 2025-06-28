@@ -45,6 +45,7 @@ function useCreateCommentBase(props: Props) {
       ...props,
       ref: inputRef,
       disabled: status === "pending",
+      disableFocusIndicator: true,
       inputFieldProps: { hasError: !!error },
       buttonProps: {
         onClick: handleCreateComment,

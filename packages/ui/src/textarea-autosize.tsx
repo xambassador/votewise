@@ -8,18 +8,20 @@ import { inputWrapper } from "./theme";
 
 export interface TextareaProps extends React.ComponentProps<typeof TextareaAutosize> {
   hasError?: boolean;
+  disableFocusIndicator?: boolean;
 }
 
 type TextareaRef = HTMLTextAreaElement;
 export const Textarea = forwardRef<TextareaRef, TextareaProps>((props, ref) => {
-  const { className, hasError, ...rest } = props;
+  const { className, hasError, disableFocusIndicator = false, ...rest } = props;
   const isError = hasError || !!props["data-has-error" as keyof typeof props];
   return (
     <TextareaAutosize
       {...rest}
       ref={ref}
       className={cn(
-        "bg-nobelBlack-100 text-gray-300 placeholder:text-gray-500 resize-none text-base focus-within:border-0 focus-within:outline-none",
+        "bg-nobelBlack-100 text-gray-300 placeholder:text-gray-500 resize-none text-base focus-within:border-0 focus-within:outline-none rounded",
+        !disableFocusIndicator && inputWrapper.focus,
         isError && inputWrapper.error,
         className
       )}
