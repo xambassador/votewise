@@ -41,7 +41,7 @@ export function Assets() {
           variant="rightCenter"
           className="-right-5 peer-hover:opacity-0 peer-hover:delay-0 transition-opacity peer-hover:duration-100 duration-300 delay-300"
         >
-          {remainingFiles}
+          +{remainingFiles}
         </FloatingCounter>
       )}
     </ZigZagList>

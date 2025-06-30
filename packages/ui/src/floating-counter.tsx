@@ -30,7 +30,7 @@ export function FloatingCounter(props: Props) {
   const { className, children, variant, ...rest } = props;
   return (
     <div {...rest} className={cn(variants({ variant, className }))}>
-      {children}+
+      {children}
     </div>
   );
 }

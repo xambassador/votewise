@@ -140,7 +140,7 @@ export function FeedImages(props: React.HTMLAttributes<HTMLDivElement> & { image
       ))}
 
       {remainingImages > 0 && (
-        <FloatingCounter className="top-1/2 -right-5 -translate-y-1/2">{remainingImages}</FloatingCounter>
+        <FloatingCounter className="top-1/2 -right-5 -translate-y-1/2">+{remainingImages}</FloatingCounter>
       )}
     </div>
   );
