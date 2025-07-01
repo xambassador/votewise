@@ -41,8 +41,8 @@ export class Server {
     http.createServer(this.app);
     const server = this.app.listen(port, () => {
       this.ctx.logger.logSync(`Votewise upload server is running on port ${port}`);
-      this.terminator = createHttpTerminator({ server });
     });
+    this.terminator = createHttpTerminator({ server });
     this.server = server;
     this.server.keepAliveTimeout = 61 * 1000;
     server.on("error", (err) => {
