@@ -22,12 +22,7 @@ export function FeedList(props: { feeds: GetAllFeedsResponse }) {
       className={styles["virtual-feed-list"]}
       data={feeds.feeds}
       computeItemKey={(i, data) => `${data.id}-${i}`}
-      itemContent={(index, data) => <FeedItem feed={data} key={data.id + "-" + index} />}
+      itemContent={(index, data) => <FeedMolecule data={data} key={data.id + "-" + index} />}
     />
   );
-}
-
-function FeedItem(props: { feed: GetAllFeedsResponse["feeds"][0] }) {
-  const { feed } = props;
-  return <FeedMolecule data={feed} />;
 }

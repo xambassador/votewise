@@ -19,7 +19,6 @@ import {
   VotersStack
 } from "@votewise/ui/cards/feed";
 import { Error } from "@votewise/ui/error";
-import { ZigZagList } from "@votewise/ui/image-card";
 import { VoteButton, VoteCount, VoteProvider } from "@votewise/ui/vote-button";
 
 import { FeedFetcher } from "@/app/(app)/_components/feed-fetcher";
@@ -28,6 +27,7 @@ import { getCommentClient } from "@/lib/client.server";
 import { routes } from "@/lib/routes";
 
 import { DiscussionPanel } from "./_components/discussion-panel";
+import { FeedAssets } from "./_components/feed-assets";
 import { CommentsFetcherFallback } from "./_components/skeleton";
 
 extend(relativeTime);
@@ -68,13 +68,7 @@ export default function Page(props: Props) {
           <FeedContent className="pb-7 border-b border-nobelBlack-200">
             <FeedContentText className="text-base font-normal text-gray-200">{feed.content}</FeedContentText>
             <FeedContentTags>#programming #startups</FeedContentTags>
-            {feed.assets.length > 0 ? (
-              <ZigZagList
-                images={feed.assets}
-                imageCardProps={({ image }) => ({ alt: image.alt || "Feed asset" })}
-                className="mt-4"
-              />
-            ) : null}
+            {feed.assets.length > 0 ? <FeedAssets assets={feed.assets} /> : null}
           </FeedContent>
 
           <div className="flex flex-col gap-8 pb-4 border-b border-nobelBlack-200">

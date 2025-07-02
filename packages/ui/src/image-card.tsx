@@ -1,9 +1,13 @@
+"use client";
+
 import type { VariantProps } from "class-variance-authority";
 
+import { useState } from "react";
 import { cva } from "class-variance-authority";
 
 import { cn } from "./cn";
 import { Cross } from "./icons/cross";
+import { Image as ImageIcon } from "./icons/image";
 
 type Props = React.HTMLProps<HTMLDivElement> & {
   url: string;
@@ -12,6 +16,8 @@ type Props = React.HTMLProps<HTMLDivElement> & {
 
 export function ImageCard(props: Props) {
   const { url, children, figureProps, alt, ...rest } = props;
+  const [error, setError] = useState(false);
+
   return (
     <div
       {...rest}
@@ -24,11 +30,23 @@ export function ImageCard(props: Props) {
         {...figureProps}
         className={cn(
           "relative z-[3] w-[calc((100/16)*1rem)] h-[calc((140/16)*1rem)] bg-nobelBlack-200 rounded-2xl border border-black-400 shadow-image-card p-3 group-hover:translate-y-[-5px] transition-transform duration-300",
+          error && "border-red-400",
           figureProps?.className
         )}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={url} alt={alt || "Avatar"} className="size-full object-cover rounded-2xl" />
+        {error ? (
+          <div className="size-full flex items-center justify-center">
+            <ImageIcon className="size-12 text-black-300" />
+          </div>
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={url}
+            alt={alt || "Avatar"}
+            className="size-full object-cover rounded-2xl"
+            onError={() => setError(true)}
+          />
+        )}
       </figure>
       {children}
     </div>
