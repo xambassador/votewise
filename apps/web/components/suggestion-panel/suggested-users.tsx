@@ -53,7 +53,10 @@ async function SuggestedUsersList() {
               {truncateOnWord(user.user_name, 30)}
             </SuggestedUserCard.UserHandle>
           </div>
-          <SuggestedUserCard.UserFollowButton />
+          <SuggestedUserCard.UserFollowButton
+            aria-label={`Follow ${user.first_name + " " + user.last_name}`}
+            title={`Follow ${user.first_name + " " + user.last_name}`}
+          />
         </SuggestedUserCard.RecommendedUserCard>
       ))}
 

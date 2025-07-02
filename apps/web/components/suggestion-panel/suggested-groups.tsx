@@ -49,7 +49,10 @@ async function SuggestedGroupsList() {
                 <SuggestedGroupCard.GroupCreatorHandle>{group.author?.user_name}</SuggestedGroupCard.GroupCreatorHandle>
               </div>
             </div>
-            <SuggestedGroupCard.GroupJoinButton />
+            <SuggestedGroupCard.GroupJoinButton
+              aria-label={`Join ${group.name} group`}
+              title={`Join ${group.name} group`}
+            />
           </SuggestedGroupCard.Header>
         </SuggestedGroupCard.SuggestedGroupCard>
       ))}
