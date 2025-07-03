@@ -148,7 +148,7 @@ CommentReplyButton.displayName = "CommentReplyButton";
 export type ReplyContainerProps = React.HTMLAttributes<HTMLDivElement>;
 export const ReplyContainer = forwardRef<HTMLDivElement, ReplyContainerProps>((props, ref) => {
   const { className, ...rest } = props;
-  return <div ref={ref} {...rest} className={cn("relative mt-5", className)} />;
+  return <div ref={ref} {...rest} className={cn("relative mt-5 flex flex-col gap-5", className)} />;
 });
 ReplyContainer.displayName = "ReplyContainer";
 

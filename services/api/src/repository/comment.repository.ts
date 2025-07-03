@@ -41,11 +41,28 @@ export class CommentRepository extends BaseRepository {
               last_name: true,
               avatar_url: true
             }
+          },
+          replies: {
+            select: {
+              id: true,
+              text: true,
+              created_at: true,
+              updated_at: true,
+              user: {
+                select: {
+                  id: true,
+                  user_name: true,
+                  first_name: true,
+                  last_name: true,
+                  avatar_url: true
+                }
+              }
+            },
+            orderBy: { created_at: "desc" },
+            take: 5
           }
         },
-        orderBy: {
-          created_at: "desc"
-        },
+        orderBy: { created_at: "desc" },
         take: 20
       })
     );

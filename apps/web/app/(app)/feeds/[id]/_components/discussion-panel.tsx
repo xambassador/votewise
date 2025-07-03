@@ -19,16 +19,17 @@ import {
   CommentHeader,
   CommentList,
   CommentReplyButton,
-  CommentReplyInput,
   Comments,
-  CommentText
+  CommentText,
+  ReplyConnector,
+  ReplyContainer
 } from "@votewise/ui/cards/comment";
 import { Error } from "@votewise/ui/error";
 import { Comment as CommentIcon } from "@votewise/ui/icons/comment";
 
 import { routes } from "@/lib/routes";
 
-import { CreateComment } from "./create-comment";
+import { CreateComment, ReplyToComment } from "./create-comment";
 import { CommentsFetcherFallback } from "./skeleton";
 
 extend(relativeTime);
@@ -67,46 +68,77 @@ export function DiscussionPanel(props: Props) {
             name={comment.user.first_name + " " + comment.user.last_name}
             text={comment.text}
             userId={comment.user.id}
-          />
+            commentId={comment.id}
+            postId={props.id}
+            replyCount={comment.replies.length}
+          >
+            {comment.replies.length > 0 ? (
+              <ReplyContainer>
+                <ReplyConnector />
+                {comment.replies.map((reply) => (
+                  <MemoizedComment
+                    key={reply.id}
+                    avatarUrl={reply.user.avatar_url || undefined}
+                    createdAt={reply.created_at}
+                    name={reply.user.first_name + " " + reply.user.last_name}
+                    text={reply.text}
+                    userId={reply.user.id}
+                    commentId={reply.id}
+                    postId={props.id}
+                  />
+                ))}
+              </ReplyContainer>
+            ) : null}
+          </MemoizedComment>
         ))}
       </CommentList>
     </Comments>
   );
 }
 
-const MemoizedComment = memo(function _Comment(props: {
+type MemoizedCommentProps = {
   name: string;
   avatarUrl: string | undefined;
   createdAt: Date;
   text: string;
   userId: string;
-}) {
-  const { name, avatarUrl, createdAt, text, userId } = props;
-  return (
-    <Comment>
-      <Link href={routes.user.profile(userId)} className="focus-visible h-fit">
-        <Avatar className="size-8">
-          <AvatarFallback name={name} />
-          <AvatarImage src={avatarUrl || ""} alt={name} className="object-cover" />
-        </Avatar>
-      </Link>
-      <CommentContent>
-        <CommentHeader>
-          <Link href={routes.user.profile(userId)} className="hover:underline focus-visible">
-            <CommentAuthor>{name}</CommentAuthor>
-          </Link>
-          <CommentDate>{dayjs(createdAt).fromNow()}</CommentDate>
-        </CommentHeader>
-        <CommentText>{text}</CommentText>
-        <CommentActions>
-          <CommentReplyButton />
-        </CommentActions>
-        <CommentReplyInput disableFocusIndicator />
-      </CommentContent>
-      <CommentConnectorLine />
-    </Comment>
-  );
-});
+  commentId: string;
+  postId: string;
+  replyCount?: number;
+  children?: React.ReactNode;
+};
+
+const MemoizedComment = memo(
+  function _Comment(props: MemoizedCommentProps) {
+    const { name, avatarUrl, createdAt, text, userId, commentId, postId, children, replyCount = 0 } = props;
+    return (
+      <Comment>
+        <Link href={routes.user.profile(userId)} className="focus-visible h-fit">
+          <Avatar className="size-8">
+            <AvatarFallback name={name} />
+            <AvatarImage src={avatarUrl || ""} alt={name} className="object-cover" />
+          </Avatar>
+        </Link>
+        <CommentContent>
+          <CommentHeader>
+            <Link href={routes.user.profile(userId)} className="hover:underline focus-visible">
+              <CommentAuthor>{name}</CommentAuthor>
+            </Link>
+            <CommentDate>{dayjs(createdAt).fromNow()}</CommentDate>
+          </CommentHeader>
+          <CommentText>{text}</CommentText>
+          <CommentActions>
+            <CommentReplyButton />
+          </CommentActions>
+          <ReplyToComment parentId={commentId} postId={postId} />
+          {children}
+        </CommentContent>
+        <CommentConnectorLine hasReplies={replyCount > 0} />
+      </Comment>
+    );
+  },
+  (prev, next) => prev.replyCount === next.replyCount && prev.text === next.text
+);
 
 const noDataElement = <Error error="Failed to get comments!" />;
 const noCommentsElement = (

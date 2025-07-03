@@ -57,4 +57,34 @@ export class BucketService {
 
     return signedUrl;
   }
+
+  generatePublicUrl(url: string, type: "avatar" | "background") {
+    let signedUrl = url;
+    const avatarBucket = this.ctx.avatarBucket;
+    const backgroundBucket = this.ctx.backgroundBucket;
+    const uploadBucket = this.ctx.uploadBucket;
+    if (type === "avatar") {
+      if (!url.startsWith("https://") && !url.startsWith("http://")) {
+        if (url.startsWith(avatarBucket)) {
+          // TODO: Protocol and port should be configurable for different environments
+          signedUrl = `http://${this.ctx.minioEndpoint}:${this.ctx.minioPort}/${url}`;
+        } else {
+          signedUrl = `http://${this.ctx.minioEndpoint}:${this.ctx.minioPort}/${uploadBucket}/${url}`;
+        }
+      }
+    }
+
+    if (type === "background") {
+      if (!url.startsWith("https://") && !url.startsWith("http://")) {
+        if (url.startsWith(backgroundBucket)) {
+          // TODO: Protocol and port should be configurable for different environments
+          signedUrl = `http://${this.ctx.minioEndpoint}:${this.ctx.minioPort}/${url}`;
+        } else {
+          signedUrl = `http://${this.ctx.minioEndpoint}:${this.ctx.minioPort}/${uploadBucket}/${url}`;
+        }
+      }
+    }
+
+    return signedUrl;
+  }
 }

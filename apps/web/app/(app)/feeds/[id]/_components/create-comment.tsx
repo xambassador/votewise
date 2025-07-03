@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useCreateComment } from "@/hooks/use-create-comment";
 
-import { CommentInput } from "@votewise/ui/cards/comment";
+import { CommentInput, CommentReplyInput } from "@votewise/ui/cards/comment";
 import { Spinner } from "@votewise/ui/ring-spinner";
 import { makeToast } from "@votewise/ui/toast";
 
@@ -11,10 +11,20 @@ const spinner = <Spinner className="size-5" />;
 
 type Props = { postId: string };
 type CommentInputProps = React.ComponentProps<typeof CommentInput>;
+type ReplyToCommentProps = React.ComponentProps<typeof CommentReplyInput> & {
+  parentId?: string;
+  postId: string;
+};
 
 export function CreateComment(props: Props) {
   const { getInputProps } = useCreateCommentBase(props);
   return <CommentInput {...getInputProps()} />;
+}
+
+export function ReplyToComment(props: ReplyToCommentProps) {
+  const { parentId, postId, ...rest } = props;
+  const { getInputProps } = useCreateCommentBase({ postId });
+  return <CommentReplyInput {...getInputProps({ ...rest, disableFocusIndicator: true, parentId })} />;
 }
 
 function useCreateCommentBase(props: Props) {
@@ -27,31 +37,32 @@ function useCreateCommentBase(props: Props) {
     if (error) setError(null);
   }
 
-  function handleCreateComment() {
+  function handleCreateComment(parentId?: string) {
     const value = inputRef.current?.value.trim();
     if (!value) {
       setError("Comment cannot be empty.");
       return;
     }
     mutation.mutate(
-      { text: value },
+      { text: value, parent_id: parentId },
       { onError: (err) => makeToast.error("Oops! Failed to create comment.", err.message) }
     );
     inputRef.current!.value = "";
   }
 
-  function getInputProps(props?: CommentInputProps): CommentInputProps {
+  function getInputProps(props?: CommentInputProps & { parentId?: string }): CommentInputProps {
+    const { parentId, ...rest } = props || {};
     return {
-      ...props,
+      ...rest,
       ref: inputRef,
       disabled: status === "pending",
       disableFocusIndicator: true,
       inputFieldProps: { hasError: !!error },
       buttonProps: {
-        onClick: handleCreateComment,
-        ...props?.buttonProps,
-        children: status === "pending" ? spinner : props?.buttonProps?.children,
-        disabled: status === "pending" || props?.buttonProps?.disabled
+        onClick: () => handleCreateComment(parentId),
+        ...rest?.buttonProps,
+        children: status === "pending" ? spinner : rest?.buttonProps?.children,
+        disabled: status === "pending" || rest?.buttonProps?.disabled
       },
       onChange: () => tryToResetError()
     };

@@ -29,6 +29,42 @@ export function useCreateComment(feedId: string) {
       await queryClient.cancelQueries({ queryKey: getCommentsKey(feedId) });
       const previousComments = queryClient.getQueryData(getCommentsKey(feedId));
       const newCommentId = `temp-${++idCounter}`;
+
+      if (variables.parent_id) {
+        // This is a reply
+        queryClient.setQueryData<GetCommentsResponse>(getCommentsKey(feedId), (oldComments) => {
+          if (!oldComments) return oldComments;
+          const comments = oldComments.comments.map((comment) => {
+            if (comment.id === variables.parent_id) {
+              const replies = comment.replies || [];
+              replies.push({
+                id: newCommentId,
+                text: variables.text,
+                created_at: new Date(),
+                updated_at: new Date(),
+                user: {
+                  avatar_url: currentUser.avatar_url,
+                  first_name: currentUser.first_name,
+                  last_name: currentUser.last_name,
+                  user_name: currentUser.username,
+                  id: currentUser.id
+                }
+              });
+              return {
+                ...comment,
+                replies
+              };
+            }
+            return comment;
+          });
+          return {
+            ...oldComments,
+            comments
+          };
+        });
+        return { previousComments, newCommentId };
+      }
+
       queryClient.setQueryData<GetCommentsResponse>(getCommentsKey(feedId), (oldComments) => {
         if (!oldComments) return oldComments;
         return {
@@ -45,7 +81,8 @@ export function useCreateComment(feedId: string) {
                 last_name: currentUser.last_name,
                 user_name: currentUser.username,
                 id: currentUser.id
-              }
+              },
+              replies: []
             },
             ...oldComments.comments
           ]
@@ -56,13 +93,37 @@ export function useCreateComment(feedId: string) {
     onError: (_, __, context) => {
       queryClient.setQueryData(getCommentsKey(feedId), context?.previousComments);
     },
-    onSettled: (data, _, __, ctx) => {
+    onSettled: (data, _, variables, ctx) => {
+      const isReply = !!variables.parent_id;
       const optimisticId = ctx?.newCommentId;
       // For any action on the comment is depend on a comment id, so invalidate the comments query
       // is not required (at least for now)
       if (!optimisticId || !data) {
         queryClient.invalidateQueries({ queryKey: getCommentsKey(feedId) });
       } else {
+        if (isReply) {
+          queryClient.setQueryData<GetCommentsResponse>(getCommentsKey(feedId), (oldComments) => {
+            if (!oldComments) return oldComments;
+            const comments = oldComments.comments.map((comment) => {
+              if (comment.id === variables.parent_id) {
+                const replies = comment.replies.map((reply) => {
+                  if (reply.id === optimisticId) {
+                    return { ...reply, id: data.id };
+                  }
+                  return reply;
+                });
+                return { ...comment, replies };
+              }
+              return comment;
+            });
+            return {
+              ...oldComments,
+              comments
+            } as GetCommentsResponse;
+          });
+          return;
+        }
+
         queryClient.setQueryData<GetCommentsResponse>(getCommentsKey(feedId), (oldComments) => {
           if (!oldComments) return oldComments;
           return {

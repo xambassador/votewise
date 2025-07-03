@@ -22,29 +22,13 @@ export class Controller {
     const feedId = req.params.feedId as string;
     this.ctx.assert.badRequest(typeof feedId !== "string", "Invalid feed ID provided");
     const comments = await this.ctx.commentRepository.findByFeedId(feedId);
-    const avatarPromises = comments.map((comment) => {
-      if (!comment.user.avatar_url) {
-        return Promise.resolve(comment);
-      }
-      return new Promise<typeof comment>((resolve) => {
-        this.ctx.bucketService
-          .getUrlForType(comment.user.avatar_url ?? "", "avatar")
-          .then((url) => {
-            resolve({
-              ...comment,
-              user: {
-                ...comment.user,
-                avatar_url: url
-              }
-            });
-          })
-          .catch(() => {
-            resolve(comment);
-          });
+    comments.forEach((comment) => {
+      comment.user.avatar_url = this.ctx.bucketService.generatePublicUrl(comment.user.avatar_url ?? "", "avatar");
+      comment.replies.forEach((reply) => {
+        reply.user.avatar_url = this.ctx.bucketService.generatePublicUrl(reply.user.avatar_url ?? "", "avatar");
       });
     });
-    const commentsWithAvatars = await Promise.all(avatarPromises);
-    const result = { comments: commentsWithAvatars };
+    const result = { comments };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 }

@@ -19,6 +19,7 @@ import {
   VotersStack
 } from "@votewise/ui/cards/feed";
 import { Error } from "@votewise/ui/error";
+import { ErrorBoundary } from "@votewise/ui/error-boundary";
 import { VoteButton, VoteCount, VoteProvider } from "@votewise/ui/vote-button";
 
 import { FeedFetcher } from "@/app/(app)/_components/feed-fetcher";
@@ -111,5 +112,10 @@ async function CommentsFetcher(props: { id: string }) {
   if (!commentsResult.success) {
     return <Error error={commentsResult.error} />;
   }
-  return <DiscussionPanel id={props.id} comments={commentsResult.data} />;
+
+  return (
+    <ErrorBoundary>
+      <DiscussionPanel id={props.id} comments={commentsResult.data} />
+    </ErrorBoundary>
+  );
 }
