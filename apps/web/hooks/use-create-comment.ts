@@ -36,20 +36,22 @@ export function useCreateComment(feedId: string) {
           if (!oldComments) return oldComments;
           const comments = oldComments.comments.map((comment) => {
             if (comment.id === variables.parent_id) {
-              const replies = comment.replies || [];
-              replies.push({
-                id: newCommentId,
-                text: variables.text,
-                created_at: new Date(),
-                updated_at: new Date(),
-                user: {
-                  avatar_url: currentUser.avatar_url,
-                  first_name: currentUser.first_name,
-                  last_name: currentUser.last_name,
-                  user_name: currentUser.username,
-                  id: currentUser.id
-                }
-              });
+              const replies = [
+                {
+                  id: newCommentId,
+                  text: variables.text,
+                  created_at: new Date(),
+                  updated_at: new Date(),
+                  user: {
+                    avatar_url: currentUser.avatar_url,
+                    first_name: currentUser.first_name,
+                    last_name: currentUser.last_name,
+                    user_name: currentUser.username,
+                    id: currentUser.id
+                  }
+                },
+                ...comment.replies
+              ];
               return {
                 ...comment,
                 replies
@@ -57,10 +59,7 @@ export function useCreateComment(feedId: string) {
             }
             return comment;
           });
-          return {
-            ...oldComments,
-            comments
-          };
+          return { comments };
         });
         return { previousComments, newCommentId };
       }
@@ -116,10 +115,7 @@ export function useCreateComment(feedId: string) {
               }
               return comment;
             });
-            return {
-              ...oldComments,
-              comments
-            } as GetCommentsResponse;
+            return { comments } as GetCommentsResponse;
           });
           return;
         }

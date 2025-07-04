@@ -71,6 +71,7 @@ export function DiscussionPanel(props: Props) {
             commentId={comment.id}
             postId={props.id}
             replyCount={comment.replies.length}
+            userName={comment.user.user_name}
           >
             {comment.replies.length > 0 ? (
               <ReplyContainer>
@@ -80,6 +81,7 @@ export function DiscussionPanel(props: Props) {
                     key={reply.id}
                     avatarUrl={reply.user.avatar_url || undefined}
                     createdAt={reply.created_at}
+                    userName={reply.user.user_name}
                     name={reply.user.first_name + " " + reply.user.last_name}
                     text={reply.text}
                     userId={reply.user.id}
@@ -98,6 +100,7 @@ export function DiscussionPanel(props: Props) {
 
 type MemoizedCommentProps = {
   name: string;
+  userName: string;
   avatarUrl: string | undefined;
   createdAt: Date;
   text: string;
@@ -108,37 +111,34 @@ type MemoizedCommentProps = {
   children?: React.ReactNode;
 };
 
-const MemoizedComment = memo(
-  function _Comment(props: MemoizedCommentProps) {
-    const { name, avatarUrl, createdAt, text, userId, commentId, postId, children, replyCount = 0 } = props;
-    return (
-      <Comment>
-        <Link href={routes.user.profile(userId)} className="focus-visible h-fit">
-          <Avatar className="size-8">
-            <AvatarFallback name={name} />
-            <AvatarImage src={avatarUrl || ""} alt={name} className="object-cover" />
-          </Avatar>
-        </Link>
-        <CommentContent>
-          <CommentHeader>
-            <Link href={routes.user.profile(userId)} className="hover:underline focus-visible">
-              <CommentAuthor>{name}</CommentAuthor>
-            </Link>
-            <CommentDate>{dayjs(createdAt).fromNow()}</CommentDate>
-          </CommentHeader>
-          <CommentText>{text}</CommentText>
-          <CommentActions>
-            <CommentReplyButton />
-          </CommentActions>
-          <ReplyToComment parentId={commentId} postId={postId} />
-          {children}
-        </CommentContent>
-        <CommentConnectorLine hasReplies={replyCount > 0} />
-      </Comment>
-    );
-  },
-  (prev, next) => prev.replyCount === next.replyCount && prev.text === next.text
-);
+const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
+  const { name, avatarUrl, createdAt, text, userId, commentId, postId, children, replyCount = 0, userName } = props;
+  return (
+    <Comment>
+      <Link href={routes.user.profile(userId)} className="focus-visible h-fit">
+        <Avatar className="size-8">
+          <AvatarFallback name={name} />
+          <AvatarImage src={avatarUrl || ""} alt={name} className="object-cover" />
+        </Avatar>
+      </Link>
+      <CommentContent>
+        <CommentHeader>
+          <Link href={routes.user.profile(userId)} className="hover:underline focus-visible">
+            <CommentAuthor>{userName}</CommentAuthor>
+          </Link>
+          <CommentDate>{dayjs(createdAt).fromNow()}</CommentDate>
+        </CommentHeader>
+        <CommentText>{text}</CommentText>
+        <CommentActions>
+          <CommentReplyButton />
+        </CommentActions>
+        <ReplyToComment parentId={commentId} postId={postId} username={userName} />
+        {children}
+      </CommentContent>
+      <CommentConnectorLine hasReplies={replyCount > 0} />
+    </Comment>
+  );
+});
 
 const noDataElement = <Error error="Failed to get comments!" />;
 const noCommentsElement = (

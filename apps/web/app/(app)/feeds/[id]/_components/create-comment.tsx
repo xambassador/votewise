@@ -14,20 +14,22 @@ type CommentInputProps = React.ComponentProps<typeof CommentInput>;
 type ReplyToCommentProps = React.ComponentProps<typeof CommentReplyInput> & {
   parentId?: string;
   postId: string;
+  username?: string;
 };
 
 export function CreateComment(props: Props) {
-  const { getInputProps } = useCreateCommentBase(props);
+  const { getInputProps } = useCommentCreation(props);
   return <CommentInput {...getInputProps()} />;
 }
 
 export function ReplyToComment(props: ReplyToCommentProps) {
-  const { parentId, postId, ...rest } = props;
-  const { getInputProps } = useCreateCommentBase({ postId });
-  return <CommentReplyInput {...getInputProps({ ...rest, disableFocusIndicator: true, parentId })} />;
+  const { parentId, postId, username, ...rest } = props;
+  const { getInputProps } = useCommentCreation({ postId });
+  const placeholder = username ? `Reply to @${username}` : "Reply";
+  return <CommentReplyInput {...getInputProps({ ...rest, disableFocusIndicator: true, parentId, placeholder })} />;
 }
 
-function useCreateCommentBase(props: Props) {
+function useCommentCreation(props: Props) {
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const [error, setError] = useState<string | null>(null);
   const mutation = useCreateComment(props.postId);

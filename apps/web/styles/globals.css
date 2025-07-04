@@ -34,6 +34,18 @@ input[data-autocompleted] {
   background-color: transparent !important;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
+@supports (scrollbar-gutter: stable) {
+  /* https://github.com/radix-ui/primitives/issues/1496#issuecomment-1962839229 */
+  html body[data-scroll-locked] {
+    --removed-body-scroll-bar-size: 0 !important;
+    margin-right: 0 !important;
+  }
+}
+
 @layer base {
   :root {
     --gray-50: 210 20% 98%; /* hsla(210, 20%, 98%, 1) */
