@@ -21,7 +21,16 @@ export class CommentRepository extends BaseRepository {
     this.db = cfg.db;
   }
 
-  public findByFeedId(id: string) {
+  public totalCountByFeedId(id: string, parentId: string | null = null) {
+    return this.execute(async () =>
+      this.db.comment.count({
+        where: { post_id: id, parent_id: parentId }
+      })
+    );
+  }
+
+  public findByFeedId(id: string, page: number, limit: number) {
+    const offset = (page - 1) * limit;
     return this.execute(async () =>
       this.db.comment.findMany({
         where: {
@@ -63,7 +72,8 @@ export class CommentRepository extends BaseRepository {
           }
         },
         orderBy: { created_at: "desc" },
-        take: 20
+        take: limit,
+        skip: offset
       })
     );
   }

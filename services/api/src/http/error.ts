@@ -16,7 +16,7 @@ const errorTypes = [
   Errors.TooManyRequestsError
 ];
 
-const serverErrors = [Errors.UnknowError, Errors.DatabaseError];
+const serverErrors = [Errors.UnknownError, Errors.DatabaseError];
 
 const INTERNAL_SERVER_ERROR = "InternalServerError";
 const INTERNAL_SERVER_ERROR_MSG = "Internal Server Error";

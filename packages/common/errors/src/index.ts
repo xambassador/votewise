@@ -65,12 +65,12 @@ class BadRequestError extends Error {
  *
  * @class UnknowError
  */
-class UnknowError extends Error {
+class UnknownError extends Error {
   statusCode = 500;
   error?: unknown;
   constructor(message: string, error?: unknown) {
     super(message);
-    this.name = "UnknowError";
+    this.name = "UnknownError";
     this.error = error;
   }
 }
@@ -195,7 +195,7 @@ class Assertions {
   }
 
   public unknown(condition: boolean, message: string) {
-    if (condition) throw new UnknowError(message);
+    if (condition) throw new UnknownError(message);
   }
 
   public forbidden(condition: boolean, message: string, errorCode = 403) {
@@ -219,7 +219,7 @@ export {
   ResourceNotFoundError,
   InvalidInputError,
   ValidationError,
-  UnknowError,
+  UnknownError,
   DatabaseError,
   AuthenticationError,
   OperationNotAllowedError,
