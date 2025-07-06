@@ -11,7 +11,7 @@ const errorTypes = [
   Errors.OperationNotAllowedError,
   Errors.ResourceNotFoundError,
   Errors.ValidationError,
-  Errors.UnknowError
+  Errors.UnknownError
 ];
 
 const INTERNAL_SERVER_ERROR = "InternalServerError";

@@ -24,8 +24,8 @@ export class Controller {
     const _user = await this.ctx.userRepository.findById(locals.payload.sub);
     this.ctx.assert.resourceNotFound(!_user, "User not found");
     const user = _user!;
-    const avatarUrl = await this.ctx.bucketService.getUrlForType(user.avatar_url ?? "", "avatar");
-    const backgroundUrl = await this.ctx.bucketService.getUrlForType(user.cover_image_url ?? "", "background");
+    const avatarUrl = this.ctx.bucketService.generatePublicUrl(user.avatar_url ?? "", "avatar");
+    const backgroundUrl = this.ctx.bucketService.generatePublicUrl(user.cover_image_url ?? "", "background");
     const result = {
       id: user.id,
       username: user.user_name,

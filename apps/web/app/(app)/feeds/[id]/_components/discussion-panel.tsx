@@ -18,6 +18,7 @@ import {
   CommentDate,
   CommentHeader,
   CommentList,
+  CommentMoreButton,
   CommentReplyButton,
   Comments,
   CommentText,
@@ -89,11 +90,15 @@ export function DiscussionPanel(props: Props) {
                     postId={props.id}
                   />
                 ))}
+                {comment.pagination.has_next_page ? (
+                  <CommentMoreButton className="w-fit">More replies</CommentMoreButton>
+                ) : null}
               </ReplyContainer>
             ) : null}
           </MemoizedComment>
         ))}
       </CommentList>
+      {data.pagination.has_next_page ? <CommentMoreButton>More</CommentMoreButton> : null}
     </Comments>
   );
 }

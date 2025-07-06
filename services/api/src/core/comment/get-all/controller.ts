@@ -15,6 +15,10 @@ type ControllerOptions = {
   assert: AppContext["assert"];
 };
 
+// TODO: Move this to @votewise/constants
+const defaultReplyPage = 1;
+const repliesLimit = 5;
+
 export class Controller {
   private readonly ctx: ControllerOptions;
 
@@ -29,16 +33,34 @@ export class Controller {
     this.ctx.assert.unprocessableEntity(!schema.success, "Invalid query");
     const query = schema.data!;
     const { page, limit } = query;
-    const totalComments = await this.ctx.commentRepository.totalCountByFeedId(feedId, null);
+    const totalComments = await this.ctx.commentRepository.count(feedId);
     const comments = await this.ctx.commentRepository.findByFeedId(feedId, page, limit);
-    comments.forEach((comment) => {
+    const commentsWithMetadata = comments.map((c) => {
+      const comment = {
+        id: c.id,
+        text: c.text,
+        created_at: c.created_at,
+        updated_at: c.updated_at,
+        user: c.user,
+        replies: c.replies
+      };
       comment.user.avatar_url = this.ctx.bucketService.generatePublicUrl(comment.user.avatar_url ?? "", "avatar");
       comment.replies.forEach((reply) => {
         reply.user.avatar_url = this.ctx.bucketService.generatePublicUrl(reply.user.avatar_url ?? "", "avatar");
       });
+      const totalReplies = c._count.replies;
+      const pagination = new PaginationBuilder({
+        limit: repliesLimit,
+        page: defaultReplyPage,
+        total: totalReplies
+      }).build();
+      return {
+        ...comment,
+        ...pagination
+      };
     });
     const pagination = new PaginationBuilder({ limit: query.limit, page: query.page, total: totalComments }).build();
-    const result = { comments, ...pagination };
+    const result = { comments: commentsWithMetadata, ...pagination };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 }

@@ -59,7 +59,7 @@ export function useCreateComment(feedId: string) {
             }
             return comment;
           });
-          return { comments };
+          return { comments, pagination: { ...oldComments.pagination } };
         });
         return { previousComments, newCommentId };
       }
@@ -84,8 +84,19 @@ export function useCreateComment(feedId: string) {
               replies: []
             },
             ...oldComments.comments
-          ]
-        };
+          ],
+          pagination:
+            oldComments.comments.length === 0
+              ? {
+                  current_page: 1,
+                  total_page: 1,
+                  has_next_page: false,
+                  has_previous_page: false,
+                  next_page: null,
+                  previous_page: null
+                }
+              : { ...oldComments.pagination }
+        } as GetCommentsResponse;
       });
       return { previousComments, newCommentId };
     },
@@ -115,7 +126,7 @@ export function useCreateComment(feedId: string) {
               }
               return comment;
             });
-            return { comments } as GetCommentsResponse;
+            return { comments, pagination: { ...oldComments.pagination } } as GetCommentsResponse;
           });
           return;
         }
@@ -129,7 +140,8 @@ export function useCreateComment(feedId: string) {
                 return { ...comment, id: data.id };
               }
               return comment;
-            })
+            }),
+            pagination: { ...oldComments.pagination }
           } as GetCommentsResponse;
         });
       }

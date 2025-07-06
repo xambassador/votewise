@@ -204,3 +204,15 @@ export function ReplyConnector(props: ReplyConnectorProps) {
     </svg>
   );
 }
+
+export function CommentMoreButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      {...props}
+      className={cn(
+        "text-gray-400 hover:text-gray-300 focus-primary focus-presets rounded p-1 underline",
+        props.className
+      )}
+    />
+  );
+}

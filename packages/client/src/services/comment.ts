@@ -1,4 +1,4 @@
-import type { CreateCommentResponse, GetCommentsResponse } from "@votewise/api";
+import type { CreateCommentResponse, GetCommentsResponse, GetRepliesResponse } from "@votewise/api";
 import type { TCommentCreate } from "@votewise/schemas/comment";
 import type { Client } from "../client";
 import type { Client as ServerClient } from "../server";
@@ -23,6 +23,11 @@ export class Comment {
     const res = await this.client.post<CreateCommentResponse, TCommentCreate>(comments.runtime.create("", id), data);
     return res;
   }
+
+  public async getReplies(feedId: string, parentId: string) {
+    const res = await this.client.get<GetRepliesResponse>(comments.runtime.getReplies("", feedId, parentId));
+    return res;
+  }
 }
 
-export type { GetCommentsResponse, CreateCommentResponse };
+export type { GetCommentsResponse, CreateCommentResponse, GetRepliesResponse };

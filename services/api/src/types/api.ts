@@ -21,3 +21,4 @@ export type { GetUserRecommendationsResponse } from "@/core/recommendation/user/
 export type { GetGroupRecommendationsResponse } from "@/core/recommendation/group/controller";
 export type { GetCommentsResponse } from "@/core/comment/get-all/controller";
 export type { CreateCommentResponse } from "@/core/comment/create/controller";
+export type { GetRepliesResponse } from "@/core/comment/get-replies/controller";

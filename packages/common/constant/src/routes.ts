@@ -170,13 +170,18 @@ export const comments = {
     /** Get all comments for a feed */
     getAll: (base: string) => base + "/feeds/:feedId/comments",
     /** Create a new comment for a feed */
-    create: (base: string) => base + "/feeds/:feedId/comments"
+    create: (base: string) => base + "/feeds/:feedId/comments",
+    /** Get replies */
+    getReplies: (base: string) => base + "/feeds/:feedId/comments/:commentId/replies"
   },
   runtime: {
     /** Get all comments for a feed */
     getAll: (base: string, feedId: string) => base + `/feeds/${feedId}/comments`,
     /** Create a new comment for a feed */
-    create: (base: string, feedId: string) => base + `/feeds/${feedId}/comments`
+    create: (base: string, feedId: string) => base + `/feeds/${feedId}/comments`,
+    /** Get replies */
+    getReplies: (base: string, feedId: string, commentId: string) =>
+      base + `/feeds/${feedId}/comments/${commentId}/replies`
   }
 };
 
