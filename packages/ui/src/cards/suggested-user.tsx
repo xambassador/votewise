@@ -3,6 +3,7 @@
 import { cn } from "../cn";
 import { createContext } from "../context";
 import { UserPlus } from "../icons/user-plus";
+import { Spinner } from "../ring-spinner";
 
 type State = { userId: string };
 const [Provider, useProvider] = createContext<State>("RecommendedUserCard");
@@ -58,8 +59,14 @@ export function UserBio(props: React.HTMLAttributes<HTMLParagraphElement>) {
   );
 }
 
-export function UserFollowButton(props: React.HTMLAttributes<HTMLButtonElement>) {
-  const { children, onClick, ...rest } = props;
+export function UserFollowButton(props: React.ButtonHTMLAttributes<HTMLButtonElement> & { loading?: boolean }) {
+  const { children, loading, disabled, ...rest } = props;
   useProvider("UserFollowButton");
-  return <button {...rest}>{children || <UserPlus className="text-gray-400" />}</button>;
+  const child = loading ? <Spinner className="size-4" /> : children || <UserPlus className="text-gray-400" />;
+  const isDisabled = disabled || loading;
+  return (
+    <button disabled={isDisabled} {...rest}>
+      {child}
+    </button>
+  );
 }

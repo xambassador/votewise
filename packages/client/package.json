@@ -44,6 +44,10 @@
     "./comment": {
       "import": "./dist/services/comment.mjs",
       "require": "./dist/services/comment.js"
+    },
+    "./follow": {
+      "import": "./dist/services/follow.mjs",
+      "require": "./dist/services/follow.js"
     }
   },
   "scripts": {

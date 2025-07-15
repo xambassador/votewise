@@ -58,4 +58,4 @@ export class Controller {
   }
 }
 
-export type CreateFollowResponse = ExtractControllerResponse<Controller>;
+export type UnFollowResponse = ExtractControllerResponse<Controller>;

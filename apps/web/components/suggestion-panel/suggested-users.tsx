@@ -8,6 +8,7 @@ import { MoreItemsWithSummary } from "@votewise/ui/more-items";
 
 import { getUserClient } from "@/lib/client.server";
 
+import { FollowUserButton } from "./follow-user-btn";
 import { ContentWrapper, ErrorMessage, fallbackSpinner, maxListItems, Title } from "./utils";
 
 const maxSuggestedUsers = maxListItems;
@@ -53,10 +54,7 @@ async function SuggestedUsersList() {
               {truncateOnWord(user.user_name, 30)}
             </SuggestedUserCard.UserHandle>
           </div>
-          <SuggestedUserCard.UserFollowButton
-            aria-label={`Follow ${user.first_name + " " + user.last_name}`}
-            title={`Follow ${user.first_name + " " + user.last_name}`}
-          />
+          <FollowUserButton username={user.user_name} name={user.first_name + " " + user.last_name} />
         </SuggestedUserCard.RecommendedUserCard>
       ))}
 
