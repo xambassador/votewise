@@ -28,7 +28,9 @@ export class PaginationBuilder {
         has_previous_page: hasPreviousPage,
         next_page: nextPage,
         current_page: this.page,
-        previous_page: previousPage
+        previous_page: previousPage,
+        limit: this.limit,
+        total: this.total
       }
     };
   }

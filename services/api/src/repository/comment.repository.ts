@@ -27,11 +27,7 @@ export class CommentRepository extends BaseRepository {
   }
 
   public count(id: string) {
-    return this.execute(async () =>
-      this.db.comment.count({
-        where: { post_id: id }
-      })
-    );
+    return this.execute(async () => this.db.comment.count({ where: { post_id: id, parent_id: null } }));
   }
 
   public findByFeedId(id: string, page: number, limit: number) {

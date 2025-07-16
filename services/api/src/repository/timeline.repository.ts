@@ -58,7 +58,7 @@ export class TimelineRepository extends BaseRepository {
               _count: {
                 select: {
                   upvotes: true,
-                  comments: true
+                  comments: { where: { parent_id: null } }
                 }
               }
             }

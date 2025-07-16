@@ -8,6 +8,7 @@ import { Comment as CommentIcon } from "../icons/comment";
 import { PaperPlane } from "../icons/paper-plane";
 import { Plus } from "../icons/plus";
 import { InputField } from "../input-field";
+import { Spinner } from "../ring-spinner";
 import { Textarea } from "../textarea-autosize";
 
 type CommentState = {
@@ -205,14 +206,20 @@ export function ReplyConnector(props: ReplyConnectorProps) {
   );
 }
 
-export function CommentMoreButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+export function CommentMoreButton(props: React.ButtonHTMLAttributes<HTMLButtonElement> & { loading?: boolean }) {
+  const { className, children, loading, disabled, ...rest } = props;
+  const child = loading ? <Spinner className="size-4" /> : children || "More";
+  const isDisabled = disabled || loading;
   return (
     <button
-      {...props}
+      {...rest}
+      disabled={isDisabled}
       className={cn(
-        "text-gray-400 hover:text-gray-300 focus-primary focus-presets rounded p-1 underline",
-        props.className
+        "text-gray-400 hover:text-gray-300 focus-primary focus-presets rounded p-1 underline flex items-center justify-center",
+        className
       )}
-    />
+    >
+      {child}
+    </button>
   );
 }

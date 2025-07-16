@@ -42,7 +42,7 @@ type Props = {
 
 export function DiscussionPanel(props: Props) {
   const { comments: initialData } = props;
-  const { status, error, data } = useFetchComments(props.id, { initialData });
+  const { status, error, data, nextPageStatus, fetchNextPage } = useFetchComments(props.id, { initialData });
   const memoizedInput = useMemo(() => <CreateComment postId={props.id} />, [props.id]);
 
   switch (status) {
@@ -86,7 +86,7 @@ export function DiscussionPanel(props: Props) {
                     name={reply.user.first_name + " " + reply.user.last_name}
                     text={reply.text}
                     userId={reply.user.id}
-                    commentId={reply.id}
+                    commentId={null}
                     postId={props.id}
                   />
                 ))}
@@ -98,7 +98,18 @@ export function DiscussionPanel(props: Props) {
           </MemoizedComment>
         ))}
       </CommentList>
-      {data.pagination.has_next_page ? <CommentMoreButton>More</CommentMoreButton> : null}
+      {data.pagination.has_next_page ? (
+        <CommentMoreButton
+          loading={nextPageStatus === "loading"}
+          className="w-full"
+          onClick={() => {
+            if (data.pagination.next_page === null) return;
+            fetchNextPage(data.pagination.next_page);
+          }}
+        >
+          More
+        </CommentMoreButton>
+      ) : null}
     </Comments>
   );
 }
@@ -110,7 +121,7 @@ type MemoizedCommentProps = {
   createdAt: Date;
   text: string;
   userId: string;
-  commentId: string;
+  commentId: string | null;
   postId: string;
   replyCount?: number;
   children?: React.ReactNode;
@@ -134,10 +145,17 @@ const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
           <CommentDate>{dayjs(createdAt).fromNow()}</CommentDate>
         </CommentHeader>
         <CommentText>{text}</CommentText>
-        <CommentActions>
-          <CommentReplyButton />
-        </CommentActions>
-        <ReplyToComment parentId={commentId} postId={postId} username={userName} />
+        {/*
+            TODO:
+            Due to design limitation (of course I am working on it..), right now we are not going to allow.
+            Reply to a comment 😛
+         */}
+        {commentId && (
+          <CommentActions>
+            <CommentReplyButton />
+          </CommentActions>
+        )}
+        {commentId && <ReplyToComment parentId={commentId} postId={postId} username={userName} />}
         {children}
       </CommentContent>
       <CommentConnectorLine hasReplies={replyCount > 0} />
