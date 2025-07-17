@@ -1,5 +1,7 @@
 import type { AppContext } from "@/context";
 
+import { PAGINATION } from "@votewise/constant";
+
 import { BaseRepository } from "./base.repository";
 
 type Dependencies = {
@@ -12,9 +14,6 @@ type TCommentCreate = {
   userId: string;
   parentId?: string | null;
 };
-
-// TODO: Move this to @votewise/constants
-const repliesLimit = 5;
 
 export class CommentRepository extends BaseRepository {
   private readonly db: Dependencies["db"];
@@ -66,7 +65,7 @@ export class CommentRepository extends BaseRepository {
               }
             },
             orderBy: { created_at: "desc" },
-            take: repliesLimit
+            take: PAGINATION.comments.reply.limit
           },
           _count: { select: { replies: true } }
         },

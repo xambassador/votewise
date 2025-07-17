@@ -6,6 +6,8 @@ import type { AsyncState } from "@votewise/types";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { PAGINATION } from "@votewise/constant";
+
 import { commentClient } from "@/lib/client";
 import { getCommentsKey } from "@/lib/constants";
 
@@ -29,7 +31,7 @@ export function useFetchComments(feedId: string, options?: Options) {
 
   async function fetchNextPage(page: number) {
     setNextPageStatus("loading");
-    const res = await commentClient.getComments(feedId, { page, limit: 10 });
+    const res = await commentClient.getComments(feedId, { page, limit: PAGINATION.comments.limit });
     if (!res.success) {
       setNextPageStatus("error");
       return;

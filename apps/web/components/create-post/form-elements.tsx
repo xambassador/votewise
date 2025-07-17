@@ -14,14 +14,12 @@ import { useAssetPicker, useAssets, useContentInput, useProgressTracker, useSubm
 
 export function TitleInput() {
   const { getInputProps } = useTitleInput();
-  const className = "placeholder:text-black-300 placeholder:text-base text-base text-gray-300";
-  return <Input {...getInputProps({ className })} />;
+  return <Input {...getInputProps({ className: titleInputClassname })} />;
 }
 
 export function ContentInput() {
   const { getTextareaProps } = useContentInput();
-  const className = "placeholder:text-black-300 placeholder:text-base text-base text-gray-300 w-full";
-  return <Textarea {...getTextareaProps({ className })} />;
+  return <Textarea {...getTextareaProps({ className: contentInputClassname })} />;
 }
 
 export function Assets() {
@@ -37,10 +35,7 @@ export function Assets() {
       })}
     >
       {remainingFiles > 0 && (
-        <FloatingCounter
-          variant="rightCenter"
-          className="-right-5 peer-hover:opacity-0 peer-hover:delay-0 transition-opacity peer-hover:duration-100 duration-300 delay-300"
-        >
+        <FloatingCounter variant="rightCenter" className={floatingCounterClassname}>
           +{remainingFiles}
         </FloatingCounter>
       )}
@@ -50,9 +45,8 @@ export function Assets() {
 
 export const AssetPicker = memo(function AssetPicker() {
   const { getInputProps, getLabelProps } = useAssetPicker();
-  const className = "flex items-center gap-2 text-black-300 cursor-pointer focus-visible focus-preset rounded";
   return (
-    <label {...getLabelProps({ className })}>
+    <label {...getLabelProps({ className: assetPickerClassName })}>
       <ImageIcon />
       <span>Photo / Video</span>
       <input {...getInputProps({ className: "sr-only" })} />
@@ -77,3 +71,9 @@ export function SubmitButton() {
   const { getButtonProps } = useSubmit();
   return <Button {...getButtonProps()} />;
 }
+
+const titleInputClassname = "placeholder:text-black-300 placeholder:text-base text-base text-gray-300";
+const contentInputClassname = "placeholder:text-black-300 placeholder:text-base text-base text-gray-300 w-full";
+const floatingCounterClassname =
+  "-right-5 peer-hover:opacity-0 peer-hover:delay-0 transition-opacity peer-hover:duration-100 duration-300 delay-300";
+const assetPickerClassName = "flex items-center gap-2 text-black-300 cursor-pointer focus-visible focus-preset rounded";

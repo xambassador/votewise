@@ -147,8 +147,8 @@ const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
         <CommentText>{text}</CommentText>
         {/*
             TODO:
-            Due to design limitation (of course I am working on it..), right now we are not going to allow.
-            Reply to a comment 😛
+            Due to design limitation (of course I am working on it..), right now we are not going to allow
+            reply to a comment 😛
          */}
         {commentId && (
           <CommentActions>

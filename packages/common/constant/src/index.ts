@@ -43,3 +43,11 @@ export const COOKIE_KEYS = {
   accessToken: "__votewise_access_token",
   refreshToken: "__votewise_refresh_token"
 };
+
+export const PAGINATION = {
+  comments: {
+    limit: 10,
+    reply: { limit: 5 }
+  },
+  feeds: { limit: 20 }
+};

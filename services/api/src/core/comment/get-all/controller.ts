@@ -4,6 +4,7 @@ import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
+import { PAGINATION } from "@votewise/constant";
 import { ZPagination } from "@votewise/schemas";
 
 import { PaginationBuilder } from "@/lib/pagination";
@@ -15,9 +16,8 @@ type ControllerOptions = {
   assert: AppContext["assert"];
 };
 
-// TODO: Move this to @votewise/constants
 const defaultReplyPage = 1;
-const repliesLimit = 5;
+const repliesLimit = PAGINATION.comments.reply.limit;
 
 export class Controller {
   private readonly ctx: ControllerOptions;

@@ -92,9 +92,7 @@ export default function Page(props: Props) {
                 {feed.upvote_count - 10 > 0 ? <VotersCount>+{feed.upvote_count - 10}</VotersCount> : null}
               </VotersStack>
             )}
-            {feed.voters.length === 0 && (
-              <span className="text-sm text-gray-500">No voters yet... Be the first one</span>
-            )}
+            {feed.voters.length === 0 && <span className="text-sm text-gray-500">{noVotersMessage}</span>}
           </div>
 
           <Suspense fallback={<CommentsFetcherFallback />}>
@@ -105,6 +103,8 @@ export default function Page(props: Props) {
     </FeedFetcher>
   );
 }
+
+const noVotersMessage = "No voters yet... Be the first one";
 
 async function CommentsFetcher(props: { id: string }) {
   const comment = getCommentClient();

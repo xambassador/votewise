@@ -1,5 +1,3 @@
-import * as React from "react";
-
 type Props = React.SVGProps<SVGSVGElement>;
 
 export function Planet(props: Props) {
