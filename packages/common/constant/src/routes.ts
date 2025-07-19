@@ -172,7 +172,9 @@ export const comments = {
     /** Create a new comment for a feed */
     create: (base: string) => base + "/feeds/:feedId/comments",
     /** Get replies */
-    getReplies: (base: string) => base + "/feeds/:feedId/comments/:commentId/replies"
+    getReplies: (base: string) => base + "/feeds/:feedId/comments/:commentId/replies",
+    /** Update comment */
+    update: (base: string) => base + "/feeds/:feedId/comments/:commentId"
   },
   runtime: {
     /** Get all comments for a feed */
@@ -181,7 +183,9 @@ export const comments = {
     create: (base: string, feedId: string) => base + `/feeds/${feedId}/comments`,
     /** Get replies */
     getReplies: (base: string, feedId: string, commentId: string) =>
-      base + `/feeds/${feedId}/comments/${commentId}/replies`
+      base + `/feeds/${feedId}/comments/${commentId}/replies`,
+    /** Update comment */
+    update: (base: string, feedId: string, commentId: string) => base + `/feeds/${feedId}/comments/${commentId}`
   }
 };
 

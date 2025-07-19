@@ -15,6 +15,12 @@ type TCommentCreate = {
   parentId?: string | null;
 };
 
+type TCommentUpdate = {
+  text: string;
+  userId: string;
+  commentId: string;
+};
+
 export class CommentRepository extends BaseRepository {
   private readonly db: Dependencies["db"];
   public reply: ReplyRepository;
@@ -86,6 +92,24 @@ export class CommentRepository extends BaseRepository {
           parent_id: data.parentId
         },
         select: { id: true }
+      })
+    );
+  }
+
+  public update(data: TCommentUpdate) {
+    return this.execute(async () =>
+      this.db.comment.update({
+        where: { id: data.commentId, user_id: data.userId },
+        data: { text: data.text }
+      })
+    );
+  }
+
+  public findById(id: string) {
+    return this.execute(async () =>
+      this.db.comment.findUnique({
+        where: { id },
+        select: { id: true, user_id: true, post_id: true }
       })
     );
   }

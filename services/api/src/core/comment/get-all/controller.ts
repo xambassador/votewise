@@ -36,13 +36,15 @@ export class Controller {
     const totalComments = await this.ctx.commentRepository.count(feedId);
     const comments = await this.ctx.commentRepository.findByFeedId(feedId, page, limit);
     const commentsWithMetadata = comments.map((c) => {
+      const isEdited = c.created_at.getTime() !== c.updated_at.getTime();
       const comment = {
         id: c.id,
         text: c.text,
         created_at: c.created_at,
         updated_at: c.updated_at,
         user: c.user,
-        replies: c.replies
+        replies: c.replies,
+        is_edited: isEdited
       };
       comment.user.avatar_url = this.ctx.bucketService.generatePublicUrl(comment.user.avatar_url ?? "", "avatar");
       comment.replies.forEach((reply) => {

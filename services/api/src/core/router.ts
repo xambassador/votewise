@@ -16,6 +16,7 @@ import { verifyControllerFactory } from "./auth/verify";
 import { createCommentControllerFactory } from "./comment/create";
 import { getCommentsControllerFactory } from "./comment/get-all";
 import { getRepliesControllerFactory } from "./comment/get-replies";
+import { updateCommentControllerFactory } from "./comment/update";
 import { createFeedControllerFactory } from "./feed/create";
 import { getFeedControllerFactory } from "./feed/get";
 import { getAllFeedControllerFactory } from "./feed/get-all";
@@ -88,6 +89,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.post(follow.paths.followUser(path), ...createFollowControllerFactory());
   router.delete(follow.paths.unfollowUser(path), ...deleteFollowControllerFactory());
   router.get(comments.paths.getReplies(path), ...getRepliesControllerFactory());
+  router.put(comments.paths.update(path), ...updateCommentControllerFactory());
 
   return router;
 }

@@ -256,6 +256,8 @@ model Comment {
     updated_at DateTime @updatedAt
 
     upvotes CommentUpvote[]
+
+    @@index([post_id])
 }
 
 model CommentUpvote {
