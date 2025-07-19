@@ -5,6 +5,7 @@ import type { GetCommentsResponse } from "@votewise/client/comment";
 import { memo, useMemo } from "react";
 import Link from "next/link";
 import { useFetchComments } from "@/hooks/use-fetch-comments";
+import { useFetchReplies } from "@/hooks/use-fetch-replies";
 import dayjs, { extend } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
@@ -42,7 +43,7 @@ type Props = {
 
 export function DiscussionPanel(props: Props) {
   const { comments: initialData } = props;
-  const { status, error, data, nextPageStatus, fetchNextPage } = useFetchComments(props.id, { initialData });
+  const { status, error, data, getTriggerProps } = useFetchComments(props.id, { initialData });
   const memoizedInput = useMemo(() => <CreateComment postId={props.id} />, [props.id]);
 
   switch (status) {
@@ -75,44 +76,69 @@ export function DiscussionPanel(props: Props) {
             userName={comment.user.user_name}
           >
             {comment.replies.length > 0 ? (
-              <ReplyContainer>
-                <ReplyConnector />
-                {comment.replies.map((reply) => (
-                  <MemoizedComment
-                    key={reply.id}
-                    avatarUrl={reply.user.avatar_url || undefined}
-                    createdAt={reply.created_at}
-                    userName={reply.user.user_name}
-                    name={reply.user.first_name + " " + reply.user.last_name}
-                    text={reply.text}
-                    userId={reply.user.id}
-                    commentId={null}
-                    postId={props.id}
-                  />
-                ))}
-                {comment.pagination.has_next_page ? (
-                  <CommentMoreButton className="w-fit">More replies</CommentMoreButton>
-                ) : null}
-              </ReplyContainer>
+              <Replies
+                pagination={comment.pagination}
+                postId={props.id}
+                replies={comment.replies}
+                parentId={comment.id}
+              />
             ) : null}
           </MemoizedComment>
         ))}
       </CommentList>
       {data.pagination.has_next_page ? (
-        <CommentMoreButton
-          loading={nextPageStatus === "loading"}
-          className="w-full"
-          onClick={() => {
-            if (data.pagination.next_page === null) return;
-            fetchNextPage(data.pagination.next_page);
-          }}
-        >
-          More
-        </CommentMoreButton>
+        <CommentMoreButton {...getTriggerProps({ className: "w-full", children: "More" })} />
       ) : null}
     </Comments>
   );
 }
+
+type RepliesProps = {
+  replies: GetCommentsResponse["comments"][0]["replies"];
+  pagination: GetCommentsResponse["comments"][0]["pagination"];
+  postId: string;
+  parentId: string;
+};
+
+const Replies = memo(function Replies(props: RepliesProps) {
+  const { replies, postId, parentId, pagination } = props;
+  const { data, error, status, getTriggerProps } = useFetchReplies({
+    feedId: postId,
+    parentId,
+    initialData: { replies, pagination }
+  });
+
+  switch (status) {
+    case "pending":
+      return <CommentsFetcherFallback />;
+    case "error":
+      return <Error error={error.message} errorInfo={{ componentStack: error.stack }} />;
+  }
+
+  if (!data) return noDataElement;
+
+  return (
+    <ReplyContainer>
+      <ReplyConnector />
+      {data.replies.map((reply) => (
+        <MemoizedComment
+          key={reply.id}
+          avatarUrl={reply.user.avatar_url || undefined}
+          createdAt={reply.created_at}
+          userName={reply.user.user_name}
+          name={reply.user.first_name + " " + reply.user.last_name}
+          text={reply.text}
+          userId={reply.user.id}
+          commentId={null}
+          postId={postId}
+        />
+      ))}
+      {data.pagination.has_next_page ? (
+        <CommentMoreButton {...getTriggerProps({ className: "w-fit", children: "More replies" })} />
+      ) : null}
+    </ReplyContainer>
+  );
+});
 
 type MemoizedCommentProps = {
   name: string;

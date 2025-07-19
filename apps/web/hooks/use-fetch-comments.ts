@@ -13,6 +13,12 @@ import { getCommentsKey } from "@/lib/constants";
 
 type Options = { initialData?: GetCommentsResponse };
 
+// TODO:
+// We have button component, so we can remove all
+// <button> elements from ui library and use that instead.
+// so we can reference the ButtonProps type from there.
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & { loading?: boolean };
+
 export function useFetchComments(feedId: string, options?: Options) {
   const [nextPageStatus, setNextPageStatus] = useState<AsyncState>("idle");
   const queryClient = useQueryClient();
@@ -49,5 +55,17 @@ export function useFetchComments(feedId: string, options?: Options) {
     setNextPageStatus("success");
   }
 
-  return { ...query, fetchNextPage, nextPageStatus };
+  function getTriggerProps(props?: ButtonProps): ButtonProps {
+    return {
+      ...props,
+      onClick: () => {
+        if (!query.data) return;
+        if (query.data.pagination.next_page === null) return;
+        fetchNextPage(query.data.pagination.next_page);
+      },
+      loading: nextPageStatus === "loading"
+    };
+  }
+
+  return { ...query, fetchNextPage, nextPageStatus, getTriggerProps };
 }

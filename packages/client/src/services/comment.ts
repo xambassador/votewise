@@ -17,12 +17,8 @@ export class Comment {
 
   public async getComments(id: string, query?: TPagination) {
     const searchParams = new URLSearchParams();
-    if (query?.limit) {
-      searchParams.set("limit", query.limit.toString());
-    }
-    if (query?.page) {
-      searchParams.set("page", query.page.toString());
-    }
+    if (query?.limit) searchParams.set("limit", query.limit.toString());
+    if (query?.page) searchParams.set("page", query.page.toString());
     const queryString = searchParams.toString() ? `?${searchParams.toString()}` : "";
     const path = comments.runtime.getAll("", id) + queryString;
     const res = await this.client.get<GetCommentsResponse>(path);
@@ -34,8 +30,13 @@ export class Comment {
     return res;
   }
 
-  public async getReplies(feedId: string, parentId: string) {
-    const res = await this.client.get<GetRepliesResponse>(comments.runtime.getReplies("", feedId, parentId));
+  public async getReplies(feedId: string, parentId: string, query?: TPagination) {
+    const searchParams = new URLSearchParams();
+    if (query?.limit) searchParams.set("limit", query.limit.toString());
+    if (query?.page) searchParams.set("page", query.page.toString());
+    const queryString = searchParams.toString() ? `?${searchParams.toString()}` : "";
+    const path = comments.runtime.getReplies("", feedId, parentId) + queryString;
+    const res = await this.client.get<GetRepliesResponse>(path);
     return res;
   }
 }
