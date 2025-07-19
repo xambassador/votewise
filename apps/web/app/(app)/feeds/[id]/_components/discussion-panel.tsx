@@ -23,6 +23,7 @@ import {
   CommentReplyButton,
   Comments,
   CommentText,
+  CommentUpdatedLabel,
   ReplyConnector,
   ReplyContainer
 } from "@votewise/ui/cards/comment";
@@ -32,6 +33,7 @@ import { Comment as CommentIcon } from "@votewise/ui/icons/comment";
 import { routes } from "@/lib/routes";
 
 import { CreateComment, ReplyToComment } from "./create-comment";
+import { EditComment, EditCommentButton } from "./edit-comment";
 import { CommentsFetcherFallback } from "./skeleton";
 
 extend(relativeTime);
@@ -74,6 +76,7 @@ export function DiscussionPanel(props: Props) {
             postId={props.id}
             replyCount={comment.replies.length}
             userName={comment.user.user_name}
+            isEdited={comment.is_edited}
           >
             {comment.replies.length > 0 ? (
               <Replies
@@ -129,8 +132,10 @@ const Replies = memo(function Replies(props: RepliesProps) {
           name={reply.user.first_name + " " + reply.user.last_name}
           text={reply.text}
           userId={reply.user.id}
-          commentId={null}
+          commentId={reply.id}
+          shouldReply={false}
           postId={postId}
+          parentId={parentId}
         />
       ))}
       {data.pagination.has_next_page ? (
@@ -147,14 +152,31 @@ type MemoizedCommentProps = {
   createdAt: Date;
   text: string;
   userId: string;
-  commentId: string | null;
+  commentId: string;
+  shouldReply?: boolean;
   postId: string;
   replyCount?: number;
   children?: React.ReactNode;
+  isEdited?: boolean;
+  parentId?: string;
 };
 
 const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
-  const { name, avatarUrl, createdAt, text, userId, commentId, postId, children, replyCount = 0, userName } = props;
+  const {
+    name,
+    avatarUrl,
+    createdAt,
+    text,
+    userId,
+    commentId,
+    postId,
+    children,
+    replyCount = 0,
+    userName,
+    isEdited,
+    shouldReply,
+    parentId
+  } = props;
   return (
     <Comment>
       <Link href={routes.user.profile(userId)} className="focus-visible h-fit">
@@ -169,8 +191,10 @@ const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
             <CommentAuthor>{userName}</CommentAuthor>
           </Link>
           <CommentDate>{dayjs(createdAt).fromNow()}</CommentDate>
+          {isEdited && <CommentUpdatedLabel>edited</CommentUpdatedLabel>}
         </CommentHeader>
         <CommentText>{text}</CommentText>
+        <EditComment text={text} authorId={userId} commentId={commentId} postId={postId} parentId={parentId} />
         {/*
             TODO:
             Due to design limitation (of course I am working on it..), right now we are not going to allow
@@ -178,9 +202,11 @@ const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
          */}
         {commentId && (
           <CommentActions>
-            <CommentReplyButton />
+            {shouldReply && <CommentReplyButton />}
+            <EditCommentButton authorId={userId} />
           </CommentActions>
         )}
+
         {commentId && <ReplyToComment parentId={commentId} postId={postId} username={userName} />}
         {children}
       </CommentContent>

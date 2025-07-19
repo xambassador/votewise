@@ -1,5 +1,10 @@
-import type { CreateCommentResponse, GetCommentsResponse, GetRepliesResponse } from "@votewise/api";
-import type { TCommentCreate } from "@votewise/schemas/comment";
+import type {
+  CreateCommentResponse,
+  GetCommentsResponse,
+  GetRepliesResponse,
+  UpdateCommentResponse
+} from "@votewise/api";
+import type { TCommentCreate, TCommentUpdate } from "@votewise/schemas/comment";
 import type { TPagination } from "@votewise/schemas/pagination";
 import type { Client } from "../client";
 import type { Client as ServerClient } from "../server";
@@ -39,6 +44,14 @@ export class Comment {
     const res = await this.client.get<GetRepliesResponse>(path);
     return res;
   }
+
+  public async update(feedId: string, id: string, data: TCommentUpdate) {
+    const res = await this.client.put<UpdateCommentResponse, TCommentUpdate>(
+      comments.runtime.update("", feedId, id),
+      data
+    );
+    return res;
+  }
 }
 
-export type { GetCommentsResponse, CreateCommentResponse, GetRepliesResponse };
+export type { GetCommentsResponse, CreateCommentResponse, GetRepliesResponse, UpdateCommentResponse };

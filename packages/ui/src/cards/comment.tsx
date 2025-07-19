@@ -5,7 +5,9 @@ import { forwardRef, memo, useState } from "react";
 import { cn } from "../cn";
 import { createContext } from "../context";
 import { Comment as CommentIcon } from "../icons/comment";
+import { Cross } from "../icons/cross";
 import { PaperPlane } from "../icons/paper-plane";
+import { Pencil } from "../icons/pencil";
 import { Plus } from "../icons/plus";
 import { InputField } from "../input-field";
 import { Spinner } from "../ring-spinner";
@@ -13,10 +15,12 @@ import { Textarea } from "../textarea-autosize";
 
 type CommentState = {
   isReplyOpen?: boolean;
-  toggle?: () => void;
+  isEditMode?: boolean;
+  toggle?: (editMode?: boolean) => void;
 };
 const [CommentProvider, useComment] = createContext<CommentState>("Comment");
 CommentProvider.displayName = "CommentProvider";
+export { useComment };
 
 type CommentsRef = HTMLDivElement;
 export type CommentsProps = React.HTMLAttributes<HTMLDivElement>;
@@ -71,12 +75,19 @@ export type CommentProps = React.HTMLAttributes<HTMLDivElement>;
 export const Comment = memo(
   forwardRef<CommentRef, CommentProps>((props, ref) => {
     const [isReplyOpen, setIsReplyOpen] = useState(false);
-    const toggle = () => {
-      setIsReplyOpen((prev) => !prev);
+    const [isEditMode, setIsEditMode] = useState(false);
+
+    const toggle = (editMode = false) => {
+      if (!editMode) {
+        setIsReplyOpen((prev) => !prev);
+        return;
+      }
+      setIsEditMode((prev) => !prev);
+      setIsReplyOpen(false);
     };
 
     return (
-      <CommentProvider isReplyOpen={isReplyOpen} toggle={toggle}>
+      <CommentProvider isReplyOpen={isReplyOpen} toggle={toggle} isEditMode={isEditMode}>
         <div {...props} ref={ref} className={cn("flex gap-3 relative", props.className)} />
       </CommentProvider>
     );
@@ -106,15 +117,23 @@ export const CommentDate = forwardRef<HTMLSpanElement, CommentDateProps>((props,
 ));
 CommentDate.displayName = "CommentDate";
 
-export type CommentTextProps = React.HTMLAttributes<HTMLParagraphElement>;
-export const CommentText = forwardRef<HTMLParagraphElement, CommentTextProps>((props, ref) => (
-  <p {...props} ref={ref} className={cn("text-base text-gray-300", props.className)} />
+export type CommentUpdatedLabelProps = React.HTMLAttributes<HTMLSpanElement>;
+export const CommentUpdatedLabel = forwardRef<HTMLSpanElement, CommentUpdatedLabelProps>((props, ref) => (
+  <span {...props} ref={ref} className={cn("text-xs text-gray-400", props.className)} />
 ));
+CommentUpdatedLabel.displayName = "CommentUpdatedLabel";
+
+export type CommentTextProps = React.HTMLAttributes<HTMLParagraphElement>;
+export const CommentText = forwardRef<HTMLParagraphElement, CommentTextProps>((props, ref) => {
+  const { isEditMode } = useComment("CommentText");
+  if (isEditMode) return null;
+  return <p {...props} ref={ref} className={cn("text-base text-gray-300", props.className)} />;
+});
 CommentText.displayName = "CommentText";
 
 export type CommentActionsProps = React.HTMLAttributes<HTMLDivElement>;
 export const CommentActions = forwardRef<HTMLDivElement, CommentActionsProps>((props, ref) => (
-  <div {...props} ref={ref} className={cn("flex items-center gap-3 mt-4", props.className)} />
+  <div {...props} ref={ref} className={cn("flex items-center gap-3 mt-3", props.className)} />
 ));
 CommentActions.displayName = "CommentActions";
 
@@ -138,13 +157,43 @@ export const CommentReplyButton = forwardRef<HTMLButtonElement, CommentReplyButt
         toggle?.();
       }}
     >
-      {leftSlot || <CommentIcon className="text-gray-400" />}
+      {leftSlot || <CommentIcon className="text-gray-400 size-5" />}
       {children || "Reply"}
       {rightSlot}
     </button>
   );
 });
 CommentReplyButton.displayName = "CommentReplyButton";
+
+export type CommentEditButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  leftSlot?: React.ReactNode;
+  rightSlot?: React.ReactNode;
+};
+export const CommentEditButton = forwardRef<HTMLButtonElement, CommentEditButtonProps>((props, ref) => {
+  const { className, children, leftSlot, rightSlot, ...rest } = props;
+  const { toggle, isEditMode } = useComment("CommentEditButton");
+  const icon = isEditMode ? <Cross className="text-gray-400 size-5" /> : <Pencil className="text-gray-400 size-5" />;
+  const label = isEditMode ? "Cancel" : "Edit";
+  return (
+    <button
+      {...rest}
+      ref={ref}
+      className={cn(
+        "flex items-center justify-center gap-1 text-gray-400 text-sm focus-primary focus-presets rounded",
+        className
+      )}
+      onClick={(e) => {
+        rest.onClick?.(e);
+        toggle?.(true);
+      }}
+    >
+      {leftSlot || icon}
+      {children || label}
+      {rightSlot}
+    </button>
+  );
+});
+CommentEditButton.displayName = "CommentEditButton";
 
 export type ReplyContainerProps = React.HTMLAttributes<HTMLDivElement>;
 export const ReplyContainer = forwardRef<HTMLDivElement, ReplyContainerProps>((props, ref) => {
@@ -165,6 +214,19 @@ export const CommentReplyInput = forwardRef<CommentInputRef, CommentInputProps>(
   );
 });
 CommentReplyInput.displayName = "CommentReplyInput";
+
+export const CommentEditInput = forwardRef<CommentInputRef, CommentInputProps>((props, ref) => {
+  const { isEditMode } = useComment("CommentEditInput");
+  if (!isEditMode) return null;
+  return (
+    <CommentInput
+      {...props}
+      ref={ref}
+      inputFieldProps={{ ...props.inputFieldProps, className: cn("mt-1 py-1", props.inputFieldProps?.className) }}
+    />
+  );
+});
+CommentEditInput.displayName = "CommentEditInput";
 
 export type CommentConnectorLineProps = React.HTMLAttributes<HTMLDivElement> & {
   hasReplies?: boolean;

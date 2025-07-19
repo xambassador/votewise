@@ -147,6 +147,5 @@ export function useCreateComment(feedId: string) {
       }
     }
   });
-
   return mutation;
 }
