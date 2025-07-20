@@ -29,37 +29,53 @@ export function useCreateComment(feedId: string) {
     onMutate: async (variables) => {
       const newCommentId = `temp-${++idCounter}`;
       const repliesKey = getRepliesKey(feedId, variables.parent_id || "");
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: repliesKey }),
+        queryClient.cancelQueries({ queryKey: commentsKey })
+      ]);
 
       if (variables.parent_id) {
         // This is a reply
-        await queryClient.cancelQueries({ queryKey: repliesKey });
         const previousReplies = queryClient.getQueryData<GetRepliesResponse>(repliesKey);
         queryClient.setQueryData<GetRepliesResponse>(repliesKey, (oldReplies) => {
           if (!oldReplies) return oldReplies;
+          const reply = {
+            id: newCommentId,
+            text: variables.text,
+            created_at: new Date(),
+            updated_at: new Date(),
+            user: {
+              avatar_url: currentUser.avatar_url,
+              first_name: currentUser.first_name,
+              last_name: currentUser.last_name,
+              user_name: currentUser.username,
+              id: currentUser.id
+            }
+          };
+
+          if (!oldReplies.replies.length) {
+            queryClient.setQueryData<GetCommentsResponse>(commentsKey, (oldComments) => {
+              if (!oldComments) return oldComments;
+              return {
+                ...oldComments,
+                comments: oldComments.comments.map((comment) => {
+                  if (comment.id === variables.parent_id) {
+                    return { ...comment, replies: [reply] };
+                  }
+                  return comment;
+                })
+              } as GetCommentsResponse;
+            });
+          }
+
           return {
             ...oldReplies,
-            replies: [
-              {
-                id: newCommentId,
-                text: variables.text,
-                created_at: new Date(),
-                updated_at: new Date(),
-                user: {
-                  avatar_url: currentUser.avatar_url,
-                  first_name: currentUser.first_name,
-                  last_name: currentUser.last_name,
-                  user_name: currentUser.username,
-                  id: currentUser.id
-                }
-              },
-              ...oldReplies.replies
-            ]
+            replies: [reply, ...oldReplies.replies]
           } as GetRepliesResponse;
         });
         return { previousComments: previousReplies, newCommentId };
       }
 
-      await queryClient.cancelQueries({ queryKey: commentsKey });
       const previousComments = queryClient.getQueryData(commentsKey);
       queryClient.setQueryData<GetCommentsResponse>(commentsKey, (oldComments) => {
         if (!oldComments) return oldComments;

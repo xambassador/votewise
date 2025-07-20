@@ -23,9 +23,8 @@ export function useEditComment(feedId: string, commentId: string, parentId?: str
       return res.data;
     },
     onMutate: async (variables) => {
-      await queryClient.cancelQueries({ queryKey: commentsKey });
-
       if (parentId) {
+        await queryClient.cancelQueries({ queryKey: repliesKey });
         const replies = queryClient.getQueryData<GetRepliesResponse>(repliesKey);
         queryClient.setQueryData<GetRepliesResponse>(repliesKey, (oldReplies) => {
           if (!oldReplies) return oldReplies;
@@ -42,6 +41,7 @@ export function useEditComment(feedId: string, commentId: string, parentId?: str
         return { previousComments: replies };
       }
 
+      await queryClient.cancelQueries({ queryKey: commentsKey });
       const previousComments = queryClient.getQueryData<GetCommentsResponse>(commentsKey);
       queryClient.setQueryData<GetCommentsResponse>(commentsKey, (oldComments) => {
         if (!oldComments) return oldComments;

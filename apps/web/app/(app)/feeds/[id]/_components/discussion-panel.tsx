@@ -82,14 +82,12 @@ export function DiscussionPanel(props: Props) {
             isEdited={comment.is_edited}
             shouldReply
           >
-            {comment.replies.length > 0 ? (
-              <Replies
-                pagination={comment.pagination}
-                postId={props.id}
-                replies={comment.replies}
-                parentId={comment.id}
-              />
-            ) : null}
+            <Replies
+              pagination={comment.pagination}
+              postId={props.id}
+              replies={comment.replies}
+              parentId={comment.id}
+            />
           </MemoizedComment>
         ))}
       </CommentList>
@@ -123,6 +121,7 @@ const Replies = memo(function Replies(props: RepliesProps) {
   }
 
   if (!data) return noDataElement;
+  if (data.replies.length === 0) return null;
 
   return (
     <ReplyContainer>
