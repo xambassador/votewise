@@ -4,10 +4,13 @@ import type {
   GetUserRecommendationsResponse,
   UsernameExistsResponse
 } from "@votewise/api";
+import type { TRecommendUserQuery } from "@votewise/schemas/user";
 import type { Client } from "../client";
 import type { Client as ServerClient } from "../server";
 
 import { user } from "@votewise/constant/routes";
+
+import { qs } from "./qs";
 
 type UserOptions = {
   client: Client | ServerClient;
@@ -32,9 +35,9 @@ export class User {
     return res;
   }
 
-  public async getRecommendateUsers() {
+  public async getRecommendateUsers(query?: TRecommendUserQuery) {
     const path = user.runtime.recommendations.get("");
-    const res = await this.client.get<GetUserRecommendationsResponse>(path);
+    const res = await this.client.get<GetUserRecommendationsResponse>(qs(path, query));
     return res;
   }
 

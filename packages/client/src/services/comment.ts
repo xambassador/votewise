@@ -11,6 +11,8 @@ import type { Client as ServerClient } from "../server";
 
 import { comments } from "@votewise/constant/routes";
 
+import { qs } from "./qs";
+
 type CommentOptions = { client: Client | ServerClient };
 
 export class Comment {
@@ -21,12 +23,8 @@ export class Comment {
   }
 
   public async getComments(id: string, query?: TPagination) {
-    const searchParams = new URLSearchParams();
-    if (query?.limit) searchParams.set("limit", query.limit.toString());
-    if (query?.page) searchParams.set("page", query.page.toString());
-    const queryString = searchParams.toString() ? `?${searchParams.toString()}` : "";
-    const path = comments.runtime.getAll("", id) + queryString;
-    const res = await this.client.get<GetCommentsResponse>(path);
+    const path = comments.runtime.getAll("", id);
+    const res = await this.client.get<GetCommentsResponse>(qs(path, query));
     return res;
   }
 
@@ -36,12 +34,8 @@ export class Comment {
   }
 
   public async getReplies(feedId: string, parentId: string, query?: TPagination) {
-    const searchParams = new URLSearchParams();
-    if (query?.limit) searchParams.set("limit", query.limit.toString());
-    if (query?.page) searchParams.set("page", query.page.toString());
-    const queryString = searchParams.toString() ? `?${searchParams.toString()}` : "";
-    const path = comments.runtime.getReplies("", feedId, parentId) + queryString;
-    const res = await this.client.get<GetRepliesResponse>(path);
+    const path = comments.runtime.getReplies("", feedId, parentId);
+    const res = await this.client.get<GetRepliesResponse>(qs(path, query));
     return res;
   }
 

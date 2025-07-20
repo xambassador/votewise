@@ -1,6 +1,6 @@
 import type { ApiErrorResponse, FetchResult } from "@votewise/types";
 
-import { env } from "../utils";
+import { environment } from "@votewise/env";
 
 type Fetch = typeof fetch;
 type Options = {
@@ -25,7 +25,7 @@ type ClientOptions = {
   timeout?: number;
 };
 
-const VOTEWISE_API = env.API_URL;
+const VOTEWISE_API = environment.VOTEWISE_API_URL;
 
 const DEFAULT_OPTIONS: ClientOptions = {
   url: VOTEWISE_API,

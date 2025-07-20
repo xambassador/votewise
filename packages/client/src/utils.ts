@@ -1,11 +1,6 @@
 import { environment } from "@votewise/env";
 import { JWT } from "@votewise/jwt";
 
-export const env = {
-  API_URL: environment.VOTEWISE_API_URL,
-  VOTEWISE_BUCKET_NAME: environment.VOTEWISE_BUCKET_NAME
-};
-
 export const COOKIE_KEYS = {
   userId: "__votewise_uid",
   verificationCode: "__votewise_vcode",
@@ -20,3 +15,7 @@ export const COOKIE_KEYS = {
 };
 
 export const jwt = new JWT({ accessTokenSecret: environment.ACCESS_TOKEN_SECRET });
+
+if (typeof window !== "undefined") {
+  throw new Error("This module should not be imported in the browser.");
+}

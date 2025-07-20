@@ -30,6 +30,12 @@ type AuthOptions = { client: Client | ServerClient };
 const debug = new Debugger("auth");
 debug.enable();
 
+if (typeof window !== "undefined") {
+  throw new Error(
+    "The `Auth` service is not yet supported in the browser environment. Please use it in a server context."
+  );
+}
+
 export class Auth {
   private readonly client: Client | ServerClient;
 
