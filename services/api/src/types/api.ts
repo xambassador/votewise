@@ -25,3 +25,4 @@ export type { GetRepliesResponse } from "@/core/comment/get-replies/controller";
 export type { FollowResponse } from "@/core/follow/create/controller";
 export type { UnFollowResponse } from "@/core/follow/delete/controller";
 export type { UpdateCommentResponse } from "@/core/comment/update/controller";
+export type { GetAllGroupsResponse } from "@/core/group/get-all/controller";

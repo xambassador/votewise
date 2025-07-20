@@ -54,4 +54,45 @@ export class GroupRepository extends BaseRepository {
       }));
     });
   }
+
+  public count() {
+    return this.execute(async () => this.db.group.count());
+  }
+
+  public getAll(props: { page: number; limit: number }) {
+    const { page, limit } = props;
+    const offset = (page - 1) * limit;
+    return this.execute(async () =>
+      this.db.group.findMany({
+        select: {
+          id: true,
+          name: true,
+          created_at: true,
+          updated_at: true,
+          status: true,
+          type: true,
+          members: {
+            select: {
+              id: true,
+              role: true,
+              user: {
+                select: {
+                  id: true,
+                  user_name: true,
+                  first_name: true,
+                  last_name: true,
+                  avatar_url: true
+                }
+              }
+            },
+            take: 5
+          },
+          _count: { select: { members: true } }
+        },
+        orderBy: { created_at: "desc" },
+        skip: offset,
+        take: limit
+      })
+    );
+  }
 }

@@ -33,9 +33,7 @@ import { routes } from "@/lib/routes";
 
 extend(relativeTime);
 
-type Props = {
-  data: TFeed;
-};
+type Props = { data: TFeed };
 
 export function FeedMolecule(props: Props) {
   const { data: feed } = props;

@@ -48,6 +48,10 @@
     "./follow": {
       "import": "./dist/services/follow.mjs",
       "require": "./dist/services/follow.js"
+    },
+    "./group": {
+      "import": "./dist/services/group.mjs",
+      "require": "./dist/services/group.js"
     }
   },
   "scripts": {

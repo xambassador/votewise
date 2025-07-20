@@ -203,3 +203,14 @@ export const follow = {
     unfollowUser: (base: string, username: string) => base + `/follow/user/${username}`
   }
 };
+
+export const groups = {
+  paths: {
+    /** Get all groups */
+    all: (base: string) => base + "/groups"
+  },
+  runtime: {
+    /** Get all groups */
+    all: (base: string) => base + "/groups"
+  }
+};

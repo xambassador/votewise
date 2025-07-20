@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { auth, comments, feeds, follow, topics, user } from "@votewise/constant/routes";
+import { auth, comments, feeds, follow, groups, topics, user } from "@votewise/constant/routes";
 
 import { forgotPasswordControllerFactory } from "./auth/forgot-password";
 import { getVerificationSessionControllerFactory } from "./auth/get-verification-session";
@@ -22,6 +22,7 @@ import { getFeedControllerFactory } from "./feed/get";
 import { getAllFeedControllerFactory } from "./feed/get-all";
 import { createFollowControllerFactory } from "./follow/create";
 import { deleteFollowControllerFactory } from "./follow/delete";
+import { getAllGroupsControllerFactory } from "./group/get-all";
 import { getGroupRecommendationsControllerFactory } from "./recommendation/group";
 import { getRecommendateUserControllerFactory } from "./recommendation/user";
 import { getAllTopicsControllerFactory } from "./topics/get-all";
@@ -43,25 +44,11 @@ export function moduleRouterFactory(basePath: string): Router {
   const router = Router();
   const path = basePath + "/v1";
 
-  router.post(auth.paths.register(path), ...registerControllerFactory(auth.paths.register(path)));
-  router.patch(auth.paths.verify(path), ...verifyControllerFactory(auth.paths.verify(path)));
-  router.post(auth.paths.signin(path), ...singinControllerFactory(auth.paths.signin(path)));
-  router.post(auth.paths.refresh(path), ...refreshControllerFactory(auth.paths.refresh(path)));
-  router.post(auth.paths.forgotPassword(path), ...forgotPasswordControllerFactory(auth.paths.forgotPassword(path)));
-  router.patch(auth.paths.resetPassword(path), ...resetPasswordControllerFactory(auth.paths.resetPassword(path)));
-  router.delete(auth.paths.logout(path), ...logoutControllerFactory());
-  router.post(auth.paths.factors.enroll(path), ...enrollMFAControllerFactory(auth.paths.factors.enroll(path)));
-  router.post(
-    auth.paths.factors.challengeFactor(path),
-    ...challengeMFAControllerFactory(auth.paths.factors.challengeFactor(path))
-  );
-  router.post(
-    auth.paths.factors.verifyFactor(path),
-    ...verifyChallengeControllerFactory(auth.paths.factors.verifyFactor(path))
-  );
+  /* -----------------------------------------------------------------------------------------------
+   * GET routes
+   * -----------------------------------------------------------------------------------------------*/
   router.get(auth.paths.emailVerificationSession(path), ...getVerificationSessionControllerFactory());
   router.get(user.paths.sessions(path), ...listSessionsControllerFactory());
-  router.patch(user.paths.onboard.update(path), ...onboardControllerFactory(user.paths.onboard.update(path)));
   router.get(
     user.paths.onboard.getStatus(path),
     ...getOnboardStatusControllerFactory(user.paths.onboard.getStatus(path))
@@ -81,15 +68,49 @@ export function moduleRouterFactory(basePath: string): Router {
     ...getGroupRecommendationsControllerFactory(user.paths.recommendations.getGroupRecommendations(path))
   );
   router.get(topics.paths.all(path), ...getAllTopicsControllerFactory());
-  router.post(feeds.paths.create(path), ...createFeedControllerFactory(feeds.paths.create(path)));
   router.get(feeds.paths.all(path), ...getAllFeedControllerFactory(feeds.paths.all(path)));
   router.get(feeds.paths.get(path), ...getFeedControllerFactory(feeds.paths.get(path)));
   router.get(comments.paths.getAll(path), ...getCommentsControllerFactory());
+  router.get(comments.paths.getReplies(path), ...getRepliesControllerFactory());
+  router.get(groups.paths.all(path), ...getAllGroupsControllerFactory());
+
+  /* -----------------------------------------------------------------------------------------------
+   * POST routes
+   * -----------------------------------------------------------------------------------------------*/
+  router.post(auth.paths.register(path), ...registerControllerFactory(auth.paths.register(path)));
+  router.post(auth.paths.signin(path), ...singinControllerFactory(auth.paths.signin(path)));
+  router.post(auth.paths.refresh(path), ...refreshControllerFactory(auth.paths.refresh(path)));
+  router.post(auth.paths.forgotPassword(path), ...forgotPasswordControllerFactory(auth.paths.forgotPassword(path)));
+  router.post(
+    auth.paths.factors.challengeFactor(path),
+    ...challengeMFAControllerFactory(auth.paths.factors.challengeFactor(path))
+  );
+  router.post(auth.paths.factors.enroll(path), ...enrollMFAControllerFactory(auth.paths.factors.enroll(path)));
+  router.post(
+    auth.paths.factors.verifyFactor(path),
+    ...verifyChallengeControllerFactory(auth.paths.factors.verifyFactor(path))
+  );
+  router.post(feeds.paths.create(path), ...createFeedControllerFactory(feeds.paths.create(path)));
   router.post(comments.paths.create(path), ...createCommentControllerFactory(path));
   router.post(follow.paths.followUser(path), ...createFollowControllerFactory());
-  router.delete(follow.paths.unfollowUser(path), ...deleteFollowControllerFactory());
-  router.get(comments.paths.getReplies(path), ...getRepliesControllerFactory());
+
+  /* -----------------------------------------------------------------------------------------------
+   * PUT routes
+   * -----------------------------------------------------------------------------------------------*/
   router.put(comments.paths.update(path), ...updateCommentControllerFactory());
+
+  /* -----------------------------------------------------------------------------------------------
+   * PATCH routes
+   * -----------------------------------------------------------------------------------------------*/
+  router.patch(auth.paths.verify(path), ...verifyControllerFactory(auth.paths.verify(path)));
+  router.patch(auth.paths.resetPassword(path), ...resetPasswordControllerFactory(auth.paths.resetPassword(path)));
+  router.patch(user.paths.onboard.update(path), ...onboardControllerFactory(user.paths.onboard.update(path)));
+
+  /* -----------------------------------------------------------------------------------------------
+   * DELETE routes
+   * -----------------------------------------------------------------------------------------------*/
+  router.delete(auth.paths.logout(path), ...logoutControllerFactory());
+  router.delete(follow.paths.unfollowUser(path), ...deleteFollowControllerFactory());
 
   return router;
 }

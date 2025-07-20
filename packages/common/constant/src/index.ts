@@ -49,5 +49,6 @@ export const PAGINATION = {
     limit: 10,
     reply: { limit: 5 }
   },
-  feeds: { limit: 20 }
+  feeds: { limit: 20 },
+  groups: { limit: 20 }
 };

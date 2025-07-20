@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { Auth } from "@votewise/client/auth";
 import { Comment } from "@votewise/client/comment";
 import { Feed } from "@votewise/client/feed";
+import { Group } from "@votewise/client/group";
 import { MFA } from "@votewise/client/mfa";
 import { Onboard } from "@votewise/client/onboard";
 import { Client } from "@votewise/client/server";
@@ -56,4 +57,9 @@ export function getUserClient() {
 export function getCommentClient() {
   const client = getClient();
   return new Comment({ client });
+}
+
+export function getGroupClient() {
+  const client = getClient();
+  return new Group({ client });
 }

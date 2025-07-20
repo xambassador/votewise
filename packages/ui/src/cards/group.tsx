@@ -1,5 +1,7 @@
 "use client";
 
+import type { BadgeProps } from "../badge";
+
 import { forwardRef } from "react";
 
 import { Badge } from "../badge";
@@ -13,7 +15,7 @@ export const Group = forwardRef<HTMLDivElement, GroupProps>((props, ref) => (
     ref={ref}
     {...props}
     className={cn(
-      "flex flex-col gap-4 p-4 rounded-xl border border-nobelBlack-200 bg-nobelBlack-100 min-w-[calc((280/16)*1rem)]",
+      "flex flex-col gap-4 p-4 rounded-xl border border-nobelBlack-200 bg-nobelBlack-100 min-w-[calc((292/16)*1rem)]",
       props.className
     )}
   />
@@ -32,10 +34,26 @@ export const GroupName = forwardRef<HTMLSpanElement, GroupNameProps>((props, ref
 ));
 GroupName.displayName = "GroupName";
 
-type GroupStatusBadgeProps = React.ComponentProps<typeof Badge>;
-export const GroupStatusBadge = forwardRef<HTMLSpanElement, GroupStatusBadgeProps>((props, ref) => (
-  <Badge {...props} ref={ref} className={cn("text-xs", props.className)} />
-));
+type GroupStatusBadgeProps = Omit<React.ComponentProps<typeof Badge>, "children"> & { children?: string };
+type BadgeVariant = BadgeProps["variant"];
+export const GroupStatusBadge = forwardRef<HTMLSpanElement, GroupStatusBadgeProps>((props, ref) => {
+  const { className, variant, children, ...rest } = props;
+  let badgeVariant: BadgeVariant = "default";
+  if (children === "OPEN") {
+    badgeVariant = "success";
+  }
+  if (children === "CLOSED") {
+    badgeVariant = "destructive";
+  }
+  if (children === "INACTIVE") {
+    badgeVariant = "default";
+  }
+  return (
+    <Badge {...rest} ref={ref} variant={badgeVariant} className={cn("text-xs", className)}>
+      {children?.toLowerCase()}
+    </Badge>
+  );
+});
 GroupStatusBadge.displayName = "GroupStatusBadge";
 
 export type GroupAuthorProps = React.HTMLAttributes<HTMLDivElement>;
@@ -46,7 +64,7 @@ GroupAuthor.displayName = "GroupAuthor";
 
 export type GroupTypeProps = React.HTMLAttributes<HTMLSpanElement>;
 export const GroupType = forwardRef<HTMLSpanElement, GroupTypeProps>((props, ref) => (
-  <span ref={ref} {...props} className={cn("text-xs text-gray-400", props.className)} />
+  <span ref={ref} {...props} className={cn("text-xs text-gray-300", props.className)} />
 ));
 GroupType.displayName = "GroupType";
 
