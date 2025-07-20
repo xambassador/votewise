@@ -7,7 +7,7 @@ import { MoreItemsWithSummary } from "@votewise/ui/more-items";
 
 import { getUserClient } from "@/lib/client.server";
 
-import { ContentWrapper, ErrorMessage, fallbackSpinner, maxListItems, Title, VerticalList } from "./utils";
+import { ContentWrapper, EmptyState, ErrorMessage, fallbackSpinner, maxListItems, Title, VerticalList } from "./utils";
 
 const maxSuggestedGroups = maxListItems;
 const fallbackError = (
@@ -34,6 +34,11 @@ async function SuggestedGroupsList() {
 
   const suggestedGroups = result.data.groups.slice(0, maxSuggestedGroups);
   const remainingSuggestedGroups = result.data.groups.slice(maxSuggestedGroups);
+
+  if (suggestedGroups.length === 0) {
+    return <EmptyState message="No suggestions!" />;
+  }
+
   return (
     <VerticalList>
       {suggestedGroups.map((group) => (

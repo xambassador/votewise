@@ -9,7 +9,7 @@ import { MoreItemsWithSummary } from "@votewise/ui/more-items";
 import { getUserClient } from "@/lib/client.server";
 
 import { FollowUserButton } from "./follow-user-btn";
-import { ContentWrapper, ErrorMessage, fallbackSpinner, maxListItems, Title } from "./utils";
+import { ContentWrapper, EmptyState, ErrorMessage, fallbackSpinner, maxListItems, Title } from "./utils";
 
 const maxSuggestedUsers = maxListItems;
 const fallbackError = (
@@ -37,6 +37,10 @@ async function SuggestedUsersList() {
 
   const suggestedUsers = result.data.users.slice(0, maxSuggestedUsers);
   const remainingSuggestedUsers = result.data.users.slice(maxSuggestedUsers);
+
+  if (suggestedUsers.length === 0) {
+    return <EmptyState message="No suggestions!" />;
+  }
 
   return (
     <Fragment>

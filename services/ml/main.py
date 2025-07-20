@@ -149,8 +149,14 @@ def recommend_groups(user_id: str, top_n: int = 5):
 @app.post("/recommend/users")
 def get_user_recommendations(request: RecommendationRequest):
     try:
-        users = recommend_users(request.user_id, request.top_n)
-        return {"user_id": request.user_id, "recommended_users": users}
+        user_id = request.user_id
+        followed = pd.read_sql(
+            f'SELECT "following_id" FROM "Follow" WHERE "follower_id" = \'{user_id}\'',
+            engine
+        )['following_id'].tolist()
+        users = recommend_users(user_id, request.top_n)
+        filtered_users = [u for u in users  if u not in followed and u != user_id][:request.top_n]
+        return {"user_id": request.user_id, "recommended_users": filtered_users}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error recommending users: {str(e)}")
 

@@ -22,6 +22,16 @@ export function ErrorMessage(props: { message: string }) {
   );
 }
 
+export function EmptyState(props: { message: string }) {
+  return (
+    <div className="grid place-items-center h-24">
+      <div className="flex flex-col items-center gap-1">
+        <span className="text-sm text-gray-400 text-center">{props.message}</span>
+      </div>
+    </div>
+  );
+}
+
 export function Title(props: React.HTMLAttributes<HTMLSpanElement>) {
   return <span {...props} className={cn("text-sm font-medium text-gray-300", props.className)} />;
 }
