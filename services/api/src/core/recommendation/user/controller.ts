@@ -4,6 +4,8 @@ import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
+import { ZRecommendUserQuery } from "@votewise/schemas/user";
+
 import { getAuthenticateLocals } from "@/utils/locals";
 
 type ControllerOptions = {
@@ -20,12 +22,22 @@ export class Controller {
     this.ctx = opts;
   }
 
-  async handle(_: Request, res: Response) {
+  async handle(req: Request, res: Response) {
     const locals = getAuthenticateLocals(res);
-    const recommendationResult = await this.ctx.mlService.getUserRecommendations({ user_id: locals.payload.sub });
+    const validate = ZRecommendUserQuery.safeParse(req.query);
+    this.ctx.assert.unprocessableEntity(
+      !validate.success,
+      validate.error?.errors[0]?.message || "Invalid query parameters"
+    );
+    const q = validate.data!;
+    const topN = q.top_n || 10;
+    const recommendationResult = await this.ctx.mlService.getUserRecommendations({
+      user_id: locals.payload.sub,
+      top_n: topN
+    });
     if (!recommendationResult.success) {
       this.ctx.assert.internalServer(!recommendationResult.success, "Failed to get user recommendations");
-      // This is just to make typescript happy. I dont have idea about how to type `assert` correctly
+      // This is just to make typescript happy. I don't have idea about how to type `assert` correctly
       throw new Error("Failed to get user recommendations");
     }
     const recommendations = recommendationResult.data.recommended_users;

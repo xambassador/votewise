@@ -8,7 +8,6 @@ from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 import redis
 
-# Load env from .env
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -18,7 +17,6 @@ if not DATABASE_URL:
 
 engine = create_engine(DATABASE_URL)
 
-# Redis setup
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = os.getenv("REDIS_PORT", 6379)
 REDIS_DB = os.getenv("REDIS_DB", 0)
@@ -30,7 +28,6 @@ class RecommendationRequest(BaseModel):
     user_id: str
     top_n: int = 5
 
-# Create similarity table in PostgreSQL if it doesn’t exist
 def init_db():
     with engine.connect() as conn:
         conn.execute(text("""
@@ -49,7 +46,6 @@ def load_data():
     upvotes = pd.read_sql('SELECT "user_id", "post_id" FROM "Upvote"', engine)
     return user_interests, group_members, upvotes
 
-# Compute and store similarity
 def compute_and_store_similarity():
     user_interests, group_members, upvotes = load_data()
     user_topic_matrix = pd.pivot_table(
@@ -124,12 +120,13 @@ def startup_event():
     _, GROUP_MEMBERS = compute_and_store_similarity() if HYBRID_SIMILARITY is None else (None, load_data()[1])
     print("Recommendation service started.")
 
-# On shutdown, we can clear the Redis cache for development purposes
 @app.on_event("shutdown")
 def shutdown_event():
     is_development = os.getenv("ENVIRONMENT") == "development"
     if is_development:
-        redis_client.flushdb()
+        all_users = pd.read_sql('SELECT DISTINCT "id" AS "user_id" FROM "User"', engine)["user_id"].tolist()
+        for user in all_users:
+            redis_client.delete(f"similarity:{user}")
         print("✅ Cache cleared on shutdown.")
 
 

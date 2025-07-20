@@ -6,3 +6,9 @@ import { ZUsername } from "./auth";
 export const ZUsernameExists = z.object({
   username: ZUsername
 });
+
+export const ZRecommendUserQuery = z.object({
+  top_n: z.coerce.number().optional()
+});
+
+export type TRecommendUserQuery = z.infer<typeof ZRecommendUserQuery>;

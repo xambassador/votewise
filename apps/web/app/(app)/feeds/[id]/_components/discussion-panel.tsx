@@ -30,6 +30,9 @@ import {
 import { Error } from "@votewise/ui/error";
 import { Comment as CommentIcon } from "@votewise/ui/icons/comment";
 
+import { useMe } from "@/components/user-provider";
+
+import { cn } from "@/lib/cn";
 import { routes } from "@/lib/routes";
 
 import { CreateComment, ReplyToComment } from "./create-comment";
@@ -77,6 +80,7 @@ export function DiscussionPanel(props: Props) {
             replyCount={comment.replies.length}
             userName={comment.user.user_name}
             isEdited={comment.is_edited}
+            shouldReply
           >
             {comment.replies.length > 0 ? (
               <Replies
@@ -177,6 +181,7 @@ const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
     shouldReply,
     parentId
   } = props;
+  const { id } = useMe("MemoizedComment");
   return (
     <Comment>
       <Link href={routes.user.profile(userId)} className="focus-visible h-fit">
@@ -200,12 +205,10 @@ const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
             Due to design limitation (of course I am working on it..), right now we are not going to allow
             reply to a comment 😛
          */}
-        {commentId && (
-          <CommentActions>
-            {shouldReply && <CommentReplyButton />}
-            <EditCommentButton authorId={userId} />
-          </CommentActions>
-        )}
+        <CommentActions className={cn(id !== userId && !shouldReply ? "hidden" : "")}>
+          {shouldReply && <CommentReplyButton />}
+          <EditCommentButton authorId={userId} />
+        </CommentActions>
 
         {commentId && <ReplyToComment parentId={commentId} postId={postId} username={userName} />}
         {children}

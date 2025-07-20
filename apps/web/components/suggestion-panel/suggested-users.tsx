@@ -31,7 +31,7 @@ export function SuggestedUsers() {
 
 async function SuggestedUsersList() {
   const user = getUserClient();
-  const result = await user.getRecommendateUsers();
+  const result = await user.getRecommendateUsers({ top_n: 20 });
 
   if (!result.success) return fallbackError;
 
@@ -64,7 +64,7 @@ async function SuggestedUsersList() {
 
       <MoreItemsWithSummary
         count={remainingSuggestedUsers.length}
-        avatars={remainingSuggestedUsers.map((user) => ({
+        avatars={remainingSuggestedUsers.slice(0, 5).map((user) => ({
           name: user.first_name + " " + user.last_name,
           url: user.avatar_url
         }))}
