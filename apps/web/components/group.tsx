@@ -4,15 +4,15 @@ import Link from "next/link";
 import dayjs, { extend } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
-import { truncateOnWord } from "@votewise/text";
+import { truncate } from "@votewise/text/truncate";
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
 import {
   Group,
-  GroupActionButton,
   GroupAuthor,
   GroupAuthorHandle,
   GroupAuthorName,
   GroupCreatedAt,
+  GroupDescription,
   GroupHeader,
   GroupMembers,
   GroupName,
@@ -33,27 +33,32 @@ export function GroupMolecule(props: Props) {
   return (
     <Group>
       <GroupHeader>
-        <GroupName title={group.name}>{truncateOnWord(group.name, 20)}</GroupName>
+        <GroupName asChild title={group.name}>
+          <Link className="focus-visible" href={routes.group.view(group.id)}>
+            {truncate(group.name, 80)}
+          </Link>
+        </GroupName>
         <GroupStatusBadge>{group.status}</GroupStatusBadge>
       </GroupHeader>
+      <Link className="focus-visible" href={routes.group.view(group.id)}>
+        <GroupDescription>{group.about}</GroupDescription>
+      </Link>
       <div className="flex items-center justify-between">
         <GroupAuthor>
-          <Link href={routes.user.profile(author?.id || "")}>
+          <Link className="focus-visible" href={routes.user.profile(author?.id || "")}>
             <Avatar>
               <AvatarFallback name={author?.first_name + " " + author?.last_name} />
               <AvatarImage src={author?.avatar_url} alt={author?.first_name + " " + author?.last_name} />
             </Avatar>
           </Link>
           <div className="flex flex-col">
-            <Link href={routes.user.profile(author?.id || "")}>
+            <Link className="focus-visible" href={routes.user.profile(author?.id || "")}>
               <GroupAuthorName title={author?.first_name + " " + author?.last_name}>
-                {truncateOnWord(author?.first_name + " " + author?.last_name, 25)}
+                {truncate(author?.first_name + " " + author?.last_name, 25)}
               </GroupAuthorName>
             </Link>
-            <Link href={routes.user.profile(author?.id || "")}>
-              <GroupAuthorHandle title={author?.user_name}>
-                @{truncateOnWord(author?.user_name || "", 30)}
-              </GroupAuthorHandle>
+            <Link className="focus-visible" href={routes.user.profile(author?.id || "")}>
+              <GroupAuthorHandle title={author?.user_name}>@{truncate(author?.user_name || "", 30)}</GroupAuthorHandle>
             </Link>
           </div>
         </GroupAuthor>
@@ -73,7 +78,6 @@ export function GroupMolecule(props: Props) {
         </GroupMembers>
         <GroupCreatedAt>Created {dayjs(group.created_at).fromNow()}</GroupCreatedAt>
       </div>
-      <GroupActionButton>Join</GroupActionButton>
     </Group>
   );
 }

@@ -14,11 +14,12 @@ export const variants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-blue-800 hover:bg-blue-700 active:scale-95 border-blue-600 focus-primary",
+        primary: "bg-blue-800 hover:bg-blue-700 active:scale-[0.99] border-blue-600 focus-primary",
         secondary:
-          "bg-nobelBlack-100 border border-nobelBlack-200 hover:bg-nobelBlack-100/50 active:scale-95 focus-secondary",
-        danger: "bg-red-700 hover:bg-red-600 active:scale-95 border-red-600 focus-danger",
-        outline: "bg-transparent border border-nobelBlack-200 hover:bg-nobelBlack-200 active:scale-95 focus-secondary"
+          "bg-nobelBlack-100 border border-nobelBlack-200 hover:bg-nobelBlack-100/50 active:scale-[0.99] focus-secondary",
+        danger: "bg-red-700 hover:bg-red-600 active:scale-[0.99] border-red-600 focus-danger",
+        outline:
+          "bg-transparent border border-nobelBlack-200 hover:bg-nobelBlack-200 active:scale-[0.99] focus-secondary"
       },
       size: {
         default: "h-10",

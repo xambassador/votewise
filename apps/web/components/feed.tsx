@@ -59,7 +59,7 @@ export function FeedMolecule(props: Props) {
               </Link>
               <FeedTimeAgo>{dayjs(feed.created_at).fromNow()}</FeedTimeAgo>
             </FeedHeader>
-            <Link href={routes.feeds.view(feed.id)} className="focus-visible rounded">
+            <Link href={routes.feed.view(feed.id)} className="focus-visible rounded">
               <FeedContentText>{truncateOnWord(feed.title, 128)}</FeedContentText>
             </Link>
             <FeedContentTags>

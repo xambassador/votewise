@@ -67,6 +67,7 @@ export class GroupRepository extends BaseRepository {
         select: {
           id: true,
           name: true,
+          about: true,
           created_at: true,
           updated_at: true,
           status: true,

@@ -2,14 +2,15 @@ import type { Meta, StoryObj } from "@storybook/react";
 
 import { getRandomImage, images } from "../_story-helpers";
 import { Avatar, AvatarFallback, AvatarImage } from "../avatar";
+import { Button } from "../button";
 import { FloatingCounter } from "../floating-counter";
 import {
   Group,
-  GroupActionButton,
   GroupAuthor,
   GroupAuthorHandle,
   GroupAuthorName,
   GroupCreatedAt,
+  GroupDescription,
   GroupHeader,
   GroupMembers,
   GroupName,
@@ -22,11 +23,16 @@ const meta = {
   component: Group,
   tags: ["autodocs", "group"],
   render: (args) => (
-    <Group {...args}>
+    <Group className="min-w-[600px] max-w-[600px]" {...args}>
       <GroupHeader>
         <GroupName>Cincinnati club</GroupName>
-        <GroupStatusBadge variant="success">open</GroupStatusBadge>
+        <GroupStatusBadge>open</GroupStatusBadge>
       </GroupHeader>
+      <GroupDescription>
+        A group for Cincinnati enthusiasts to discuss local events, share experiences, and connect with fellow members.
+        This group is open to anyone interested in Cincinnati and its vibrant community. We welcome discussions on local
+        culture, events, and more.
+      </GroupDescription>
       <div className="flex items-center justify-between">
         <GroupAuthor>
           <Avatar>
@@ -52,7 +58,6 @@ const meta = {
         </GroupMembers>
         <GroupCreatedAt>Created 2 days ago</GroupCreatedAt>
       </div>
-      <GroupActionButton>Join</GroupActionButton>
     </Group>
   )
 } satisfies Meta<typeof Group>;
@@ -63,13 +68,18 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const Closed: Story = {
+export const MyGroupCard: Story = {
   render: (args) => (
-    <Group {...args}>
+    <Group className="min-w-[600px] max-w-[600px]" {...args}>
       <GroupHeader>
         <GroupName>Cincinnati club</GroupName>
-        <GroupStatusBadge variant="success">open</GroupStatusBadge>
+        <GroupStatusBadge>open</GroupStatusBadge>
       </GroupHeader>
+      <GroupDescription>
+        A group for Cincinnati enthusiasts to discuss local events, share experiences, and connect with fellow members.
+        This group is open to anyone interested in Cincinnati and its vibrant community. We welcome discussions on local
+        culture, events, and more.
+      </GroupDescription>
       <div className="flex items-center justify-between">
         <GroupAuthor>
           <Avatar>
@@ -95,7 +105,8 @@ export const Closed: Story = {
         </GroupMembers>
         <GroupCreatedAt>Created 2 days ago</GroupCreatedAt>
       </div>
-      <GroupActionButton isClosed />
+
+      <Button>Enter</Button>
     </Group>
   )
 };

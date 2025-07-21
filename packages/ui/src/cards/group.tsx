@@ -1,55 +1,56 @@
 "use client";
 
-import type { BadgeProps } from "../badge";
-
 import { forwardRef } from "react";
+import { Slot } from "@radix-ui/react-slot";
 
 import { Badge } from "../badge";
-import { Button } from "../button";
 import { cn } from "../cn";
-import { AlertTriangle } from "../icons/alert-triangle";
 
-export type GroupProps = React.HTMLAttributes<HTMLDivElement>;
-export const Group = forwardRef<HTMLDivElement, GroupProps>((props, ref) => (
-  <div
-    ref={ref}
-    {...props}
-    className={cn(
-      "flex flex-col gap-4 p-4 rounded-xl border border-nobelBlack-200 bg-nobelBlack-100 min-w-[calc((292/16)*1rem)]",
-      props.className
-    )}
-  />
-));
+export type GroupProps = React.HTMLAttributes<HTMLDivElement> & {
+  asChild?: boolean;
+};
+export const Group = forwardRef<HTMLDivElement, GroupProps>((props, ref) => {
+  const { className, asChild = false, children, ...rest } = props;
+  const Comp = asChild ? Slot : "div";
+  return (
+    <Comp
+      ref={ref}
+      {...rest}
+      className={cn("flex flex-col gap-4 p-4 rounded-xl border border-nobelBlack-200 bg-nobelBlack-100", className)}
+    >
+      {children}
+    </Comp>
+  );
+});
 Group.displayName = "Group";
 
 export type GroupHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 export const GroupHeader = forwardRef<HTMLDivElement, GroupHeaderProps>((props, ref) => (
-  <div ref={ref} {...props} className={cn("flex items-center justify-between", props.className)} />
+  <div ref={ref} {...props} className={cn("flex items-start justify-between w-full", props.className)} />
 ));
 GroupHeader.displayName = "GroupHeader";
 
-export type GroupNameProps = React.HTMLAttributes<HTMLSpanElement>;
-export const GroupName = forwardRef<HTMLSpanElement, GroupNameProps>((props, ref) => (
-  <span ref={ref} {...props} className={cn("text-gray-100 text-lg", props.className)} />
-));
+export type GroupNameProps = React.HTMLAttributes<HTMLSpanElement> & {
+  asChild?: boolean;
+};
+export const GroupName = forwardRef<HTMLSpanElement, GroupNameProps>((props, ref) => {
+  const { className, asChild = false, ...rest } = props;
+  const Comp = asChild ? Slot : "span";
+  return <Comp ref={ref} {...rest} className={cn("text-gray-200 text-lg break-words w-full max-w-[80%]", className)} />;
+});
 GroupName.displayName = "GroupName";
 
+export type GroupDescriptionProps = React.HTMLAttributes<HTMLSpanElement>;
+export const GroupDescription = forwardRef<HTMLSpanElement, GroupDescriptionProps>((props, ref) => (
+  <span ref={ref} {...props} className={cn("text-gray-300 text-sm", props.className)} />
+));
+GroupDescription.displayName = "GroupDescription";
+
 type GroupStatusBadgeProps = Omit<React.ComponentProps<typeof Badge>, "children"> & { children?: string };
-type BadgeVariant = BadgeProps["variant"];
 export const GroupStatusBadge = forwardRef<HTMLSpanElement, GroupStatusBadgeProps>((props, ref) => {
-  const { className, variant, children, ...rest } = props;
-  let badgeVariant: BadgeVariant = "default";
-  if (children === "OPEN") {
-    badgeVariant = "success";
-  }
-  if (children === "CLOSED") {
-    badgeVariant = "destructive";
-  }
-  if (children === "INACTIVE") {
-    badgeVariant = "default";
-  }
+  const { className, children, ...rest } = props;
   return (
-    <Badge {...rest} ref={ref} variant={badgeVariant} className={cn("text-xs", className)}>
+    <Badge {...rest} ref={ref} variant="default" className={cn("text-xs", className)}>
       {children?.toLowerCase()}
     </Badge>
   );
@@ -91,22 +92,3 @@ export const GroupAuthorHandle = forwardRef<HTMLSpanElement, GroupAuthorHandlePr
   <span ref={ref} {...props} className={cn("text-gray-400 text-xs", props.className)} />
 ));
 GroupAuthorHandle.displayName = "GroupAuthorHandle";
-
-export type GroupActionButtonProps = React.ComponentProps<typeof Button> & { isClosed?: boolean };
-export const GroupActionButton = forwardRef<HTMLButtonElement, GroupActionButtonProps>((props, ref) => {
-  const { isClosed, children = "Closed. Time to explore new ideas!", ...rest } = props;
-  if (isClosed) {
-    return (
-      <Button ref={ref} {...rest} variant="outline" disabled className={cn("gap-2", props.className)}>
-        <AlertTriangle className="size-5" />
-        {children}
-      </Button>
-    );
-  }
-  return (
-    <Button ref={ref} {...rest} className={cn("gap-2", props.className)}>
-      {children}
-    </Button>
-  );
-});
-GroupActionButton.displayName = "GroupActionButton";

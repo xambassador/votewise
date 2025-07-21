@@ -32,6 +32,7 @@ export class Controller {
       const g = {
         id: group.id,
         name: group.name,
+        about: group.about,
         type: group.type,
         status: group.status,
         members: group.members.map((member) => ({

@@ -24,11 +24,15 @@ export const routes = {
     step7: () => "/onboard/secure-your-account"
   },
   app: { root: () => "/" },
-  feeds: {
+  feed: {
     root: () => "/feeds",
     view: (id: string) => `/feeds/${id}`
   },
   user: {
     profile: (id: string) => `/profile/${id}`
+  },
+  group: {
+    root: () => "/groups",
+    view: (id: string) => `/groups/${id}`
   }
 };

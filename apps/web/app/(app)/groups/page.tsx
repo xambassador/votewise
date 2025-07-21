@@ -10,7 +10,7 @@ export default function Page() {
     <Suspense fallback={<Loading />}>
       <GroupFetcher>
         {({ groups }) => (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-4">
             {groups.map((group) => (
               <GroupMolecule key={group.id} group={group} />
             ))}
