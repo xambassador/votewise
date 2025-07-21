@@ -4,6 +4,7 @@ import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
+import { PAGINATION } from "@votewise/constant";
 import { ZPagination } from "@votewise/schemas";
 
 import { PaginationBuilder } from "@/lib/pagination";
@@ -28,7 +29,8 @@ export class Controller {
     this.ctx.assert.unprocessableEntity(!schema.success, "Invalid query");
     const query = schema.data!;
     const total = await this.ctx.timelineRepository.countByUserId(locals.payload.sub);
-    const { page, limit } = query;
+    const { page } = query;
+    const limit = query.limit < 1 ? PAGINATION.feeds.limit : query.limit;
     const timeline = await this.ctx.timelineRepository.findByUserId(locals.payload.sub, { page, limit });
     const timelineFeedPromises = timeline.map((timeline) => ({
       id: timeline.post.id,

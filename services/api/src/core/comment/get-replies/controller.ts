@@ -4,6 +4,7 @@ import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
+import { PAGINATION } from "@votewise/constant";
 import { ZPagination } from "@votewise/schemas";
 
 import { PaginationBuilder } from "@/lib/pagination";
@@ -30,7 +31,8 @@ export class Controller {
     const schema = ZPagination.safeParse(req.query);
     this.ctx.assert.unprocessableEntity(!schema.success, "Invalid query");
     const query = schema.data!;
-    const { page, limit } = query;
+    const { page } = query;
+    const limit = query.limit < 1 ? PAGINATION.comments.reply.limit : query.limit;
     const totalReplies = await this.ctx.commentRepository.reply.count(feedId, commentId);
     const repliesResult = await this.ctx.commentRepository.reply.findByParentId(feedId, commentId, page, limit);
     const replies = repliesResult.map((reply) => {

@@ -32,7 +32,8 @@ export class Controller {
     const schema = ZPagination.safeParse(req.query);
     this.ctx.assert.unprocessableEntity(!schema.success, "Invalid query");
     const query = schema.data!;
-    const { page, limit } = query;
+    const { page } = query;
+    const limit = query.limit < 1 ? PAGINATION.comments.limit : query.limit;
     const totalComments = await this.ctx.commentRepository.count(feedId);
     const comments = await this.ctx.commentRepository.findByFeedId(feedId, page, limit);
     const commentsWithMetadata = comments.map((c) => {
@@ -61,7 +62,7 @@ export class Controller {
         ...pagination
       };
     });
-    const pagination = new PaginationBuilder({ limit: query.limit, page: query.page, total: totalComments }).build();
+    const pagination = new PaginationBuilder({ limit, page, total: totalComments }).build();
     const result = { comments: commentsWithMetadata, ...pagination };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
