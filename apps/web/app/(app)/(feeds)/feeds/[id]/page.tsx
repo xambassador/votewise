@@ -22,7 +22,7 @@ import { Error } from "@votewise/ui/error";
 import { ErrorBoundary } from "@votewise/ui/error-boundary";
 import { VoteButton, VoteCount, VoteProvider } from "@votewise/ui/vote-button";
 
-import { FeedFetcher } from "@/app/(app)/_components/feed-fetcher";
+import { FeedFetcher } from "@/app/(app)/(feeds)/_components/feed-fetcher";
 
 import { getCommentClient } from "@/lib/client.server";
 import { routes } from "@/lib/routes";

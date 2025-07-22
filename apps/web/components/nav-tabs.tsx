@@ -1,46 +1,29 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { cn } from "@/lib/cn";
 
-export function NavTabs() {
-  const pathname = usePathname();
-  const isHome = pathname === "/" || pathname.includes("feeds");
-  const isGroups = pathname.startsWith("/groups");
-
-  if (isHome) {
-    return <FeedTabs />;
-  }
-
-  if (isGroups) {
-    return <GroupTabs />;
-  }
-
-  return null;
-}
+type Props = { children: React.ReactNode };
 
 const tabsWrapperClass = "flex items-center gap-4 border-b border-nobelBlack-200 tab-wrapper-width mx-auto";
 const activeButtonClass = "h-7 text-blue-200 text-sm font-medium border-b border-blue-600 focus-visible";
 const inActiveButtonClass = "h-7 text-black-200 text-sm font-medium focus-visible";
 
-function FeedTabs() {
+export function NavTabs(props: Props) {
+  const { children } = props;
   return (
     <div className="tab-container">
-      <div className={tabsWrapperClass}>
-        <button className={activeButtonClass}>Discover</button>
-        <button className={inActiveButtonClass}>Trending</button>
-      </div>
+      <div className={tabsWrapperClass}>{children}</div>
     </div>
   );
 }
 
-function GroupTabs() {
+type NabTabButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & { isActive?: boolean };
+export function NavTabButton(props: NabTabButtonProps) {
+  const { isActive, children, className, ...rest } = props;
+  const buttonClass = isActive ? activeButtonClass : inActiveButtonClass;
   return (
-    <div className="tab-container">
-      <div className={tabsWrapperClass}>
-        <button className={activeButtonClass}>Groups</button>
-        <button className={inActiveButtonClass}>My Groups</button>
-        <button className={inActiveButtonClass}>Invitations</button>
-      </div>
-    </div>
+    <button {...rest} className={cn(buttonClass, className)}>
+      {children}
+    </button>
   );
 }
