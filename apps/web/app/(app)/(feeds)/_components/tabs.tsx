@@ -1,17 +1,28 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
-import { NavTabButton, NavTabs } from "@/components/nav-tabs";
+import { Tabs, TabsList, TabsTrigger } from "@votewise/ui/tab";
+
+const links = [
+  { href: "/", label: "Discover", id: "discover" },
+  { href: "/trending", label: "Trending", id: "trending" }
+];
 
 export function FeedTabs() {
   const pathname = usePathname();
-  const isFeeds = pathname === "/" || pathname.includes("feeds");
-  const isTrending = pathname.startsWith("/trending");
+  const router = useRouter();
   return (
-    <NavTabs>
-      <NavTabButton isActive={isFeeds}>Discover</NavTabButton>
-      <NavTabButton isActive={isTrending}>Trending</NavTabButton>
-    </NavTabs>
+    <Tabs className="tab-container" defaultValue={pathname}>
+      <div className="tab-list">
+        <TabsList>
+          {links.map((link) => (
+            <TabsTrigger value={link.href} key={link.id} onClick={() => router.push(link.href)}>
+              {link.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
+    </Tabs>
   );
 }

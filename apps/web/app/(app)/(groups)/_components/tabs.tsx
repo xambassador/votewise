@@ -1,8 +1,8 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
-import { NavTabButton, NavTabs } from "@/components/nav-tabs";
+import { Tabs, TabsList, TabsTrigger } from "@votewise/ui/tab";
 
 const links = [
   { href: "/groups", label: "Groups", id: "groups" },
@@ -12,13 +12,16 @@ const links = [
 
 export function GroupTabs() {
   const pathname = usePathname();
+  const router = useRouter();
   return (
-    <NavTabs>
-      {links.map((link) => (
-        <NavTabButton key={link.id} isActive={pathname.startsWith(link.href)}>
-          {link.label}
-        </NavTabButton>
-      ))}
-    </NavTabs>
+    <Tabs className="tab-container" defaultValue={pathname}>
+      <TabsList>
+        {links.map((link) => (
+          <TabsTrigger value={link.href} key={link.id} onClick={() => router.push(link.href)}>
+            {link.label}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </Tabs>
   );
 }
