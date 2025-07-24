@@ -1,5 +1,6 @@
 import type { Feed as TFeed } from "@/types";
 
+import { memo } from "react";
 import Link from "next/link";
 import dayjs, { extend } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -29,13 +30,14 @@ import { Comment } from "@votewise/ui/icons/comment";
 import { PaperPlane } from "@votewise/ui/icons/paper-plane";
 import { Separator } from "@votewise/ui/separator";
 
+import { cn } from "@/lib/cn";
 import { routes } from "@/lib/routes";
 
 extend(relativeTime);
 
 type Props = { data: TFeed };
 
-export function FeedMolecule(props: Props) {
+export const FeedMolecule = memo(function FeedMolecule(props: Props) {
   const { data: feed } = props;
   return (
     <Feed>
@@ -47,10 +49,10 @@ export function FeedMolecule(props: Props) {
       <FeedContainer>
         <div className="flex gap-2">
           <Link href={routes.user.profile(feed.author.id)} className="focus-visible h-fit">
-            <Avatar className="size-12">
-              <AvatarFallback name={feed.author.first_name + " " + feed.author.last_name} />
-              <AvatarImage src={feed.author.avatar_url || ""} alt={feed.author.first_name} className="object-cover" />
-            </Avatar>
+            <FeedAvatar
+              name={feed.author.first_name + " " + feed.author.last_name}
+              url={feed.author.avatar_url || ""}
+            />
           </Link>
           <FeedContent>
             <FeedHeader>
@@ -84,10 +86,7 @@ export function FeedMolecule(props: Props) {
           <VotersStack>
             <Voters>
               {feed.voters.map((voter) => (
-                <Avatar className="size-6" key={voter.id}>
-                  <AvatarFallback name="Voter" />
-                  <AvatarImage src={voter.avatar_url || ""} alt={voter.id} />
-                </Avatar>
+                <FeedAvatar key={voter.id} className="size-6" name="Voter" url={voter.avatar_url || ""} />
               ))}
             </Voters>
             {feed.votes - feed.voters.length > 0 && <VotersCount>+{feed.votes - feed.voters.length}</VotersCount>}
@@ -96,4 +95,13 @@ export function FeedMolecule(props: Props) {
       </FeedContainer>
     </Feed>
   );
-}
+});
+
+const FeedAvatar = memo(function FeedAvatar(props: { name: string; url: string; className?: string }) {
+  return (
+    <Avatar className={cn("size-12", props.className)}>
+      <AvatarFallback name={props.name} />
+      <AvatarImage src={props.url} alt={props.name} className="object-cover" />
+    </Avatar>
+  );
+});

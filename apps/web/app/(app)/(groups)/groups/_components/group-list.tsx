@@ -5,10 +5,10 @@ import type { GetAllGroupsResponse } from "@votewise/client/group";
 import { useFetchGroups } from "@/hooks/use-fetch-groups";
 
 import { Error } from "@votewise/ui/error";
-import { Spinner } from "@votewise/ui/ring-spinner";
 
 import { GroupMolecule } from "@/components/group";
 import { InView } from "@/components/in-view";
+import { LoadMoreSpinner } from "@/components/load-more-spinner";
 
 import Loading from "../loading";
 
@@ -44,11 +44,7 @@ export function GroupList(props: Props) {
       {data.groups.map((group) => (
         <GroupMolecule key={group.id} group={group} />
       ))}
-      {nextPageStatus === "loading" && (
-        <div className="flex items-center justify-center">
-          <Spinner className="size-5" />
-        </div>
-      )}
+      {nextPageStatus === "loading" && <LoadMoreSpinner />}
       <InView onInView={handleLoadMore} />
     </div>
   );

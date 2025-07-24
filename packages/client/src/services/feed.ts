@@ -1,9 +1,12 @@
 import type { CreateFeedResponse, GetAllFeedsResponse, GetFeedResponse } from "@votewise/api";
 import type { TFeedCreate } from "@votewise/schemas/feed";
+import type { TPagination } from "@votewise/schemas/pagination";
 import type { Client } from "../client";
 import type { Client as ServerClient } from "../server";
 
 import { feeds } from "@votewise/constant/routes";
+
+import { qs } from "./qs";
 
 type FeedOptions = { client: Client | ServerClient };
 
@@ -14,8 +17,8 @@ export class Feed {
     this.client = opts.client;
   }
 
-  public async getAll() {
-    const res = await this.client.get<GetAllFeedsResponse>(feeds.runtime.all(""));
+  public async getAll(query?: TPagination) {
+    const res = await this.client.get<GetAllFeedsResponse>(qs(feeds.runtime.all(""), query));
     return res;
   }
 
