@@ -47,3 +47,8 @@ export const ZigZag: ZigZagStory = {
   args: { images },
   render: (args) => <ZigZagList {...args} />
 };
+
+export const ErrorState: Story = {
+  args: { url: "https://invalid-url" },
+  render: (args) => <ImageCard {...args} />
+};

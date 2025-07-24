@@ -2,12 +2,15 @@
 
 import type { VariantProps } from "class-variance-authority";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { cva } from "class-variance-authority";
 
 import { cn } from "./cn";
 import { Cross } from "./icons/cross";
 import { Image as ImageIcon } from "./icons/image";
+import { Spinner } from "./ring-spinner";
+import { useIsHydrated } from "./use-is-hydrated";
+import { useLayoutEffect } from "./use-layout-effect";
 
 type Props = React.HTMLProps<HTMLDivElement> & {
   url: string;
@@ -16,7 +19,10 @@ type Props = React.HTMLProps<HTMLDivElement> & {
 
 export function ImageCard(props: Props) {
   const { url, children, figureProps, alt, ...rest } = props;
-  const [error, setError] = useState(false);
+  const imageLoadingStatus = useImageLoadingStatus(url);
+  const error = imageLoadingStatus === "error";
+  const isLoading = imageLoadingStatus === "loading";
+  const isLoaded = imageLoadingStatus === "loaded";
 
   return (
     <div
@@ -34,18 +40,19 @@ export function ImageCard(props: Props) {
           figureProps?.className
         )}
       >
-        {error ? (
+        {error && (
           <div className="size-full flex items-center justify-center">
             <ImageIcon className="size-12 text-black-300" />
           </div>
-        ) : (
+        )}
+        {isLoading && (
+          <div className="size-full flex items-center justify-center">
+            <Spinner className="size-5" />
+          </div>
+        )}
+        {isLoaded && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={url}
-            alt={alt || "Avatar"}
-            className="size-full object-cover rounded-2xl"
-            onError={() => setError(true)}
-          />
+          <img src={url} alt={alt || "Avatar"} className="size-full object-cover rounded-2xl" />
         )}
       </figure>
       {children}
@@ -135,4 +142,48 @@ export function ZigZagList(props: ZigZagListProps) {
       {children}
     </div>
   );
+}
+
+type LoadingStatus = "loading" | "loaded" | "error" | "idle";
+
+function useImageLoadingStatus(src: string | undefined) {
+  const isHydrated = useIsHydrated();
+  const imageRef = useRef<HTMLImageElement | null>(null);
+  const image = (() => {
+    if (!isHydrated) return null;
+    if (!imageRef.current) {
+      imageRef.current = new window.Image();
+    }
+    return imageRef.current;
+  })();
+
+  const [status, setStatus] = useState<LoadingStatus>(() => loadingStatusFromImage(image, src));
+
+  useLayoutEffect(() => {
+    setStatus(loadingStatusFromImage(image, src));
+  }, [image, src]);
+
+  useLayoutEffect(() => {
+    if (!image) return;
+    const handleLoaded = () => setStatus("loaded");
+    const handleError = () => setStatus("error");
+    image.addEventListener("load", handleLoaded);
+    image.addEventListener("error", handleError);
+    // eslint-disable-next-line consistent-return
+    return () => {
+      image.removeEventListener("load", handleLoaded);
+      image.removeEventListener("error", handleError);
+    };
+  }, [image]);
+
+  return status;
+}
+
+function loadingStatusFromImage(image: HTMLImageElement | null, src?: string): LoadingStatus {
+  if (!image) return "idle";
+  if (!src) return "error";
+  if (image.src !== src) {
+    image.src = src;
+  }
+  return image.complete && image.naturalHeight !== 0 ? "loaded" : "loading";
 }
