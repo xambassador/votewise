@@ -6,7 +6,7 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 
 import { Controller } from "./controller";
 
-export function getAllGroupsControllerFactory() {
+export function getMyGroupsControllerFactory() {
   const ctx = AppContext.getInjectionTokens(["assert", "bucketService", "repositories", "logger"]);
   const controller = new Controller({
     assert: ctx.assert,
@@ -14,7 +14,7 @@ export function getAllGroupsControllerFactory() {
     groupRepository: ctx.repositories.group
   });
   const auth = authMiddlewareFactory();
-  const exceptionLayer = new ExceptionLayer({ name: "get-all-groups" });
-  ctx.logger.info(`[${yellow("GetAllGroupsController")}] dependencies initialized`);
+  const exceptionLayer = new ExceptionLayer({ name: "get-my-groups" });
+  ctx.logger.info(`[${yellow("GetMyGroupsController")}] dependencies initialized`);
   return [auth, exceptionLayer.catch(controller.handle.bind(controller))];
 }

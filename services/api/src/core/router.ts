@@ -23,6 +23,7 @@ import { getAllFeedControllerFactory } from "./feed/get-all";
 import { createFollowControllerFactory } from "./follow/create";
 import { deleteFollowControllerFactory } from "./follow/delete";
 import { getAllGroupsControllerFactory } from "./group/get-all";
+import { getMyGroupsControllerFactory } from "./group/my-groups";
 import { getGroupRecommendationsControllerFactory } from "./recommendation/group";
 import { getRecommendateUserControllerFactory } from "./recommendation/user";
 import { getAllTopicsControllerFactory } from "./topics/get-all";
@@ -45,7 +46,6 @@ export function moduleRouterFactory(basePath: string): Router {
   const path = basePath + "/v1";
 
   /* -----------------------------------------------------------------------------------------------
-   * GET routes
    * -----------------------------------------------------------------------------------------------*/
   router.get(auth.paths.emailVerificationSession(path), ...getVerificationSessionControllerFactory());
   router.get(user.paths.sessions(path), ...listSessionsControllerFactory());
@@ -73,9 +73,9 @@ export function moduleRouterFactory(basePath: string): Router {
   router.get(comments.paths.getAll(path), ...getCommentsControllerFactory());
   router.get(comments.paths.getReplies(path), ...getRepliesControllerFactory());
   router.get(groups.paths.all(path), ...getAllGroupsControllerFactory());
+  router.get(groups.paths.myGroups(path), ...getMyGroupsControllerFactory());
 
   /* -----------------------------------------------------------------------------------------------
-   * POST routes
    * -----------------------------------------------------------------------------------------------*/
   router.post(auth.paths.register(path), ...registerControllerFactory(auth.paths.register(path)));
   router.post(auth.paths.signin(path), ...singinControllerFactory(auth.paths.signin(path)));
@@ -95,19 +95,16 @@ export function moduleRouterFactory(basePath: string): Router {
   router.post(follow.paths.followUser(path), ...createFollowControllerFactory());
 
   /* -----------------------------------------------------------------------------------------------
-   * PUT routes
    * -----------------------------------------------------------------------------------------------*/
   router.put(comments.paths.update(path), ...updateCommentControllerFactory());
 
   /* -----------------------------------------------------------------------------------------------
-   * PATCH routes
    * -----------------------------------------------------------------------------------------------*/
   router.patch(auth.paths.verify(path), ...verifyControllerFactory(auth.paths.verify(path)));
   router.patch(auth.paths.resetPassword(path), ...resetPasswordControllerFactory(auth.paths.resetPassword(path)));
   router.patch(user.paths.onboard.update(path), ...onboardControllerFactory(user.paths.onboard.update(path)));
 
   /* -----------------------------------------------------------------------------------------------
-   * DELETE routes
    * -----------------------------------------------------------------------------------------------*/
   router.delete(auth.paths.logout(path), ...logoutControllerFactory());
   router.delete(follow.paths.unfollowUser(path), ...deleteFollowControllerFactory());

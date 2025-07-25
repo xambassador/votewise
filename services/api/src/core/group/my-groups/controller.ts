@@ -8,6 +8,7 @@ import { PAGINATION } from "@votewise/constant";
 import { ZPagination } from "@votewise/schemas";
 
 import { PaginationBuilder } from "@/lib/pagination";
+import { getAuthenticateLocals } from "@/utils/locals";
 
 type ControllerOptions = {
   assert: AppContext["assert"];
@@ -23,13 +24,15 @@ export class Controller {
   }
 
   public async handle(req: Request, res: Response) {
+    const locals = getAuthenticateLocals(res);
+    const { sub } = locals.payload;
     const schema = ZPagination.safeParse(req.query);
     this.ctx.assert.unprocessableEntity(!schema.success, "Invalid query");
     const query = schema.data!;
-    const total = await this.ctx.groupRepository.count();
     const { page } = query;
     const limit = query.limit < 1 ? PAGINATION.groups.limit : query.limit;
-    const _groups = await this.ctx.groupRepository.getAll({ page, limit });
+    const total = await this.ctx.groupRepository.getCountByUserId(sub);
+    const _groups = await this.ctx.groupRepository.getByUserId(sub, { page, limit });
     const groups = _groups.map((group) => ({
       id: group.id,
       name: group.name,
@@ -55,4 +58,4 @@ export class Controller {
   }
 }
 
-export type GetAllGroupsResponse = ExtractControllerResponse<Controller>;
+export type GetMyGroupsResponse = ExtractControllerResponse<Controller>;

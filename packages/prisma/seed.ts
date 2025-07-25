@@ -478,20 +478,10 @@ async function createPosts(users: User[], groups: Group[], hashtags: HashTag[], 
       const assetCount = faker.number.int({ min: 0, max: 3 });
 
       for (let j = 0; j < assetCount; j++) {
-        const assetType = faker.helpers.arrayElement(["image", "video", "document"]);
-        let url;
-
-        if (assetType === "image") {
-          url = faker.image.url();
-        } else if (assetType === "video") {
-          url = `https://example.com/videos/${faker.string.uuid()}.mp4`;
-        } else {
-          url = `https://example.com/documents/${faker.string.uuid()}.pdf`;
-        }
-
+        const url = faker.image.url();
         await prisma.postAsset.create({
           data: {
-            type: assetType,
+            type: "image",
             url,
             post_id: post.id
           }

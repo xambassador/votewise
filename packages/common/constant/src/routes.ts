@@ -207,10 +207,14 @@ export const follow = {
 export const groups = {
   paths: {
     /** Get all groups */
-    all: (base: string) => base + "/groups"
+    all: (base: string) => base + "/groups",
+    /** Get current user groups */
+    myGroups: (base: string) => base + "/me/groups"
   },
   runtime: {
     /** Get all groups */
-    all: (base: string) => base + "/groups"
+    all: (base: string) => base + "/groups",
+    /** Get current user groups */
+    myGroups: (base: string) => base + "/me/groups"
   }
 };

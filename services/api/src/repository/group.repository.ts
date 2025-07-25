@@ -96,4 +96,51 @@ export class GroupRepository extends BaseRepository {
       })
     );
   }
+
+  public getCountByUserId(userId: string) {
+    return this.execute(async () => {
+      const count = await this.db.group.count({
+        where: { members: { some: { user_id: userId } } }
+      });
+      return count;
+    });
+  }
+
+  public getByUserId(userId: string, props: { page: number; limit: number }) {
+    const { page, limit } = props;
+    const offset = (page - 1) * limit;
+    return this.execute(() =>
+      this.db.group.findMany({
+        where: { members: { some: { user_id: userId } } },
+        select: {
+          id: true,
+          name: true,
+          about: true,
+          created_at: true,
+          updated_at: true,
+          status: true,
+          type: true,
+          members: {
+            select: {
+              id: true,
+              role: true,
+              user: {
+                select: {
+                  id: true,
+                  user_name: true,
+                  first_name: true,
+                  last_name: true,
+                  avatar_url: true
+                }
+              }
+            }
+          },
+          _count: { select: { members: true } }
+        },
+        orderBy: { created_at: "desc" },
+        skip: offset,
+        take: limit
+      })
+    );
+  }
 }
