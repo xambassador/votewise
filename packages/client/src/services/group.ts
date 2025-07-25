@@ -1,4 +1,4 @@
-import type { GetAllGroupsResponse } from "@votewise/api";
+import type { GetAllGroupsResponse, GetMyGroupsResponse } from "@votewise/api";
 import type { TPagination } from "@votewise/schemas/pagination";
 import type { Client } from "../client";
 import type { Client as ServerClient } from "../server";
@@ -23,6 +23,12 @@ export class Group {
     const response = await this.client.get<GetAllGroupsResponse>(qs(path, query));
     return response;
   }
+
+  public async getMyGroups(query?: TPagination) {
+    const path = groups.runtime.myGroups("");
+    const response = await this.client.get<GetMyGroupsResponse>(qs(path, query));
+    return response;
+  }
 }
 
-export type { GetAllGroupsResponse };
+export type { GetAllGroupsResponse, GetMyGroupsResponse };
