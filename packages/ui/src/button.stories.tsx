@@ -10,11 +10,16 @@ const meta = {
     children: "Click me",
     variant: "primary",
     loading: false,
-    disabled: false
+    disabled: false,
+    size: "default"
   },
   argTypes: {
     variant: {
       options: ["primary", "secondary", "outline", "danger"],
+      control: { type: "select" }
+    },
+    size: {
+      options: ["default", "md", "lg", "sm"],
       control: { type: "select" }
     },
     asChild: { table: { disable: true } },

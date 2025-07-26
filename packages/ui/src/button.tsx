@@ -24,7 +24,8 @@ export const variants = cva(
       size: {
         default: "h-10",
         md: "h-11",
-        lg: "h-12"
+        lg: "h-12",
+        sm: "h-6"
       }
     },
     defaultVariants: {
