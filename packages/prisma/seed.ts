@@ -118,9 +118,13 @@ async function createUsers(count = 100) {
   const backgrounds = Array.from({ length: 10 }).map((_, index) => "backgrounds/bg_" + (index + 1) + ".png");
 
   for (let i = 0; i < count; i++) {
-    const firstName = faker.person.firstName();
-    const lastName = faker.person.lastName();
-    const userName = faker.internet.userName({ firstName, lastName }).toLowerCase() + "_" + faker.number.int(999);
+    const firstName = faker.person.firstName().slice(0, 50);
+    const lastName = faker.person.lastName().slice(0, 50);
+    const userName = (
+      faker.internet.userName({ firstName, lastName }).toLowerCase() +
+      "_" +
+      faker.number.int(999)
+    ).slice(0, 20);
 
     const user = await prisma.user.create({
       data: {
@@ -129,7 +133,7 @@ async function createUsers(count = 100) {
         password: "$2a$12$WiBdk9VyfUbSb4Ys0ya9Y.3KwbEgDMjWaui9Bfs2pDlBiVdmF/r0u", // Password@123
         first_name: firstName,
         last_name: lastName,
-        about: faker.lorem.paragraph(),
+        about: faker.lorem.paragraph().slice(0, 256),
         twitter_profile_url: faker.helpers.maybe(() => `https://twitter.com/${userName}`, { probability: 0.6 }),
         facebook_profile_url: faker.helpers.maybe(() => `https://facebook.com/${userName}`, { probability: 0.5 }),
         instagram_profile_url: faker.helpers.maybe(() => `https://instagram.com/${userName}`, { probability: 0.7 }),
@@ -286,39 +290,16 @@ async function createHashtags() {
 async function createGroups() {
   const groupTypes = Object.values(GroupType);
   const groupStatuses = Object.values(GroupStatus);
-  const groupNames = [
-    "Tech Enthusiasts",
-    "Science Geeks",
-    "Health & Wellness",
-    "Business Network",
-    "Creative Artists",
-    "Music Lovers",
-    "Travel Adventurers",
-    "Foodies Club",
-    "Book Club",
-    "Movie Buffs",
-    "Gaming Community",
-    "Photography Club",
-    "DIY Projects",
-    "Fitness Motivation",
-    "Environmental Activists",
-    "Startup Founders",
-    "Data Scientists",
-    "Web Developers",
-    "Mobile App Builders",
-    "AI & Machine Learning"
-  ];
-
   const groups: Group[] = [];
 
   for (let i = 0; i < 20; i++) {
+    const name = faker.company.name().slice(0, 21);
     const group = await prisma.group.create({
       data: {
-        name: groupNames[i],
-        about: faker.lorem.paragraphs(2),
+        name,
+        about: faker.lorem.paragraphs(2).slice(0, 500),
         type: faker.helpers.arrayElement(groupTypes),
-        status: faker.helpers.arrayElement(groupStatuses),
-        join_through_request: faker.datatype.boolean()
+        status: faker.helpers.arrayElement(groupStatuses)
       }
     });
     groups.push(group);
@@ -430,7 +411,7 @@ async function createPosts(users: User[], groups: Group[], hashtags: HashTag[], 
         }
       }
 
-      const title = faker.lorem.sentence();
+      const title = faker.lorem.sentence().slice(0, 50);
       const slug =
         title
           .toLowerCase()
@@ -442,7 +423,7 @@ async function createPosts(users: User[], groups: Group[], hashtags: HashTag[], 
       const post = await prisma.post.create({
         data: {
           title,
-          content: faker.lorem.paragraphs({ min: 2, max: 5 }),
+          content: faker.lorem.paragraphs({ min: 2, max: 5 }).slice(0, 300),
           slug,
           type: group ? "GROUP_ONLY" : "PUBLIC",
           status: faker.helpers.arrayElement(postStatuses),

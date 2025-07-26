@@ -12,7 +12,10 @@ export const ZWhatShouldWeCall = z.object({
 export const ZTellUsAboutYou = z.object({
   step: z.literal(2),
   gender: z.enum(["MALE", "FEMALE", "OTHER"], { message: "gender is required" }),
-  about: z.string({ required_error: "about is required" }).min(1, { message: "about is required" })
+  about: z
+    .string({ required_error: "about is required" })
+    .min(1, { message: "about is required" })
+    .max(256, { message: "about must be less than 256 characters" })
 });
 
 export const ZYourPhotoShine = z.object({
@@ -27,7 +30,12 @@ export const ZYourProfileStandOut = z.object({
 
 export const ZConnectYourSocials = z.object({
   step: z.literal(5),
-  location: z.string({ required_error: "This field is required" }).min(1, { message: "This field is required" }),
+  location: z
+    .string({ required_error: "This field is required" })
+    .min(1, { message: "This field is required" })
+    .max(100, {
+      message: "Location must be less than 100 characters"
+    }),
   facebook: z.string().optional(),
   instagram: z.string().optional(),
   twitter: z.string().optional()

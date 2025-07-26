@@ -2,7 +2,8 @@ import { z } from "zod";
 
 const ZText = z
   .string({ required_error: "text is required" })
-  .min(2, { message: "text must be at least 2 characters long" });
+  .min(2, { message: "text must be at least 2 characters long" })
+  .max(300, { message: "text must be at most 300 characters long" });
 
 export const ZCommentCreate = z.object({
   text: ZText,

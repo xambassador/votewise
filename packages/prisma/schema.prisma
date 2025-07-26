@@ -92,19 +92,19 @@ enum FactorStatus {
 model User {
     id                    String    @id @default(cuid())
     email                 String    @unique
-    user_name             String    @unique
+    user_name             String    @unique @db.VarChar(20)
     password              String
-    first_name            String
-    last_name             String
+    first_name            String    @db.VarChar(50)
+    last_name             String    @db.VarChar(50)
     secret                String    @default(uuid()) // Encrypted secret to sign JWT
-    about                 String?
+    about                 String?   @db.VarChar(256)
     twitter_profile_url   String?
     facebook_profile_url  String?
     instagram_profile_url String?
     github_profile_url    String?
     avatar_url            String?
     cover_image_url       String?
-    location              String?
+    location              String?   @db.VarChar(100)
     gender                Gender?
     last_login            DateTime?
 
@@ -151,12 +151,12 @@ model Factor {
     updated_at DateTime @updatedAt
 
     sessions   Session[] // Sessions authenticated using this factor
-    challanges Challange[] // Challanges for this factor
+    challenges Challenge[] // Challenges for this factor
 
     @@index([user_id], name: "user_id_index")
 }
 
-model Challange {
+model Challenge {
     id       String  @id @default(uuid())
     ip       String
     otp_code String?
@@ -187,8 +187,8 @@ model Session {
 
 model Post {
     id      String     @id @default(cuid())
-    title   String     @db.VarChar(255)
-    content String     @db.Text
+    title   String     @db.VarChar(50)
+    content String     @db.VarChar(300)
     slug    String     @unique @db.VarChar(255)
     type    PostType   @default(PUBLIC)
     status  PostStatus @default(OPEN)
@@ -240,7 +240,7 @@ model Upvote {
 
 model Comment {
     id        String  @id @default(cuid())
-    text      String  @db.Text
+    text      String  @db.VarChar(300)
     parent_id String?
 
     post_id String
@@ -332,12 +332,11 @@ model Friend {
 }
 
 model Group {
-    id                   String      @id @default(cuid())
-    name                 String
-    about                String
-    type                 GroupType
-    status               GroupStatus
-    join_through_request Boolean     @default(false)
+    id     String      @id @default(cuid())
+    name   String      @unique @db.VarChar(21)
+    about  String      @db.VarChar(500)
+    type   GroupType
+    status GroupStatus
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -421,7 +420,7 @@ model PostTopic {
 
 model Topics {
     id              String  @id @default(cuid())
-    name            String  @unique
+    name            String  @unique @db.VarChar(20)
     is_system_topic Boolean @default(true)
 
     created_at    DateTime        @default(now())

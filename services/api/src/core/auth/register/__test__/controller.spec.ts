@@ -67,7 +67,7 @@ describe("Register Controller", () => {
     const createBody = {
       email: body.email,
       password: hashedPassword,
-      user_name: "user_" + defaultUserName,
+      user_name: defaultUserName,
       first_name: "INVALID_FIRST_NAME",
       last_name: "INVALID_LAST_NAME"
     };

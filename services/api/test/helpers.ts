@@ -1,4 +1,4 @@
-import type { Challange, Factor, RefreshToken, User } from "@votewise/prisma/client";
+import type { Challenge, Factor, RefreshToken, User } from "@votewise/prisma/client";
 import type { AccessTokenPayload } from "@votewise/types";
 import type { Request, Response } from "express";
 
@@ -87,7 +87,7 @@ export function buildFactor(overrides: Partial<Factor> = {}): Factor {
   };
 }
 
-export function buildChallenge(overrides: Partial<Challange> = {}): Challange {
+export function buildChallenge(overrides: Partial<Challenge> = {}): Challenge {
   return {
     id: faker.string.uuid(),
     ip: "",

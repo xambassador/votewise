@@ -38,7 +38,7 @@ export class Controller {
     const createdUser = await this.ctx.userRepository.create({
       email,
       password: hash,
-      user_name: `user_${defaultUserName}`, // We will update this later in onboarding process
+      user_name: defaultUserName, // We will update this later in onboarding process
       first_name: "INVALID_FIRST_NAME",
       last_name: "INVALID_LAST_NAME"
     });

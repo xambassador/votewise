@@ -8,13 +8,16 @@ export const ZPassword = z
   .min(6, { message: "password must be at least 6 characters" });
 export const ZUsername = z
   .string({ required_error: "username is required", invalid_type_error: "username must be a string" })
-  .min(3, { message: "username must be at least 3 characters" });
+  .min(3, { message: "username must be at least 3 characters" })
+  .max(20, { message: "username must be at most 20 characters" });
 export const ZFirstName = z
   .string({ required_error: "first_name is required", invalid_type_error: "first_name must be a string" })
-  .min(2, { message: "first_name must be at least 2 characters" });
+  .min(2, { message: "first_name must be at least 2 characters" })
+  .max(50, { message: "first_name must be at most 50 characters" });
 export const ZLastName = z
   .string({ required_error: "last_name is required", invalid_type_error: "last_name must be a string" })
-  .min(2, { message: "last_name must be at least 2 characters" });
+  .min(2, { message: "last_name must be at least 2 characters" })
+  .max(50, { message: "last_name must be at most 50 characters" });
 export const ZVerificationCode = z
   .string({ required_error: "verification_code is missing", invalid_type_error: "verification_code must be a string" })
   .min(1, { message: "verification_code is missing" });

@@ -25,8 +25,11 @@ export const ZFeedCreate = z.object({
   title: z
     .string({ required_error: "title is required" })
     .min(1, { message: "title is required" })
-    .max(255, { message: "title must be less than 255 characters" }),
-  content: z.string({ message: "content is required" }).min(1, { message: "content is required" }),
+    .max(50, { message: "title must be less than 50 characters" }),
+  content: z
+    .string({ message: "content is required" })
+    .min(1, { message: "content is required" })
+    .max(300, { message: "content must be less than 300 characters" }),
   status: z
     .enum(["OPEN", "CLOSED", "ARCHIVED", "INPROGRESS"], {
       errorMap: (issue, ctx) => {

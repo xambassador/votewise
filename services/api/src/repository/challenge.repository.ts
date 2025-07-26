@@ -24,7 +24,7 @@ export class ChallengeRepository extends BaseRepository {
 
   public create(data: TCreate) {
     return this.execute(async () => {
-      const challenge = await this.db.challange.create({
+      const challenge = await this.db.challenge.create({
         data: {
           ip: data.ip,
           factor_id: data.factor_id,
@@ -37,14 +37,14 @@ export class ChallengeRepository extends BaseRepository {
 
   public findById(id: string) {
     return this.execute(async () => {
-      const challenge = await this.db.challange.findUnique({ where: { id } });
+      const challenge = await this.db.challenge.findUnique({ where: { id } });
       return challenge;
     });
   }
 
   public verifyChallenge(id: string) {
     return this.execute(async () => {
-      const challenge = await this.db.challange.update({ data: { verified_at: new Date() }, where: { id } });
+      const challenge = await this.db.challenge.update({ data: { verified_at: new Date() }, where: { id } });
       return challenge;
     });
   }
