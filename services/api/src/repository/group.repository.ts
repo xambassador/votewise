@@ -1,17 +1,18 @@
-import type { AppContext } from "@/context";
+import type { Prisma } from "@votewise/prisma";
+import type { GroupMemberRole } from "@votewise/prisma/client";
 
 import { BaseRepository } from "./base.repository";
 
-type Dependencies = {
-  db: AppContext["db"];
-};
+type CreateGroup = Prisma.GroupCreateInput;
 
 export class GroupRepository extends BaseRepository {
-  private readonly db: Dependencies["db"];
+  private readonly db: RepositoryConfig["db"];
+  public readonly groupMemberRepository: GroupMemberRepository;
 
-  constructor(cfg: Dependencies) {
+  constructor(cfg: RepositoryConfig) {
     super();
     this.db = cfg.db;
+    this.groupMemberRepository = new GroupMemberRepository(cfg);
   }
 
   public getGroupsById(ids: string[]) {
@@ -142,5 +143,37 @@ export class GroupRepository extends BaseRepository {
         take: limit
       })
     );
+  }
+
+  public create(data: CreateGroup) {
+    return this.execute(async () => {
+      const group = await this.db.group.create({
+        data: {
+          about: data.about,
+          name: data.name,
+          type: data.type,
+          status: data.status
+        }
+      });
+      return group;
+    });
+  }
+}
+
+export class GroupMemberRepository extends BaseRepository {
+  private readonly db: RepositoryConfig["db"];
+
+  constructor(cfg: RepositoryConfig) {
+    super();
+    this.db = cfg.db;
+  }
+
+  public addMember(groupId: string, userId: string, role: GroupMemberRole) {
+    return this.execute(async () => {
+      const member = await this.db.groupMember.create({
+        data: { group_id: groupId, user_id: userId, role }
+      });
+      return member;
+    });
   }
 }

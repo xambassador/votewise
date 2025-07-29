@@ -22,6 +22,7 @@ import { getFeedControllerFactory } from "./feed/get";
 import { getAllFeedControllerFactory } from "./feed/get-all";
 import { createFollowControllerFactory } from "./follow/create";
 import { deleteFollowControllerFactory } from "./follow/delete";
+import { createGroupControllerFactory } from "./group/create";
 import { getAllGroupsControllerFactory } from "./group/get-all";
 import { getMyGroupsControllerFactory } from "./group/my-groups";
 import { getGroupRecommendationsControllerFactory } from "./recommendation/group";
@@ -93,6 +94,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.post(feeds.paths.create(path), ...createFeedControllerFactory(feeds.paths.create(path)));
   router.post(comments.paths.create(path), ...createCommentControllerFactory(path));
   router.post(follow.paths.followUser(path), ...createFollowControllerFactory());
+  router.post(groups.paths.create(path), ...createGroupControllerFactory());
 
   /* -----------------------------------------------------------------------------------------------
    * -----------------------------------------------------------------------------------------------*/

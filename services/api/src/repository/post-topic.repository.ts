@@ -1,15 +1,9 @@
-import type { AppContext } from "@/context";
-
 import { BaseRepository } from "./base.repository";
 
-type Dependencies = {
-  db: AppContext["db"];
-};
-
 export class PostTopicRepository extends BaseRepository {
-  private readonly db: Dependencies["db"];
+  private readonly db: RepositoryConfig["db"];
 
-  constructor(cfg: Dependencies) {
+  constructor(cfg: RepositoryConfig) {
     super();
     this.db = cfg.db;
   }

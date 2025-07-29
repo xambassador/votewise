@@ -1,12 +1,6 @@
-import type { AppContext } from "@/context";
-
 import { PAGINATION } from "@votewise/constant";
 
 import { BaseRepository } from "./base.repository";
-
-type Dependencies = {
-  db: AppContext["db"];
-};
 
 type TCommentCreate = {
   text: string;
@@ -22,10 +16,10 @@ type TCommentUpdate = {
 };
 
 export class CommentRepository extends BaseRepository {
-  private readonly db: Dependencies["db"];
+  private readonly db: RepositoryConfig["db"];
   public reply: ReplyRepository;
 
-  constructor(cfg: Dependencies) {
+  constructor(cfg: RepositoryConfig) {
     super();
     this.db = cfg.db;
     this.reply = new ReplyRepository(cfg);
@@ -116,9 +110,9 @@ export class CommentRepository extends BaseRepository {
 }
 
 class ReplyRepository extends BaseRepository {
-  private readonly db: Dependencies["db"];
+  private readonly db: RepositoryConfig["db"];
 
-  constructor(cfg: Dependencies) {
+  constructor(cfg: RepositoryConfig) {
     super();
     this.db = cfg.db;
   }

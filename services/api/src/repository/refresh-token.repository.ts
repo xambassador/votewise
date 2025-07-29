@@ -1,16 +1,11 @@
-import type { AppContext } from "@/context";
-
 import { BaseRepository } from "./base.repository";
 
-type Dependencies = {
-  db: AppContext["db"];
-};
 type TCreate = { userId: string; token: string; revoked?: boolean };
 
 export class RefreshTokenRepository extends BaseRepository {
-  private readonly db: Dependencies["db"];
+  private readonly db: RepositoryConfig["db"];
 
-  constructor(cfg: Dependencies) {
+  constructor(cfg: RepositoryConfig) {
     super();
     this.db = cfg.db;
   }

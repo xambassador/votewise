@@ -40,6 +40,10 @@
     "./comment": {
       "import": "./dist/comment.mjs",
       "require": "./dist/comment.js"
+    },
+    "./group": {
+      "import": "./dist/group.mjs",
+      "require": "./dist/group.js"
     }
   },
   "scripts": {

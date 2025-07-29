@@ -1,11 +1,6 @@
-import type { AppContext } from "@/context";
 import type { PostStatus, PostType } from "@votewise/prisma/client";
 
 import { BaseRepository } from "./base.repository";
-
-type Dependencies = {
-  db: AppContext["db"];
-};
 
 type TCreate = {
   content: string;
@@ -17,9 +12,9 @@ type TCreate = {
 };
 
 export class FeedRepository extends BaseRepository {
-  private readonly db: Dependencies["db"];
+  private readonly db: RepositoryConfig["db"];
 
-  constructor(cfg: Dependencies) {
+  constructor(cfg: RepositoryConfig) {
     super();
     this.db = cfg.db;
   }

@@ -1,11 +1,6 @@
-import type { AppContext } from "@/context";
 import type { Prisma } from "@votewise/prisma";
 
 import { BaseRepository } from "./base.repository";
-
-type Dependencies = {
-  db: AppContext["db"];
-};
 
 type TFactorCreate = Prisma.FactorCreateInput;
 type TCreate = {
@@ -17,9 +12,9 @@ type TCreate = {
 };
 
 export class FactorRepository extends BaseRepository {
-  private readonly db: Dependencies["db"];
+  private readonly db: RepositoryConfig["db"];
 
-  constructor(cfg: Dependencies) {
+  constructor(cfg: RepositoryConfig) {
     super();
     this.db = cfg.db;
   }

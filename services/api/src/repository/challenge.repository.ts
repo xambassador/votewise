@@ -1,12 +1,6 @@
-import type { AppContext } from "@/context";
-
 import { BaseRepository } from "./base.repository";
 
 /* ----------------------------------------------------------------------------------------------- */
-
-type Dependencies = {
-  db: AppContext["db"];
-};
 
 type TCreate = {
   ip: string;
@@ -15,9 +9,9 @@ type TCreate = {
 };
 
 export class ChallengeRepository extends BaseRepository {
-  private readonly db: Dependencies["db"];
+  private readonly db: RepositoryConfig["db"];
 
-  constructor(cfg: Dependencies) {
+  constructor(cfg: RepositoryConfig) {
     super();
     this.db = cfg.db;
   }

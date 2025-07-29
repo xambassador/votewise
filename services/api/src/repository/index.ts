@@ -1,3 +1,5 @@
+import type { AppContext } from "@/context";
+
 import { ChallengeRepository } from "./challenge.repository";
 import { CommentRepository } from "./comment.repository";
 import { FactorRepository } from "./factor.repository";
@@ -46,5 +48,9 @@ declare global {
     postTopic: PostTopicRepository;
     group: GroupRepository;
     comment: CommentRepository;
+  }
+
+  interface RepositoryConfig {
+    db: AppContext["db"];
   }
 }

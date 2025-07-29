@@ -1,5 +1,3 @@
-import type { AppContext } from "@/context";
-
 import { BaseRepository } from "./base.repository";
 
 type TCreate = {
@@ -10,14 +8,11 @@ type TCreate = {
   ip: string;
   id: string;
 };
-type Dependencies = {
-  db: AppContext["db"];
-};
 
 export class SessionRepository extends BaseRepository {
-  private readonly db: Dependencies["db"];
+  private readonly db: RepositoryConfig["db"];
 
-  constructor(cfg: Dependencies) {
+  constructor(cfg: RepositoryConfig) {
     super();
     this.db = cfg.db;
   }

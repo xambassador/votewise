@@ -5,3 +5,4 @@ export * from "./user";
 export * from "./feed";
 export * from "./pagination";
 export * from "./comment";
+export * from "./group";

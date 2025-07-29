@@ -209,12 +209,16 @@ export const groups = {
     /** Get all groups */
     all: (base: string) => base + "/groups",
     /** Get current user groups */
-    myGroups: (base: string) => base + "/me/groups"
+    myGroups: (base: string) => base + "/me/groups",
+    /** Create a new group */
+    create: (base: string) => base + "/groups"
   },
   runtime: {
     /** Get all groups */
     all: (base: string) => base + "/groups",
     /** Get current user groups */
-    myGroups: (base: string) => base + "/me/groups"
+    myGroups: (base: string) => base + "/me/groups",
+    /** Create a new group */
+    create: (base: string) => base + "/groups"
   }
 };
