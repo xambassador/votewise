@@ -27,3 +27,4 @@ export type { UnFollowResponse } from "@/core/follow/delete/controller";
 export type { UpdateCommentResponse } from "@/core/comment/update/controller";
 export type { GetAllGroupsResponse } from "@/core/group/get-all/controller";
 export type { GetMyGroupsResponse } from "@/core/group/my-groups/controller";
+export type { CreateGroupResponse } from "@/core/group/create/controller";

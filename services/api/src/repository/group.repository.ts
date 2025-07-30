@@ -7,12 +7,12 @@ type CreateGroup = Prisma.GroupCreateInput;
 
 export class GroupRepository extends BaseRepository {
   private readonly db: RepositoryConfig["db"];
-  public readonly groupMemberRepository: GroupMemberRepository;
+  public readonly groupMember: GroupMemberRepository;
 
   constructor(cfg: RepositoryConfig) {
     super();
     this.db = cfg.db;
-    this.groupMemberRepository = new GroupMemberRepository(cfg);
+    this.groupMember = new GroupMemberRepository(cfg);
   }
 
   public getGroupsById(ids: string[]) {
@@ -58,6 +58,13 @@ export class GroupRepository extends BaseRepository {
 
   public count() {
     return this.execute(async () => this.db.group.count());
+  }
+
+  public findById(id: string) {
+    return this.execute(async () => {
+      const group = await this.db.group.findUnique({ where: { id } });
+      return group;
+    });
   }
 
   public getAll(props: { page: number; limit: number }) {
@@ -174,6 +181,17 @@ export class GroupMemberRepository extends BaseRepository {
         data: { group_id: groupId, user_id: userId, role }
       });
       return member;
+    });
+  }
+
+  public isMember(groupId: string, userId: string) {
+    return this.execute(async () => {
+      // @todo: Replace this with findUnique after schema migration
+      const member = await this.db.groupMember.findFirst({
+        where: { group_id: groupId, user_id: userId },
+        select: { id: true }
+      });
+      return !!member;
     });
   }
 }

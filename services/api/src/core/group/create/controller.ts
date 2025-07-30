@@ -31,7 +31,7 @@ export class Controller {
       status: "OPEN",
       type: body.type
     });
-    const member = await this.ctx.groupRepository.groupMemberRepository.addMember(group.id, sub, "ADMIN");
+    const member = await this.ctx.groupRepository.groupMember.addMember(group.id, sub, "ADMIN");
     const result = {
       group: { id: group.id, name: group.name, about: group.about, type: group.type },
       member: { id: member.id }

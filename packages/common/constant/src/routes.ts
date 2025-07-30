@@ -211,7 +211,9 @@ export const groups = {
     /** Get current user groups */
     myGroups: (base: string) => base + "/me/groups",
     /** Create a new group */
-    create: (base: string) => base + "/groups"
+    create: (base: string) => base + "/groups",
+    /** Join group */
+    join: (base: string) => base + "/groups/:groupId/join"
   },
   runtime: {
     /** Get all groups */
@@ -219,6 +221,8 @@ export const groups = {
     /** Get current user groups */
     myGroups: (base: string) => base + "/me/groups",
     /** Create a new group */
-    create: (base: string) => base + "/groups"
+    create: (base: string) => base + "/groups",
+    /** Join group */
+    join: (base: string, groupId: string) => base + `/groups/${groupId}/join`
   }
 };
