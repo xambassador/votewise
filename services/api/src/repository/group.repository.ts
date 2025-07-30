@@ -1,5 +1,5 @@
 import type { Prisma } from "@votewise/prisma";
-import type { GroupMemberRole } from "@votewise/prisma/client";
+import type { GroupMemberRole, GroupStatus } from "@votewise/prisma/client";
 
 import { BaseRepository } from "./base.repository";
 
@@ -56,8 +56,9 @@ export class GroupRepository extends BaseRepository {
     });
   }
 
-  public count() {
-    return this.execute(async () => this.db.group.count());
+  public count(params?: { status?: GroupStatus }) {
+    const { status } = params || {};
+    return this.execute(async () => this.db.group.count({ where: { status } }));
   }
 
   public findById(id: string) {
@@ -67,8 +68,8 @@ export class GroupRepository extends BaseRepository {
     });
   }
 
-  public getAll(props: { page: number; limit: number }) {
-    const { page, limit } = props;
+  public getAll(props: { page: number; limit: number; status?: GroupStatus }) {
+    const { page, limit, status = "OPEN" } = props;
     const offset = (page - 1) * limit;
     return this.execute(async () =>
       this.db.group.findMany({
@@ -98,6 +99,7 @@ export class GroupRepository extends BaseRepository {
           },
           _count: { select: { members: true } }
         },
+        where: { status },
         orderBy: { created_at: "desc" },
         skip: offset,
         take: limit

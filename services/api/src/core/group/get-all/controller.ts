@@ -3,6 +3,7 @@ import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
+import { z } from "zod";
 
 import { PAGINATION } from "@votewise/constant";
 import { ZPagination } from "@votewise/schemas";
@@ -15,6 +16,16 @@ type ControllerOptions = {
   bucketService: AppContext["bucketService"];
 };
 
+const ZFilter = ZPagination.extend({
+  status: z
+    .enum(["CLOSED", "OPEN", "INACTIVE"], {
+      invalid_type_error: "Status must be one of CLOSED, OPEN, or INACTIVE",
+      message: "Status must be one of CLOSED, OPEN, or INACTIVE"
+    })
+    .optional()
+    .default("OPEN")
+});
+
 export class Controller {
   private readonly ctx: ControllerOptions;
 
@@ -23,13 +34,13 @@ export class Controller {
   }
 
   public async handle(req: Request, res: Response) {
-    const schema = ZPagination.safeParse(req.query);
-    this.ctx.assert.unprocessableEntity(!schema.success, "Invalid query");
+    const schema = ZFilter.safeParse(req.query);
+    this.ctx.assert.unprocessableEntity(!schema.success, schema.error?.errors[0]?.message || "Invalid query");
     const query = schema.data!;
-    const total = await this.ctx.groupRepository.count();
+    const total = await this.ctx.groupRepository.count({ status: query.status });
     const { page } = query;
     const limit = query.limit < 1 ? PAGINATION.groups.limit : query.limit;
-    const _groups = await this.ctx.groupRepository.getAll({ page, limit });
+    const _groups = await this.ctx.groupRepository.getAll({ page, limit, status: query.status });
     const groups = _groups.map((group) => ({
       id: group.id,
       name: group.name,

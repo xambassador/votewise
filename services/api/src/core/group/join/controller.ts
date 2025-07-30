@@ -12,7 +12,7 @@ type ControllerOptions = {
   groupRepository: AppContext["repositories"]["group"];
 };
 
-const querySchema = z.object({ groupId: z.string({ invalid_type_error: "groupId must be a string" }) });
+const ZQuery = z.object({ groupId: z.string({ invalid_type_error: "groupId must be a string" }) });
 
 export class Controller {
   private readonly ctx: ControllerOptions;
@@ -23,7 +23,7 @@ export class Controller {
 
   public async handle(req: Request, res: Response) {
     const groupId = req.params.groupId;
-    const validate = querySchema.safeParse({ groupId });
+    const validate = ZQuery.safeParse({ groupId });
     this.ctx.assert.unprocessableEntity(!validate.success, validate.error?.errors[0]?.message || "Invalid request");
     const data = validate.data!;
 
