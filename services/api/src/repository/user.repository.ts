@@ -72,5 +72,5 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  delete() {}
+  public delete() {}
 }

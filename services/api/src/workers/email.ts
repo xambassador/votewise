@@ -10,7 +10,7 @@ type EmailProcessorOptions = {
   userRepository: AppContext["repositories"]["user"];
 };
 
-export class EmailProcessor implements ITaskWorker {
+export class EmailWorker implements ITaskWorker {
   private readonly opts: EmailProcessorOptions;
   private readonly compiledTemplates: { [key: string]: pug.compileTemplate } = {};
 
@@ -22,7 +22,7 @@ export class EmailProcessor implements ITaskWorker {
     const emailData = data as EmailJob;
     const { templateName, to, locals, subject } = emailData;
     this.opts.logger.info(`Sending email to ${emailData.to}`);
-    const templatePath = path.resolve(__dirname, `../../emails/templates/${templateName}.pug`);
+    const templatePath = path.resolve(__dirname, `../emails/templates/${templateName}.pug`);
     const template = this.compiledTemplates[emailData.templateName] || pug.compileFile(templatePath);
     const html = template(locals);
     try {

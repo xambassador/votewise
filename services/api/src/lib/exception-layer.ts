@@ -2,9 +2,7 @@ import type { NextFunction, Request, RequestHandler, Response } from "express";
 
 import { AppContext } from "@/context";
 
-type TConfig = {
-  name: string;
-};
+type TConfig = { name: string };
 
 export class ExceptionLayer {
   private readonly name: string;

@@ -8,7 +8,7 @@ type UploadCompletedEventProcessorOptions = {
   uploadsBucket: AppContext["config"]["uploadBucket"];
 };
 
-export class UploadCompletedEventProcessor implements ITaskWorker {
+export class UploadCompletedEventWorker implements ITaskWorker {
   private readonly opts: UploadCompletedEventProcessorOptions;
 
   constructor(opts: UploadCompletedEventProcessorOptions) {

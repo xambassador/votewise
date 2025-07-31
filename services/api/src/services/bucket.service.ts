@@ -16,7 +16,7 @@ export class BucketService {
     this.ctx = opts;
   }
 
-  async getUrlForType(url: string, type: "avatar" | "background") {
+  public async getUrlForType(url: string, type: "avatar" | "background") {
     const avatarBucket = this.ctx.avatarBucket;
     const backgroundBucket = this.ctx.backgroundBucket;
     const uploadBucket = this.ctx.uploadBucket;
@@ -58,7 +58,7 @@ export class BucketService {
     return signedUrl;
   }
 
-  generatePublicUrl(url: string, type: "avatar" | "background") {
+  public generatePublicUrl(url: string, type: "avatar" | "background") {
     let signedUrl = url;
     const avatarBucket = this.ctx.avatarBucket;
     const backgroundBucket = this.ctx.backgroundBucket;

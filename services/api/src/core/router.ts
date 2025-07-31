@@ -47,8 +47,7 @@ export function moduleRouterFactory(basePath: string): Router {
   const router = Router();
   const path = basePath + "/v1";
 
-  /* -----------------------------------------------------------------------------------------------
-   * -----------------------------------------------------------------------------------------------*/
+  /* ----------------------------------------------------------------------------------------------- */
   router.get(auth.paths.emailVerificationSession(path), ...getVerificationSessionControllerFactory());
   router.get(user.paths.sessions(path), ...listSessionsControllerFactory());
   router.get(
@@ -77,8 +76,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.get(groups.paths.all(path), ...getAllGroupsControllerFactory());
   router.get(groups.paths.myGroups(path), ...getMyGroupsControllerFactory());
 
-  /* -----------------------------------------------------------------------------------------------
-   * -----------------------------------------------------------------------------------------------*/
+  /* ----------------------------------------------------------------------------------------------- */
   router.post(auth.paths.register(path), ...registerControllerFactory(auth.paths.register(path)));
   router.post(auth.paths.signin(path), ...singinControllerFactory(auth.paths.signin(path)));
   router.post(auth.paths.refresh(path), ...refreshControllerFactory(auth.paths.refresh(path)));
@@ -98,18 +96,15 @@ export function moduleRouterFactory(basePath: string): Router {
   router.post(groups.paths.create(path), ...createGroupControllerFactory());
   router.post(groups.paths.join(path), ...joinGroupControllerFactory());
 
-  /* -----------------------------------------------------------------------------------------------
-   * -----------------------------------------------------------------------------------------------*/
+  /* ----------------------------------------------------------------------------------------------- */
   router.put(comments.paths.update(path), ...updateCommentControllerFactory());
 
-  /* -----------------------------------------------------------------------------------------------
-   * -----------------------------------------------------------------------------------------------*/
+  /* ----------------------------------------------------------------------------------------------- */
   router.patch(auth.paths.verify(path), ...verifyControllerFactory(auth.paths.verify(path)));
   router.patch(auth.paths.resetPassword(path), ...resetPasswordControllerFactory(auth.paths.resetPassword(path)));
   router.patch(user.paths.onboard.update(path), ...onboardControllerFactory(user.paths.onboard.update(path)));
 
-  /* -----------------------------------------------------------------------------------------------
-   * -----------------------------------------------------------------------------------------------*/
+  /* ----------------------------------------------------------------------------------------------- */
   router.delete(auth.paths.logout(path), ...logoutControllerFactory());
   router.delete(follow.paths.unfollowUser(path), ...deleteFollowControllerFactory());
 

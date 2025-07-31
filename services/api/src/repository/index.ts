@@ -15,22 +15,44 @@ import { TopicRepository } from "./topic.repository";
 import { UserInterestRepository } from "./user-interest.repository";
 import { UserRepository } from "./user.repository";
 
-export {
-  ChallengeRepository,
-  FactorRepository,
-  FeedAssetRepository,
-  FeedRepository,
-  FollowRepository,
-  RefreshTokenRepository,
-  SessionRepository,
-  TimelineRepository,
-  TopicRepository,
-  UserInterestRepository,
-  UserRepository,
-  PostTopicRepository,
-  GroupRepository,
-  CommentRepository
-};
+/**
+ * Factory function to create a container of repositories.
+ *
+ * @param db Database instance from AppContext
+ * @returns {Repositories} Repositories container
+ */
+export function createRepositories(db: AppContext["db"]): Repositories {
+  const userRepository = new UserRepository({ db });
+  const factorRepository = new FactorRepository({ db });
+  const challengeRepository = new ChallengeRepository({ db });
+  const refreshTokenRepository = new RefreshTokenRepository({ db });
+  const sessionRepository = new SessionRepository({ db });
+  const topicRepository = new TopicRepository({ db });
+  const userInterestRepository = new UserInterestRepository({ db });
+  const feedRepository = new FeedRepository({ db });
+  const followRepository = new FollowRepository({ db });
+  const timelineRepository = new TimelineRepository({ db });
+  const feedAssetRepository = new FeedAssetRepository({ db });
+  const postTopicRepository = new PostTopicRepository({ db });
+  const groupRepository = new GroupRepository({ db });
+  const commentRepository = new CommentRepository({ db });
+  return {
+    user: userRepository,
+    factor: factorRepository,
+    challenge: challengeRepository,
+    refreshToken: refreshTokenRepository,
+    session: sessionRepository,
+    topic: topicRepository,
+    userInterest: userInterestRepository,
+    feed: feedRepository,
+    follow: followRepository,
+    timeline: timelineRepository,
+    feedAsset: feedAssetRepository,
+    postTopic: postTopicRepository,
+    group: groupRepository,
+    comment: commentRepository
+  };
+}
 
 declare global {
   interface Repositories {

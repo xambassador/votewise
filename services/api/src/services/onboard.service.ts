@@ -36,7 +36,7 @@ export class OnboardService {
     this.ctx = opts;
   }
 
-  async getUserOnboardData(userId: string) {
+  public async getUserOnboardData(userId: string) {
     const onboardDataFromCache = await this.getOnboardDataFromCache(userId);
     if (onboardDataFromCache) return onboardDataFromCache;
     const _onboardDataFromDb = await this.ctx.userRepository.findById(userId);
@@ -70,7 +70,7 @@ export class OnboardService {
     return data;
   }
 
-  async updateUserOnboardCache(userId: string, data: Partial<OnboardData>) {
+  public async updateUserOnboardCache(userId: string, data: Partial<OnboardData>) {
     const onboardData = await this.getOnboardDataFromCache(userId);
     if (!onboardData) return;
     const updatedData = { ...onboardData, ...data };

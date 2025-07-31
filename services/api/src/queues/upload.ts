@@ -1,11 +1,12 @@
 import type { AppContext } from "@/context";
-import type { UploadToS3Task } from "@votewise/types";
+import type { UploadCompletedEventTask, UploadToS3Task } from "@votewise/types";
 
-import { Queue } from "bullmq";
+import { Queue, Worker } from "bullmq";
 
-import { uploadQueueDefaultJobOptions, uploadQueueName } from "@votewise/constant/queue";
+import { uploadCompletedEventQueueName, uploadQueueDefaultJobOptions, uploadQueueName } from "@votewise/constant/queue";
 
 import { RedisAdapter } from "@/storage/redis";
+import { UploadCompletedEventWorker } from "@/workers/upload-complete";
 
 type UploadQueueOptions = {
   env: AppContext["environment"];
@@ -31,5 +32,44 @@ export class UploadQueue {
   public async add(task: UploadToS3Task) {
     if (!this.queue) throw new Error("Upload queue not initialized");
     return this.queue.add(task.name, task);
+  }
+}
+
+type UploadCompletedEventQueueOptions = {
+  env: AppContext["environment"];
+};
+
+export class UploadCompletedEventQueue {
+  private readonly opts: UploadCompletedEventQueueOptions;
+  private worker: Worker<UploadCompletedEventTask> | null = null;
+  private redis: RedisAdapter | null = null;
+
+  constructor(opts: UploadCompletedEventQueueOptions) {
+    this.opts = opts;
+  }
+
+  public init() {
+    this.redis = new RedisAdapter(this.opts.env.REDIS_URL, { maxRetriesPerRequest: null });
+  }
+
+  public initWorker(ctx: AppContext) {
+    if (!this.redis) throw new Error("Redis not initialized");
+    const uploadCompletedEventProcessor = new UploadCompletedEventWorker({
+      userRepository: ctx.repositories.user,
+      onboardService: ctx.onboardService,
+      minio: ctx.minio,
+      uploadsBucket: ctx.config.uploadBucket
+    });
+    this.worker = new Worker<UploadCompletedEventTask>(
+      uploadCompletedEventQueueName,
+      async (job) => {
+        await uploadCompletedEventProcessor.process(job.data.payload);
+      },
+      { connection: this.redis }
+    );
+
+    this.worker.on("completed", () => {
+      ctx.logger.info(`[Upload Completed Event Worker] Job completed`);
+    });
   }
 }
