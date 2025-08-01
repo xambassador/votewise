@@ -361,6 +361,8 @@ model GroupMember {
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
+
+    @@unique([user_id, group_id], name: "user_group_unique")
 }
 
 enum GroupInvitationStatus {
