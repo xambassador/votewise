@@ -9,11 +9,11 @@ import { rateLimitStrategies } from "@/lib/rate-limiter";
 import { Controller } from "./controller";
 
 export function getFeedControllerFactory(path: string) {
-  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "logger", "bucketService"]);
+  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "logger", "services"]);
   const controller = new Controller({
     assert: ctx.assert,
     feedRepository: ctx.repositories.feed,
-    bucketService: ctx.bucketService
+    bucketService: ctx.services.bucket
   });
   const auth = authMiddlewareFactory();
   const limiter = rateLimitMiddlewareFactory(path, {

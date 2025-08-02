@@ -66,6 +66,7 @@ export class Server {
       this.ctx.logger.logSync(chalk.blue("Press Ctrl+C to shutdown Votewise API\n\n"));
       this.ctx.logger.logSync(`Votewise API is running on port ${port}`);
     });
+    this.ctx.services.realtime.init(server);
     this.terminator = createHttpTerminator({ server });
     this.server = server;
     this.server.keepAliveTimeout = this.serverConfig.keepAliveTimeout ?? 61 * 1000;

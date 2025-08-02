@@ -9,7 +9,7 @@ import { ERROR_CODES } from "@votewise/constant";
 import { getAuthenticateLocals } from "@/utils/locals";
 
 type ControllerOptions = {
-  cryptoService: AppContext["cryptoService"];
+  cryptoService: AppContext["services"]["crypto"];
   userRepository: AppContext["repositories"]["user"];
   factorRepository: AppContext["repositories"]["factor"];
   environment: AppContext["environment"];

@@ -8,12 +8,12 @@ import { ERROR_CODES } from "@votewise/constant";
 import { ZResetPassword, ZResetPasswordQuery } from "@votewise/schemas";
 
 type ControllerOptions = {
-  jwtService: AppContext["jwtService"];
+  jwtService: AppContext["services"]["jwt"];
   assert: AppContext["assert"];
   userRepository: AppContext["repositories"]["user"];
-  cryptoService: AppContext["cryptoService"];
+  cryptoService: AppContext["services"]["crypto"];
   requestParser: AppContext["plugins"]["requestParser"];
-  sessionManager: AppContext["sessionManager"];
+  sessionManager: AppContext["services"]["session"];
   taskQueue: AppContext["queues"]["tasksQueue"];
   appUrl: AppContext["config"]["appUrl"];
 };

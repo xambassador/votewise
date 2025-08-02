@@ -7,10 +7,10 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { Controller } from "./controller";
 
 export function getRepliesControllerFactory() {
-  const ctx = AppContext.getInjectionTokens(["assert", "bucketService", "repositories", "logger", "bucketService"]);
+  const ctx = AppContext.getInjectionTokens(["assert", "services", "repositories", "logger"]);
   const controller = new Controller({
     assert: ctx.assert,
-    bucketService: ctx.bucketService,
+    bucketService: ctx.services.bucket,
     commentRepository: ctx.repositories.comment,
     feedRepository: ctx.repositories.feed
   });

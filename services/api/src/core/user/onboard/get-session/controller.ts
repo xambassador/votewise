@@ -7,7 +7,7 @@ import { StatusCodes } from "http-status-codes";
 import { getAuthenticateLocals } from "@/utils/locals";
 
 type ControllerOptions = {
-  onboardService: AppContext["onboardService"];
+  onboardService: AppContext["services"]["onboard"];
 };
 
 export class Controller {

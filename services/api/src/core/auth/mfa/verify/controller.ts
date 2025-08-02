@@ -16,9 +16,9 @@ type ControllerOptions = {
   factorRepository: AppContext["repositories"]["factor"];
   requestParser: AppContext["plugins"]["requestParser"];
   assert: AppContext["assert"];
-  cryptoService: AppContext["cryptoService"];
+  cryptoService: AppContext["services"]["crypto"];
   environment: AppContext["environment"];
-  sessionManager: AppContext["sessionManager"];
+  sessionManager: AppContext["services"]["session"];
 };
 
 const { FACTOR_NOT_FOUND, CHALLENGE_NOT_FOUND, INVALID_CHALLENGE, CHALLENGE_EXPIRED } = ERROR_CODES["2FA"];

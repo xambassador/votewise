@@ -373,6 +373,10 @@ async function createGroupInvitations(users: User[], groups: Group[]) {
     const invitedUsers = faker.helpers.arrayElements(nonMembers, Math.min(invitationCount, nonMembers.length));
 
     for (const user of invitedUsers) {
+      const isAlreadyInvited = await prisma.groupInvitation.findFirst({
+        where: { group_id: group.id, user_id: user.id }
+      });
+      if (isAlreadyInvited) continue;
       await prisma.groupInvitation.create({
         data: {
           type: faker.helpers.arrayElement(invitationTypes),

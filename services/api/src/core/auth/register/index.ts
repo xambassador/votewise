@@ -14,21 +14,21 @@ export function registerControllerFactory(path: string) {
     "assert",
     "queues",
     "cache",
-    "cryptoService",
     "plugins",
     "config",
-    "logger"
+    "logger",
+    "services"
   ]);
   const service = new UserRegisterService({
     cache: ctx.cache,
-    cryptoService: ctx.cryptoService,
+    cryptoService: ctx.services.crypto,
     tasksQueue: ctx.queues.tasksQueue,
     appUrl: ctx.config.appUrl
   });
   const controller = new Controller({
     userRepository: ctx.repositories.user,
     assert: ctx.assert,
-    cryptoService: ctx.cryptoService,
+    cryptoService: ctx.services.crypto,
     requestParser: ctx.plugins.requestParser,
     userRegisterService: service
   });

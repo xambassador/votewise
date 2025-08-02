@@ -19,8 +19,8 @@ type ControllerOptions = {
   appUrl: AppContext["config"]["appUrl"];
   postTopicRepository: AppContext["repositories"]["postTopic"];
   timelineRepository: AppContext["repositories"]["timeline"];
-  onboardService: AppContext["onboardService"];
-  sessionManager: AppContext["sessionManager"];
+  onboardService: AppContext["services"]["onboard"];
+  sessionManager: AppContext["services"]["session"];
   avatarsBucket: AppContext["config"]["avatarsBucket"];
   backgroundsBucket: AppContext["config"]["backgroundsBucket"];
 };

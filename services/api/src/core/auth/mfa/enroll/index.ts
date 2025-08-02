@@ -9,16 +9,9 @@ import { rateLimitStrategies } from "@/lib/rate-limiter";
 import { Controller } from "./controller";
 
 export function enrollMFAControllerFactory(path: string) {
-  const ctx = AppContext.getInjectionTokens([
-    "cryptoService",
-    "repositories",
-    "environment",
-    "config",
-    "assert",
-    "logger"
-  ]);
+  const ctx = AppContext.getInjectionTokens(["services", "repositories", "environment", "config", "assert", "logger"]);
   const controller = new Controller({
-    cryptoService: ctx.cryptoService,
+    cryptoService: ctx.services.crypto,
     userRepository: ctx.repositories.user,
     factorRepository: ctx.repositories.factor,
     environment: ctx.environment,

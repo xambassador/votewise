@@ -9,7 +9,7 @@ import { ERROR_CODES } from "@votewise/constant";
 import { getAuthenticateLocals } from "@/utils/locals";
 
 type ControllerOptions = {
-  sessionManager: AppContext["sessionManager"];
+  sessionManager: AppContext["services"]["session"];
   userRepository: AppContext["repositories"]["user"];
   assert: AppContext["assert"];
 };

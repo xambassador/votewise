@@ -12,7 +12,7 @@ type ControllerOptions = {
   userRepository: AppContext["repositories"]["user"];
   cache: AppContext["cache"];
   requestParser: AppContext["plugins"]["requestParser"];
-  cryptoService: AppContext["cryptoService"];
+  cryptoService: AppContext["services"]["crypto"];
 };
 
 const { INVALID_VERIFICATION_CODE, USER_NOT_FOUND, INVALID_EMAIL, INVALID_OTP, VERIFICATION_CODE_EXPIRED } =

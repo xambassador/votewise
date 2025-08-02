@@ -14,11 +14,11 @@ import { getCookieOptions } from "@/utils/cookie";
 
 type ControllerOptions = {
   requestParser: AppContext["plugins"]["requestParser"];
-  cryptoService: AppContext["cryptoService"];
-  jwtService: AppContext["jwtService"];
+  cryptoService: AppContext["services"]["crypto"];
+  jwtService: AppContext["services"]["jwt"];
   assert: AppContext["assert"];
   strategies: Record<"email" | "username", Strategy>;
-  sessionManager: AppContext["sessionManager"];
+  sessionManager: AppContext["services"]["session"];
   refreshTokenRepository: AppContext["repositories"]["refreshToken"];
   userRepository: AppContext["repositories"]["user"];
   sessionRepository: AppContext["repositories"]["session"];

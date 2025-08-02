@@ -7,8 +7,8 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { Controller } from "./controller";
 
 export function logoutControllerFactory() {
-  const ctx = AppContext.getInjectionTokens(["sessionManager", "assert", "logger"]);
-  const controller = new Controller({ sessionManager: ctx.sessionManager, assert: ctx.assert });
+  const ctx = AppContext.getInjectionTokens(["services", "assert", "logger"]);
+  const controller = new Controller({ sessionManager: ctx.services.session, assert: ctx.assert });
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "logout" });
   ctx.logger.info(`[${yellow("LogoutController")}] dependencies initialized`);

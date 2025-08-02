@@ -6,7 +6,7 @@ import { StatusCodes } from "http-status-codes";
 import { getAuthenticateLocals } from "@/utils/locals";
 
 type ControllerOptions = {
-  sessionManager: AppContext["sessionManager"];
+  sessionManager: AppContext["services"]["session"];
   assert: AppContext["assert"];
 };
 

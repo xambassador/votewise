@@ -56,7 +56,7 @@ export class UploadCompletedEventQueue {
     if (!this.redis) throw new Error("Redis not initialized");
     const uploadCompletedEventProcessor = new UploadCompletedEventWorker({
       userRepository: ctx.repositories.user,
-      onboardService: ctx.onboardService,
+      onboardService: ctx.services.onboard,
       minio: ctx.minio,
       uploadsBucket: ctx.config.uploadBucket
     });

@@ -4,15 +4,18 @@ import type { GroupMemberRole, GroupStatus } from "@votewise/prisma/client";
 import { BaseRepository } from "./base.repository";
 
 type CreateGroup = Prisma.GroupCreateInput;
+type CreateGroupInvitation = Prisma.GroupInvitationUncheckedCreateInput;
 
 export class GroupRepository extends BaseRepository {
   private readonly db: RepositoryConfig["db"];
   public readonly groupMember: GroupMemberRepository;
+  public readonly groupInvitation: GroupInvitationRepository;
 
   constructor(cfg: RepositoryConfig) {
     super();
     this.db = cfg.db;
     this.groupMember = new GroupMemberRepository(cfg);
+    this.groupInvitation = new GroupInvitationRepository(cfg);
   }
 
   public getGroupsById(ids: string[]) {
@@ -194,6 +197,34 @@ export class GroupMemberRepository extends BaseRepository {
         select: { id: true }
       });
       return !!member;
+    });
+  }
+
+  public getAdmin(groupId: string) {
+    return this.execute(async () => {
+      const admin = await this.db.groupMember.findFirst({
+        where: { group_id: groupId, role: "ADMIN" }
+      });
+      return admin;
+    });
+  }
+}
+
+export class GroupInvitationRepository extends BaseRepository {
+  private readonly db: RepositoryConfig["db"];
+
+  constructor(cfg: RepositoryConfig) {
+    super();
+    this.db = cfg.db;
+  }
+
+  public create(data: CreateGroupInvitation) {
+    return this.execute(async () => {
+      const invitation = await this.db.groupInvitation.create({
+        data,
+        select: { id: true }
+      });
+      return invitation;
     });
   }
 }

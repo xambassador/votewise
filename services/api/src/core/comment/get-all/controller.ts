@@ -12,7 +12,7 @@ import { PaginationBuilder } from "@/lib/pagination";
 type ControllerOptions = {
   feedRepository: AppContext["repositories"]["feed"];
   commentRepository: AppContext["repositories"]["comment"];
-  bucketService: AppContext["bucketService"];
+  bucketService: AppContext["services"]["bucket"];
   assert: AppContext["assert"];
 };
 

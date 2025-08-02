@@ -72,9 +72,11 @@ export function GroupMolecule(props: Props) {
               <AvatarImage src={member.avatar_url} alt={member.first_name + " " + member.last_name} />
             </Avatar>
           ))}
-          <FloatingCounter className="size-7 text-xs -right-4">
-            +{group.total_members - group.members.length}
-          </FloatingCounter>
+          {group.total_members - group.members.length > 0 && (
+            <FloatingCounter className="size-7 text-xs -right-4">
+              +{group.total_members - group.members.length}
+            </FloatingCounter>
+          )}
         </GroupMembers>
         <GroupCreatedAt>Created {dayjs(group.created_at).fromNow()}</GroupCreatedAt>
       </div>

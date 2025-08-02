@@ -20,6 +20,7 @@
     "@votewise/debug": "*",
     "@votewise/env": "*",
     "@votewise/errors": "*",
+    "@votewise/event": "*",
     "@votewise/jwt": "*",
     "@votewise/log": "*",
     "@votewise/prisma": "*",
@@ -32,12 +33,13 @@
     "chalk": "4.1.2",
     "chrona": "^1.0.4",
     "compression": "^1.7.4",
+    "cookie": "^1.0.2",
     "cookie-parser": "^1.4.7",
-    "cookies": "^0.9.1",
     "cors": "^2.8.5",
     "crypto-js": "^4.2.0",
     "debug": "^4.3.6",
     "dotenv": "^16.4.5",
+    "eventemitter3": "^5.0.1",
     "express": "^4.19.2",
     "figlet": "^1.7.0",
     "fs-extra": "^11.2.0",
@@ -61,6 +63,7 @@
     "slug": "^9.1.0",
     "slugify": "^1.6.6",
     "uuid": "^10.0.0",
+    "ws": "^8.18.3",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -81,6 +84,7 @@
     "@types/qrcode": "^1",
     "@types/request-ip": "^0.0.41",
     "@types/supertest": "^6.0.2",
+    "@types/ws": "^8.18.1",
     "@votewise/config": "*",
     "@votewise/tsconfig": "*",
     "@votewise/types": "*",
@@ -100,5 +104,8 @@
       "types": "./dist/src/types/api.d.ts",
       "import": "./dist/src/types/api.js"
     }
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.9"
   }
 }

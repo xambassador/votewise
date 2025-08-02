@@ -8,12 +8,12 @@ import { ERROR_CODES } from "@votewise/constant";
 import { ZRefresh } from "@votewise/schemas";
 
 type ControllerOptions = {
-  sessionManager: AppContext["sessionManager"];
+  sessionManager: AppContext["services"]["session"];
   useRepository: AppContext["repositories"]["user"];
   refreshTokensRepository: AppContext["repositories"]["refreshToken"];
   assert: AppContext["assert"];
   requestParser: AppContext["plugins"]["requestParser"];
-  jwtService: AppContext["jwtService"];
+  jwtService: AppContext["services"]["jwt"];
 };
 
 const { INVALID_ACCESS_TOKEN, INVALID_REFRESH_TOKEN, USER_NOT_FOUND } = ERROR_CODES.AUTH;

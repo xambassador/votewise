@@ -3,7 +3,7 @@ import type { ITaskWorker, UploadCompletedEventJob } from "@votewise/types";
 
 type UploadCompletedEventProcessorOptions = {
   userRepository: AppContext["repositories"]["user"];
-  onboardService: AppContext["onboardService"];
+  onboardService: AppContext["services"]["onboard"];
   minio: AppContext["minio"];
   uploadsBucket: AppContext["config"]["uploadBucket"];
 };

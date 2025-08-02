@@ -3,7 +3,7 @@ import type { AppContext } from "@/context";
 import { InvalidInputError } from "@votewise/errors";
 
 type JWTPluginOptions = {
-  jwtService: AppContext["jwtService"];
+  jwtService: AppContext["services"]["jwt"];
 };
 
 export class JWTPlugin {

@@ -13,7 +13,7 @@ import { getAuthenticateLocals } from "@/utils/locals";
 type ControllerOptions = {
   assert: AppContext["assert"];
   groupRepository: AppContext["repositories"]["group"];
-  bucketService: AppContext["bucketService"];
+  bucketService: AppContext["services"]["bucket"];
 };
 
 export class Controller {

@@ -4,7 +4,7 @@ import type { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 
 type ControllerOptions = {
-  sessionManager: AppContext["sessionManager"];
+  sessionManager: AppContext["services"]["session"];
 };
 
 export class Controller {

@@ -10,7 +10,7 @@ import { ZRegister } from "@votewise/schemas";
 
 type ControllerOptions = {
   userRepository: AppContext["repositories"]["user"];
-  cryptoService: AppContext["cryptoService"];
+  cryptoService: AppContext["services"]["crypto"];
   assert: AppContext["assert"];
   requestParser: AppContext["plugins"]["requestParser"];
   userRegisterService: UserRegisterService;

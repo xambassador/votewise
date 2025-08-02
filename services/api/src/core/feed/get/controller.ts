@@ -11,7 +11,7 @@ import { getAuthenticateLocals } from "@/utils/locals";
 type ControllerOptions = {
   feedRepository: AppContext["repositories"]["feed"];
   assert: AppContext["assert"];
-  bucketService: AppContext["bucketService"];
+  bucketService: AppContext["services"]["bucket"];
 };
 
 export class Controller {

@@ -2,7 +2,7 @@ import chrona from "chrona";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { json, urlencoded } from "express";
+import { json, static as static_, urlencoded } from "express";
 import helmet from "helmet";
 
 import { AppContext } from "@/context";
@@ -37,7 +37,8 @@ export class AppMiddleware {
       urlencoded({ extended: true }),
       json({ limit: ctx.config.blobUploadLimit }),
       extractIp,
-      ...(shouldEnableChaosMonkey ? [chaosMonkey.register()] : [])
+      ...(shouldEnableChaosMonkey ? [chaosMonkey.register()] : []),
+      static_("public")
     ];
   }
 }

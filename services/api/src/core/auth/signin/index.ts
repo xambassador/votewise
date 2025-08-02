@@ -14,9 +14,7 @@ export function singinControllerFactory(path: string) {
     "repositories",
     "assert",
     "plugins",
-    "jwtService",
-    "cryptoService",
-    "sessionManager",
+    "services",
     "cache",
     "queues",
     "config",
@@ -28,16 +26,16 @@ export function singinControllerFactory(path: string) {
   const service = new UserRegisterService({
     cache: ctx.cache,
     tasksQueue: ctx.queues.tasksQueue,
-    cryptoService: ctx.cryptoService,
+    cryptoService: ctx.services.crypto,
     appUrl: ctx.config.appUrl
   });
   const controller = new Controller({
     strategies,
     requestParser: ctx.plugins.requestParser,
-    jwtService: ctx.jwtService,
-    cryptoService: ctx.cryptoService,
+    jwtService: ctx.services.jwt,
+    cryptoService: ctx.services.crypto,
     assert: ctx.assert,
-    sessionManager: ctx.sessionManager,
+    sessionManager: ctx.services.session,
     refreshTokenRepository: ctx.repositories.refreshToken,
     userRepository: ctx.repositories.user,
     sessionRepository: ctx.repositories.session,

@@ -4,8 +4,8 @@ import { Minute } from "@votewise/times";
 
 type SessionManagerOptions = {
   cache: AppContext["cache"];
-  cryptoService: AppContext["cryptoService"];
-  jwtService: AppContext["jwtService"];
+  cryptoService: AppContext["services"]["crypto"];
+  jwtService: AppContext["services"]["jwt"];
   assert: AppContext["assert"];
   sessionRepository: AppContext["repositories"]["session"];
   accessTokenExpiration: number;

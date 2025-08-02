@@ -3,7 +3,7 @@ import type { AppContext } from "@/context";
 import { Minute } from "@votewise/times";
 
 type RegisterServiceOptions = {
-  cryptoService: AppContext["cryptoService"];
+  cryptoService: AppContext["services"]["crypto"];
   cache: AppContext["cache"];
   tasksQueue: AppContext["queues"]["tasksQueue"];
   appUrl: AppContext["config"]["appUrl"];

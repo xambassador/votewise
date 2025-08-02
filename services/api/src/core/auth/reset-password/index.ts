@@ -11,10 +11,8 @@ export function resetPasswordControllerFactory(path: string) {
   const ctx = AppContext.getInjectionTokens([
     "plugins",
     "repositories",
-    "jwtService",
+    "services",
     "assert",
-    "cryptoService",
-    "sessionManager",
     "queues",
     "config",
     "logger"
@@ -22,10 +20,10 @@ export function resetPasswordControllerFactory(path: string) {
   const controller = new Controller({
     requestParser: ctx.plugins.requestParser,
     userRepository: ctx.repositories.user,
-    jwtService: ctx.jwtService,
+    jwtService: ctx.services.jwt,
     assert: ctx.assert,
-    cryptoService: ctx.cryptoService,
-    sessionManager: ctx.sessionManager,
+    cryptoService: ctx.services.crypto,
+    sessionManager: ctx.services.session,
     taskQueue: ctx.queues.tasksQueue,
     appUrl: ctx.config.appUrl
   });

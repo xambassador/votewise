@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-
 import type { envBaseSchema, TEnv } from "@votewise/env";
 import type { AccessTokenPayload } from "@votewise/types";
 import type { Request, Response } from "express";
+import type Websocket from "ws";
 import type { z } from "zod";
 
 declare global {
@@ -42,3 +42,10 @@ export type ExtractControllerResponse<T extends { handle: Function }> = T["handl
     ? T
     : never
   : never;
+
+export type SocketClient = {
+  sub: string;
+  ip: string;
+  connectedAt: number;
+  ws: Websocket;
+};

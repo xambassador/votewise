@@ -7164,6 +7164,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/ws@npm:^8.18.1":
+  version: 8.18.1
+  resolution: "@types/ws@npm:8.18.1"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 61aff1129143fcc4312f083bc9e9e168aa3026b7dd6e70796276dcfb2c8211c4292603f9c4864fae702f2ed86e4abd4d38aa421831c2fd7f856c931a481afbab
+  languageName: node
+  linkType: hard
+
 "@types/yargs-parser@npm:*":
   version: 21.0.0
   resolution: "@types/yargs-parser@npm:21.0.0"
@@ -7576,11 +7585,13 @@ __metadata:
     "@types/qrcode": "npm:^1"
     "@types/request-ip": "npm:^0.0.41"
     "@types/supertest": "npm:^6.0.2"
+    "@types/ws": "npm:^8.18.1"
     "@votewise/config": "npm:*"
     "@votewise/constant": "npm:*"
     "@votewise/debug": "npm:*"
     "@votewise/env": "npm:*"
     "@votewise/errors": "npm:*"
+    "@votewise/event": "npm:*"
     "@votewise/jwt": "npm:*"
     "@votewise/log": "npm:*"
     "@votewise/prisma": "npm:*"
@@ -7589,18 +7600,20 @@ __metadata:
     "@votewise/tsconfig": "npm:*"
     "@votewise/types": "npm:*"
     bcrypt: "npm:^5.1.1"
+    bufferutil: "npm:^4.0.9"
     bullmq: "npm:^5.12.10"
     busboy: "npm:^1.6.0"
     bytes: "npm:^3.1.2"
     chalk: "npm:4.1.2"
     chrona: "npm:^1.0.4"
     compression: "npm:^1.7.4"
+    cookie: "npm:^1.0.2"
     cookie-parser: "npm:^1.4.7"
-    cookies: "npm:^0.9.1"
     cors: "npm:^2.8.5"
     crypto-js: "npm:^4.2.0"
     debug: "npm:^4.3.6"
     dotenv: "npm:^16.4.5"
+    eventemitter3: "npm:^5.0.1"
     express: "npm:^4.19.2"
     figlet: "npm:^1.7.0"
     fs-extra: "npm:^11.2.0"
@@ -7634,7 +7647,11 @@ __metadata:
     tsconfig-paths: "npm:^4.2.0"
     typescript: "npm:^5.5.4"
     uuid: "npm:^10.0.0"
+    ws: "npm:^8.18.3"
     zod: "npm:^3.23.8"
+  dependenciesMeta:
+    bufferutil:
+      optional: true
   languageName: unknown
   linkType: soft
 
@@ -7718,6 +7735,16 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@votewise/errors@workspace:packages/common/errors"
   dependencies:
+    tsup: "npm:^8.2.4"
+    typescript: "npm:^5.5.4"
+  languageName: unknown
+  linkType: soft
+
+"@votewise/event@npm:*, @votewise/event@workspace:packages/common/event":
+  version: 0.0.0-use.local
+  resolution: "@votewise/event@workspace:packages/common/event"
+  dependencies:
+    "@votewise/types": "npm:*"
     tsup: "npm:^8.2.4"
     typescript: "npm:^5.5.4"
   languageName: unknown
@@ -9187,6 +9214,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bufferutil@npm:^4.0.9":
+  version: 4.0.9
+  resolution: "bufferutil@npm:4.0.9"
+  dependencies:
+    node-gyp: "npm:latest"
+    node-gyp-build: "npm:^4.3.0"
+  checksum: f8a93279fc9bdcf32b42eba97edc672b39ca0fe5c55a8596099886cffc76ea9dd78e0f6f51ecee3b5ee06d2d564aa587036b5d4ea39b8b5ac797262a363cdf7d
+  languageName: node
+  linkType: hard
+
 "builtins@npm:^5.0.0":
   version: 5.0.1
   resolution: "builtins@npm:5.0.1"
@@ -10447,16 +10484,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cookies@npm:^0.9.1":
-  version: 0.9.1
-  resolution: "cookies@npm:0.9.1"
-  dependencies:
-    depd: "npm:~2.0.0"
-    keygrip: "npm:~1.1.0"
-  checksum: 3ffa1c0e992b62ee119adae4dd2ddd4a89166fa5434cd9bd9ff84ec4d2f14dfe2318a601280abfe32a4f64f884ec9345fb1912e488b002d188d2efa0d3919ba3
-  languageName: node
-  linkType: hard
-
 "core-util-is@npm:~1.0.0":
   version: 1.0.3
   resolution: "core-util-is@npm:1.0.3"
@@ -11002,7 +11029,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"depd@npm:2.0.0, depd@npm:~2.0.0":
+"depd@npm:2.0.0":
   version: 2.0.0
   resolution: "depd@npm:2.0.0"
   checksum: 58bd06ec20e19529b06f7ad07ddab60e504d9e0faca4bd23079fac2d279c3594334d736508dc350e06e510aba5e22e4594483b3a6562ce7c17dd797f4cc4ad2c
@@ -16540,15 +16567,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"keygrip@npm:~1.1.0":
-  version: 1.1.0
-  resolution: "keygrip@npm:1.1.0"
-  dependencies:
-    tsscmp: "npm:1.0.6"
-  checksum: 2aceec1a1e642a0caf938044056ed67b1909cfe67a93a59b32aae2863e0f35a1a53782ecc8f9cd0e3bdb60863fa0f401ccbd257cd7dfae61915f78445139edea
-  languageName: node
-  linkType: hard
-
 "keyv@npm:^4.5.3, keyv@npm:^4.5.4":
   version: 4.5.4
   resolution: "keyv@npm:4.5.4"
@@ -18239,6 +18257,17 @@ __metadata:
     node-gyp-build-optional-packages-optional: optional.js
     node-gyp-build-optional-packages-test: build-test.js
   checksum: e0edb57358dfa8e31c26b38310ddc5ae81d19fd13b3bf095c41215dfd6a033b1269b510c3ce5e73f7a4ed3d36f101ea47716ec75be38f5e31916d185e7f18905
+  languageName: node
+  linkType: hard
+
+"node-gyp-build@npm:^4.3.0":
+  version: 4.8.4
+  resolution: "node-gyp-build@npm:4.8.4"
+  bin:
+    node-gyp-build: bin.js
+    node-gyp-build-optional: optional.js
+    node-gyp-build-test: build-test.js
+  checksum: 444e189907ece2081fe60e75368784f7782cfddb554b60123743dfb89509df89f1f29c03bbfa16b3a3e0be3f48799a4783f487da6203245fa5bed239ba7407e1
   languageName: node
   linkType: hard
 
@@ -23955,13 +23984,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsscmp@npm:1.0.6":
-  version: 1.0.6
-  resolution: "tsscmp@npm:1.0.6"
-  checksum: 2f79a9455e7e3e8071995f98cdf3487ccfc91b760bec21a9abb4d90519557eafaa37246e87c92fa8bf3fef8fd30cfd0cc3c4212bb929baa9fb62494bfa4d24b2
-  languageName: node
-  linkType: hard
-
 "tsup@npm:^8.2.4":
   version: 8.2.4
   resolution: "tsup@npm:8.2.4"
@@ -25250,6 +25272,21 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: aec4ef4eb65821a7dde7b44790f8699cfafb7978c9b080f6d7a98a7f8fc0ce674c027073a78574c94786ba7112cc90fa2cc94fc224ceba4d4b1030cff9662494
+  languageName: node
+  linkType: hard
+
+"ws@npm:^8.18.3":
+  version: 8.18.3
+  resolution: "ws@npm:8.18.3"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: eac918213de265ef7cb3d4ca348b891a51a520d839aa51cdb8ca93d4fa7ff9f6ccb339ccee89e4075324097f0a55157c89fa3f7147bde9d8d7e90335dc087b53
   languageName: node
   linkType: hard
 

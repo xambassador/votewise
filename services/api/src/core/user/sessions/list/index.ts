@@ -7,8 +7,8 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { Controller } from "./controller";
 
 export function listSessionsControllerFactory() {
-  const { sessionManager, logger } = AppContext.getInjectionTokens(["sessionManager", "logger"]);
-  const controller = new Controller({ sessionManager });
+  const { services, logger } = AppContext.getInjectionTokens(["services", "logger"]);
+  const controller = new Controller({ sessionManager: services.session });
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "list-sessions" });
   logger.info(`[${yellow("ListSessionsController")}] dependencies initialized`);

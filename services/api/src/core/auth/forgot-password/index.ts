@@ -11,23 +11,21 @@ export function forgotPasswordControllerFactory(path: string) {
   const ctx = AppContext.getInjectionTokens([
     "assert",
     "repositories",
-    "cryptoService",
-    "jwtService",
+    "services",
     "queues",
     "config",
     "plugins",
-    "sessionManager",
     "logger"
   ]);
   const controller = new Controller({
     assert: ctx.assert,
     userRepository: ctx.repositories.user,
-    cryptoService: ctx.cryptoService,
-    jwtService: ctx.jwtService,
+    cryptoService: ctx.services.crypto,
+    jwtService: ctx.services.jwt,
     tasksQueue: ctx.queues.tasksQueue,
     appUrl: ctx.config.appUrl,
     requestParser: ctx.plugins.requestParser,
-    sessionManager: ctx.sessionManager
+    sessionManager: ctx.services.session
   });
   const limiter = rateLimitMiddlewareFactory(path, {
     ...rateLimitStrategies.THREE_PER_HOUR,

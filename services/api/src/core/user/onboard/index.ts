@@ -18,8 +18,7 @@ export function onboardControllerFactory(path: string) {
     "logger",
     "cache",
     "minio",
-    "onboardService",
-    "sessionManager"
+    "services"
   ]);
   const controller = new Controller({
     assert: ctx.assert,
@@ -33,8 +32,8 @@ export function onboardControllerFactory(path: string) {
     backgroundsBucket: ctx.config.backgroundsBucket,
     postTopicRepository: ctx.repositories.postTopic,
     timelineRepository: ctx.repositories.timeline,
-    onboardService: ctx.onboardService,
-    sessionManager: ctx.sessionManager
+    onboardService: ctx.services.onboard,
+    sessionManager: ctx.services.session
   });
   const auth = authMiddlewareFactory();
   const limiter = rateLimitMiddlewareFactory(path, {

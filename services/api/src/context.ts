@@ -6,6 +6,7 @@ import logger from "@votewise/log";
 import { prisma } from "@votewise/prisma";
 
 import { Mailer } from "@/emails/mailer";
+import { EventBus } from "@/lib/event-bus";
 import { RateLimiterManager } from "@/lib/rate-limiter";
 import * as Plugins from "@/plugins";
 import * as Queues from "@/queues";
@@ -26,17 +27,13 @@ export type AppContextOptions = {
   cache: Cache;
   mailer: Mailer;
   repositories: Repositories;
-  jwtService: Services["jwt"];
-  cryptoService: Services["crypto"];
-  onboardService: Services["onboard"];
-  bucketService: Services["bucket"];
-  mlService: Services["ml"];
-  sessionManager: Services["session"];
+  services: Services;
   queues: Queue;
   assert: Assertions;
   plugins: Plugins;
   rateLimiteManager: RateLimiterManager;
   minio: Minio.Client;
+  eventBus: EventBus;
 };
 
 /**
@@ -54,17 +51,13 @@ export class AppContext {
   public cache: Cache;
   public mailer: Mailer;
   public repositories: Repositories;
-  public jwtService: Services["jwt"];
-  public cryptoService: Services["crypto"];
-  public bucketService: Services["bucket"];
-  public mlService: Services["ml"];
+  public services: Services;
   public queues: Queue;
   public assert: Assertions;
-  public sessionManager: Services["session"];
   public plugins: Plugins;
   public rateLimiteManager: RateLimiterManager;
   public minio: Minio.Client;
-  public onboardService: Services["onboard"];
+  public eventBus: EventBus;
 
   /**
    * Initializes the AppContext with the provided options. Use `AppContext.fromConfig` to create an instance
@@ -81,19 +74,15 @@ export class AppContext {
     this.db = opts.db;
     this.logger = opts.logger;
     this.environment = opts.environment;
-    this.jwtService = opts.jwtService;
     this.repositories = opts.repositories;
     this.mailer = opts.mailer;
-    this.cryptoService = opts.cryptoService;
-    this.onboardService = opts.onboardService;
-    this.bucketService = opts.bucketService;
-    this.mlService = opts.mlService;
     this.queues = opts.queues;
     this.assert = opts.assert;
-    this.sessionManager = opts.sessionManager;
     this.plugins = opts.plugins;
     this.rateLimiteManager = opts.rateLimiteManager;
     this.minio = opts.minio;
+    this.services = opts.services;
+    this.eventBus = opts.eventBus;
 
     this.logger.info(`[${yellow("AppContext")}] dependencies initialized`);
   }
@@ -118,21 +107,13 @@ export class AppContext {
     const assert = new Assertions();
     const cache = new Cache();
     const db = prisma;
-    const jwtService = new Services.JWTService({ accessTokenSecret: secrets.jwtSecret });
-    const cryptoService = new Services.CryptoService();
     const repositories = createRepositories(db);
     const mailer = new Mailer({ env: environment });
     const tasksQueue = new Queues.TasksQueue({ env: environment });
     const uploadQueue = new Queues.UploadQueue({ env: environment });
     const uploadCompletedEventQueue = new Queues.UploadCompletedEventQueue({ env: environment });
-    const sessionManager = new Services.SessionManager({
-      jwtService,
-      cache,
-      assert,
-      cryptoService,
-      sessionRepository: repositories.session,
-      accessTokenExpiration: cfg.jwt.accessTokenExpiration
-    });
+    const jwtService = new Services.JWTService({ accessTokenSecret: secrets.jwtSecret });
+    const cryptoService = new Services.CryptoService();
     const requestParser = Plugins.requestParserPluginFactory();
     const jwtPlugin = Plugins.jwtPluginFactory({ jwtService });
     const rateLimiteManager = RateLimiterManager.create();
@@ -142,6 +123,15 @@ export class AppContext {
       useSSL: false, // TODO: Get this from env
       accessKey: environment.MINIO_ACCESS_KEY,
       secretKey: environment.MINIO_SECRET_KEY
+    });
+    const eventBus = EventBus.create();
+    const sessionManager = new Services.SessionManager({
+      jwtService,
+      cache,
+      assert,
+      cryptoService,
+      sessionRepository: repositories.session,
+      accessTokenExpiration: cfg.jwt.accessTokenExpiration
     });
     const bucketService = new Services.BucketService({
       minio,
@@ -158,6 +148,7 @@ export class AppContext {
       bucketService
     });
     const mlService = new Services.MLService("http://localhost:5003"); // TODO: Move to env
+    const realtime = new Services.Realtime({ cryptoService, env: environment, jwtService, logger });
     const ctx = new AppContext({
       config: cfg,
       secrets,
@@ -165,18 +156,22 @@ export class AppContext {
       logger,
       environment,
       cache,
-      jwtService,
       mailer,
-      cryptoService,
       assert,
-      sessionManager,
       rateLimiteManager,
-      onboardService,
-      bucketService,
-      mlService,
       repositories,
+      eventBus,
       queues: { tasksQueue, uploadQueue },
       plugins: { requestParser, jwt: jwtPlugin },
+      services: {
+        bucket: bucketService,
+        crypto: cryptoService,
+        jwt: jwtService,
+        ml: mlService,
+        realtime,
+        session: sessionManager,
+        onboard: onboardService
+      },
       minio,
       ...(overrides ?? {})
     });

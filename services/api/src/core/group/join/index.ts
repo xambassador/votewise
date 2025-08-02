@@ -7,8 +7,15 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { Controller } from "./controller";
 
 export function joinGroupControllerFactory() {
-  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "logger"]);
-  const controller = new Controller({ assert: ctx.assert, groupRepository: ctx.repositories.group });
+  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "logger", "services", "eventBus"]);
+  const controller = new Controller({
+    assert: ctx.assert,
+    groupRepository: ctx.repositories.group,
+    notificationRepository: ctx.repositories.notification,
+    bucketService: ctx.services.bucket,
+    eventBus: ctx.eventBus,
+    userRepository: ctx.repositories.user
+  });
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "join-group" });
   ctx.logger.info(`[${yellow("JoinGroupController")}] dependencies initialized`);

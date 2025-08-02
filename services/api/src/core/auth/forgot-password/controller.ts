@@ -10,12 +10,12 @@ import { Minute } from "@votewise/times";
 type ControllerOptions = {
   userRepository: AppContext["repositories"]["user"];
   assert: AppContext["assert"];
-  jwtService: AppContext["jwtService"];
-  cryptoService: AppContext["cryptoService"];
+  jwtService: AppContext["services"]["jwt"];
+  cryptoService: AppContext["services"]["crypto"];
   tasksQueue: AppContext["queues"]["tasksQueue"];
   appUrl: AppContext["config"]["appUrl"];
   requestParser: AppContext["plugins"]["requestParser"];
-  sessionManager: AppContext["sessionManager"];
+  sessionManager: AppContext["services"]["session"];
 };
 
 const msg = "If the email exists, a reset link will be sent.";

@@ -8,8 +8,8 @@ import { getAuthenticateLocals } from "@/utils/locals";
 
 type ControllerOptions = {
   assert: AppContext["assert"];
-  mlService: AppContext["mlService"];
-  bucketService: AppContext["bucketService"];
+  mlService: AppContext["services"]["ml"];
+  bucketService: AppContext["services"]["bucket"];
   groupRepository: AppContext["repositories"]["group"];
 };
 

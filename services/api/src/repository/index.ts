@@ -7,6 +7,7 @@ import { FeedAssetRepository } from "./feed-asset.repository";
 import { FeedRepository } from "./feed.repository";
 import { FollowRepository } from "./follow.repository";
 import { GroupRepository } from "./group.repository";
+import { NotificationRepository } from "./notification.repository";
 import { PostTopicRepository } from "./post-topic.repository";
 import { RefreshTokenRepository } from "./refresh-token.repository";
 import { SessionRepository } from "./session.repository";
@@ -36,6 +37,7 @@ export function createRepositories(db: AppContext["db"]): Repositories {
   const postTopicRepository = new PostTopicRepository({ db });
   const groupRepository = new GroupRepository({ db });
   const commentRepository = new CommentRepository({ db });
+  const notificationRepository = new NotificationRepository({ db });
   return {
     user: userRepository,
     factor: factorRepository,
@@ -50,7 +52,8 @@ export function createRepositories(db: AppContext["db"]): Repositories {
     feedAsset: feedAssetRepository,
     postTopic: postTopicRepository,
     group: groupRepository,
-    comment: commentRepository
+    comment: commentRepository,
+    notification: notificationRepository
   };
 }
 
@@ -70,6 +73,7 @@ declare global {
     postTopic: PostTopicRepository;
     group: GroupRepository;
     comment: CommentRepository;
+    notification: NotificationRepository;
   }
 
   interface RepositoryConfig {

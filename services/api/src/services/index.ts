@@ -2,10 +2,21 @@ import { BucketService } from "./bucket.service";
 import { CryptoService } from "./crypto.service";
 import { JWTService } from "./jwt.service";
 import { MLService } from "./ml.service";
+import { NotificationService } from "./notification.service";
 import { OnboardService } from "./onboard.service";
+import { Realtime } from "./realtime.service";
 import { SessionManager } from "./session.service";
 
-export { CryptoService, JWTService, SessionManager, OnboardService, BucketService, MLService };
+export {
+  CryptoService,
+  JWTService,
+  SessionManager,
+  OnboardService,
+  BucketService,
+  MLService,
+  NotificationService,
+  Realtime
+};
 
 declare global {
   interface Services {
@@ -15,5 +26,6 @@ declare global {
     onboard: OnboardService;
     bucket: BucketService;
     ml: MLService;
+    realtime: Realtime;
   }
 }

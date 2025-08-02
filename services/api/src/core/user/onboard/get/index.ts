@@ -9,10 +9,10 @@ import { rateLimitStrategies } from "@/lib/rate-limiter";
 import { Controller } from "./controller";
 
 export function getOnboardStatusControllerFactory(path: string) {
-  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "logger", "sessionManager"]);
+  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "logger", "services"]);
   const controller = new Controller({
     userRepository: ctx.repositories.user,
-    sessionManager: ctx.sessionManager,
+    sessionManager: ctx.services.session,
     assert: ctx.assert
   });
   const auth = authMiddlewareFactory();

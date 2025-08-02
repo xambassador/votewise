@@ -8,20 +8,13 @@ import { rateLimitStrategies } from "@/lib/rate-limiter";
 import { Controller } from "./controller";
 
 export function refreshControllerFactory(path: string) {
-  const ctx = AppContext.getInjectionTokens([
-    "assert",
-    "repositories",
-    "sessionManager",
-    "jwtService",
-    "plugins",
-    "logger"
-  ]);
+  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "services", "plugins", "logger"]);
   const controller = new Controller({
     assert: ctx.assert,
     useRepository: ctx.repositories.user,
-    sessionManager: ctx.sessionManager,
+    sessionManager: ctx.services.session,
     requestParser: ctx.plugins.requestParser,
-    jwtService: ctx.jwtService,
+    jwtService: ctx.services.jwt,
     refreshTokensRepository: ctx.repositories.refreshToken
   });
   const limiter = rateLimitMiddlewareFactory(path, {
