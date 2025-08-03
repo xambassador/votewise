@@ -2,7 +2,7 @@ import type { Prisma } from "@votewise/prisma";
 
 import { BaseRepository } from "./base.repository";
 
-type TCreate = Prisma.NotificationCreateInput;
+type TCreate = Prisma.NotificationUncheckedCreateInput;
 
 export class NotificationRepository extends BaseRepository {
   private readonly db: RepositoryConfig["db"];

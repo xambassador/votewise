@@ -48,20 +48,20 @@ export class Controller {
 
     const isPrivateGroup = group.type === "PRIVATE";
 
+    const _admin = await this.ctx.groupRepository.groupMember.getAdmin(data.groupId);
+    this.ctx.assert.unprocessableEntity(!_admin, `This should not happen`);
+    const admin = _admin!;
+
+    const _me = await this.ctx.userRepository.findById(currentUserId);
+    this.ctx.assert.resourceNotFound(!_me, `User with id ${currentUserId} not found`);
+    const me = _me!;
+
     if (isPrivateGroup) {
       const isAlreadySent = await this.ctx.groupRepository.groupInvitation.findByUserWithGroup(
         currentUserId,
         data.groupId
       );
       this.ctx.assert.unprocessableEntity(!!isAlreadySent, `You have already sent a join request to this group`);
-
-      const _admin = await this.ctx.groupRepository.groupMember.getAdmin(data.groupId);
-      // A group without an admin ???? huh.. 🤔
-      this.ctx.assert.unprocessableEntity(!_admin, `This should not happen`);
-      const admin = _admin!;
-      const _me = await this.ctx.userRepository.findById(currentUserId);
-      this.ctx.assert.resourceNotFound(!_me, `User with id ${currentUserId} not found`);
-      const me = _me!;
 
       const sentAt = new Date();
       await this.ctx.groupRepository.groupInvitation.create({
@@ -71,8 +71,13 @@ export class Controller {
         user_id: currentUserId,
         sent_at: sentAt
       });
+      await this.ctx.notificationRepository.create({
+        event_id: 10, // @TODO: need to do something about this guy
+        event_type: "JOIN_GROUP_REQUEST",
+        user_id: admin.user_id
+      });
 
-      const event = new EventBuilder("groupJoinRequest").setData({
+      const event = new EventBuilder("groupJoinRequestNotification").setData({
         adminId: admin.user_id,
         avatarUrl: this.ctx.bucketService.generatePublicUrl(me.avatar_url ?? "", "avatar"),
         createdAt: sentAt,
@@ -89,6 +94,23 @@ export class Controller {
     }
 
     const member = await this.ctx.groupRepository.groupMember.addMember(data.groupId, currentUserId, "MEMBER");
+    await this.ctx.notificationRepository.create({
+      event_id: 10, // @TODO: need to do something about this guy
+      event_type: "GROUP_JOINED",
+      user_id: admin.user_id
+    });
+
+    const event = new EventBuilder("groupJoinNotification").setData({
+      adminId: admin.user_id,
+      avatarUrl: this.ctx.bucketService.generatePublicUrl(me.avatar_url ?? "", "avatar"),
+      firstName: me.first_name,
+      lastName: me.last_name,
+      groupName: group.name,
+      type: "JOIN",
+      userName: me.user_name,
+      createdAt: new Date()
+    });
+    this.ctx.eventBus.emit(event.name, event.data);
 
     const result = { id: member.id };
     return res.status(StatusCodes.CREATED).json(result) as Response<typeof result>;

@@ -22,20 +22,24 @@ export class NotificationService {
   }
 
   private listenForGroupEvents() {
-    this.eventBus.on("groupJoinRequest", (data) => {
-      const event = new EventBuilder("groupJoinRequest").setData(data).serialize(["adminId"]);
-      const sockets = this.ctx.clients.get(data.adminId);
-      if (!sockets) return;
-      sockets.forEach((client) => {
-        if (client.ws.readyState === Websocket.OPEN) {
-          client.ws.send(
-            JSON.stringify({
-              type: "NOTIFICATION_GROUP_JOIN_REQUEST",
-              data: event
-            })
-          );
-        }
-      });
+    this.eventBus.on("groupJoinRequestNotification", (data) => {
+      const event = new EventBuilder("groupJoinRequestNotification").setData(data).serialize(["adminId"]);
+      this.sendNotificationToClient(data.adminId, event);
+    });
+
+    this.eventBus.on("groupJoinNotification", (data) => {
+      const event = new EventBuilder("groupJoinNotification").setData(data).serialize(["adminId"]);
+      this.sendNotificationToClient(data.adminId, event);
+    });
+  }
+
+  private sendNotificationToClient(clientId: string, event: string) {
+    const sockets = this.ctx.clients.get(clientId);
+    if (!sockets) return;
+    sockets.forEach((client) => {
+      if (client.ws.readyState === Websocket.OPEN) {
+        client.ws.send(event);
+      }
     });
   }
 }
