@@ -191,9 +191,8 @@ export class GroupMemberRepository extends BaseRepository {
 
   public isMember(groupId: string, userId: string) {
     return this.execute(async () => {
-      // @todo: Replace this with findUnique after schema migration
-      const member = await this.db.groupMember.findFirst({
-        where: { group_id: groupId, user_id: userId },
+      const member = await this.db.groupMember.findUnique({
+        where: { user_group_unique: { user_id: userId, group_id: groupId } },
         select: { id: true }
       });
       return !!member;
@@ -226,5 +225,22 @@ export class GroupInvitationRepository extends BaseRepository {
       });
       return invitation;
     });
+  }
+
+  public findById(id: string) {
+    return this.execute(async () => this.db.groupInvitation.findUnique({ where: { id } }));
+  }
+
+  public findByUserWithGroup(userId: string, groupId: string) {
+    return this.execute(async () =>
+      this.db.groupInvitation.findUnique({
+        where: {
+          user_id_group_id: {
+            user_id: userId,
+            group_id: groupId
+          }
+        }
+      })
+    );
   }
 }

@@ -8,8 +8,8 @@ export class EventBuilder<T extends EventNames> {
     this.eventName = opts;
   }
 
-  public setData(data: EventData<T>): this {
-    this._data = data;
+  public setData(data: Omit<EventData<T>, "event">): this {
+    this._data = { ...data, event: this.eventName } as EventData<T>;
     return this;
   }
 

@@ -14,4 +14,4 @@ export type Events = {
 };
 
 export type EventNames = keyof Events;
-export type EventData<T extends EventNames> = Events[T];
+export type EventData<T extends EventNames> = Events[T] & { event: T };

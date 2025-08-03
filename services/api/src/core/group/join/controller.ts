@@ -49,6 +49,12 @@ export class Controller {
     const isPrivateGroup = group.type === "PRIVATE";
 
     if (isPrivateGroup) {
+      const isAlreadySent = await this.ctx.groupRepository.groupInvitation.findByUserWithGroup(
+        currentUserId,
+        data.groupId
+      );
+      this.ctx.assert.unprocessableEntity(!!isAlreadySent, `You have already sent a join request to this group`);
+
       const _admin = await this.ctx.groupRepository.groupMember.getAdmin(data.groupId);
       // A group without an admin ???? huh.. 🤔
       this.ctx.assert.unprocessableEntity(!_admin, `This should not happen`);
