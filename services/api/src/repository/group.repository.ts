@@ -170,6 +170,15 @@ export class GroupRepository extends BaseRepository {
       return group;
     });
   }
+
+  public getByName(name: string) {
+    return this.execute(async () => {
+      const group = await this.db.group.findUnique({
+        where: { name }
+      });
+      return group;
+    });
+  }
 }
 
 export class GroupMemberRepository extends BaseRepository {

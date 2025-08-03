@@ -399,6 +399,7 @@ model Notification {
     event_type NotificationType
     event_id   Int
     is_read    Boolean          @default(false)
+    content    Json?
 
     user_id String
     user    User   @relation(fields: [user_id], references: [id])

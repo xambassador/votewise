@@ -25,6 +25,10 @@ export class Controller {
     const { body } = this.ctx.requestParser.getParser(ZGroupCreate).parseRequest(req, res);
     const locals = getAuthenticateLocals(res);
     const { sub } = locals.payload;
+
+    const isNameTaken = await this.ctx.groupRepository.getByName(body.name);
+    this.ctx.assert.unprocessableEntity(!!isNameTaken, "Group name is already taken");
+
     const group = await this.ctx.groupRepository.create({
       name: body.name,
       about: body.description,

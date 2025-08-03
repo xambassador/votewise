@@ -1,21 +1,17 @@
 import type { AppContext } from "@/context";
 import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
+import type { Strategy } from "./strategies";
 
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-
-import { EventBuilder } from "@votewise/event";
 
 import { getAuthenticateLocals } from "@/utils/locals";
 
 type ControllerOptions = {
   assert: AppContext["assert"];
   groupRepository: AppContext["repositories"]["group"];
-  notificationRepository: AppContext["repositories"]["notification"];
-  eventBus: AppContext["eventBus"];
-  userRepository: AppContext["repositories"]["user"];
-  bucketService: AppContext["services"]["bucket"];
+  strategies: Record<"public" | "private", Strategy>;
 };
 
 const ZQuery = z.object({ groupId: z.string({ invalid_type_error: "groupId must be a string" }) });
@@ -39,83 +35,14 @@ export class Controller {
     const _group = await this.ctx.groupRepository.findById(data.groupId);
     this.ctx.assert.resourceNotFound(!_group, `Group with id ${data.groupId} not found`);
     const group = _group!;
-
-    const isAlreadyMember = await this.ctx.groupRepository.groupMember.isMember(data.groupId, currentUserId);
-    this.ctx.assert.unprocessableEntity(isAlreadyMember, "You are already a member of this group");
-
-    const isJoinable = group.status === "OPEN";
-    this.ctx.assert.unprocessableEntity(!isJoinable, "This group is not open for joining");
-
     const isPrivateGroup = group.type === "PRIVATE";
 
-    const _admin = await this.ctx.groupRepository.groupMember.getAdmin(data.groupId);
-    this.ctx.assert.unprocessableEntity(!_admin, `This should not happen`);
-    const admin = _admin!;
-
-    const _me = await this.ctx.userRepository.findById(currentUserId);
-    this.ctx.assert.resourceNotFound(!_me, `User with id ${currentUserId} not found`);
-    const me = _me!;
-
     if (isPrivateGroup) {
-      const isAlreadySent = await this.ctx.groupRepository.groupInvitation.findByUserWithGroup(
-        currentUserId,
-        data.groupId
-      );
-      this.ctx.assert.unprocessableEntity(!!isAlreadySent, `You have already sent a join request to this group`);
-
-      const sentAt = new Date();
-      const invitation = await this.ctx.groupRepository.groupInvitation.create({
-        status: "PENDING",
-        type: "JOIN",
-        group_id: data.groupId,
-        user_id: currentUserId,
-        sent_at: sentAt
-      });
-      await this.ctx.notificationRepository.create({
-        event_id: 10, // @TODO: need to do something about this guy
-        event_type: "JOIN_GROUP_REQUEST",
-        user_id: admin.user_id
-      });
-
-      const event = new EventBuilder("groupJoinRequestNotification").setData({
-        adminId: admin.user_id,
-        avatarUrl: this.ctx.bucketService.generatePublicUrl(me.avatar_url ?? "", "avatar"),
-        createdAt: sentAt,
-        firstName: me.first_name,
-        lastName: me.last_name,
-        groupName: group.name,
-        type: "JOIN",
-        userName: me.user_name,
-        groupId: data.groupId,
-        invitationId: invitation.id
-      });
-      this.ctx.eventBus.emit(event.name, event.data);
-
-      const result = { id: "PENDING" };
+      const result = await this.ctx.strategies.private.handle({ group, groupId: data.groupId, currentUserId });
       return res.status(StatusCodes.CREATED).json(result) as Response<typeof result>;
     }
 
-    const member = await this.ctx.groupRepository.groupMember.addMember(data.groupId, currentUserId, "MEMBER");
-    await this.ctx.notificationRepository.create({
-      event_id: 10, // @TODO: need to do something about this guy
-      event_type: "GROUP_JOINED",
-      user_id: admin.user_id
-    });
-
-    const event = new EventBuilder("groupJoinNotification").setData({
-      adminId: admin.user_id,
-      avatarUrl: this.ctx.bucketService.generatePublicUrl(me.avatar_url ?? "", "avatar"),
-      firstName: me.first_name,
-      lastName: me.last_name,
-      groupName: group.name,
-      type: "JOIN",
-      userName: me.user_name,
-      createdAt: new Date(),
-      groupId: data.groupId
-    });
-    this.ctx.eventBus.emit(event.name, event.data);
-
-    const result = { id: member.id };
+    const result = await this.ctx.strategies.public.handle({ group, groupId: data.groupId, currentUserId });
     return res.status(StatusCodes.CREATED).json(result) as Response<typeof result>;
   }
 }
