@@ -64,7 +64,7 @@ export class Controller {
       this.ctx.assert.unprocessableEntity(!!isAlreadySent, `You have already sent a join request to this group`);
 
       const sentAt = new Date();
-      await this.ctx.groupRepository.groupInvitation.create({
+      const invitation = await this.ctx.groupRepository.groupInvitation.create({
         status: "PENDING",
         type: "JOIN",
         group_id: data.groupId,
@@ -85,7 +85,9 @@ export class Controller {
         lastName: me.last_name,
         groupName: group.name,
         type: "JOIN",
-        userName: me.user_name
+        userName: me.user_name,
+        groupId: data.groupId,
+        invitationId: invitation.id
       });
       this.ctx.eventBus.emit(event.name, event.data);
 
@@ -108,7 +110,8 @@ export class Controller {
       groupName: group.name,
       type: "JOIN",
       userName: me.user_name,
-      createdAt: new Date()
+      createdAt: new Date(),
+      groupId: data.groupId
     });
     this.ctx.eventBus.emit(event.name, event.data);
 
@@ -117,4 +120,4 @@ export class Controller {
   }
 }
 
-export type JoinGroupControllerResponse = ExtractControllerResponse<Controller>;
+export type JoinGroupResponse = ExtractControllerResponse<Controller>;

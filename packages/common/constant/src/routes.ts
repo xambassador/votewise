@@ -213,7 +213,11 @@ export const groups = {
     /** Create a new group */
     create: (base: string) => base + "/groups",
     /** Join group */
-    join: (base: string) => base + "/groups/:groupId/join"
+    join: (base: string) => base + "/groups/:groupId/join",
+    /** Get group by ID */
+    get: (base: string) => base + "/groups/:groupId",
+    /** Invite a user to join the group */
+    invite: (base: string) => base + "/groups/:groupId/invite/:username"
   },
   runtime: {
     /** Get all groups */
@@ -223,6 +227,29 @@ export const groups = {
     /** Create a new group */
     create: (base: string) => base + "/groups",
     /** Join group */
-    join: (base: string, groupId: string) => base + `/groups/${groupId}/join`
+    join: (base: string, groupId: string) => base + `/groups/${groupId}/join`,
+    /** Get group by ID */
+    get: (base: string, groupId: string) => base + `/groups/${groupId}`,
+    /** Invite a user to join the group */
+    invite: (base: string, groupId: string, username: string) => base + `/groups/${groupId}/invite/${username}`
+  }
+};
+
+export const notifications = {
+  paths: {
+    /** Get all notifications for the user */
+    all: (base: string) => base + "/notifications",
+    /** Mark all notifications as read */
+    markAllAsRead: (base: string) => base + "/notifications/mark-all-as-read",
+    /** Mark a notification as read */
+    markAsRead: (base: string) => base + "/notifications/:id/mark-as-read"
+  },
+  runtime: {
+    /** Get all notifications for the user */
+    all: (base: string) => base + "/notifications",
+    /** Mark all notifications as read */
+    markAllAsRead: (base: string) => base + "/notifications/mark-all-as-read",
+    /** Mark a notification as read */
+    markAsRead: (base: string, id: string) => base + `/notifications/${id}/mark-as-read`
   }
 };

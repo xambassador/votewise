@@ -207,6 +207,15 @@ export class GroupMemberRepository extends BaseRepository {
       return admin;
     });
   }
+
+  public whatIsMyRole(groupId: string, userId: string) {
+    return this.execute(async () =>
+      this.db.groupMember.findUnique({
+        where: { user_group_unique: { user_id: userId, group_id: groupId } },
+        select: { role: true }
+      })
+    );
+  }
 }
 
 export class GroupInvitationRepository extends BaseRepository {

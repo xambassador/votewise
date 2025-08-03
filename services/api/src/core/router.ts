@@ -24,6 +24,7 @@ import { createFollowControllerFactory } from "./follow/create";
 import { deleteFollowControllerFactory } from "./follow/delete";
 import { createGroupControllerFactory } from "./group/create";
 import { getAllGroupsControllerFactory } from "./group/get-all";
+import { sendGroupInviteControllerFactory } from "./group/invite";
 import { joinGroupControllerFactory } from "./group/join";
 import { getMyGroupsControllerFactory } from "./group/my-groups";
 import { getGroupRecommendationsControllerFactory } from "./recommendation/group";
@@ -95,6 +96,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.post(follow.paths.followUser(path), ...createFollowControllerFactory());
   router.post(groups.paths.create(path), ...createGroupControllerFactory());
   router.post(groups.paths.join(path), ...joinGroupControllerFactory());
+  router.post(groups.paths.invite(path), ...sendGroupInviteControllerFactory());
 
   /* ----------------------------------------------------------------------------------------------- */
   router.put(comments.paths.update(path), ...updateCommentControllerFactory());

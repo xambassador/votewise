@@ -31,6 +31,11 @@ export class NotificationService {
       const event = new EventBuilder("groupJoinNotification").setData(data).serialize(["adminId"]);
       this.sendNotificationToClient(data.adminId, event);
     });
+
+    this.eventBus.on("groupInviteNotification", (data) => {
+      const event = new EventBuilder("groupInviteNotification").setData(data).serialize();
+      this.sendNotificationToClient(data.invitedUserId, event);
+    });
   }
 
   private sendNotificationToClient(clientId: string, event: string) {
