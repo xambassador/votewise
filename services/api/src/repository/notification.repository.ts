@@ -21,4 +21,13 @@ export class NotificationRepository extends BaseRepository {
       return notification;
     });
   }
+
+  public async findByUserId(userId: string) {
+    return this.execute(async () => {
+      const notifications = await this.db.notification.findMany({
+        where: { user_id: userId }
+      });
+      return notifications;
+    });
+  }
 }

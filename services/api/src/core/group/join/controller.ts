@@ -35,7 +35,13 @@ export class Controller {
     const _group = await this.ctx.groupRepository.findById(data.groupId);
     this.ctx.assert.resourceNotFound(!_group, `Group with id ${data.groupId} not found`);
     const group = _group!;
+
+    const isJoinable = group.status === "OPEN";
     const isPrivateGroup = group.type === "PRIVATE";
+    this.ctx.assert.unprocessableEntity(!isJoinable, "This group is not open for joining");
+
+    const isAlreadyMember = await this.ctx.groupRepository.groupMember.isMember(data.groupId, currentUserId);
+    this.ctx.assert.unprocessableEntity(isAlreadyMember, "You are already a member of this group");
 
     if (isPrivateGroup) {
       const result = await this.ctx.strategies.private.handle({ group, groupId: data.groupId, currentUserId });

@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { auth, comments, feeds, follow, groups, topics, user } from "@votewise/constant/routes";
+import { auth, comments, feeds, follow, groups, notifications, topics, user } from "@votewise/constant/routes";
 
 import { forgotPasswordControllerFactory } from "./auth/forgot-password";
 import { getVerificationSessionControllerFactory } from "./auth/get-verification-session";
@@ -27,6 +27,7 @@ import { getAllGroupsControllerFactory } from "./group/get-all";
 import { sendGroupInviteControllerFactory } from "./group/invite";
 import { joinGroupControllerFactory } from "./group/join";
 import { getMyGroupsControllerFactory } from "./group/my-groups";
+import { getNotificationsControllerFactory } from "./notification/get-all";
 import { getGroupRecommendationsControllerFactory } from "./recommendation/group";
 import { getRecommendateUserControllerFactory } from "./recommendation/user";
 import { getAllTopicsControllerFactory } from "./topics/get-all";
@@ -76,6 +77,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.get(comments.paths.getReplies(path), ...getRepliesControllerFactory());
   router.get(groups.paths.all(path), ...getAllGroupsControllerFactory());
   router.get(groups.paths.myGroups(path), ...getMyGroupsControllerFactory());
+  router.get(notifications.paths.all(path), ...getNotificationsControllerFactory());
 
   /* ----------------------------------------------------------------------------------------------- */
   router.post(auth.paths.register(path), ...registerControllerFactory(auth.paths.register(path)));

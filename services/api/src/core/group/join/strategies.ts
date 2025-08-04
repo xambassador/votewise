@@ -23,11 +23,6 @@ export abstract class Strategy {
 
   public abstract handle(data: { group: Group; groupId: string; currentUserId: string }): Promise<Result>;
 
-  protected async isAlreadyMember(groupId: string, userId: string) {
-    const isAlreadyMember = await this.ctx.groupRepository.groupMember.isMember(groupId, userId);
-    this.ctx.assert.unprocessableEntity(isAlreadyMember, "You are already a member of this group");
-  }
-
   protected async getAdmin(groupId: string) {
     const _admin = await this.ctx.groupRepository.groupMember.getAdmin(groupId);
     this.ctx.assert.unprocessableEntity(!_admin, `This should not happen`);
@@ -47,9 +42,6 @@ export class PublicGroupStrategy extends Strategy {
   }
 
   public override async handle(data: { group: Group; groupId: string; currentUserId: string }): Promise<Result> {
-    await this.isAlreadyMember(data.groupId, data.currentUserId);
-    const isJoinable = data.group.status === "OPEN";
-    this.ctx.assert.unprocessableEntity(!isJoinable, "This group is not open for joining");
     const admin = await this.getAdmin(data.groupId);
     const user = await this.getUser(data.currentUserId);
     const member = await this.ctx.groupRepository.groupMember.addMember(data.groupId, data.currentUserId, "MEMBER");
@@ -89,9 +81,6 @@ export class PrivateGroupStrategy extends Strategy {
   }
 
   public override async handle(data: { group: Group; groupId: string; currentUserId: string }): Promise<Result> {
-    await this.isAlreadyMember(data.groupId, data.currentUserId);
-    const isJoinable = data.group.status === "OPEN";
-    this.ctx.assert.unprocessableEntity(!isJoinable, "This group is not open for joining");
     const admin = await this.getAdmin(data.groupId);
     const user = await this.getUser(data.currentUserId);
     const isAlreadySent = await this.ctx.groupRepository.groupInvitation.findByUserWithGroup(
