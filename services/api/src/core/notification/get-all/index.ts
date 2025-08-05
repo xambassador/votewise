@@ -7,8 +7,19 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { Controller } from "./controller";
 
 export function getNotificationsControllerFactory() {
-  const { assert, repositories, logger } = AppContext.getInjectionTokens(["assert", "repositories", "logger"]);
-  const controller = new Controller({ assert, notificationRepository: repositories.notification });
+  const { assert, repositories, logger, services } = AppContext.getInjectionTokens([
+    "assert",
+    "repositories",
+    "logger",
+    "services"
+  ]);
+  const controller = new Controller({
+    assert,
+    notificationRepository: repositories.notification,
+    bucketService: services.bucket,
+    groupRepository: repositories.group,
+    userRepository: repositories.user
+  });
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "get-notification" });
   logger.info(`[${yellow("GetNotificationsController")}] dependencies initialized`);

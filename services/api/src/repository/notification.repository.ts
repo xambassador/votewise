@@ -1,8 +1,11 @@
+import type { NotificationContent } from "@/lib/notification-builder";
 import type { Prisma } from "@votewise/prisma";
 
 import { BaseRepository } from "./base.repository";
 
-type TCreate = Prisma.NotificationUncheckedCreateInput;
+type TCreate = Omit<Prisma.NotificationUncheckedCreateInput, "content"> & {
+  content: NotificationContent;
+};
 
 export class NotificationRepository extends BaseRepository {
   private readonly db: RepositoryConfig["db"];
@@ -25,7 +28,9 @@ export class NotificationRepository extends BaseRepository {
   public async findByUserId(userId: string) {
     return this.execute(async () => {
       const notifications = await this.db.notification.findMany({
-        where: { user_id: userId }
+        where: { user_id: userId },
+        orderBy: { created_at: "desc" },
+        take: 10
       });
       return notifications;
     });

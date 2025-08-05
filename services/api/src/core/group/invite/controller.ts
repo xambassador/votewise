@@ -45,14 +45,7 @@ export class Controller {
     const member = await this.getUser(username);
     await this.isAlreadyMember(groupId, member.id);
     await this.isAlreadyInvited(groupId, member.id, member.user_name);
-    const { invitation } = await this.sendInvitation(groupId, member.id, {
-      groupName: group.name,
-      avatarUrl: this.ctx.bucketService.generatePublicUrl(currentUserDetails.avatar_url || "", "avatar"),
-      firstName: currentUserDetails.first_name,
-      lastName: currentUserDetails.last_name,
-      userName: currentUserDetails.user_name,
-      invitedUserId: member.id
-    });
+    const { invitation } = await this.sendInvitation(groupId, member.id, currentUserDetails.id);
 
     const event = new EventBuilder("groupInviteNotification").setData({
       groupId,
@@ -126,18 +119,7 @@ export class Controller {
     }
   }
 
-  private async sendInvitation(
-    groupId: string,
-    userId: string,
-    data: {
-      groupName: string;
-      avatarUrl: string;
-      firstName: string;
-      lastName: string;
-      userName: string;
-      invitedUserId: string;
-    }
-  ) {
+  private async sendInvitation(groupId: string, userId: string, currentUserId: string) {
     const invitation = await this.ctx.groupRepository.groupInvitation.create({
       group_id: groupId,
       user_id: userId,
@@ -149,9 +131,10 @@ export class Controller {
       event_type: "GROUP_INVITATION",
       user_id: userId,
       content: {
+        type: "GROUP_INVITATION",
         groupId,
         invitationId: invitation.id,
-        ...data
+        userId: currentUserId
       }
     });
     return { invitation, notification };

@@ -50,13 +50,9 @@ export class PublicGroupStrategy extends Strategy {
       event_type: "GROUP_JOINED",
       user_id: admin.user_id,
       content: {
-        groupId: data.groupId,
-        groupName: data.group.name,
-        userName: user.user_name,
-        firstName: user.first_name,
-        lastName: user.last_name,
-        userId: user.id,
-        avatarUrl: this.ctx.bucketService.generatePublicUrl(user.avatar_url ?? "", "avatar")
+        type: "GROUP_JOINED",
+        joinedUserId: user.id,
+        groupId: data.groupId
       }
     });
     const event = new EventBuilder("groupJoinNotification").setData({
@@ -101,14 +97,10 @@ export class PrivateGroupStrategy extends Strategy {
       event_type: "JOIN_GROUP_REQUEST",
       user_id: admin.user_id,
       content: {
+        type: "GROUP_JOIN_REQUEST",
         groupId: data.groupId,
-        groupName: data.group.name,
-        userName: user.user_name,
-        firstName: user.first_name,
-        lastName: user.last_name,
-        userId: user.id,
-        avatarUrl: this.ctx.bucketService.generatePublicUrl(user.avatar_url ?? "", "avatar"),
-        invitationId: invitation.id
+        invitationId: invitation.id,
+        userId: user.id
       }
     });
     const event = new EventBuilder("groupJoinRequestNotification").setData({
