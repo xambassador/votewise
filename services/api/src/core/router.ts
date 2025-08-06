@@ -28,6 +28,7 @@ import { sendGroupInviteControllerFactory } from "./group/invite";
 import { joinGroupControllerFactory } from "./group/join";
 import { getMyGroupsControllerFactory } from "./group/my-groups";
 import { getNotificationsControllerFactory } from "./notification/get-all";
+import { markReadNotificationControllerFactory } from "./notification/mark-read";
 import { getGroupRecommendationsControllerFactory } from "./recommendation/group";
 import { getRecommendateUserControllerFactory } from "./recommendation/user";
 import { getAllTopicsControllerFactory } from "./topics/get-all";
@@ -107,6 +108,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.patch(auth.paths.verify(path), ...verifyControllerFactory(auth.paths.verify(path)));
   router.patch(auth.paths.resetPassword(path), ...resetPasswordControllerFactory(auth.paths.resetPassword(path)));
   router.patch(user.paths.onboard.update(path), ...onboardControllerFactory(user.paths.onboard.update(path)));
+  router.patch(notifications.paths.markAsRead(path), ...markReadNotificationControllerFactory());
 
   /* ----------------------------------------------------------------------------------------------- */
   router.delete(auth.paths.logout(path), ...logoutControllerFactory());

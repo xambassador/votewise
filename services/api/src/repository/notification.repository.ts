@@ -35,4 +35,23 @@ export class NotificationRepository extends BaseRepository {
       return notifications;
     });
   }
+
+  public async findById(id: string) {
+    return this.execute(async () => {
+      const notification = await this.db.notification.findUnique({
+        where: { id }
+      });
+      return notification;
+    });
+  }
+
+  public async markAsRead(id: string) {
+    return this.execute(async () => {
+      const notification = await this.db.notification.update({
+        where: { id },
+        data: { is_read: true }
+      });
+      return notification;
+    });
+  }
 }
