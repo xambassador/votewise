@@ -217,7 +217,9 @@ export const groups = {
     /** Get group by ID */
     get: (base: string) => base + "/groups/:groupId",
     /** Invite a user to join the group */
-    invite: (base: string) => base + "/groups/:groupId/invite/:username"
+    invite: (base: string) => base + "/groups/:groupId/invite/:username",
+    /** Leave the group */
+    leave: (base: string) => base + "/groups/:groupId/leave"
   },
   runtime: {
     /** Get all groups */
@@ -231,7 +233,9 @@ export const groups = {
     /** Get group by ID */
     get: (base: string, groupId: string) => base + `/groups/${groupId}`,
     /** Invite a user to join the group */
-    invite: (base: string, groupId: string, username: string) => base + `/groups/${groupId}/invite/${username}`
+    invite: (base: string, groupId: string, username: string) => base + `/groups/${groupId}/invite/${username}`,
+    /** Leave the group */
+    leave: (base: string, groupId: string) => base + `/groups/${groupId}/leave`
   }
 };
 

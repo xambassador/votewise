@@ -225,6 +225,15 @@ export class GroupMemberRepository extends BaseRepository {
       })
     );
   }
+
+  public leaveGroup(groupId: string, userId: string) {
+    return this.execute(async () => {
+      const member = await this.db.groupMember.delete({
+        where: { user_group_unique: { user_id: userId, group_id: groupId } }
+      });
+      return member;
+    });
+  }
 }
 
 export class GroupInvitationRepository extends BaseRepository {

@@ -32,3 +32,4 @@ export type { JoinGroupResponse } from "@/core/group/join/controller";
 export type { SendGroupInviteResponse } from "@/core/group/invite/controller";
 export type { GetAllNotificationsResponse } from "@/core/notification/get-all/controller";
 export type { MarkNotificationReadResponse } from "@/core/notification/mark-read/controller";
+export type { LeaveGroupResponse } from "@/core/group/leave/controller";

@@ -58,7 +58,7 @@
     },
     // shared
     {
-      "path": "./packages/ui"
+      "path": "./packages/client"
     },
     {
       "path": "./packages/prisma"
@@ -67,13 +67,28 @@
       "path": "./packages/schemas"
     },
     {
-      "path": "./packages/common/env"
+      "path": "./packages/ui"
+    },
+    {
+      "path": "./packages/common/constant"
+    },
+    {
+      "path": "./packages/common/crypto"
     },
     {
       "path": "./packages/common/debug"
     },
     {
+      "path": "./packages/common/env"
+    },
+    {
       "path": "./packages/common/errors"
+    },
+    {
+      "path": "./packages/common/event"
+    },
+    {
+      "path": "./packages/common/jwt"
     },
     {
       "path": "./packages/common/log"
