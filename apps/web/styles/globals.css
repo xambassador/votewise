@@ -149,6 +149,10 @@ html {
   .focus-danger {
     @apply focus:border-red-500 focus:ring-red-500/30;
   }
+
+  .overlay {
+    @apply bg-nobelBlack-50/80 animate-in fade-in-0 fixed inset-0 z-50 backdrop-blur-sm;
+  }
 }
 
 @layer components {
