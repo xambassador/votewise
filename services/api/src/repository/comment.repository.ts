@@ -107,6 +107,10 @@ export class CommentRepository extends BaseRepository {
       })
     );
   }
+
+  public delete(id: string) {
+    return this.execute(async () => this.db.comment.delete({ where: { id } }));
+  }
 }
 
 class ReplyRepository extends BaseRepository {

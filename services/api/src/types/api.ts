@@ -22,6 +22,7 @@ export type { GetGroupRecommendationsResponse } from "@/core/recommendation/grou
 export type { GetCommentsResponse } from "@/core/comment/get-all/controller";
 export type { CreateCommentResponse } from "@/core/comment/create/controller";
 export type { GetRepliesResponse } from "@/core/comment/get-replies/controller";
+export type { DeleteCommentResponse } from "@/core/comment/delete/controller";
 export type { FollowResponse } from "@/core/follow/create/controller";
 export type { UnFollowResponse } from "@/core/follow/delete/controller";
 export type { UpdateCommentResponse } from "@/core/comment/update/controller";

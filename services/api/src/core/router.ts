@@ -14,6 +14,7 @@ import { resetPasswordControllerFactory } from "./auth/reset-password";
 import { singinControllerFactory } from "./auth/signin";
 import { verifyControllerFactory } from "./auth/verify";
 import { createCommentControllerFactory } from "./comment/create";
+import { deleteCommentControllerFactory } from "./comment/delete";
 import { getCommentsControllerFactory } from "./comment/get-all";
 import { getRepliesControllerFactory } from "./comment/get-replies";
 import { updateCommentControllerFactory } from "./comment/update";
@@ -115,6 +116,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.delete(auth.paths.logout(path), ...logoutControllerFactory());
   router.delete(follow.paths.unfollowUser(path), ...deleteFollowControllerFactory());
   router.delete(groups.paths.leave(path), ...leaveGroupControllerFactory());
+  router.delete(comments.paths.delete(path), ...deleteCommentControllerFactory());
 
   return router;
 }

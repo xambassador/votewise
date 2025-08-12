@@ -1,5 +1,6 @@
 import type {
   CreateCommentResponse,
+  DeleteCommentResponse,
   GetCommentsResponse,
   GetRepliesResponse,
   UpdateCommentResponse
@@ -44,6 +45,11 @@ export class Comment {
       comments.runtime.update("", feedId, id),
       data
     );
+    return res;
+  }
+
+  public async delete(feedId: string, commentId: string) {
+    const res = await this.client.delete<DeleteCommentResponse>(comments.runtime.delete("", feedId, commentId));
     return res;
   }
 }

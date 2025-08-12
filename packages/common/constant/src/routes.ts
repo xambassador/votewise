@@ -174,7 +174,9 @@ export const comments = {
     /** Get replies */
     getReplies: (base: string) => base + "/feeds/:feedId/comments/:commentId/replies",
     /** Update comment */
-    update: (base: string) => base + "/feeds/:feedId/comments/:commentId"
+    update: (base: string) => base + "/feeds/:feedId/comments/:commentId",
+    /** Delete comment */
+    delete: (base: string) => base + "/feeds/:feedId/comments/:commentId"
   },
   runtime: {
     /** Get all comments for a feed */
@@ -185,7 +187,9 @@ export const comments = {
     getReplies: (base: string, feedId: string, commentId: string) =>
       base + `/feeds/${feedId}/comments/${commentId}/replies`,
     /** Update comment */
-    update: (base: string, feedId: string, commentId: string) => base + `/feeds/${feedId}/comments/${commentId}`
+    update: (base: string, feedId: string, commentId: string) => base + `/feeds/${feedId}/comments/${commentId}`,
+    /** Delete comment */
+    delete: (base: string, feedId: string, commentId: string) => base + `/feeds/${feedId}/comments/${commentId}`
   }
 };
 
