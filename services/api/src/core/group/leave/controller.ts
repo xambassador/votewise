@@ -24,7 +24,7 @@ export class Controller {
   }
 
   public async handle(req: Request, res: Response) {
-    const query = ZQuery.safeParse(req.query);
+    const query = ZQuery.safeParse(req.params);
     this.ctx.assert.unprocessableEntity(!query.success, "Invalid request");
     const { groupId } = query.data!;
     const locals = getAuthenticateLocals(res);

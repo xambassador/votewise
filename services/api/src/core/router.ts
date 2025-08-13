@@ -24,6 +24,7 @@ import { getAllFeedControllerFactory } from "./feed/get-all";
 import { createFollowControllerFactory } from "./follow/create";
 import { deleteFollowControllerFactory } from "./follow/delete";
 import { createGroupControllerFactory } from "./group/create";
+import { getGroupControllerFactory } from "./group/get";
 import { getAllGroupsControllerFactory } from "./group/get-all";
 import { sendGroupInviteControllerFactory } from "./group/invite";
 import { joinGroupControllerFactory } from "./group/join";
@@ -80,6 +81,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.get(comments.paths.getReplies(path), ...getRepliesControllerFactory());
   router.get(groups.paths.all(path), ...getAllGroupsControllerFactory());
   router.get(groups.paths.myGroups(path), ...getMyGroupsControllerFactory());
+  router.get(groups.paths.get(path), ...getGroupControllerFactory());
   router.get(notifications.paths.all(path), ...getNotificationsControllerFactory());
 
   /* ----------------------------------------------------------------------------------------------- */

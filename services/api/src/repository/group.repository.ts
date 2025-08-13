@@ -217,6 +217,26 @@ export class GroupMemberRepository extends BaseRepository {
     });
   }
 
+  public getAdminDetails(groupId: string) {
+    return this.execute(async () => {
+      const admin = await this.db.groupMember.findFirst({
+        where: { group_id: groupId, role: "ADMIN" },
+        include: {
+          user: {
+            select: {
+              id: true,
+              user_name: true,
+              first_name: true,
+              last_name: true,
+              avatar_url: true
+            }
+          }
+        }
+      });
+      return admin;
+    });
+  }
+
   public whatIsMyRole(groupId: string, userId: string) {
     return this.execute(async () =>
       this.db.groupMember.findUnique({

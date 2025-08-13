@@ -31,6 +31,7 @@ export type { GetMyGroupsResponse } from "@/core/group/my-groups/controller";
 export type { CreateGroupResponse } from "@/core/group/create/controller";
 export type { JoinGroupResponse } from "@/core/group/join/controller";
 export type { SendGroupInviteResponse } from "@/core/group/invite/controller";
+export type { GetGroupResponse } from "@/core/group/get/controller";
 export type { GetAllNotificationsResponse } from "@/core/notification/get-all/controller";
 export type { MarkNotificationReadResponse } from "@/core/notification/mark-read/controller";
 export type { LeaveGroupResponse } from "@/core/group/leave/controller";
