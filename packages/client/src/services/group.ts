@@ -4,6 +4,7 @@ import type {
   GetGroupResponse,
   GetMyGroupsResponse,
   JoinGroupResponse,
+  KickMemberResponse,
   LeaveGroupResponse,
   SendGroupInviteResponse
 } from "@votewise/api";
@@ -66,6 +67,12 @@ export class Group {
   public async invite(id: string, username: string) {
     const path = groups.runtime.invite("", id, username);
     const response = await this.client.post<SendGroupInviteResponse, object>(path, {});
+    return response;
+  }
+
+  public async kick(id: string, username: string) {
+    const path = groups.runtime.kick("", id, username);
+    const response = await this.client.delete<KickMemberResponse>(path);
     return response;
   }
 }

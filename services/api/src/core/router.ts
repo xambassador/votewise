@@ -28,6 +28,7 @@ import { getGroupControllerFactory } from "./group/get";
 import { getAllGroupsControllerFactory } from "./group/get-all";
 import { sendGroupInviteControllerFactory } from "./group/invite";
 import { joinGroupControllerFactory } from "./group/join";
+import { kickMemberControllerFactory } from "./group/kick";
 import { leaveGroupControllerFactory } from "./group/leave";
 import { getMyGroupsControllerFactory } from "./group/my-groups";
 import { getNotificationsControllerFactory } from "./notification/get-all";
@@ -118,6 +119,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.delete(auth.paths.logout(path), ...logoutControllerFactory());
   router.delete(follow.paths.unfollowUser(path), ...deleteFollowControllerFactory());
   router.delete(groups.paths.leave(path), ...leaveGroupControllerFactory());
+  router.delete(groups.paths.kick(path), ...kickMemberControllerFactory());
   router.delete(comments.paths.delete(path), ...deleteCommentControllerFactory());
 
   return router;

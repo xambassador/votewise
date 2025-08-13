@@ -124,7 +124,7 @@ export class GroupRepository extends BaseRepository {
     const offset = (page - 1) * limit;
     return this.execute(() =>
       this.db.group.findMany({
-        where: { members: { some: { user_id: userId } } },
+        where: { members: { some: { user_id: userId, is_removed: false } } },
         select: {
           id: true,
           name: true,
@@ -146,7 +146,9 @@ export class GroupRepository extends BaseRepository {
                   avatar_url: true
                 }
               }
-            }
+            },
+            orderBy: { created_at: "desc" },
+            take: 5
           },
           _count: { select: { members: true } }
         },
@@ -250,6 +252,16 @@ export class GroupMemberRepository extends BaseRepository {
     return this.execute(async () => {
       const member = await this.db.groupMember.delete({
         where: { user_group_unique: { user_id: userId, group_id: groupId } }
+      });
+      return member;
+    });
+  }
+
+  public kick(groupId: string, userId: string) {
+    return this.execute(async () => {
+      const member = await this.db.groupMember.update({
+        where: { user_group_unique: { user_id: userId, group_id: groupId } },
+        data: { is_removed: true }
       });
       return member;
     });
