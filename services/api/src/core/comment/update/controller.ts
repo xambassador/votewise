@@ -3,6 +3,7 @@ import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
+import { z } from "zod";
 
 import { ZCommentUpdate } from "@votewise/schemas/comment";
 
@@ -15,6 +16,8 @@ type ControllerOptions = {
   requestParser: AppContext["plugins"]["requestParser"];
 };
 
+const ZQuery = z.object({ feedId: z.string(), commentId: z.string() });
+
 export class Controller {
   private readonly ctx: ControllerOptions;
 
@@ -26,11 +29,9 @@ export class Controller {
     const locals = getAuthenticateLocals(res);
     const { body } = this.ctx.requestParser.getParser(ZCommentUpdate).parseRequest(req, res);
     const currentUserId = locals.payload.sub;
-    const feedId = req.params.feedId as string;
-    const commentId = req.params.commentId as string;
-
-    this.ctx.assert.badRequest(typeof feedId !== "string", "Invalid feed ID provided");
-    this.ctx.assert.badRequest(typeof commentId !== "string", "Invalid comment ID provided");
+    const validate = ZQuery.safeParse(req.params);
+    this.ctx.assert.unprocessableEntity(!validate.success, "Invalid request");
+    const { commentId, feedId } = validate.data!;
 
     const _comment = await this.ctx.commentRepository.findById(commentId);
     this.ctx.assert.resourceNotFound(!_comment, "Comment not found");

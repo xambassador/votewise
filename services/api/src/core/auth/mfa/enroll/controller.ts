@@ -35,7 +35,6 @@ export class Controller {
 
     const _user = await this.ctx.userRepository.findById(payload.sub);
     this.ctx.assert.resourceNotFound(!_user, USER_NOT_FOUND_MSG, USER_NOT_FOUND);
-
     const user = _user!;
 
     const userHasTOTPFactor = await this.ctx.factorRepository.findByUserIdAndType(user.id, "TOTP");

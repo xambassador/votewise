@@ -3,6 +3,7 @@ import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
+import { z } from "zod";
 
 import { PAGINATION } from "@votewise/constant";
 import { ZPagination } from "@votewise/schemas";
@@ -16,6 +17,11 @@ type ControllerOptions = {
   assert: AppContext["assert"];
 };
 
+const ZQuery = z.object({
+  feedId: z.string(),
+  commentId: z.string()
+});
+
 export class Controller {
   private readonly ctx: ControllerOptions;
 
@@ -24,12 +30,11 @@ export class Controller {
   }
 
   public async handle(req: Request, res: Response) {
-    const feedId = req.params.feedId as string;
-    const commentId = req.params.commentId as string;
-    const isParamsValid = typeof feedId !== "string" || typeof commentId !== "string";
-    this.ctx.assert.badRequest(isParamsValid, "Invalid parameters provided");
+    const validate = ZQuery.safeParse(req.params);
+    this.ctx.assert.unprocessableEntity(!validate.success, "Invalid request");
     const schema = ZPagination.safeParse(req.query);
     this.ctx.assert.unprocessableEntity(!schema.success, "Invalid query");
+    const { feedId, commentId } = validate.data!;
     const query = schema.data!;
     const { page } = query;
     const limit = query.limit < 1 ? PAGINATION.comments.reply.limit : query.limit;

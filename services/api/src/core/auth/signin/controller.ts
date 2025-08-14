@@ -76,7 +76,7 @@ export class Controller {
 
     const session = this.ctx.sessionManager.create({
       subject: user.id,
-      aal: "aal1", // This will always be aal1, because user has not completed the MFA yet or if they dont have any MFA
+      aal: "aal1", // This will always be aal1, because user has not completed the MFA yet or if they dent have any MFA
       amr: [{ method: "password", timestamp: Date.now() }],
       email: user.email,
       role: "user",
@@ -84,12 +84,14 @@ export class Controller {
       appMetaData: { provider: "email", providers: ["email"] }
     });
 
-    await this.ctx.sessionManager.save(session.sessionId, { ip, userAgent, aal, userId: user.id });
-    await this.ctx.refreshTokenRepository.create({ token: session.refreshToken, userId: user.id });
-    await this.ctx.sessionManager.saveOnboardStatus(user.id, user.is_onboarded ? "ONBOARDED" : "NOT_ONBOARDED");
+    await Promise.all([
+      this.ctx.sessionManager.save(session.sessionId, { ip, userAgent, aal, userId: user.id }),
+      this.ctx.refreshTokenRepository.create({ token: session.refreshToken, userId: user.id }),
+      this.ctx.sessionManager.saveOnboardStatus(user.id, user.is_onboarded ? "ONBOARDED" : "NOT_ONBOARDED")
+    ]);
 
     const lastLogin = new Date();
-    await this.ctx.userRepository.update(user.id, { last_login: lastLogin });
+    this.ctx.userRepository.update(user.id, { last_login: lastLogin });
 
     const { accessToken, refreshToken } = COOKIE_KEYS;
     res.cookie(

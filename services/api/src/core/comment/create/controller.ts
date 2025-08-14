@@ -3,6 +3,7 @@ import type { ExtractControllerResponse } from "@/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
+import { z } from "zod";
 
 import { ERROR_CODES } from "@votewise/constant";
 import { ZCommentCreate } from "@votewise/schemas/comment";
@@ -16,6 +17,8 @@ type ControllerOptions = {
   requestParser: AppContext["plugins"]["requestParser"];
 };
 
+const ZQuery = z.object({ feedId: z.string() });
+
 export class Controller {
   private readonly ctx: ControllerOptions;
 
@@ -24,15 +27,22 @@ export class Controller {
   }
 
   public async handle(req: Request, res: Response) {
+    const validate = ZQuery.safeParse(req.params);
+    this.ctx.assert.unprocessableEntity(!validate.success, "Invalid request");
+    const query = validate.data!;
+    const feedId = query.feedId;
+
     const locals = getAuthenticateLocals(res);
     const { body } = this.ctx.requestParser.getParser(ZCommentCreate).parseRequest(req, res);
     const currentUserId = locals.payload.sub;
-    const feedId = req.params.feedId as string;
-    this.ctx.assert.badRequest(typeof feedId !== "string", "Invalid feed ID provided");
 
     const _feed = await this.ctx.feedRepository.findById(feedId);
     this.ctx.assert.resourceNotFound(!_feed, `Feed with ID ${feedId} not found`, ERROR_CODES.FEED.FEED_NOT_FOUND);
-    const feed = _feed!;
+
+    if (body.parent_id) {
+      const parent = await this.ctx.commentRepository.findById(body.parent_id);
+      this.ctx.assert.resourceNotFound(!parent, `Parent comment with ID ${body.parent_id} not found`);
+    }
 
     // TODO: Check if the current user is allowed to comment on this feed.
     // this.ctx.permissions.assert.canCommentOnFeed(currentUserId, feed.id)
@@ -42,7 +52,7 @@ export class Controller {
     const comment = await this.ctx.commentRepository.create({
       text: body.text,
       parentId: body.parent_id,
-      postId: feed.id,
+      postId: feedId,
       userId: currentUserId
     });
 
