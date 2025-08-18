@@ -1,3 +1,5 @@
+import type { TransactionCtx } from "./transaction";
+
 import { BaseRepository } from "./base.repository";
 
 export class PostTopicRepository extends BaseRepository {
@@ -8,17 +10,19 @@ export class PostTopicRepository extends BaseRepository {
     this.db = cfg.db;
   }
 
-  public create(data: { postId: string; topicId: string }) {
+  public create(data: { postId: string; topicId: string }, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () =>
-      this.db.postTopic.create({
+      db.postTopic.create({
         data: { post_id: data.postId, topic_id: data.topicId }
       })
     );
   }
 
-  public createMany(data: { postId: string; topicId: string }[]) {
+  public createMany(data: { postId: string; topicId: string }[], tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () =>
-      this.db.postTopic.createMany({
+      db.postTopic.createMany({
         data: data.map((item) => ({
           post_id: item.postId,
           topic_id: item.topicId

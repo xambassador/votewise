@@ -1,4 +1,5 @@
 import type { Prisma } from "@votewise/prisma";
+import type { TransactionCtx } from "./transaction";
 
 import { BaseRepository } from "./base.repository";
 
@@ -19,9 +20,10 @@ export class FactorRepository extends BaseRepository {
     this.db = cfg.db;
   }
 
-  public create(data: TCreate) {
+  public create(data: TCreate, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      const factor = await this.db.factor.create({
+      const factor = await db.factor.create({
         data: {
           user_id: data.userId,
           factor_type: data.factorType,
@@ -42,9 +44,10 @@ export class FactorRepository extends BaseRepository {
     });
   }
 
-  public verifyFactor(id: string) {
+  public verifyFactor(id: string, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      const factor = await this.db.factor.update({ where: { id }, data: { status: "VERIFIED" } });
+      const factor = await db.factor.update({ where: { id }, data: { status: "VERIFIED" } });
       return factor;
     });
   }

@@ -13,6 +13,7 @@ import { RefreshTokenRepository } from "./refresh-token.repository";
 import { SessionRepository } from "./session.repository";
 import { TimelineRepository } from "./timeline.repository";
 import { TopicRepository } from "./topic.repository";
+import { TransactionManager } from "./transaction";
 import { UserInterestRepository } from "./user-interest.repository";
 import { UserRepository } from "./user.repository";
 
@@ -38,6 +39,7 @@ export function createRepositories(db: AppContext["db"]): Repositories {
   const groupRepository = new GroupRepository({ db });
   const commentRepository = new CommentRepository({ db });
   const notificationRepository = new NotificationRepository({ db });
+  const transactionManager = new TransactionManager({ db });
   return {
     user: userRepository,
     factor: factorRepository,
@@ -53,7 +55,8 @@ export function createRepositories(db: AppContext["db"]): Repositories {
     postTopic: postTopicRepository,
     group: groupRepository,
     comment: commentRepository,
-    notification: notificationRepository
+    notification: notificationRepository,
+    transactionManager
   };
 }
 
@@ -74,6 +77,7 @@ declare global {
     group: GroupRepository;
     comment: CommentRepository;
     notification: NotificationRepository;
+    transactionManager: TransactionManager;
   }
 
   interface RepositoryConfig {

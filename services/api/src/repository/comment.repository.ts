@@ -1,3 +1,5 @@
+import type { TransactionCtx } from "./transaction";
+
 import { PAGINATION } from "@votewise/constant";
 
 import { BaseRepository } from "./base.repository";
@@ -76,9 +78,10 @@ export class CommentRepository extends BaseRepository {
     );
   }
 
-  public create(data: TCommentCreate) {
+  public create(data: TCommentCreate, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () =>
-      this.db.comment.create({
+      db.comment.create({
         data: {
           text: data.text,
           post_id: data.postId,
@@ -90,9 +93,10 @@ export class CommentRepository extends BaseRepository {
     );
   }
 
-  public update(data: TCommentUpdate) {
+  public update(data: TCommentUpdate, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () =>
-      this.db.comment.update({
+      db.comment.update({
         where: { id: data.commentId, user_id: data.userId },
         data: { text: data.text }
       })
@@ -108,8 +112,9 @@ export class CommentRepository extends BaseRepository {
     );
   }
 
-  public delete(id: string) {
-    return this.execute(async () => this.db.comment.delete({ where: { id } }));
+  public delete(id: string, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
+    return this.execute(async () => db.comment.delete({ where: { id } }));
   }
 }
 

@@ -1,3 +1,5 @@
+import type { TransactionCtx } from "./transaction";
+
 import { BaseRepository } from "./base.repository";
 
 /* ----------------------------------------------------------------------------------------------- */
@@ -16,9 +18,10 @@ export class ChallengeRepository extends BaseRepository {
     this.db = cfg.db;
   }
 
-  public create(data: TCreate) {
+  public create(data: TCreate, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      const challenge = await this.db.challenge.create({
+      const challenge = await db.challenge.create({
         data: {
           ip: data.ip,
           factor_id: data.factor_id,
@@ -36,9 +39,10 @@ export class ChallengeRepository extends BaseRepository {
     });
   }
 
-  public verifyChallenge(id: string) {
+  public verifyChallenge(id: string, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      const challenge = await this.db.challenge.update({ data: { verified_at: new Date() }, where: { id } });
+      const challenge = await db.challenge.update({ data: { verified_at: new Date() }, where: { id } });
       return challenge;
     });
   }

@@ -1,3 +1,5 @@
+import type { TransactionCtx } from "./transaction";
+
 import { BaseRepository } from "./base.repository";
 
 type TCreate = {
@@ -17,9 +19,10 @@ export class SessionRepository extends BaseRepository {
     this.db = cfg.db;
   }
 
-  public create(data: TCreate) {
+  public create(data: TCreate, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      const session = await this.db.session.create({
+      const session = await db.session.create({
         data: {
           user_id: data.userId,
           factor_id: data.factorId,
@@ -40,15 +43,17 @@ export class SessionRepository extends BaseRepository {
     });
   }
 
-  public delete(id: string) {
+  public delete(id: string, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      await this.db.session.delete({ where: { id } });
+      await db.session.delete({ where: { id } });
     });
   }
 
-  public update(id: string, data: Partial<TCreate>) {
+  public update(id: string, data: Partial<TCreate>, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      await this.db.session.update({
+      await db.session.update({
         where: { id },
         data: { aal: data.aal, factor_id: data.factorId, user_agent: data.userAgent, user_id: data.userId, ip: data.ip }
       });
@@ -62,9 +67,10 @@ export class SessionRepository extends BaseRepository {
     });
   }
 
-  public clearByUserId(userId: string) {
+  public clearByUserId(userId: string, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      await this.db.session.deleteMany({ where: { user_id: userId } });
+      await db.session.deleteMany({ where: { user_id: userId } });
     });
   }
 }

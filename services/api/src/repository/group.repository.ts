@@ -1,5 +1,6 @@
 import type { Prisma } from "@votewise/prisma";
 import type { GroupMemberRole, GroupStatus } from "@votewise/prisma/client";
+import type { TransactionCtx } from "./transaction";
 
 import { BaseRepository } from "./base.repository";
 
@@ -159,9 +160,10 @@ export class GroupRepository extends BaseRepository {
     );
   }
 
-  public create(data: CreateGroup) {
+  public create(data: CreateGroup, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      const group = await this.db.group.create({
+      const group = await db.group.create({
         data: {
           about: data.about,
           name: data.name,
@@ -191,9 +193,10 @@ export class GroupMemberRepository extends BaseRepository {
     this.db = cfg.db;
   }
 
-  public addMember(groupId: string, userId: string, role: GroupMemberRole) {
+  public addMember(groupId: string, userId: string, role: GroupMemberRole, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      const member = await this.db.groupMember.create({
+      const member = await db.groupMember.create({
         data: { group_id: groupId, user_id: userId, role }
       });
       return member;
@@ -248,18 +251,20 @@ export class GroupMemberRepository extends BaseRepository {
     );
   }
 
-  public leaveGroup(groupId: string, userId: string) {
+  public leaveGroup(groupId: string, userId: string, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      const member = await this.db.groupMember.delete({
+      const member = await db.groupMember.delete({
         where: { user_group_unique: { user_id: userId, group_id: groupId } }
       });
       return member;
     });
   }
 
-  public kick(groupId: string, userId: string) {
+  public kick(groupId: string, userId: string, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      const member = await this.db.groupMember.update({
+      const member = await db.groupMember.update({
         where: { user_group_unique: { user_id: userId, group_id: groupId } },
         data: { is_removed: true }
       });
@@ -276,9 +281,10 @@ export class GroupInvitationRepository extends BaseRepository {
     this.db = cfg.db;
   }
 
-  public create(data: CreateGroupInvitation) {
+  public create(data: CreateGroupInvitation, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      const invitation = await this.db.groupInvitation.create({
+      const invitation = await db.groupInvitation.create({
         data,
         select: { id: true }
       });

@@ -1,3 +1,5 @@
+import type { TransactionCtx } from "./transaction";
+
 import { BaseRepository } from "./base.repository";
 
 export class FollowRepository extends BaseRepository {
@@ -8,9 +10,10 @@ export class FollowRepository extends BaseRepository {
     this.db = cfg.db;
   }
 
-  public create(followerId: string, followedId: string) {
+  public create(followerId: string, followedId: string, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      const follow = await this.db.follow.create({
+      const follow = await db.follow.create({
         data: {
           follower_id: followerId,
           following_id: followedId
@@ -60,7 +63,8 @@ export class FollowRepository extends BaseRepository {
     });
   }
 
-  public delete(id: string) {
-    return this.execute(async () => this.db.follow.delete({ where: { id } }));
+  public delete(id: string, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
+    return this.execute(async () => db.follow.delete({ where: { id } }));
   }
 }

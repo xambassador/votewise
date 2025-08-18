@@ -1,3 +1,5 @@
+import type { TransactionCtx } from "./transaction";
+
 import { BaseRepository } from "./base.repository";
 
 type TTimelineCreate = {
@@ -13,9 +15,10 @@ export class TimelineRepository extends BaseRepository {
     this.db = cfg.db;
   }
 
-  public createMany(timeline: TTimelineCreate[]) {
+  public createMany(timeline: TTimelineCreate[], tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      await this.db.timeline.createMany({ data: timeline });
+      await db.timeline.createMany({ data: timeline });
     });
   }
 

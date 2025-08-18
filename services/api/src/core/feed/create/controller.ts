@@ -18,6 +18,7 @@ type ControllerOptions = {
   postTopicRepository: AppContext["repositories"]["postTopic"];
   topicRepository: AppContext["repositories"]["topic"];
   assert: AppContext["assert"];
+  transaction: AppContext["repositories"]["transactionManager"];
 };
 
 export class Controller {
@@ -33,32 +34,38 @@ export class Controller {
 
     const today = Date.now();
     const slug = slugify(body.title + " " + today);
-    const feed = await this.ctx.feedRepository.create({
-      authorId: locals.payload.sub,
-      type: body.type!,
-      content: body.content,
-      title: body.title,
-      slug,
-      status: body.status!
-    });
-
     const validTopicsPromises = body.topics.map((topic) => this.ctx.topicRepository.findById(topic));
     const validTopics = await Promise.all(validTopicsPromises);
     const invalidTopics = validTopics.filter((topic) => topic === null);
     const invalidMessage = body.topics.length > 1 ? "Invalid topics provided" : "Invalid topic provided";
     this.ctx.assert.unprocessableEntity(invalidTopics.length > 0, invalidMessage);
 
-    const topicsToCreate = body.topics.map((topic) => ({ postId: feed.id, topicId: topic }));
-    await this.ctx.postTopicRepository.createMany(topicsToCreate);
+    const { feed } = await this.ctx.transaction.withTransaction(async (tx) => {
+      const feed = await this.ctx.feedRepository.create(
+        {
+          authorId: locals.payload.sub,
+          type: body.type!,
+          content: body.content,
+          title: body.title,
+          slug,
+          status: body.status!
+        },
+        tx
+      );
 
-    if (body.assets && body.assets.length > 0) {
-      const assets = body.assets.map((asset) => ({
-        post_id: feed.id,
-        type: asset.type,
-        url: asset.url
-      }));
-      await this.ctx.feedAsset.createMany(assets);
-    }
+      const topicsToCreate = body.topics.map((topic) => ({ postId: feed.id, topicId: topic }));
+      await this.ctx.postTopicRepository.createMany(topicsToCreate, tx);
+
+      if (body.assets && body.assets.length > 0) {
+        const assets = body.assets.map((asset) => ({
+          post_id: feed.id,
+          type: asset.type,
+          url: asset.url
+        }));
+        await this.ctx.feedAsset.createMany(assets, tx);
+      }
+      return { feed };
+    });
 
     const followers = await this.ctx.followRepository.findByFollowingId(locals.payload.sub);
     const timelines = followers.map((follower) => ({

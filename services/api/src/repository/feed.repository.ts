@@ -1,4 +1,5 @@
 import type { PostStatus, PostType } from "@votewise/prisma/client";
+import type { TransactionCtx } from "./transaction";
 
 import { BaseRepository } from "./base.repository";
 
@@ -19,9 +20,10 @@ export class FeedRepository extends BaseRepository {
     this.db = cfg.db;
   }
 
-  public create(data: TCreate) {
+  public create(data: TCreate, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      const feed = await this.db.post.create({
+      const feed = await db.post.create({
         data: {
           content: data.content,
           slug: data.slug,

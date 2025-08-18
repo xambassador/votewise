@@ -1,3 +1,5 @@
+import type { TransactionCtx } from "./transaction";
+
 import { BaseRepository } from "./base.repository";
 
 type TCreate = {
@@ -14,9 +16,10 @@ export class FeedAssetRepository extends BaseRepository {
     this.db = cfg.db;
   }
 
-  public create(data: TCreate) {
+  public create(data: TCreate, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      await this.db.postAsset.create({
+      await db.postAsset.create({
         data: {
           type: data.type,
           url: data.url,
@@ -26,9 +29,10 @@ export class FeedAssetRepository extends BaseRepository {
     });
   }
 
-  public createMany(data: TCreate[]) {
+  public createMany(data: TCreate[], tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      await this.db.postAsset.createMany({
+      await db.postAsset.createMany({
         data: data.map((item) => ({
           type: item.type,
           url: item.url,

@@ -1,4 +1,5 @@
 import type { Prisma } from "@votewise/prisma";
+import type { TransactionCtx } from "./transaction";
 
 import { BaseRepository } from "./base.repository";
 
@@ -13,9 +14,10 @@ export class UserRepository extends BaseRepository {
     this.db = cfg.db;
   }
 
-  public create(data: TCreate) {
+  public create(data: TCreate, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      const user = await this.db.user.create({ data });
+      const user = await db.user.create({ data });
       return user;
     });
   }
@@ -41,16 +43,18 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  public update(id: string, data: TUpdate) {
+  public update(id: string, data: TUpdate, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      const user = await this.db.user.update({ where: { id }, data });
+      const user = await db.user.update({ where: { id }, data });
       return user;
     });
   }
 
-  public updateByEmail(email: string, data: TUpdate) {
+  public updateByEmail(email: string, data: TUpdate, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      const user = await this.db.user.update({ where: { email }, data });
+      const user = await db.user.update({ where: { email }, data });
       return user;
     });
   }

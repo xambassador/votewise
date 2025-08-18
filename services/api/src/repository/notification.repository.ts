@@ -1,5 +1,6 @@
 import type { NotificationContent } from "@/lib/notification-builder";
 import type { Prisma } from "@votewise/prisma";
+import type { TransactionCtx } from "./transaction";
 
 import { BaseRepository } from "./base.repository";
 
@@ -15,9 +16,10 @@ export class NotificationRepository extends BaseRepository {
     this.db = cfg.db;
   }
 
-  public create(data: TCreate) {
+  public create(data: TCreate, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      const notification = await this.db.notification.create({
+      const notification = await db.notification.create({
         data,
         select: { id: true }
       });
@@ -45,9 +47,10 @@ export class NotificationRepository extends BaseRepository {
     });
   }
 
-  public async markAsRead(id: string) {
+  public async markAsRead(id: string, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(async () => {
-      const notification = await this.db.notification.update({
+      const notification = await db.notification.update({
         where: { id },
         data: { is_read: true }
       });

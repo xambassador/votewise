@@ -1,3 +1,5 @@
+import type { TransactionCtx } from "./transaction";
+
 import { BaseRepository } from "./base.repository";
 
 export class UserInterestRepository extends BaseRepository {
@@ -8,17 +10,19 @@ export class UserInterestRepository extends BaseRepository {
     this.db = cfg.db;
   }
 
-  public async create(userId: string, topics: string[]) {
+  public async create(userId: string, topics: string[], tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(() =>
-      this.db.userInterests.createMany({
+      db.userInterests.createMany({
         data: topics.map((topic) => ({ topic_id: topic, user_id: userId }))
       })
     );
   }
 
-  public async delete(userId: string, topics: string[]) {
+  public async delete(userId: string, topics: string[], tx?: TransactionCtx) {
+    const db = tx ?? this.db;
     return this.execute(() =>
-      this.db.userInterests.deleteMany({
+      db.userInterests.deleteMany({
         where: {
           user_id: userId,
           topic_id: { in: topics }
