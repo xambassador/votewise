@@ -31,7 +31,11 @@ const meta = {
         <Comment>
           <Avatar className="size-8">
             <AvatarFallback name="John doe" />
-            <AvatarImage src={getRandomImage().url} alt={getRandomImage().name} />
+            <AvatarImage
+              src={getRandomImage().url}
+              alt={getRandomImage().name}
+              className="overflow-clip-margin-unset"
+            />
           </Avatar>
           <CommentContent>
             <CommentHeader>
@@ -49,7 +53,11 @@ const meta = {
               <Comment>
                 <Avatar className="size-8">
                   <AvatarFallback name="John doe" />
-                  <AvatarImage src={getRandomImage().url} alt={getRandomImage().name} />
+                  <AvatarImage
+                    src={getRandomImage().url}
+                    alt={getRandomImage().name}
+                    className="overflow-clip-margin-unset"
+                  />
                 </Avatar>
                 <CommentContent>
                   <CommentHeader>

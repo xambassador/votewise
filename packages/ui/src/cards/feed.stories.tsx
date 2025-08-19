@@ -64,7 +64,7 @@ const meta = {
         <div className="flex gap-2">
           <Avatar className="size-12">
             <AvatarFallback name="John doe" />
-            <AvatarImage src={getRandomImage().url} alt="John doe" />
+            <AvatarImage src={getRandomImage().url} alt="John doe" className="overflow-clip-margin-unset" />
           </Avatar>
           <FeedContent>
             <FeedHeader>
@@ -95,7 +95,7 @@ const meta = {
               {voters.map((voter, index) => (
                 <Avatar key={index} className="size-6" isOnline={voter.isOnline}>
                   <AvatarFallback name="John doe" />
-                  <AvatarImage src={voter.url} />
+                  <AvatarImage src={voter.url} className="overflow-clip-margin-unset" />
                 </Avatar>
               ))}
             </Voters>
@@ -125,7 +125,7 @@ export const Voted: Story = {
         <div className="flex gap-2">
           <Avatar className="size-12">
             <AvatarFallback name="John doe" />
-            <AvatarImage src={getRandomImage().url} alt="John doe" />
+            <AvatarImage src={getRandomImage().url} alt="John doe" className="overflow-clip-margin-unset" />
           </Avatar>
           <FeedContent>
             <FeedHeader>
@@ -157,7 +157,7 @@ export const Voted: Story = {
               {voters.map((voter, index) => (
                 <Avatar key={index} className="size-6" isOnline={voter.isOnline}>
                   <AvatarFallback name="John doe" />
-                  <AvatarImage src={voter.url} />
+                  <AvatarImage src={voter.url} className="overflow-clip-margin-unset" />
                 </Avatar>
               ))}
             </Voters>

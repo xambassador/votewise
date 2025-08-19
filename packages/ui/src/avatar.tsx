@@ -12,7 +12,7 @@ export const Avatar = forwardRef<AvatarRef, AvatarProps>(({ className, isOnline,
   <AvatarPrimitive.Root
     ref={ref}
     className={cn(
-      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-red-200 bg-nobelBlack-100",
+      "flex h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-red-200 bg-nobelBlack-100",
       isOnline && "border-green-600",
       className
     )}

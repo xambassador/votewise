@@ -48,7 +48,11 @@ export function GroupMolecule(props: Props) {
           <Link className="focus-visible" href={routes.user.profile(author?.id || "")}>
             <Avatar>
               <AvatarFallback name={author?.first_name + " " + author?.last_name} />
-              <AvatarImage src={author?.avatar_url} alt={author?.first_name + " " + author?.last_name} />
+              <AvatarImage
+                src={author?.avatar_url}
+                alt={author?.first_name + " " + author?.last_name}
+                className="overflow-clip-margin-unset"
+              />
             </Avatar>
           </Link>
           <div className="flex flex-col">
@@ -69,7 +73,11 @@ export function GroupMolecule(props: Props) {
           {group.members.map((member) => (
             <Avatar className="size-6" key={member.id}>
               <AvatarFallback name={member.first_name + " " + member.last_name} />
-              <AvatarImage src={member.avatar_url} alt={member.first_name + " " + member.last_name} />
+              <AvatarImage
+                src={member.avatar_url}
+                alt={member.first_name + " " + member.last_name}
+                className="overflow-clip-margin-unset"
+              />
             </Avatar>
           ))}
           {group.total_members - group.members.length > 0 && (

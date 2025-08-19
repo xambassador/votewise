@@ -188,7 +188,7 @@ export function VoteLabel(props: React.HTMLAttributes<HTMLSpanElement> & { isVot
 }
 
 export function VotersStack(props: React.HTMLAttributes<HTMLDivElement>) {
-  return <div {...props} className={cn("flex items-center gap-1 relative", props.className)} />;
+  return <div {...props} className={cn("flex items-center gap-1", props.className)} />;
 }
 
 export function Voters(props: React.HTMLAttributes<HTMLDivElement>) {

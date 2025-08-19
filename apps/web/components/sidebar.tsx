@@ -36,7 +36,7 @@ export function Sidebar(props: Props) {
         <div className="pl-2 pr-1">
           <Avatar>
             <AvatarFallback name={name} />
-            <AvatarImage className="object-cover" src={avatarUrl} alt={name} />
+            <AvatarImage className="object-cover overflow-clip-margin-unset" src={avatarUrl} alt={name} />
           </Avatar>
         </div>
         <div className="flex flex-col gap-8">

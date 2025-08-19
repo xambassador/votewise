@@ -11,7 +11,7 @@ import { useCreatePostDialog } from "./store";
 const LazyCreatePostDialog = dynamic(() => import("./lazy-dialog").then((mod) => mod.LazyCreatePostDialog), {
   ssr: false,
   loading: () => (
-    <div className="at-max-viewport overlay grid place-items-center">
+    <div className="at-max-viewport overlay grid place-items-center fixed inset-0">
       <Spinner />
     </div>
   )

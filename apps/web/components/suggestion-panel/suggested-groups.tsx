@@ -47,7 +47,11 @@ async function SuggestedGroupsList() {
             <div className="flex-1 flex gap-1">
               <Avatar className="rounded size-10">
                 <AvatarFallback name={group.author ? group.author.first_name + group.author.last_name : ""} />
-                <AvatarImage src={group.author?.avatar_url || ""} alt={group.author?.first_name} />
+                <AvatarImage
+                  src={group.author?.avatar_url || ""}
+                  alt={group.author?.first_name}
+                  className="overflow-clip-margin-unset"
+                />
               </Avatar>
               <div className="flex flex-col">
                 <SuggestedGroupCard.GroupName>{group.name}</SuggestedGroupCard.GroupName>

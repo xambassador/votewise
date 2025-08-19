@@ -49,7 +49,7 @@ export default function Page(props: Props) {
                 <AvatarImage
                   src={feed.author.avatar_url || ""}
                   alt={feed.author.first_name + " " + feed.author.last_name}
-                  className="object-cover"
+                  className="object-cover overflow-clip-margin-unset"
                 />
               </Avatar>
             </Link>
@@ -85,7 +85,11 @@ export default function Page(props: Props) {
                   {feed.voters.map((voter) => (
                     <Avatar className="size-8" key={voter.id}>
                       <AvatarFallback name="Jane Smith" />
-                      <AvatarImage src={voter.avatar_url || ""} alt="Voter" className="object-cover" />
+                      <AvatarImage
+                        src={voter.avatar_url || ""}
+                        alt="Voter"
+                        className="object-cover overflow-clip-margin-unset"
+                      />
                     </Avatar>
                   ))}
                 </Voters>

@@ -186,7 +186,7 @@ const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
       <Link href={routes.user.profile(userId)} className="focus-visible h-fit">
         <Avatar className="size-8">
           <AvatarFallback name={name} />
-          <AvatarImage src={avatarUrl || ""} alt={name} className="object-cover" />
+          <AvatarImage src={avatarUrl || ""} alt={name} className="object-cover overflow-clip-margin-unset" />
         </Avatar>
       </Link>
       <CommentContent>

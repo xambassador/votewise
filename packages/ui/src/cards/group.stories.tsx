@@ -37,7 +37,7 @@ const meta = {
         <GroupAuthor>
           <Avatar>
             <AvatarFallback name="Amelia olla" />
-            <AvatarImage src={getRandomImage().url} />
+            <AvatarImage src={getRandomImage().url} className="overflow-clip-margin-unset" />
           </Avatar>
           <div className="flex flex-col">
             <GroupAuthorName>Amelia Olla</GroupAuthorName>
@@ -51,7 +51,7 @@ const meta = {
           {images.slice(0, 5).map((image) => (
             <Avatar key={image.id} className="size-6">
               <AvatarFallback name={image.name} />
-              <AvatarImage src={image.url} />
+              <AvatarImage src={image.url} className="overflow-clip-margin-unset" />
             </Avatar>
           ))}
           <FloatingCounter className="size-7 text-xs -right-4">+{images.length}</FloatingCounter>
@@ -84,7 +84,7 @@ export const MyGroupCard: Story = {
         <GroupAuthor>
           <Avatar>
             <AvatarFallback name="Amelia olla" />
-            <AvatarImage src={getRandomImage().url} />
+            <AvatarImage src={getRandomImage().url} className="overflow-clip-margin-unset" />
           </Avatar>
           <div className="flex flex-col">
             <GroupAuthorName>Amelia Olla</GroupAuthorName>
@@ -98,7 +98,7 @@ export const MyGroupCard: Story = {
           {images.slice(0, 5).map((image) => (
             <Avatar key={image.id} className="size-6">
               <AvatarFallback name={image.name} />
-              <AvatarImage src={image.url} />
+              <AvatarImage src={image.url} className="overflow-clip-margin-unset" />
             </Avatar>
           ))}
           <FloatingCounter className="size-7 text-xs -right-4">+{images.length}</FloatingCounter>
