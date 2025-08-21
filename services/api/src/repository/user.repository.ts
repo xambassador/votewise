@@ -77,4 +77,14 @@ export class UserRepository extends BaseRepository {
   }
 
   public delete() {}
+
+  public getRemainingVotes(userId: string) {
+    return this.execute(async () => {
+      const user = await this.db.user.findUnique({
+        where: { id: userId },
+        select: { vote_bucket: true }
+      });
+      return user?.vote_bucket ?? 0;
+    });
+  }
 }

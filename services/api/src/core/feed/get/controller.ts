@@ -22,12 +22,18 @@ export class Controller {
   }
 
   public async handle(req: Request, res: Response) {
-    const locals = getAuthenticateLocals(res);
     const id = req.params.id as string;
-    this.ctx.assert.badRequest(typeof id !== "string", "Invalid id provided");
+    this.ctx.assert.badRequest(typeof id !== "string", "Invalid request");
+
+    const locals = getAuthenticateLocals(res);
+    const currentUserId = locals.payload.sub;
+
     const _feed = await this.ctx.feedRepository.findById(id);
     this.ctx.assert.resourceNotFound(!_feed, `Feed with id ${id} not found`, ERROR_CODES.FEED.FEED_NOT_FOUND);
     const feed = _feed!;
+
+    const isVotedByMe = await this.ctx.feedRepository.isVoted(currentUserId, feed.id);
+
     const result = {
       id: feed.id,
       title: feed.title,
@@ -42,6 +48,7 @@ export class Controller {
       ...(feed.author.id === locals.payload.sub ? { is_self: true } : {}),
       upvote_count: feed._count.upvotes,
       comment_count: feed._count.comments,
+      is_voted: isVotedByMe ? true : false,
       voters: feed.upvotes.map((v) => ({
         id: v.user.id,
         avatar_url: v.user.avatar_url

@@ -2,7 +2,7 @@
 
 import type { VariantProps } from "class-variance-authority";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cva } from "class-variance-authority";
 
 import { cn } from "./cn";
@@ -19,11 +19,17 @@ export type VoteProviderProps = React.HTMLAttributes<HTMLDivElement> & { count?:
 export type VoteButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   isVoted?: boolean;
   showCount?: boolean;
+  loading?: boolean;
 };
 
 export function VoteProvider(props: VoteProviderProps) {
   const { count: defaultCount, children, ...rest } = props;
   const [count, setCount] = useState(defaultCount || 0);
+
+  useEffect(() => {
+    setCount(defaultCount || 0);
+  }, [defaultCount]);
+
   return (
     <Provider count={count} setCount={setCount}>
       <div
@@ -67,8 +73,10 @@ const voted = <span className="text-transparent bg-clip-text bg-gradient-to-r fr
 
 export function VoteButton(props: VoteButtonProps) {
   const { setCount, count } = useVoteButton("VoteButton");
-  const { children, className, isVoted: _isVoted = false, onClick, showCount = false, ...rest } = props;
+  const { children, className, isVoted: _isVoted, onClick, showCount = false, loading, disabled, ...rest } = props;
   const [isVoted, setIsVoted] = useState(_isVoted);
+  const isControlled = typeof _isVoted !== "undefined" && typeof onClick !== "undefined";
+  const isDisabled = disabled || loading;
 
   if (isVoted) {
     return (
@@ -83,7 +91,12 @@ export function VoteButton(props: VoteButtonProps) {
   return (
     <button
       {...rest}
+      disabled={isDisabled}
       onClick={(e) => {
+        if (isControlled) {
+          onClick?.(e);
+          return;
+        }
         setCount(count + 1);
         setIsVoted(true);
         onClick?.(e);
@@ -97,7 +110,8 @@ export function VoteButton(props: VoteButtonProps) {
         )
       }
     >
-      {children}
+      {loading && "Voting..."}
+      {!loading && children}
     </button>
   );
 }

@@ -55,6 +55,8 @@ export function buildUser(overrides: Partial<User> = {}): User {
     banned_until: null,
     email_confirmation_sent_at: null,
     email_confirmed_at: null,
+    last_bucket_reset_at: null,
+    vote_bucket: 10,
     ...overrides
   };
 }

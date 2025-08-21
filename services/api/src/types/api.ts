@@ -11,6 +11,7 @@ export type { VerifyEmailResponse } from "@/core/auth/verify/controller";
 export type { CreateFeedResponse } from "@/core/feed/create/controller";
 export type { GetAllFeedsResponse } from "@/core/feed/get-all/controller";
 export type { GetFeedResponse } from "@/core/feed/get/controller";
+export type { VoteResponse } from "@/core/feed/vote/controller";
 export type { GetAllTopicsResponse } from "@/core/topics/get-all/controller";
 export type { UsernameExistsResponse } from "@/core/user/exists/controller";
 export type { OnboardUserResponse } from "@/core/user/onboard/controller";

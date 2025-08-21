@@ -118,6 +118,8 @@ model User {
     email_confirmed_at         DateTime?
     email_confirmation_sent_at DateTime?
     banned_until               DateTime?
+    vote_bucket                Int       @default(10)
+    last_bucket_reset_at       DateTime?
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -231,8 +233,6 @@ model PostAsset {
 }
 
 model Upvote {
-    id String @id @default(cuid())
-
     post_id String
     post    Post   @relation(fields: [post_id], references: [id])
 
@@ -241,12 +241,15 @@ model Upvote {
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
+
+    @@unique([post_id, user_id], name: "post_user_unique")
 }
 
 model Comment {
-    id        String  @id @default(cuid())
-    text      String  @db.VarChar(300)
-    parent_id String?
+    id          String  @id @default(cuid())
+    text        String  @db.VarChar(300)
+    parent_id   String?
+    appreciated Boolean @default(false)
 
     post_id String
     post    Post   @relation(fields: [post_id], references: [id])
@@ -263,6 +266,7 @@ model Comment {
     upvotes CommentUpvote[]
 
     @@index([post_id])
+    @@index([user_id])
 }
 
 model CommentUpvote {

@@ -80,4 +80,25 @@ export class FeedRepository extends BaseRepository {
       })
     );
   }
+
+  public isVoted(userId: string, feedId: string) {
+    return this.execute(() =>
+      this.db.upvote.findUnique({
+        where: { post_user_unique: { post_id: feedId, user_id: userId } }
+      })
+    );
+  }
+
+  public vote(userId: string, feedId: string, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
+    return this.execute(async () => {
+      const upvote = await db.upvote.create({
+        data: {
+          post_id: feedId,
+          user_id: userId
+        }
+      });
+      return upvote;
+    });
+  }
 }

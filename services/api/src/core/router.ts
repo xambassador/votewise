@@ -21,6 +21,7 @@ import { updateCommentControllerFactory } from "./comment/update";
 import { createFeedControllerFactory } from "./feed/create";
 import { getFeedControllerFactory } from "./feed/get";
 import { getAllFeedControllerFactory } from "./feed/get-all";
+import { voteControllerFactory } from "./feed/vote";
 import { createFollowControllerFactory } from "./follow/create";
 import { deleteFollowControllerFactory } from "./follow/delete";
 import { createGroupControllerFactory } from "./group/create";
@@ -100,6 +101,7 @@ export function moduleRouterFactory(basePath: string): Router {
     ...verifyChallengeControllerFactory(auth.paths.factors.verifyFactor(path))
   );
   router.post(feeds.paths.create(path), ...createFeedControllerFactory(feeds.paths.create(path)));
+  router.post(feeds.paths.vote(path), ...voteControllerFactory(feeds.paths.vote(path)));
   router.post(comments.paths.create(path), ...createCommentControllerFactory(path));
   router.post(follow.paths.followUser(path), ...createFollowControllerFactory());
   router.post(groups.paths.create(path), ...createGroupControllerFactory());

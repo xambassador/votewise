@@ -122,7 +122,9 @@ export const feeds = {
     /** Get feed */
     get: (base: string) => base + "/feeds/:id",
     /** Create a new feed */
-    create: (base: string) => base + "/feeds"
+    create: (base: string) => base + "/feeds",
+    /** Vote on feed */
+    vote: (base: string) => base + "/feeds/:id/vote"
   },
   runtime: {
     /** Get all feeds of the user */
@@ -130,7 +132,9 @@ export const feeds = {
     /** Get feed */
     get: (base: string, id: string) => base + `/feeds/${id}`,
     /** Create a new feed */
-    create: (base: string) => base + "/feeds"
+    create: (base: string) => base + "/feeds",
+    /** Vote on feed */
+    vote: (base: string, id: string) => base + `/feeds/${id}/vote`
   }
 };
 

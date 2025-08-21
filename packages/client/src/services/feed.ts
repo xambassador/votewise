@@ -1,4 +1,4 @@
-import type { CreateFeedResponse, GetAllFeedsResponse, GetFeedResponse } from "@votewise/api";
+import type { CreateFeedResponse, GetAllFeedsResponse, GetFeedResponse, VoteResponse } from "@votewise/api";
 import type { TFeedCreate } from "@votewise/schemas/feed";
 import type { TPagination } from "@votewise/schemas/pagination";
 import type { Client } from "../client";
@@ -29,6 +29,11 @@ export class Feed {
 
   public async get(id: string) {
     const res = await this.client.get<GetFeedResponse>(feeds.runtime.get("", id));
+    return res;
+  }
+
+  public async vote(id: string) {
+    const res = await this.client.post<VoteResponse, object>(feeds.runtime.vote("", id), {});
     return res;
   }
 }

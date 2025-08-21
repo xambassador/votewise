@@ -3,3 +3,4 @@ export const getRepliesKey = (feedId: string, parentId: string) => ["replies", f
 export const getGroupsKey = () => ["groups"];
 export const getFeedsKey = () => ["feeds"];
 export const getMyGroupsKey = () => ["my-groups"];
+export const getFeedKey = (id: string) => ["feed", id];
