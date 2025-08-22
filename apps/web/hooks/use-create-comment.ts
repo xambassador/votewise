@@ -13,12 +13,19 @@ type CreateCommentParams = Parameters<typeof commentClient.createComment>[1];
 
 let idCounter = 0;
 
+/**
+ * A hook to create a comment or a reply to a comment.
+ *
+ * @param feedId - The id of the feed to create comment or reply for.
+ * @returns - A mutation object to create a comment or reply.
+ */
 export function useCreateComment(feedId: string) {
   const commentsKey = getCommentsKey(feedId);
   const queryClient = useQueryClient();
   const currentUser = useMe("useCreateComment");
+  const mutationKey = ["createComment", feedId];
   const mutation = useMutation({
-    mutationKey: ["createComment", feedId],
+    mutationKey,
     mutationFn: async (data: CreateCommentParams) => {
       const res = await commentClient.createComment(feedId, data);
       if (!res.success) {
@@ -53,6 +60,11 @@ export function useCreateComment(feedId: string) {
             }
           };
 
+          // This is the first reply to this comment.
+          // We are mutating the comments query rather than replies query
+          // because if we don't mutate the comments query here, we will not able
+          // to see the connection line between the comment and the reply.
+          // This is because it is rendered based on the replies.
           if (!oldReplies.replies.length) {
             queryClient.setQueryData<GetCommentsResponse>(commentsKey, (oldComments) => {
               if (!oldComments) return oldComments;
@@ -94,7 +106,17 @@ export function useCreateComment(feedId: string) {
                 user_name: currentUser.username,
                 id: currentUser.id
               },
-              replies: []
+              replies: [],
+              pagination: {
+                current_page: 1,
+                total_page: 1,
+                has_next_page: false,
+                has_previous_page: false,
+                next_page: null,
+                previous_page: null,
+                limit: 5,
+                total: 0
+              }
             },
             ...oldComments.comments
           ],
