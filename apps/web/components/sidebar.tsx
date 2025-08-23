@@ -8,6 +8,7 @@ import { Users } from "@votewise/ui/icons/users";
 
 import { CreatePostDialog } from "./create-post";
 import { Link } from "./link";
+import { Logout } from "./logout";
 
 type Props = {
   name: string;
@@ -47,6 +48,7 @@ export function Sidebar(props: Props) {
                 {link.name}
               </Link>
             ))}
+            <Logout />
           </div>
           <CreatePostDialog />
         </div>

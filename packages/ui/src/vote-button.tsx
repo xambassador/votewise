@@ -78,6 +78,10 @@ export function VoteButton(props: VoteButtonProps) {
   const isControlled = typeof _isVoted !== "undefined" && typeof onClick !== "undefined";
   const isDisabled = disabled || loading;
 
+  useEffect(() => {
+    setIsVoted(!!_isVoted);
+  }, [_isVoted]);
+
   if (isVoted) {
     return (
       <button className="px-5 bg-nobelBlack-100 text-sm h-12 font-medium flex items-center justify-center w-full focus-secondary outline-none focus:ring-0 rounded-xl focus:border focus:border-blue-500">

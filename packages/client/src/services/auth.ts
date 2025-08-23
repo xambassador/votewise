@@ -127,6 +127,15 @@ export class Auth {
     if (!user || !accessToken) return null;
     return { user, accessToken };
   }
+
+  public async signout() {
+    const storage = this.client.getStorage();
+    storage?.remove(COOKIE_KEYS.accessToken);
+    storage?.remove(COOKIE_KEYS.refreshToken);
+    storage?.remove(COOKIE_KEYS.user);
+    const res = await this.client.delete(auth.runtime.logout(""));
+    return res;
+  }
 }
 
 export type {
