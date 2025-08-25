@@ -11,7 +11,7 @@ type Options = IRateLimiterOptions & { calcKey?: (ip: string) => string };
 
 export function rateLimitMiddlewareFactory(path: string, opts: Options) {
   const { calcKey, ...rest } = opts;
-  const rateLimiteManager = AppContext.getInjectionToken("rateLimiteManager");
+  const { rateLimiteManager, environment } = AppContext.getInjectionTokens(["rateLimiteManager", "environment"]);
   const exceptionLayer = new ExceptionLayer({ name: "rate-limit-middleware" });
   return exceptionLayer.catch(async (_, res, next) => {
     const {
@@ -19,6 +19,11 @@ export function rateLimitMiddlewareFactory(path: string, opts: Options) {
     } = getIpLocals(res);
     const key = calcKey ? calcKey(ip) : ip;
     const limiter = rateLimiteManager.register(path, rest);
+
+    if (environment.NODE_ENV === "development") {
+      return next();
+    }
+
     try {
       await limiter.consume(key);
     } catch (rateLimitRes) {

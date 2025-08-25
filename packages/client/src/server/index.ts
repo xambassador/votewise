@@ -95,6 +95,7 @@ export class Client {
       const response = await this.fetch(endpoint, _options);
       const isJson = response.headers.get("content-type")?.includes("application/json");
       const responseHeaders: Record<string, string | string[]> = {};
+      const statusCode = response.status;
 
       response.headers.forEach((value, key) => {
         if (key.toLowerCase() === "set-cookie") {
@@ -128,6 +129,10 @@ export class Client {
             status_code: response.status
           }
         };
+      }
+
+      if (statusCode === 204) {
+        return { success: true, data: null as unknown as T, headers: responseHeaders };
       }
 
       const data = (await response.json()) as T;

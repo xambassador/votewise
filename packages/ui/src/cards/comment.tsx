@@ -9,6 +9,7 @@ import { Cross } from "../icons/cross";
 import { PaperPlane } from "../icons/paper-plane";
 import { Pencil } from "../icons/pencil";
 import { Plus } from "../icons/plus";
+import { Trash } from "../icons/trash";
 import { InputField } from "../input-field";
 import { Spinner } from "../ring-spinner";
 import { Textarea } from "../textarea-autosize";
@@ -172,7 +173,7 @@ export type CommentEditButtonProps = React.ButtonHTMLAttributes<HTMLButtonElemen
 export const CommentEditButton = forwardRef<HTMLButtonElement, CommentEditButtonProps>((props, ref) => {
   const { className, children, leftSlot, rightSlot, ...rest } = props;
   const { toggle, isEditMode } = useComment("CommentEditButton");
-  const icon = isEditMode ? <Cross className="text-gray-400 size-5" /> : <Pencil className="text-gray-400 size-5" />;
+  const icon = isEditMode ? <Cross className="text-gray-400 size-5" /> : <Pencil className="text-gray-400 size-6" />;
   const label = isEditMode ? "Cancel" : "Edit";
   return (
     <button
@@ -285,3 +286,26 @@ export function CommentMoreButton(props: React.ButtonHTMLAttributes<HTMLButtonEl
     </button>
   );
 }
+
+export type CommentDeleteButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  leftSlot?: React.ReactNode;
+  rightSlot?: React.ReactNode;
+};
+export const CommentDeleteButton = forwardRef<HTMLButtonElement, CommentDeleteButtonProps>((props, ref) => {
+  const { className, children, leftSlot, rightSlot, ...rest } = props;
+  return (
+    <button
+      {...rest}
+      ref={ref}
+      className={cn(
+        "flex items-center justify-center gap-1 text-gray-400 text-sm focus-primary focus-presets rounded",
+        className
+      )}
+    >
+      {leftSlot || <Trash className="text-gray-400 size-5" />}
+      {children}
+      {rightSlot}
+    </button>
+  );
+});
+CommentDeleteButton.displayName = "CommentDeleteButton";

@@ -59,6 +59,8 @@ export class Client {
       }
       const response = await this.fetch(endpoint, _options);
       const isJson = response.headers.get("content-type")?.includes("application/json");
+      const statusCode = response.status;
+
       if (!response.ok && isJson) {
         const data = (await response.json()) as ApiErrorResponse;
         return { success: false, error: data.error.message, errorData: data.error, status: response.status };
@@ -75,6 +77,10 @@ export class Client {
             status_code: response.status
           }
         };
+      }
+
+      if (statusCode === 204) {
+        return { success: true, data: null as unknown as T };
       }
 
       const data = (await response.json()) as T;

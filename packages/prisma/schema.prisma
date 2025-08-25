@@ -152,7 +152,7 @@ model Factor {
     last_challenged_at DateTime?
 
     user_id String
-    user    User   @relation(fields: [user_id], references: [id])
+    user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -169,7 +169,7 @@ model Challenge {
     otp_code String?
 
     factor_id String
-    factor    Factor @relation(fields: [factor_id], references: [id])
+    factor    Factor @relation(fields: [factor_id], references: [id], onDelete: Cascade)
 
     created_at  DateTime  @default(now())
     verified_at DateTime?
@@ -182,9 +182,9 @@ model Session {
     user_agent String
 
     user_id   String
-    user      User    @relation(fields: [user_id], references: [id])
+    user      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
     factor_id String? // Optional if the session requires a factor
-    factor    Factor? @relation(fields: [factor_id], references: [id])
+    factor    Factor? @relation(fields: [factor_id], references: [id], onDelete: Cascade)
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -201,10 +201,10 @@ model Post {
     status  PostStatus @default(OPEN)
 
     group_id String?
-    group    Group?  @relation(fields: [group_id], references: [id])
+    group    Group?  @relation(fields: [group_id], references: [id], onDelete: Cascade)
 
     author_id String
-    author    User   @relation(fields: [author_id], references: [id])
+    author    User   @relation(fields: [author_id], references: [id], onDelete: Cascade)
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -226,7 +226,7 @@ model PostAsset {
     size      Int?
 
     post_id String
-    post    Post   @relation(fields: [post_id], references: [id])
+    post    Post   @relation(fields: [post_id], references: [id], onDelete: Cascade)
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -234,10 +234,10 @@ model PostAsset {
 
 model Upvote {
     post_id String
-    post    Post   @relation(fields: [post_id], references: [id])
+    post    Post   @relation(fields: [post_id], references: [id], onDelete: Cascade)
 
     user_id String
-    user    User   @relation(fields: [user_id], references: [id])
+    user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -252,13 +252,13 @@ model Comment {
     appreciated Boolean @default(false)
 
     post_id String
-    post    Post   @relation(fields: [post_id], references: [id])
+    post    Post   @relation(fields: [post_id], references: [id], onDelete: Cascade)
 
     user_id String
-    user    User   @relation(fields: [user_id], references: [id])
+    user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
     replies Comment[] @relation("Replies")
-    parent  Comment?  @relation("Replies", fields: [parent_id], references: [id])
+    parent  Comment?  @relation("Replies", fields: [parent_id], references: [id], onDelete: Cascade)
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -273,13 +273,13 @@ model CommentUpvote {
     id String @id @default(cuid())
 
     comment_id String
-    comment    Comment @relation(fields: [comment_id], references: [id])
+    comment    Comment @relation(fields: [comment_id], references: [id], onDelete: Cascade)
 
     post_id String
-    post    Post   @relation(fields: [post_id], references: [id])
+    post    Post   @relation(fields: [post_id], references: [id], onDelete: Cascade)
 
     user_id String
-    user    User   @relation(fields: [user_id], references: [id])
+    user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -300,10 +300,10 @@ model PostHashTag {
     id String @id @default(cuid())
 
     post_id String
-    post    Post   @relation(fields: [post_id], references: [id])
+    post    Post   @relation(fields: [post_id], references: [id], onDelete: Cascade)
 
     hash_tag_id String
-    hash_tag    HashTag @relation(fields: [hash_tag_id], references: [id])
+    hash_tag    HashTag @relation(fields: [hash_tag_id], references: [id], onDelete: Cascade)
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -314,11 +314,11 @@ model Follow {
 
     // foreign key referencing the id of the user who is following
     follower_id String
-    followers   User   @relation("followers", fields: [follower_id], references: [id])
+    followers   User   @relation("followers", fields: [follower_id], references: [id], onDelete: Cascade)
 
     // foreign key referencing the id of the user who is being followed
     following_id String
-    following    User   @relation("following", fields: [following_id], references: [id])
+    following    User   @relation("following", fields: [following_id], references: [id], onDelete: Cascade)
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -331,10 +331,10 @@ model Friend {
     type FriendType
 
     user_id String
-    user    User   @relation("user", fields: [user_id], references: [id])
+    user    User   @relation("user", fields: [user_id], references: [id], onDelete: Cascade)
 
     friend_id String
-    friend    User   @relation("friend", fields: [friend_id], references: [id])
+    friend    User   @relation("friend", fields: [friend_id], references: [id], onDelete: Cascade)
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -363,10 +363,10 @@ model GroupMember {
     is_removed Boolean         @default(false)
 
     user_id String
-    user    User   @relation(fields: [user_id], references: [id])
+    user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
     group_id String
-    group    Group  @relation(fields: [group_id], references: [id])
+    group    Group  @relation(fields: [group_id], references: [id], onDelete: Cascade)
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -387,10 +387,10 @@ model GroupInvitation {
     sent_at DateTime              @default(now())
 
     group_id String
-    group    Group  @relation(fields: [group_id], references: [id])
+    group    Group  @relation(fields: [group_id], references: [id], onDelete: Cascade)
 
     user_id String
-    user    User   @relation(fields: [user_id], references: [id])
+    user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -406,7 +406,7 @@ model Notification {
     content    Json?
 
     user_id String
-    user    User   @relation(fields: [user_id], references: [id])
+    user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -418,7 +418,7 @@ model RefreshToken {
     id      String  @id @default(cuid())
     token   String  @unique
     user_id String
-    user    User    @relation(fields: [user_id], references: [id])
+    user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
     revoked Boolean @default(false)
 
     created_at DateTime @default(now())
@@ -427,9 +427,9 @@ model RefreshToken {
 
 model PostTopic {
     post_id  String
-    post     Post   @relation(fields: [post_id], references: [id])
+    post     Post   @relation(fields: [post_id], references: [id], onDelete: Cascade)
     topic_id String
-    topic    Topics @relation(fields: [topic_id], references: [id])
+    topic    Topics @relation(fields: [topic_id], references: [id], onDelete: Cascade)
 
     @@unique([post_id, topic_id], name: "post_topic_unique")
 }
@@ -467,8 +467,8 @@ model Timeline {
     post_id    String
     created_at DateTime @default(now())
 
-    user User @relation(fields: [user_id], references: [id])
-    post Post @relation(fields: [post_id], references: [id])
+    user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+    post Post @relation(fields: [post_id], references: [id], onDelete: Cascade)
 
     @@unique([user_id, post_id], name: "user_post_unique")
 }

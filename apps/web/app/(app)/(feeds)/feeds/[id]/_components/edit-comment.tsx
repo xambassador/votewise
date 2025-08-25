@@ -52,6 +52,11 @@ function useUpdateComment(props: Props) {
       setError("Comment cannot be empty.");
       return;
     }
+    if (value === text) {
+      toggle?.(true);
+      return;
+    }
+
     mutation.mutate(
       { text: value },
       { onError: (err) => makeToast.error("Oops! Failed to create comment.", err.message) }

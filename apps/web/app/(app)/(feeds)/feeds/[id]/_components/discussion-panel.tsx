@@ -36,6 +36,7 @@ import { cn } from "@/lib/cn";
 import { routes } from "@/lib/routes";
 
 import { CreateComment, ReplyToComment } from "./create-comment";
+import { DeleteCommentButton } from "./delete-comment";
 import { EditComment, EditCommentButton } from "./edit-comment";
 import { CommentsFetcherFallback } from "./skeleton";
 
@@ -207,6 +208,7 @@ const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
         <CommentActions className={cn(id !== userId && !shouldReply ? "hidden" : "")}>
           {shouldReply && <CommentReplyButton />}
           <EditCommentButton authorId={userId} />
+          <DeleteCommentButton authorId={userId} commentId={commentId} feedId={postId} parentId={parentId} />
         </CommentActions>
 
         {commentId && <ReplyToComment parentId={commentId} postId={postId} username={userName} />}
