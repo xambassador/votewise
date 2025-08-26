@@ -33,7 +33,8 @@ export class Controller {
       name: body.name,
       about: body.description,
       status: "OPEN",
-      type: body.type
+      type: body.type,
+      coverImageUrl: body.cover_image_url
     });
     const member = await this.ctx.groupRepository.groupMember.addMember(group.id, sub, "ADMIN");
     const result = {

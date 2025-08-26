@@ -18,7 +18,8 @@ export const ZGroupCreate = z.object({
   type: z.enum(["PUBLIC", "PRIVATE"], {
     required_error: "Type is required",
     invalid_type_error: "Type must be either PUBLIC or PRIVATE"
-  })
+  }),
+  cover_image_url: z.string().url().optional()
 });
 
 export type TGroupCreate = z.infer<typeof ZGroupCreate>;

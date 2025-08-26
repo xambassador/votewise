@@ -341,11 +341,12 @@ model Friend {
 }
 
 model Group {
-    id     String      @id @default(cuid())
-    name   String      @unique @db.VarChar(21)
-    about  String      @db.VarChar(500)
-    type   GroupType
-    status GroupStatus
+    id            String      @id @default(cuid())
+    name          String      @unique @db.VarChar(21)
+    about         String      @db.VarChar(500)
+    coverImageUrl String?
+    type          GroupType
+    status        GroupStatus
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
