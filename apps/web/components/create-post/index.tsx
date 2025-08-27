@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useLazyLoad } from "@/hooks/use-lazy-load";
 
 import { Button } from "@votewise/ui/button";
 import { Pencil } from "@votewise/ui/icons/pencil";
@@ -19,14 +20,15 @@ const LazyCreatePostDialog = dynamic(() => import("./lazy-dialog").then((mod) =>
 const load = () => import("./lazy-dialog");
 
 export function CreatePostDialog() {
-  const { getDialogProps, getButtonProps, isLazyLoaded } = useCreatePostDialog();
+  const { getDialogProps, getButtonProps } = useCreatePostDialog();
+  const { isLoaded, trigger } = useLazyLoad();
   return (
     <>
-      <Button {...getButtonProps({ className: "w-fit gap-1", onMouseEnter: load, onFocus: load })}>
+      <Button {...getButtonProps({ className: "w-fit gap-1", onMouseEnter: load, onFocus: load, onClick: trigger })}>
         <Pencil className="text-gray-200" />
         <span>Share Idea</span>
       </Button>
-      {isLazyLoaded() && <LazyCreatePostDialog {...getDialogProps()} />}
+      {isLoaded() && <LazyCreatePostDialog {...getDialogProps()} />}
     </>
   );
 }

@@ -46,7 +46,6 @@ const isCreatePostDialogOpenAtom = atom(false);
  * Hooks
  * -----------------------------------------------------------------------------------------------*/
 export function useCreatePostDialog() {
-  const lazyLoaded = useRef(false);
   const [isOpen, setIsOpen] = useAtom(isCreatePostDialogOpenAtom);
 
   function getDialogProps(props?: DialogProps): DialogProps {
@@ -56,18 +55,13 @@ export function useCreatePostDialog() {
   function getButtonProps(props?: ButtonProps): ButtonProps {
     return {
       ...props,
-      onClick: chain(() => {
-        lazyLoaded.current = true;
+      onClick: chain(props?.onClick, () => {
         setIsOpen(true);
-      }, props?.onClick)
+      })
     };
   }
 
-  function isLazyLoaded() {
-    return lazyLoaded.current;
-  }
-
-  return { getDialogProps, getButtonProps, isLazyLoaded };
+  return { getDialogProps, getButtonProps };
 }
 
 export function useTitleInput() {
