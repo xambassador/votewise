@@ -1,6 +1,7 @@
 "use client";
 
 import { Close, Dialog, DialogContent, DialogDescription, DialogTitle } from "@votewise/ui/dialog";
+import { Dash } from "@votewise/ui/icons/dash";
 
 import { CurrentUserAvatar } from "../current-user-avatar";
 import { AssetPicker, Assets, ContentInput, ProgressTracker, SubmitButton, TitleInput } from "./form-elements";
@@ -27,6 +28,7 @@ export function LazyCreatePostDialog(props: React.ComponentProps<typeof Dialog>)
             <AssetPicker />
             <ProgressTracker />
           </div>
+          <Dash className="text-nobelBlack-200" />
         </div>
         <SubmitButton />
       </DialogContent>
