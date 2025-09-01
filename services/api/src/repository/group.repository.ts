@@ -317,4 +317,32 @@ export class GroupInvitationRepository extends BaseRepository {
       return invitation;
     });
   }
+
+  public getAllJointRequests(groupId: string) {
+    return this.execute(async () => {
+      const invitations = await this.db.groupInvitation.findMany({
+        where: { group_id: groupId, status: "PENDING", type: "JOIN" },
+        include: {
+          group: {
+            select: {
+              id: true,
+              name: true
+            }
+          },
+          user: {
+            select: {
+              id: true,
+              user_name: true,
+              first_name: true,
+              last_name: true,
+              avatar_url: true
+            }
+          }
+        },
+        orderBy: { created_at: "desc" },
+        take: 50
+      });
+      return invitations;
+    });
+  }
 }

@@ -28,11 +28,13 @@ import { acceptGroupInviteControllerFactory } from "./group/accept-invite";
 import { createGroupControllerFactory } from "./group/create";
 import { getGroupControllerFactory } from "./group/get";
 import { getAllGroupsControllerFactory } from "./group/get-all";
+import { getGroupJoinRequestsControllerFactory } from "./group/get-join-requests";
 import { sendGroupInviteControllerFactory } from "./group/invite";
 import { joinGroupControllerFactory } from "./group/join";
 import { kickMemberControllerFactory } from "./group/kick";
 import { leaveGroupControllerFactory } from "./group/leave";
 import { getMyGroupsControllerFactory } from "./group/my-groups";
+import { rejectGroupInviteControllerFactory } from "./group/reject-invite";
 import { getNotificationsControllerFactory } from "./notification/get-all";
 import { markReadNotificationControllerFactory } from "./notification/mark-read";
 import { getGroupRecommendationsControllerFactory } from "./recommendation/group";
@@ -86,6 +88,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.get(groups.paths.myGroups(path), ...getMyGroupsControllerFactory());
   router.get(groups.paths.get(path), ...getGroupControllerFactory());
   router.get(notifications.paths.all(path), ...getNotificationsControllerFactory());
+  router.get(groups.paths.joinRequests(path), ...getGroupJoinRequestsControllerFactory());
 
   /* ----------------------------------------------------------------------------------------------- */
   router.post(auth.paths.register(path), ...registerControllerFactory(auth.paths.register(path)));
@@ -125,6 +128,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.delete(groups.paths.leave(path), ...leaveGroupControllerFactory());
   router.delete(groups.paths.kick(path), ...kickMemberControllerFactory());
   router.delete(comments.paths.delete(path), ...deleteCommentControllerFactory());
+  router.delete(user.paths.invitations.declineGroupInvite(path), ...rejectGroupInviteControllerFactory());
 
   return router;
 }
