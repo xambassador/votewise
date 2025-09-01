@@ -24,6 +24,7 @@ import { getAllFeedControllerFactory } from "./feed/get-all";
 import { voteControllerFactory } from "./feed/vote";
 import { createFollowControllerFactory } from "./follow/create";
 import { deleteFollowControllerFactory } from "./follow/delete";
+import { acceptGroupInviteControllerFactory } from "./group/accept-invite";
 import { createGroupControllerFactory } from "./group/create";
 import { getGroupControllerFactory } from "./group/get";
 import { getAllGroupsControllerFactory } from "./group/get-all";
@@ -107,6 +108,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.post(groups.paths.create(path), ...createGroupControllerFactory());
   router.post(groups.paths.join(path), ...joinGroupControllerFactory());
   router.post(groups.paths.invite(path), ...sendGroupInviteControllerFactory());
+  router.post(user.paths.invitations.acceptGroupInvite(path), ...acceptGroupInviteControllerFactory());
 
   /* ----------------------------------------------------------------------------------------------- */
   router.put(comments.paths.update(path), ...updateCommentControllerFactory());

@@ -6,6 +6,7 @@ import { BaseRepository } from "./base.repository";
 
 type CreateGroup = Prisma.GroupCreateInput;
 type CreateGroupInvitation = Prisma.GroupInvitationUncheckedCreateInput;
+type UpdateGroupInvitation = Prisma.GroupInvitationUncheckedUpdateInput;
 
 export class GroupRepository extends BaseRepository {
   private readonly db: RepositoryConfig["db"];
@@ -307,5 +308,13 @@ export class GroupInvitationRepository extends BaseRepository {
         }
       })
     );
+  }
+
+  public update(id: string, data: UpdateGroupInvitation, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
+    return this.execute(async () => {
+      const invitation = await db.groupInvitation.update({ where: { id }, data });
+      return invitation;
+    });
   }
 }

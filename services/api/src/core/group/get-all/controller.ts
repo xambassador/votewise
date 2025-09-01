@@ -16,7 +16,7 @@ type ControllerOptions = {
   bucketService: AppContext["services"]["bucket"];
 };
 
-const ZFilter = ZPagination.extend({
+const ZQuery = ZPagination.extend({
   status: z
     .enum(["CLOSED", "OPEN", "INACTIVE"], {
       invalid_type_error: "Status must be one of CLOSED, OPEN, or INACTIVE",
@@ -34,7 +34,7 @@ export class Controller {
   }
 
   public async handle(req: Request, res: Response) {
-    const schema = ZFilter.safeParse(req.query);
+    const schema = ZQuery.safeParse(req.query);
     this.ctx.assert.unprocessableEntity(!schema.success, schema.error?.errors[0]?.message || "Invalid query");
     const query = schema.data!;
     const total = await this.ctx.groupRepository.count({ status: query.status });

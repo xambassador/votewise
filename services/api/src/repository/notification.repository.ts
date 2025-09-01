@@ -19,10 +19,7 @@ export class NotificationRepository extends BaseRepository {
   public create(data: TCreate, tx?: TransactionCtx) {
     const db = tx ?? this.db;
     return this.execute(async () => {
-      const notification = await db.notification.create({
-        data,
-        select: { id: true }
-      });
+      const notification = await db.notification.create({ data, select: { id: true } });
       return notification;
     });
   }
@@ -30,7 +27,7 @@ export class NotificationRepository extends BaseRepository {
   public async findByUserId(userId: string) {
     return this.execute(async () => {
       const notifications = await this.db.notification.findMany({
-        where: { user_id: userId },
+        where: { user_id: userId, is_read: false },
         orderBy: { created_at: "desc" },
         take: 10
       });
@@ -40,9 +37,7 @@ export class NotificationRepository extends BaseRepository {
 
   public async findById(id: string) {
     return this.execute(async () => {
-      const notification = await this.db.notification.findUnique({
-        where: { id }
-      });
+      const notification = await this.db.notification.findUnique({ where: { id } });
       return notification;
     });
   }
@@ -50,10 +45,7 @@ export class NotificationRepository extends BaseRepository {
   public async markAsRead(id: string, tx?: TransactionCtx) {
     const db = tx ?? this.db;
     return this.execute(async () => {
-      const notification = await db.notification.update({
-        where: { id },
-        data: { is_read: true }
-      });
+      const notification = await db.notification.update({ where: { id }, data: { is_read: true } });
       return notification;
     });
   }

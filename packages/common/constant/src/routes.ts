@@ -69,7 +69,15 @@ export const user = {
     usernameExists: (base: string) => base + "/users/:username/exists",
     me: {
       /** Get the current user's profile */
-      get: (base: string) => base + "/me"
+      get: (base: string) => base + "/me",
+      /** Get all invitations */
+      getInvitations: (base: string) => base + "/me/invitations"
+    },
+    invitations: {
+      /** Accept group invitation  */
+      acceptGroupInvite: (base: string) => base + "/invitations/:id/accept",
+      /** Decline group invitation  */
+      declineGroupInvite: (base: string) => base + "/invitations/:id/decline"
     },
     recommendations: {
       /** Get user recommendations for current user */
@@ -93,7 +101,15 @@ export const user = {
     usernameExists: (base: string, username: string) => base + `/users/${username}/exists`,
     me: {
       /** Get the current user's profile */
-      get: (base: string) => base + "/me"
+      get: (base: string) => base + "/me",
+      /** Get all invitations */
+      getInvitations: (base: string) => base + "/me/invitations"
+    },
+    invitation: {
+      /** Accept group invitation  */
+      acceptGroupInvite: (base: string, invitationId: string) => base + `/invitations/${invitationId}/accept`,
+      /** Decline group invitation  */
+      declineGroupInvite: (base: string, invitationId: string) => base + `/invitations/${invitationId}/decline`
     },
     recommendations: {
       /** Get user recommendations for current user */
@@ -229,7 +245,13 @@ export const groups = {
     /** Leave the group */
     leave: (base: string) => base + "/groups/:groupId/leave",
     /** Kick user from the group */
-    kick: (base: string) => base + "/groups/:groupId/kick/:username"
+    kick: (base: string) => base + "/groups/:groupId/kick/:username",
+    /** Update group details */
+    update: (base: string) => base + "/groups/:groupId",
+    /** Delete group */
+    delete: (base: string) => base + "/groups/:groupId",
+    /** Get group join requests */
+    joinRequests: (base: string) => base + "/groups/:groupId/join-requests"
   },
   runtime: {
     /** Get all groups */
@@ -247,7 +269,13 @@ export const groups = {
     /** Leave the group */
     leave: (base: string, groupId: string) => base + `/groups/${groupId}/leave`,
     /** Kick user from the group */
-    kick: (base: string, groupId: string, username: string) => base + `/groups/${groupId}/kick/${username}`
+    kick: (base: string, groupId: string, username: string) => base + `/groups/${groupId}/kick/${username}`,
+    /** Update group details */
+    update: (base: string, groupId: string) => base + `/groups/${groupId}`,
+    /** Delete group */
+    delete: (base: string, groupId: string) => base + `/groups/${groupId}`,
+    /** Get group join requests */
+    joinRequests: (base: string, groupId: string) => base + `/groups/${groupId}/join-requests`
   }
 };
 

@@ -43,6 +43,9 @@ export class Controller {
     const currentUserDetails = await this.getUserById(currentUserId);
     const group = await this.getGroup(groupId);
     const member = await this.getUser(username);
+
+    this.ctx.assert.unprocessableEntity(member.id === currentUserId, "You cannot invite yourself");
+
     await this.isAlreadyMember(groupId, member.id);
     await this.isAlreadyInvited(groupId, member.id, member.user_name);
     const { invitation } = await this.sendInvitation(groupId, member.id, currentUserDetails.id);
@@ -127,7 +130,6 @@ export class Controller {
       type: "INVITE"
     });
     const notification = await this.ctx.notificationRepository.create({
-      event_id: 10,
       event_type: "GROUP_INVITATION",
       user_id: userId,
       content: {

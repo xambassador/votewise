@@ -46,7 +46,6 @@ export class PublicGroupStrategy extends Strategy {
     const user = await this.getUser(data.currentUserId);
     const member = await this.ctx.groupRepository.groupMember.addMember(data.groupId, data.currentUserId, "MEMBER");
     await this.ctx.notificationRepository.create({
-      event_id: 10,
       event_type: "GROUP_JOINED",
       user_id: admin.user_id,
       content: {
@@ -93,7 +92,6 @@ export class PrivateGroupStrategy extends Strategy {
       sent_at: sentAt
     });
     await this.ctx.notificationRepository.create({
-      event_id: 10,
       event_type: "JOIN_GROUP_REQUEST",
       user_id: admin.user_id,
       content: {
