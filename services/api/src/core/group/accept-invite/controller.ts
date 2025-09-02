@@ -7,9 +7,7 @@ import { z } from "zod";
 
 import { getAuthenticateLocals } from "@/utils/locals";
 
-const ZParams = z.object({
-  id: z.string({ invalid_type_error: "id must be a string" })
-});
+const ZParams = z.object({ id: z.string({ invalid_type_error: "id must be a string" }) });
 const ZQuery = z.object({
   notification_id: z.string({ invalid_type_error: "notification_id must be a string" }).optional()
 });
@@ -20,6 +18,10 @@ type ControllerOptions = {
   notificationRepository: AppContext["repositories"]["notification"];
   transactionManager: AppContext["repositories"]["transactionManager"];
 };
+
+const invitationNotFoundMessage = "Invitation not found. It may have been revoked or expired.";
+const invitationAlreadyAcceptedMessage = "This invitation has already been accepted.";
+const permissionMessage = "You do not have permission to accept this invitation.";
 
 export class Controller {
   private readonly ctx: ControllerOptions;
@@ -46,28 +48,27 @@ export class Controller {
     const locals = getAuthenticateLocals(res);
     const currentUserId = locals.payload.sub;
 
-    const _invitation = await this.ctx.groupRepository.groupInvitation.findById(invitationId);
-    this.ctx.assert.resourceNotFound(!_invitation, "Invitation not found. It may have been revoked or expired.");
-    const invitation = _invitation!;
-    this.ctx.assert.unprocessableEntity(invitation.status === "ACCEPTED", "This invitation has already been accepted.");
+    const invitation = await this.ctx.groupRepository.groupInvitation.findById(invitationId);
 
-    this.ctx.assert.forbidden(
-      invitation.user_id !== currentUserId,
-      "You do not have permission to accept this invitation."
-    );
+    this.ctx.assert.resourceNotFound(!invitation, invitationNotFoundMessage);
+    this.ctx.assert.unprocessableEntity(invitation!.status === "ACCEPTED", invitationAlreadyAcceptedMessage);
+    this.ctx.assert.forbidden(invitation!.user_id !== currentUserId, permissionMessage);
 
-    const isAlreadyMember = await this.ctx.groupRepository.groupMember.isMember(invitation.group_id, currentUserId);
+    const groupId = invitation!.group_id;
+    const userId = invitation!.user_id;
+
+    const isAlreadyMember = await this.ctx.groupRepository.groupMember.isMember(groupId, currentUserId);
     this.ctx.assert.unprocessableEntity(isAlreadyMember, "You are already a member of this group.");
 
     await this.ctx.transactionManager.withTransaction(async (tx) => {
-      await this.ctx.groupRepository.groupMember.addMember(invitation.group_id, invitation.user_id, "MEMBER", tx);
-      await this.ctx.groupRepository.groupInvitation.update(invitation.id, { status: "ACCEPTED" }, tx);
+      await this.ctx.groupRepository.groupMember.addMember(groupId, userId, "MEMBER", tx);
+      await this.ctx.groupRepository.groupInvitation.update(invitation!.id, { status: "ACCEPTED" }, tx);
       if (notificationId) {
         await this.ctx.notificationRepository.markAsRead(notificationId, tx);
       }
     });
 
-    const result = { id: invitation.id };
+    const result = { id: invitation!.id };
     return res.status(StatusCodes.CREATED).json(result) as Response<typeof result>;
   }
 }

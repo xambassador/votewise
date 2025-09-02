@@ -21,6 +21,11 @@ type ControllerOptions = {
   transactionManager: AppContext["repositories"]["transactionManager"];
 };
 
+const invitationNotFoundMessage = "Invitation not found. It may have been revoked or expired.";
+const acceptedInvitationMessage = "This invitation has already been accepted.";
+const invitationRejectedMessage = "This invitation has already been rejected.";
+const permissionErrorMessage = "You do not have permission to reject this invitation.";
+
 export class Controller {
   private readonly ctx: ControllerOptions;
 
@@ -46,20 +51,14 @@ export class Controller {
     const locals = getAuthenticateLocals(res);
     const currentUserId = locals.payload.sub;
 
-    const _invitation = await this.ctx.groupRepository.groupInvitation.findById(invitationId);
-    this.ctx.assert.resourceNotFound(!_invitation, "Invitation not found. It may have been revoked or expired.");
-
-    const invitation = _invitation!;
-    this.ctx.assert.unprocessableEntity(invitation.status === "ACCEPTED", "This invitation has already been accepted.");
-    this.ctx.assert.unprocessableEntity(invitation.status === "REJECTED", "This invitation has already been rejected.");
-
-    this.ctx.assert.forbidden(
-      invitation.user_id !== currentUserId,
-      "You do not have permission to reject this invitation."
-    );
+    const invitation = await this.ctx.groupRepository.groupInvitation.findById(invitationId);
+    this.ctx.assert.resourceNotFound(!invitation, invitationNotFoundMessage);
+    this.ctx.assert.unprocessableEntity(invitation!.status === "ACCEPTED", acceptedInvitationMessage);
+    this.ctx.assert.unprocessableEntity(invitation!.status === "REJECTED", invitationRejectedMessage);
+    this.ctx.assert.forbidden(invitation!.user_id !== currentUserId, permissionErrorMessage);
 
     await this.ctx.transactionManager.withTransaction(async (tx) => {
-      await this.ctx.groupRepository.groupInvitation.update(invitation.id, { status: "REJECTED" }, tx);
+      await this.ctx.groupRepository.groupInvitation.update(invitation!.id, { status: "REJECTED" }, tx);
       if (notificationId) {
         await this.ctx.notificationRepository.markAsRead(notificationId, tx);
       }

@@ -251,7 +251,11 @@ export const groups = {
     /** Delete group */
     delete: (base: string) => base + "/groups/:groupId",
     /** Get group join requests */
-    joinRequests: (base: string) => base + "/groups/:groupId/join-requests"
+    joinRequests: (base: string) => base + "/groups/join-requests",
+    /** Accept a group join request */
+    acceptJoinRequest: (base: string) => base + "/groups/join-requests/:id/accept",
+    /** Decline a group join request */
+    declineJoinRequest: (base: string) => base + "/groups/join-requests/:id/decline"
   },
   runtime: {
     /** Get all groups */
@@ -275,7 +279,11 @@ export const groups = {
     /** Delete group */
     delete: (base: string, groupId: string) => base + `/groups/${groupId}`,
     /** Get group join requests */
-    joinRequests: (base: string, groupId: string) => base + `/groups/${groupId}/join-requests`
+    joinRequests: (base: string) => base + `/groups/join-requests`,
+    /** Accept a group join request */
+    acceptJoinRequest: (base: string, joinRequestId: string) => base + `/groups/join-requests/${joinRequestId}/accept`,
+    /** Decline a group join request */
+    declineJoinRequest: (base: string, joinRequestId: string) => base + `/groups/join-requests/${joinRequestId}/decline`
   }
 };
 

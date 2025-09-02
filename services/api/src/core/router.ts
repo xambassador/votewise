@@ -24,6 +24,7 @@ import { getAllFeedControllerFactory } from "./feed/get-all";
 import { voteControllerFactory } from "./feed/vote";
 import { createFollowControllerFactory } from "./follow/create";
 import { deleteFollowControllerFactory } from "./follow/delete";
+import { acceptGroupJoinRequestControllerFactory } from "./group/accept-group-join-request";
 import { acceptGroupInviteControllerFactory } from "./group/accept-invite";
 import { createGroupControllerFactory } from "./group/create";
 import { getGroupControllerFactory } from "./group/get";
@@ -34,6 +35,7 @@ import { joinGroupControllerFactory } from "./group/join";
 import { kickMemberControllerFactory } from "./group/kick";
 import { leaveGroupControllerFactory } from "./group/leave";
 import { getMyGroupsControllerFactory } from "./group/my-groups";
+import { rejectGroupJoinRequestControllerFactory } from "./group/reject-group-join-request";
 import { rejectGroupInviteControllerFactory } from "./group/reject-invite";
 import { getNotificationsControllerFactory } from "./notification/get-all";
 import { markReadNotificationControllerFactory } from "./notification/mark-read";
@@ -86,9 +88,9 @@ export function moduleRouterFactory(basePath: string): Router {
   router.get(comments.paths.getReplies(path), ...getRepliesControllerFactory());
   router.get(groups.paths.all(path), ...getAllGroupsControllerFactory());
   router.get(groups.paths.myGroups(path), ...getMyGroupsControllerFactory());
+  router.get(groups.paths.joinRequests(path), ...getGroupJoinRequestsControllerFactory());
   router.get(groups.paths.get(path), ...getGroupControllerFactory());
   router.get(notifications.paths.all(path), ...getNotificationsControllerFactory());
-  router.get(groups.paths.joinRequests(path), ...getGroupJoinRequestsControllerFactory());
 
   /* ----------------------------------------------------------------------------------------------- */
   router.post(auth.paths.register(path), ...registerControllerFactory(auth.paths.register(path)));
@@ -111,6 +113,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.post(groups.paths.create(path), ...createGroupControllerFactory());
   router.post(groups.paths.join(path), ...joinGroupControllerFactory());
   router.post(groups.paths.invite(path), ...sendGroupInviteControllerFactory());
+  router.post(groups.paths.acceptJoinRequest(path), ...acceptGroupJoinRequestControllerFactory());
   router.post(user.paths.invitations.acceptGroupInvite(path), ...acceptGroupInviteControllerFactory());
 
   /* ----------------------------------------------------------------------------------------------- */
@@ -129,6 +132,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.delete(groups.paths.kick(path), ...kickMemberControllerFactory());
   router.delete(comments.paths.delete(path), ...deleteCommentControllerFactory());
   router.delete(user.paths.invitations.declineGroupInvite(path), ...rejectGroupInviteControllerFactory());
+  router.delete(groups.paths.declineJoinRequest(path), ...rejectGroupJoinRequestControllerFactory());
 
   return router;
 }

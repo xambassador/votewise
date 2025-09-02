@@ -345,4 +345,44 @@ export class GroupInvitationRepository extends BaseRepository {
       return invitations;
     });
   }
+
+  public findPendingJoinRequest(id: string) {
+    return this.execute(async () =>
+      this.db.groupInvitation.findUnique({ where: { id, status: "PENDING", type: "JOIN" } })
+    );
+  }
+
+  public getUserGroupsJoinRequests(userId: string) {
+    return this.execute(async () => {
+      const groups = await this.db.groupMember.findMany({
+        where: { user_id: userId, is_removed: false, role: { in: ["ADMIN", "MODERATOR"] } },
+        select: {
+          group_id: true
+        }
+      });
+      const groupIds = groups.map((g) => g.group_id);
+      const invitations = await this.db.groupInvitation.findMany({
+        where: { group_id: { in: groupIds }, status: "PENDING", type: "JOIN" },
+        orderBy: { created_at: "desc" },
+        include: {
+          user: {
+            select: {
+              id: true,
+              user_name: true,
+              first_name: true,
+              last_name: true,
+              avatar_url: true
+            }
+          },
+          group: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
+        }
+      });
+      return invitations;
+    });
+  }
 }
