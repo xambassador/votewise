@@ -12,6 +12,8 @@ type ControllerOptions = {
   userRepository: AppContext["repositories"]["user"];
   followRepository: AppContext["repositories"]["follow"];
   assert: AppContext["assert"];
+  transactionManager: AppContext["repositories"]["transactionManager"];
+  aggregator: AppContext["repositories"]["aggregator"];
 };
 
 export class Controller {
@@ -37,7 +39,25 @@ export class Controller {
       if (!follow) {
         return res.status(StatusCodes.NO_CONTENT).send() as Response<void>;
       }
-      await this.ctx.followRepository.delete(follow.id);
+      await this.ctx.transactionManager.withTransaction(async (tx) => {
+        await this.ctx.followRepository.delete(follow.id, tx);
+        await this.ctx.aggregator.userAggregator.aggregate(
+          currentUserId,
+          (stats) => ({
+            ...stats,
+            total_following: (stats?.total_following ?? 1) - 1
+          }),
+          tx
+        );
+        await this.ctx.aggregator.userAggregator.aggregate(
+          user.id,
+          (stats) => ({
+            ...stats,
+            total_followers: (stats?.total_followers ?? 1) - 1
+          }),
+          tx
+        );
+      });
       return res.status(StatusCodes.NO_CONTENT).send() as Response<void>;
     } else {
       const _userByUsername = await this.ctx.userRepository.findByUsername(canBeUsernameOrId);
@@ -52,7 +72,25 @@ export class Controller {
       if (!follow) {
         return res.status(StatusCodes.NO_CONTENT).send() as Response<void>;
       }
-      await this.ctx.followRepository.delete(follow.id);
+      await this.ctx.transactionManager.withTransaction(async (tx) => {
+        await this.ctx.followRepository.delete(follow.id);
+        await this.ctx.aggregator.userAggregator.aggregate(
+          currentUserId,
+          (stats) => ({
+            ...stats,
+            total_following: (stats?.total_following ?? 1) - 1
+          }),
+          tx
+        );
+        await this.ctx.aggregator.userAggregator.aggregate(
+          userByUsername.id,
+          (stats) => ({
+            ...stats,
+            total_followers: (stats?.total_followers ?? 1) - 1
+          }),
+          tx
+        );
+      });
       return res.status(StatusCodes.NO_CONTENT).send() as Response<void>;
     }
   }

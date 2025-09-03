@@ -11,7 +11,9 @@ export function deleteCommentControllerFactory() {
   const controller = new Controller({
     assert: ctx.assert,
     commentRepository: ctx.repositories.comment,
-    feedRepository: ctx.repositories.feed
+    feedRepository: ctx.repositories.feed,
+    transactionManger: ctx.repositories.transactionManager,
+    aggregator: ctx.repositories.aggregator
   });
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "get-comments" });

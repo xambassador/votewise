@@ -107,7 +107,7 @@ export class CommentRepository extends BaseRepository {
     return this.execute(async () =>
       this.db.comment.findUnique({
         where: { id },
-        select: { id: true, user_id: true, post_id: true }
+        select: { id: true, user_id: true, post_id: true, parent_id: true }
       })
     );
   }

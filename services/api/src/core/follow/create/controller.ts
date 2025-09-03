@@ -12,6 +12,8 @@ type ControllerOptions = {
   userRepository: AppContext["repositories"]["user"];
   followRepository: AppContext["repositories"]["follow"];
   assert: AppContext["assert"];
+  aggregator: AppContext["repositories"]["aggregator"];
+  transactionManager: AppContext["repositories"]["transactionManager"];
 };
 
 export class Controller {
@@ -34,8 +36,29 @@ export class Controller {
     if (user) {
       this.ctx.assert.operationNotAllowed(user.id === currentUserId, `You cannot follow yourself.`);
       const isAlreadyFollowing = await this.ctx.followRepository.isFollowing(currentUserId, user.id);
-      this.ctx.assert.operationNotAllowed(isAlreadyFollowing, `You are already following this user.`);
-      const follow = await this.ctx.followRepository.create(currentUserId, user.id);
+      if (isAlreadyFollowing) {
+        return res.status(StatusCodes.CREATED).json({ id: isAlreadyFollowing.id }) as Response<{ id: string }>;
+      }
+      const follow = await this.ctx.transactionManager.withTransaction(async (tx) => {
+        const follow = await this.ctx.followRepository.create(currentUserId, user.id, tx);
+        await this.ctx.aggregator.userAggregator.aggregate(
+          currentUserId,
+          (stats) => ({
+            ...stats,
+            total_following: (stats?.total_following ?? 0) + 1
+          }),
+          tx
+        );
+        await this.ctx.aggregator.userAggregator.aggregate(
+          user.id,
+          (stats) => ({
+            ...stats,
+            total_followers: (stats?.total_followers ?? 0) + 1
+          }),
+          tx
+        );
+        return follow;
+      });
       return res.status(StatusCodes.CREATED).json({ id: follow.id }) as Response<{ id: string }>;
     } else {
       const _userByUsername = await this.ctx.userRepository.findByUsername(canBeUsernameOrId);
@@ -47,8 +70,30 @@ export class Controller {
       const userByUsername = _userByUsername!;
       this.ctx.assert.operationNotAllowed(userByUsername.id === currentUserId, `You cannot follow yourself.`);
       const isAlreadyFollowing = await this.ctx.followRepository.isFollowing(currentUserId, userByUsername.id);
-      this.ctx.assert.operationNotAllowed(isAlreadyFollowing, `You are already following this user.`);
-      const follow = await this.ctx.followRepository.create(currentUserId, userByUsername.id);
+      if (isAlreadyFollowing) {
+        return res.status(StatusCodes.CREATED).json({ id: isAlreadyFollowing.id }) as Response<{ id: string }>;
+      }
+
+      const follow = await this.ctx.transactionManager.withTransaction(async (tx) => {
+        const follow = await this.ctx.followRepository.create(currentUserId, userByUsername.id);
+        await this.ctx.aggregator.userAggregator.aggregate(
+          currentUserId,
+          (stats) => ({
+            ...stats,
+            total_following: (stats?.total_following ?? 0) + 1
+          }),
+          tx
+        );
+        await this.ctx.aggregator.userAggregator.aggregate(
+          userByUsername.id,
+          (stats) => ({
+            ...stats,
+            total_followers: (stats?.total_followers ?? 0) + 1
+          }),
+          tx
+        );
+        return follow;
+      });
       return res.status(StatusCodes.CREATED).json({ id: follow.id }) as Response<{ id: string }>;
     }
   }

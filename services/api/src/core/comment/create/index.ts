@@ -14,7 +14,9 @@ export function createCommentControllerFactory(path: string) {
     assert: ctx.assert,
     commentRepository: ctx.repositories.comment,
     feedRepository: ctx.repositories.feed,
-    requestParser: ctx.plugins.requestParser
+    requestParser: ctx.plugins.requestParser,
+    transactionManager: ctx.repositories.transactionManager,
+    aggregator: ctx.repositories.aggregator
   });
   const auth = authMiddlewareFactory();
   const limiter = rateLimitMiddlewareFactory(path, {

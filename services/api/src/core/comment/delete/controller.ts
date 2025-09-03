@@ -11,6 +11,8 @@ type ControllerOptions = {
   feedRepository: AppContext["repositories"]["feed"];
   commentRepository: AppContext["repositories"]["comment"];
   assert: AppContext["assert"];
+  transactionManger: AppContext["repositories"]["transactionManager"];
+  aggregator: AppContext["repositories"]["aggregator"];
 };
 
 const ZQuery = z.object({
@@ -40,7 +42,28 @@ export class Controller {
     this.ctx.assert.unprocessableEntity(comment.post_id !== body.feedId, "Comment does not belong to this feed");
     this.ctx.assert.forbidden(comment.user_id !== currentUserId, "You are not allowed to delete this comment");
 
-    await this.ctx.commentRepository.delete(comment.id);
+    await this.ctx.transactionManger.withTransaction(async (tx) => {
+      await this.ctx.commentRepository.delete(comment.id, tx);
+
+      if (!comment.parent_id) {
+        await this.ctx.aggregator.postAggregator.aggregate(
+          comment.post_id,
+          (stats) => ({
+            ...stats,
+            comments: (stats?.comments ?? 1) - 1
+          }),
+          tx
+        );
+        await this.ctx.aggregator.userAggregator.aggregate(
+          comment.user_id,
+          (stats) => ({
+            ...stats,
+            total_comments: (stats?.total_comments ?? 1) - 1
+          }),
+          tx
+        );
+      }
+    });
     return res.status(StatusCodes.NO_CONTENT).send();
   }
 }

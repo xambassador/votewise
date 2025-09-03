@@ -11,7 +11,9 @@ export function deleteFollowControllerFactory() {
   const controller = new Controller({
     assert: ctx.assert,
     followRepository: ctx.repositories.follow,
-    userRepository: ctx.repositories.user
+    userRepository: ctx.repositories.user,
+    transactionManager: ctx.repositories.transactionManager,
+    aggregator: ctx.repositories.aggregator
   });
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "delete-follow" });

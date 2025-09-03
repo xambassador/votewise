@@ -1,5 +1,6 @@
 import type { AppContext } from "@/context";
 
+import { Aggregator } from "./aggregator.repository";
 import { ChallengeRepository } from "./challenge.repository";
 import { CommentRepository } from "./comment.repository";
 import { FactorRepository } from "./factor.repository";
@@ -40,6 +41,7 @@ export function createRepositories(db: AppContext["db"]): Repositories {
   const commentRepository = new CommentRepository({ db });
   const notificationRepository = new NotificationRepository({ db });
   const transactionManager = new TransactionManager({ db });
+  const aggregator = new Aggregator({ db });
   return {
     user: userRepository,
     factor: factorRepository,
@@ -56,7 +58,8 @@ export function createRepositories(db: AppContext["db"]): Repositories {
     group: groupRepository,
     comment: commentRepository,
     notification: notificationRepository,
-    transactionManager
+    transactionManager,
+    aggregator
   };
 }
 
@@ -78,6 +81,7 @@ declare global {
     comment: CommentRepository;
     notification: NotificationRepository;
     transactionManager: TransactionManager;
+    aggregator: Aggregator;
   }
 
   interface RepositoryConfig {

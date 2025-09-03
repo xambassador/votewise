@@ -19,6 +19,7 @@ type ControllerOptions = {
   topicRepository: AppContext["repositories"]["topic"];
   assert: AppContext["assert"];
   transaction: AppContext["repositories"]["transactionManager"];
+  aggregator: AppContext["repositories"]["aggregator"];
 };
 
 export class Controller {
@@ -64,6 +65,30 @@ export class Controller {
         }));
         await this.ctx.feedAsset.createMany(assets, tx);
       }
+
+      await this.ctx.aggregator.postAggregator.aggregate(
+        feed.id,
+        (currentStats) => ({
+          comments: currentStats?.comments ?? 0,
+          shares: currentStats?.shares ?? 0,
+          views: currentStats?.views ?? 0,
+          votes: currentStats?.votes ?? 0
+        }),
+        tx
+      );
+      await this.ctx.aggregator.userAggregator.aggregate(
+        locals.payload.sub,
+        (currentStats) => ({
+          total_comments: currentStats?.total_comments ?? 0,
+          total_followers: currentStats?.total_followers ?? 0,
+          total_following: currentStats?.total_following ?? 0,
+          total_groups: currentStats?.total_groups ?? 0,
+          total_posts: (currentStats?.total_posts ?? 0) + 1,
+          total_votes: currentStats?.total_votes ?? 0
+        }),
+        tx
+      );
+
       return { feed };
     });
 

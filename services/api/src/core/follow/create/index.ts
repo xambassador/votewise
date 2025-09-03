@@ -11,7 +11,9 @@ export function createFollowControllerFactory() {
   const controller = new Controller({
     assert: ctx.assert,
     followRepository: ctx.repositories.follow,
-    userRepository: ctx.repositories.user
+    userRepository: ctx.repositories.user,
+    aggregator: ctx.repositories.aggregator,
+    transactionManager: ctx.repositories.transactionManager
   });
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "create-follow" });

@@ -15,6 +15,8 @@ type ControllerOptions = {
   commentRepository: AppContext["repositories"]["comment"];
   feedRepository: AppContext["repositories"]["feed"];
   requestParser: AppContext["plugins"]["requestParser"];
+  aggregator: AppContext["repositories"]["aggregator"];
+  transactionManager: AppContext["repositories"]["transactionManager"];
 };
 
 const ZQuery = z.object({ feedId: z.string() });
@@ -44,16 +46,35 @@ export class Controller {
       this.ctx.assert.resourceNotFound(!parent, `Parent comment with ID ${body.parent_id} not found`);
     }
 
-    // TODO: Check if the current user is allowed to comment on this feed.
-    // this.ctx.permissions.assert.canCommentOnFeed(currentUserId, feed.id)
-    // or
-    // this.ctx.permissionManager.check(currentUserId, "canCommentOnFeed", feed.id);
+    const comment = await this.ctx.transactionManager.withTransaction(async (tx) => {
+      const comment = await this.ctx.commentRepository.create({
+        text: body.text,
+        parentId: body.parent_id,
+        postId: feedId,
+        userId: currentUserId
+      });
 
-    const comment = await this.ctx.commentRepository.create({
-      text: body.text,
-      parentId: body.parent_id,
-      postId: feedId,
-      userId: currentUserId
+      // We are only aggregating comments and not replies
+      if (!body.parent_id) {
+        await this.ctx.aggregator.postAggregator.aggregate(
+          feedId,
+          (stats) => ({
+            ...stats,
+            comments: (stats?.comments ?? 0) + 1
+          }),
+          tx
+        );
+        await this.ctx.aggregator.userAggregator.aggregate(
+          currentUserId,
+          (stats) => ({
+            ...stats,
+            total_comments: (stats?.total_comments ?? 0) + 1
+          }),
+          tx
+        );
+      }
+
+      return comment;
     });
 
     const result = { id: comment.id };

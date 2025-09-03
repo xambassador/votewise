@@ -14,6 +14,7 @@ type ControllerOptions = {
   assert: AppContext["assert"];
   bucketService: AppContext["services"]["bucket"];
   transactionManager: AppContext["repositories"]["transactionManager"];
+  aggregator: AppContext["repositories"]["aggregator"];
 };
 
 export class Controller {
@@ -43,6 +44,22 @@ export class Controller {
     await this.ctx.transactionManager.withTransaction(async (tx) => {
       await this.ctx.feedRepository.vote(currentUserId, feed.id, tx);
       await this.ctx.userRepository.update(currentUserId, { vote_bucket: remainingVotes - 1 }, tx);
+      await this.ctx.aggregator.postAggregator.aggregate(
+        id,
+        (currentStats) => ({
+          ...currentStats,
+          votes: (currentStats?.votes ?? 0) + 1
+        }),
+        tx
+      );
+      await this.ctx.aggregator.userAggregator.aggregate(
+        currentUserId,
+        (currentStats) => ({
+          ...currentStats,
+          total_votes: (currentStats?.total_votes ?? 0) + 1
+        }),
+        tx
+      );
     });
 
     const result = { message: "Ok" };

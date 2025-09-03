@@ -19,6 +19,7 @@ export function createFeedControllerFactory(path: string) {
     postTopicRepository: ctx.repositories.postTopic,
     topicRepository: ctx.repositories.topic,
     transaction: ctx.repositories.transactionManager,
+    aggregator: ctx.repositories.aggregator,
     assert: ctx.assert
   });
   const auth = authMiddlewareFactory();

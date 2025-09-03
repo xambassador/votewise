@@ -12,6 +12,8 @@ type ControllerOptions = {
   assert: AppContext["assert"];
   groupRepository: AppContext["repositories"]["group"];
   requestParser: AppContext["plugins"]["requestParser"];
+  transactionManager: AppContext["repositories"]["transactionManager"];
+  aggregator: AppContext["repositories"]["aggregator"];
 };
 
 export class Controller {
@@ -29,14 +31,29 @@ export class Controller {
     const isNameTaken = await this.ctx.groupRepository.getByName(body.name);
     this.ctx.assert.unprocessableEntity(!!isNameTaken, "Group name is already taken");
 
-    const group = await this.ctx.groupRepository.create({
-      name: body.name,
-      about: body.description,
-      status: "OPEN",
-      type: body.type,
-      coverImageUrl: body.cover_image_url
+    const { group, member } = await this.ctx.transactionManager.withTransaction(async (tx) => {
+      const group = await this.ctx.groupRepository.create(
+        {
+          name: body.name,
+          about: body.description,
+          status: "OPEN",
+          type: body.type,
+          coverImageUrl: body.cover_image_url
+        },
+        tx
+      );
+      const member = await this.ctx.groupRepository.groupMember.addMember(group.id, sub, "ADMIN", tx);
+      await this.ctx.aggregator.userAggregator.aggregate(
+        sub,
+        (stats) => ({
+          ...stats,
+          total_groups: (stats?.total_groups ?? 0) + 1
+        }),
+        tx
+      );
+      return { group, member };
     });
-    const member = await this.ctx.groupRepository.groupMember.addMember(group.id, sub, "ADMIN");
+
     const result = {
       group: { id: group.id, name: group.name, about: group.about, type: group.type },
       member: { id: member.id }

@@ -11,7 +11,9 @@ export function createGroupControllerFactory() {
   const controller = new Controller({
     assert: ctx.assert,
     groupRepository: ctx.repositories.group,
-    requestParser: ctx.plugins.requestParser
+    requestParser: ctx.plugins.requestParser,
+    aggregator: ctx.repositories.aggregator,
+    transactionManager: ctx.repositories.transactionManager
   });
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "create-group" });

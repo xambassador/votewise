@@ -15,7 +15,8 @@ export function voteControllerFactory(path: string) {
     feedRepository: ctx.repositories.feed,
     bucketService: ctx.services.bucket,
     transactionManager: ctx.repositories.transactionManager,
-    userRepository: ctx.repositories.user
+    userRepository: ctx.repositories.user,
+    aggregator: ctx.repositories.aggregator
   });
   const auth = authMiddlewareFactory();
   const limiter = rateLimitMiddlewareFactory(path, {

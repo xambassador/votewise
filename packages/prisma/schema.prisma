@@ -140,6 +140,7 @@ model User {
     refreshTokens    RefreshToken[]
     interests        UserInterests[]
     timelines        Timeline[]
+    userAggregates   UserAggregates?
 }
 
 model Factor {
@@ -216,6 +217,10 @@ model Post {
     commentUpvotes CommentUpvote[]
     timelines      Timeline[]
     postTopics     PostTopic[]
+    postAggregates PostAggregates?
+
+    @@index([author_id], name: "post_author_index")
+    @@index([group_id], name: "post_group_index")
 }
 
 model PostAsset {
@@ -471,4 +476,24 @@ model Timeline {
     post Post @relation(fields: [post_id], references: [id], onDelete: Cascade)
 
     @@unique([user_id, post_id], name: "user_post_unique")
+}
+
+model PostAggregates {
+    votes    Int    @default(0)
+    comments Int    @default(0)
+    views    Int    @default(0)
+    shares   Int    @default(0)
+    post_id  String @id @unique
+    post     Post   @relation(fields: [post_id], references: [id], onDelete: Cascade)
+}
+
+model UserAggregates {
+    total_posts     Int    @default(0)
+    total_votes     Int    @default(0)
+    total_comments  Int    @default(0)
+    total_followers Int    @default(0)
+    total_following Int    @default(0)
+    total_groups    Int    @default(0)
+    user_id         String @id @unique
+    user            User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
