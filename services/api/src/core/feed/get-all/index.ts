@@ -13,7 +13,8 @@ export function getAllFeedControllerFactory(path: string) {
   const controller = new Controller({
     assert: ctx.assert,
     timelineRepository: ctx.repositories.timeline,
-    bucketService: ctx.services.bucket
+    bucketService: ctx.services.bucket,
+    aggregator: ctx.repositories.aggregator
   });
   const auth = authMiddlewareFactory();
   const limiter = rateLimitMiddlewareFactory(path, {

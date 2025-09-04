@@ -70,10 +70,12 @@ export class FeedRepository extends BaseRepository {
             select: { user: { select: { id: true, avatar_url: true } } },
             take: 10
           },
-          _count: {
+          postAggregates: {
             select: {
-              upvotes: true,
-              comments: true
+              comments: true,
+              votes: true,
+              shares: true,
+              views: true
             }
           }
         }

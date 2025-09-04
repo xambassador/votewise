@@ -14,6 +14,7 @@ type ControllerOptions = {
   timelineRepository: AppContext["repositories"]["timeline"];
   assert: AppContext["assert"];
   bucketService: AppContext["services"]["bucket"];
+  aggregator: AppContext["repositories"]["aggregator"];
 };
 
 export class Controller {
@@ -48,12 +49,12 @@ export class Controller {
         last_name: timeline.post.author.last_name,
         avatar_url: this.ctx.bucketService.generatePublicUrl(timeline.post.author.avatar_url ?? "", "avatar")
       },
-      votes: timeline.post._count.upvotes,
+      votes: timeline.post.postAggregates?.votes ?? 0,
       voters: timeline.post.upvotes.map((vote) => ({
         id: vote.user.id,
         avatar_url: this.ctx.bucketService.generatePublicUrl(vote.user.avatar_url ?? "", "avatar")
       })),
-      comments: timeline.post._count.comments
+      comments: timeline.post.postAggregates?.comments ?? 0
     }));
     const feeds = await Promise.all(timelineFeedPromises);
     const pagination = new PaginationBuilder({ total, page, limit }).build();

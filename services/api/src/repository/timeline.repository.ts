@@ -52,10 +52,10 @@ export class TimelineRepository extends BaseRepository {
                 select: { user: { select: { id: true, avatar_url: true } } },
                 take: 5
               },
-              _count: {
+              postAggregates: {
                 select: {
-                  upvotes: true,
-                  comments: { where: { parent_id: null } }
+                  comments: true,
+                  votes: true
                 }
               }
             }

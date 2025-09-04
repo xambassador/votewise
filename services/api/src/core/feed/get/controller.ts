@@ -46,8 +46,8 @@ export class Controller {
       author: feed.author,
       assets: feed.assets,
       ...(feed.author.id === locals.payload.sub ? { is_self: true } : {}),
-      upvote_count: feed._count.upvotes,
-      comment_count: feed._count.comments,
+      upvote_count: feed.postAggregates?.votes ?? 0,
+      comment_count: feed.postAggregates?.comments ?? 0,
       is_voted: isVotedByMe ? true : false,
       voters: feed.upvotes.map((v) => ({
         id: v.user.id,
