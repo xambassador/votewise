@@ -6,6 +6,7 @@ import { cn } from "../cn";
 import { createContext } from "../context";
 import { Comment as CommentIcon } from "../icons/comment";
 import { Cross } from "../icons/cross";
+import { Minus } from "../icons/minus";
 import { PaperPlane } from "../icons/paper-plane";
 import { Pencil } from "../icons/pencil";
 import { Plus } from "../icons/plus";
@@ -240,14 +241,10 @@ export const CommentConnectorLine = forwardRef<HTMLDivElement, CommentConnectorL
       {...rest}
       ref={ref}
       className={cn(
-        "CommentConnectorLine bg-nobelBlack-200 absolute left-8 -translate-x-4 top-9 w-[2px] rounded-full h-[calc(100%-3rem)]",
+        "bg-nobelBlack-200 absolute left-8 -translate-x-4 top-9 w-[2px] rounded-full h-[calc(100%-3rem)]",
         rest.className
       )}
-    >
-      <button className="size-6 rounded-full border border-black-300 bg-nobelBlack-200 border-dashed flex items-center justify-center relative -left-3 top-4 focus-presets">
-        <Plus className="text-gray-400 size-4" />
-      </button>
-    </div>
+    />
   );
 });
 CommentConnectorLine.displayName = "CommentConnectorLine";
@@ -309,3 +306,21 @@ export const CommentDeleteButton = forwardRef<HTMLButtonElement, CommentDeleteBu
   );
 });
 CommentDeleteButton.displayName = "CommentDeleteButton";
+
+type ExpandButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & { expanded?: boolean };
+export const ExpandButton = forwardRef<HTMLButtonElement, ExpandButtonProps>((props, ref) => {
+  const { className, expanded, ...rest } = props;
+  return (
+    <button
+      ref={ref}
+      className={cn(
+        "size-6 rounded-full border border-black-300 bg-nobelBlack-200 border-dashed flex items-center justify-center relative -left-3 top-4 focus-presets",
+        className
+      )}
+      {...rest}
+    >
+      {expanded ? <Minus className="text-gray-400 size-4" /> : <Plus className="text-gray-400 size-4" />}
+    </button>
+  );
+});
+ExpandButton.displayName = "ExpandButton";

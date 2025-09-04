@@ -2,7 +2,7 @@
 
 import type { GetCommentsResponse } from "@votewise/client/comment";
 
-import { memo, useMemo } from "react";
+import { memo, useMemo, useState } from "react";
 import Link from "next/link";
 import { useFetchComments } from "@/hooks/use-fetch-comments";
 import { useFetchReplies } from "@/hooks/use-fetch-replies";
@@ -24,6 +24,7 @@ import {
   Comments,
   CommentText,
   CommentUpdatedLabel,
+  ExpandButton,
   ReplyConnector,
   ReplyContainer
 } from "@votewise/ui/cards/comment";
@@ -126,7 +127,6 @@ const Replies = memo(function Replies(props: RepliesProps) {
 
   return (
     <ReplyContainer>
-      <ReplyConnector />
       {data.replies.map((reply) => (
         <MemoizedComment
           key={reply.id}
@@ -182,8 +182,11 @@ const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
     parentId
   } = props;
   const { id } = useMe("MemoizedComment");
+  const [showReplies, setShowReplies] = useState(true);
+
   return (
     <Comment>
+      {parentId && <ReplyConnector />}
       <Link href={routes.user.profile(userId)} className="focus-visible h-fit">
         <Avatar className="size-8">
           <AvatarFallback name={name} />
@@ -212,9 +215,11 @@ const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
         </CommentActions>
 
         {commentId && <ReplyToComment parentId={commentId} postId={postId} username={userName} />}
-        {children}
+        {showReplies && children}
       </CommentContent>
-      <CommentConnectorLine hasReplies={replyCount > 0} />
+      <CommentConnectorLine hasReplies={replyCount > 0}>
+        <ExpandButton expanded={showReplies} onClick={() => setShowReplies(!showReplies)} />
+      </CommentConnectorLine>
     </Comment>
   );
 });
