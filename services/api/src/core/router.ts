@@ -47,6 +47,7 @@ import { getMeControllerFactory } from "./user/me";
 import { onboardControllerFactory } from "./user/onboard";
 import { getOnboardStatusControllerFactory } from "./user/onboard/get";
 import { getOnboardSessionControllerFactory } from "./user/onboard/get-session";
+import { getUserProfileControllerFactory } from "./user/profile/get";
 import { listSessionsControllerFactory } from "./user/sessions/list";
 
 /**
@@ -91,6 +92,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.get(groups.paths.joinRequests(path), ...getGroupJoinRequestsControllerFactory());
   router.get(groups.paths.get(path), ...getGroupControllerFactory());
   router.get(notifications.paths.all(path), ...getNotificationsControllerFactory());
+  router.get(user.paths.profile.getByUsername(path), ...getUserProfileControllerFactory());
 
   /* ----------------------------------------------------------------------------------------------- */
   router.post(auth.paths.register(path), ...registerControllerFactory(auth.paths.register(path)));

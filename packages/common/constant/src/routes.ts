@@ -71,7 +71,9 @@ export const user = {
       /** Get the current user's profile */
       get: (base: string) => base + "/me",
       /** Get all invitations */
-      getInvitations: (base: string) => base + "/me/invitations"
+      getInvitations: (base: string) => base + "/me/invitations",
+      /** Update profile */
+      update: (base: string) => base + "/me"
     },
     invitations: {
       /** Accept group invitation  */
@@ -84,6 +86,10 @@ export const user = {
       get: (base: string) => base + "/users/recommendations",
       /** Get group recommendations for current user */
       getGroupRecommendations: (base: string) => base + "/users/recommendations/groups"
+    },
+    profile: {
+      /** Get a user's profile by username */
+      getByUsername: (base: string) => base + "/users/:username/profile"
     }
   },
   runtime: {

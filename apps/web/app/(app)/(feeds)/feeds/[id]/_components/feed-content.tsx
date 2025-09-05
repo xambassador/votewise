@@ -10,7 +10,6 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
 import {
   FeedContent as _FeedContent,
-  FeedContentTags,
   FeedContentText,
   FeedHeader,
   FeedTimeAgo,
@@ -79,7 +78,6 @@ export function FeedContent(props: Props) {
       <FeedTitle className="pb-4 border-b border-nobelBlack-200">{feed.title}</FeedTitle>
       <_FeedContent className="pb-7 border-b border-nobelBlack-200">
         <FeedContentText className="text-base font-normal text-gray-200">{feed.content}</FeedContentText>
-        <FeedContentTags>#programming #startups</FeedContentTags>
         {feed.assets.length > 0 ? <FeedAssets assets={feed.assets} /> : null}
       </_FeedContent>
 
