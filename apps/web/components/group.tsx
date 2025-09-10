@@ -51,7 +51,7 @@ export function GroupMolecule(props: Props) {
               <AvatarImage
                 src={author?.avatar_url}
                 alt={author?.first_name + " " + author?.last_name}
-                className="overflow-clip-margin-unset"
+                className="overflow-clip-margin-unset object-cover"
               />
             </Avatar>
           </Link>
@@ -76,7 +76,7 @@ export function GroupMolecule(props: Props) {
               <AvatarImage
                 src={member.avatar_url}
                 alt={member.first_name + " " + member.last_name}
-                className="overflow-clip-margin-unset"
+                className="overflow-clip-margin-unset object-cover"
               />
             </Avatar>
           ))}

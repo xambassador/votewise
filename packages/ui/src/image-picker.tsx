@@ -83,16 +83,18 @@ export type ImagePickerButtonProps = React.HTMLAttributes<HTMLLabelElement> & {
   isMultiple?: boolean;
   accept?: string;
   preventDefaultBehavior?: boolean;
+  onFileSelect?: (file: File | null) => void;
 };
 
 export function ImagePickerButton(props: ImagePickerButtonProps) {
-  const { isMultiple = false, accept = "image/*", preventDefaultBehavior = false, ...rest } = props;
+  const { isMultiple = false, accept = "image/*", preventDefaultBehavior = false, onFileSelect, ...rest } = props;
   const { onPreviewChange } = useProvider("ImagePickerButton");
   const id = useId();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
     if (files && files.length) {
+      onFileSelect?.(files[0]);
       onPreviewChange(URL.createObjectURL(files[0]));
     }
     e.target.value = "";

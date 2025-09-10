@@ -7,6 +7,8 @@ import { cn } from "./cn";
 import { Cross } from "./icons/cross";
 
 export const Dialog = DialogPrimitive.Root;
+export type DialogProps = React.ComponentPropsWithoutRef<typeof Dialog>;
+
 export const DialogTrigger = DialogPrimitive.Trigger;
 const DialogPortal = DialogPrimitive.Portal;
 export const DialogClose = DialogPrimitive.Close;

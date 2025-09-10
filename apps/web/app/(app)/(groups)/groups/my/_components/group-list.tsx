@@ -5,10 +5,9 @@ import type { GetAllGroupsResponse } from "@votewise/client/group";
 import Link from "next/link";
 import { useFetchMyGroups } from "@/hooks/use-fetch-my-groups";
 
-import { Button } from "@votewise/ui/button";
 import { Error } from "@votewise/ui/error";
-import { Users } from "@votewise/ui/icons/users";
 
+import { CreateGroup } from "@/components/create-group";
 import { GroupMolecule } from "@/components/group";
 import { InView } from "@/components/in-view";
 import { LoadMoreSpinner } from "@/components/load-more-spinner";
@@ -22,8 +21,8 @@ type Props = {
 };
 
 export function MyGroupsList(props: Props) {
-  const { groups } = props;
-  const { data, status, error, fetchNextPage, nextPageStatus } = useFetchMyGroups({ initialData: groups });
+  const { groups: initialData } = props;
+  const { data, status, error, fetchNextPage, nextPageStatus } = useFetchMyGroups({ initialData });
 
   function handleLoadMore(inView: boolean) {
     if (!inView) return;
@@ -44,31 +43,35 @@ export function MyGroupsList(props: Props) {
     return <Error error="No data received!" />;
   }
 
+  const groups = data.groups;
+
   return (
     <div className="flex flex-col gap-4">
-      {groups.groups.length === 0 && (
-        <div className="flex flex-col gap-5 items-center">
-          <h2 className="text-black-200 text-lg text-center">
-            Your ideas are lonely! Give them some friends.
-            <br />
-            start a group or join fellow thinkers.
-          </h2>
-          <Button>
-            <Users /> Create
-          </Button>
-          <p className="text-black-200 text-sm">
-            Browse around - your people are waiting{" "}
-            <Link href={routes.group.root()} className="underline text-blue-500">
-              here!
-            </Link>
-          </p>
-        </div>
-      )}
-      {groups.groups.map((group) => (
+      {groups.length === 0 && <NoGroups />}
+      {groups.map((group) => (
         <GroupMolecule key={group.id} group={group} />
       ))}
       {nextPageStatus === "loading" && <LoadMoreSpinner />}
       <InView onInView={handleLoadMore} />
+    </div>
+  );
+}
+
+function NoGroups() {
+  return (
+    <div className="flex flex-col gap-5 items-center">
+      <h2 className="text-black-200 text-lg text-center">
+        Your ideas are lonely! Give them some friends.
+        <br />
+        start a group or join fellow thinkers.
+      </h2>
+      <CreateGroup />
+      <p className="text-black-200 text-sm">
+        Browse around - your people are waiting{" "}
+        <Link href={routes.group.root()} className="underline text-blue-500">
+          here!
+        </Link>
+      </p>
     </div>
   );
 }
