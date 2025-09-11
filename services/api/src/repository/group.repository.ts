@@ -68,7 +68,39 @@ export class GroupRepository extends BaseRepository {
 
   public findById(id: string) {
     return this.execute(async () => {
-      const group = await this.db.group.findUnique({ where: { id } });
+      const group = await this.db.group.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          name: true,
+          about: true,
+          cover_image_url: true,
+          created_at: true,
+          logo_url: true,
+          status: true,
+          type: true,
+          updated_at: true,
+          groupAggregates: {
+            select: {
+              total_comments: true,
+              total_members: true,
+              total_posts: true,
+              total_votes: true
+            }
+          },
+          members: {
+            select: {
+              user_id: true,
+              user: {
+                select: {
+                  avatar_url: true
+                }
+              }
+            },
+            take: 5
+          }
+        }
+      });
       return group;
     });
   }
@@ -169,7 +201,9 @@ export class GroupRepository extends BaseRepository {
           about: data.about,
           name: data.name,
           type: data.type,
-          status: data.status
+          status: data.status,
+          cover_image_url: data.cover_image_url,
+          logo_url: data.logo_url
         }
       });
       return group;

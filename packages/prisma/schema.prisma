@@ -346,19 +346,21 @@ model Friend {
 }
 
 model Group {
-    id            String      @id @default(cuid())
-    name          String      @unique @db.VarChar(21)
-    about         String      @db.VarChar(500)
-    coverImageUrl String?
-    type          GroupType
-    status        GroupStatus
+    id              String      @id @default(cuid())
+    name            String      @unique @db.VarChar(21)
+    about           String      @db.VarChar(500)
+    cover_image_url String?
+    logo_url        String?
+    type            GroupType
+    status          GroupStatus
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
 
-    members     GroupMember[]
-    invitations GroupInvitation[]
-    posts       Post[]
+    members         GroupMember[]
+    invitations     GroupInvitation[]
+    posts           Post[]
+    groupAggregates GroupAggregates?
 }
 
 model GroupMember {
@@ -496,4 +498,13 @@ model UserAggregates {
     total_groups    Int    @default(0)
     user_id         String @id @unique
     user            User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model GroupAggregates {
+    total_posts    Int    @default(0)
+    total_members  Int    @default(0)
+    total_comments Int    @default(0)
+    total_votes    Int    @default(0)
+    group_id       String @id @unique
+    group          Group  @relation(fields: [group_id], references: [id], onDelete: Cascade)
 }

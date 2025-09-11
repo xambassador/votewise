@@ -38,7 +38,8 @@ export class Controller {
           about: body.description,
           status: "OPEN",
           type: body.type,
-          coverImageUrl: body.cover_image_url
+          cover_image_url: body.cover_image_url,
+          logo_url: body.logo_url
         },
         tx
       );

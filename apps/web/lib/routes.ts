@@ -33,6 +33,6 @@ export const routes = {
   },
   group: {
     root: () => "/groups",
-    view: (id: string) => `/groups/${id}`
+    view: (id: string) => `/groups/v/${id}`
   }
 };

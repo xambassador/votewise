@@ -77,4 +77,13 @@ export class Group {
   }
 }
 
-export type { GetAllGroupsResponse, GetMyGroupsResponse };
+export type {
+  GetAllGroupsResponse,
+  GetMyGroupsResponse,
+  CreateGroupResponse,
+  GetGroupResponse,
+  JoinGroupResponse,
+  KickMemberResponse,
+  LeaveGroupResponse,
+  SendGroupInviteResponse
+};

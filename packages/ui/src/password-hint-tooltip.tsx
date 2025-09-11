@@ -1,6 +1,6 @@
 "use client";
 
-import { InforCircleSolid } from "./icons/infor-circle-solid";
+import { InforCircleSolid } from "./icons/info-circle-solid";
 import { checkStrength } from "./password-strength";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 

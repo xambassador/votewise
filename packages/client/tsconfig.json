@@ -9,14 +9,7 @@
     "moduleResolution": "NodeNext",
     "verbatimModuleSyntax": false,
     "incremental": false,
-    "composite": false,
-    "paths": {
-      // I found this **hack** from [Colin mcdonnell](https://colinhacks.com/)
-      // Before this, I need to first build the api service to get newly
-      // introduced types. But now I can just directly use them without
-      // building the api service.
-      "@votewise/api": ["../../services/api/src/types/api.ts"]
-    }
+    "composite": false
   },
   "include": ["./src"],
   "exclude": ["dist", "build", "node_modules"]
