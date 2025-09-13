@@ -1,6 +1,7 @@
 import type {
   CreateGroupResponse,
   GetAllGroupsResponse,
+  GetGroupMembersResponse,
   GetGroupResponse,
   GetMyGroupsResponse,
   JoinGroupResponse,
@@ -73,6 +74,12 @@ export class Group {
   public async kick(id: string, username: string) {
     const path = groups.runtime.kick("", id, username);
     const response = await this.client.delete<KickMemberResponse>(path);
+    return response;
+  }
+
+  public async getMembers(id: string) {
+    const path = groups.runtime.members("", id);
+    const response = await this.client.get<GetGroupMembersResponse>(path);
     return response;
   }
 }

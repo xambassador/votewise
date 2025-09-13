@@ -4,3 +4,4 @@ export const getGroupsKey = () => ["groups"];
 export const getFeedsKey = () => ["feeds"];
 export const getMyGroupsKey = () => ["my-groups"];
 export const getFeedKey = (id: string) => ["feed", id];
+export const getMembersKey = (groupId: string) => ["members", groupId];

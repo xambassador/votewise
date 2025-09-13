@@ -3,7 +3,6 @@ import relativeTime from "dayjs/plugin/relativeTime";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
 import { Badge } from "@votewise/ui/badge";
-import { GroupMembers } from "@votewise/ui/cards/group";
 import { Error } from "@votewise/ui/error";
 import { Clock } from "@votewise/ui/icons/clock";
 import { Comment } from "@votewise/ui/icons/comment";
@@ -11,6 +10,7 @@ import { Heart } from "@votewise/ui/icons/heart";
 import { InforCircleSolid } from "@votewise/ui/icons/info-circle-solid";
 import { Pencil } from "@votewise/ui/icons/pencil";
 import { User } from "@votewise/ui/icons/user";
+import { Image } from "@votewise/ui/image";
 
 import { getGroupClient } from "@/lib/client.server";
 
@@ -33,8 +33,7 @@ export default async function Page(props: Props) {
       <div className="flex flex-col gap-4">
         <div className="relative">
           <figure className="relative w-full h-[calc((200/16)*1rem)] max-h-[calc((200/16)*1rem)] rounded-xl overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="max-w-full" src={group.cover_url ?? ""} alt={group.name} />
+            <Image className="max-w-full" src={group.cover_url ?? ""} alt={group.name} />
           </figure>
           <Avatar className="size-20 absolute -bottom-10 left-5">
             <AvatarImage src={group.logo_url ?? ""} alt={group.name} />
@@ -104,18 +103,6 @@ export default async function Page(props: Props) {
               </div>
             </div>
           </div>
-          <GroupMembers>
-            {group.members.map((member) => (
-              <Avatar className="size-6" key={member.id}>
-                <AvatarFallback name={`${group.name} member`} />
-                <AvatarImage
-                  src={member.avatar_url ?? ""}
-                  alt={`${group.name} member`}
-                  className="overflow-clip-margin-unset object-cover"
-                />
-              </Avatar>
-            ))}
-          </GroupMembers>
         </div>
       </div>
     </div>

@@ -261,7 +261,9 @@ export const groups = {
     /** Accept a group join request */
     acceptJoinRequest: (base: string) => base + "/groups/join-requests/:id/accept",
     /** Decline a group join request */
-    declineJoinRequest: (base: string) => base + "/groups/join-requests/:id/decline"
+    declineJoinRequest: (base: string) => base + "/groups/join-requests/:id/decline",
+    /** Get group members */
+    members: (base: string) => base + "/groups/:groupId/members"
   },
   runtime: {
     /** Get all groups */
@@ -289,7 +291,10 @@ export const groups = {
     /** Accept a group join request */
     acceptJoinRequest: (base: string, joinRequestId: string) => base + `/groups/join-requests/${joinRequestId}/accept`,
     /** Decline a group join request */
-    declineJoinRequest: (base: string, joinRequestId: string) => base + `/groups/join-requests/${joinRequestId}/decline`
+    declineJoinRequest: (base: string, joinRequestId: string) =>
+      base + `/groups/join-requests/${joinRequestId}/decline`,
+    /** Get group members */
+    members: (base: string, groupId: string) => base + `/groups/${groupId}/members`
   }
 };
 

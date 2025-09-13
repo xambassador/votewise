@@ -30,6 +30,7 @@ import { createGroupControllerFactory } from "./group/create";
 import { getGroupControllerFactory } from "./group/get";
 import { getAllGroupsControllerFactory } from "./group/get-all";
 import { getGroupJoinRequestsControllerFactory } from "./group/get-join-requests";
+import { getGroupMembersControllerFactory } from "./group/get-members";
 import { sendGroupInviteControllerFactory } from "./group/invite";
 import { joinGroupControllerFactory } from "./group/join";
 import { kickMemberControllerFactory } from "./group/kick";
@@ -93,6 +94,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.get(groups.paths.get(path), ...getGroupControllerFactory());
   router.get(notifications.paths.all(path), ...getNotificationsControllerFactory());
   router.get(user.paths.profile.getByUsername(path), ...getUserProfileControllerFactory());
+  router.get(groups.paths.members(path), ...getGroupMembersControllerFactory());
 
   /* ----------------------------------------------------------------------------------------------- */
   router.post(auth.paths.register(path), ...registerControllerFactory(auth.paths.register(path)));
