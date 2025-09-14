@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
 import * as SuggestedGroupCard from "@votewise/ui/cards/suggested-group";
@@ -6,6 +7,7 @@ import { ErrorBoundary } from "@votewise/ui/error-boundary";
 import { MoreItemsWithSummary } from "@votewise/ui/more-items";
 
 import { getUserClient } from "@/lib/client.server";
+import { routes } from "@/lib/routes";
 
 import { ContentWrapper, EmptyState, ErrorMessage, fallbackSpinner, maxListItems, Title, VerticalList } from "./utils";
 
@@ -54,8 +56,16 @@ async function SuggestedGroupsList() {
                 />
               </Avatar>
               <div className="flex flex-col">
-                <SuggestedGroupCard.GroupName>{group.name}</SuggestedGroupCard.GroupName>
-                <SuggestedGroupCard.GroupCreatorHandle>{group.author?.user_name}</SuggestedGroupCard.GroupCreatorHandle>
+                <SuggestedGroupCard.GroupName>
+                  <Link href={routes.group.view(group.id)} className="focus-presets focus-primary rounded">
+                    {group.name}
+                  </Link>
+                </SuggestedGroupCard.GroupName>
+                <SuggestedGroupCard.GroupCreatorHandle>
+                  <Link href={routes.group.view(group.id)} className="focus-presets focus-primary rounded">
+                    {group.author?.user_name}
+                  </Link>
+                </SuggestedGroupCard.GroupCreatorHandle>
               </div>
             </div>
             <SuggestedGroupCard.GroupJoinButton

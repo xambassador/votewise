@@ -6,7 +6,7 @@ import { domAnimation, LazyMotion } from "framer-motion";
 
 function queryClientFactory() {
   return new QueryClient({
-    defaultOptions: { queries: { staleTime: 60 * 1000 } }
+    defaultOptions: { queries: { staleTime: 60 * 1000, refetchOnWindowFocus: false, retry: false } }
   });
 }
 

@@ -7,12 +7,13 @@ import { Error } from "@votewise/ui/error";
 import { Clock } from "@votewise/ui/icons/clock";
 import { Comment } from "@votewise/ui/icons/comment";
 import { Heart } from "@votewise/ui/icons/heart";
-import { InforCircleSolid } from "@votewise/ui/icons/info-circle-solid";
 import { Pencil } from "@votewise/ui/icons/pencil";
 import { User } from "@votewise/ui/icons/user";
 import { Image } from "@votewise/ui/image";
 
 import { getGroupClient } from "@/lib/client.server";
+
+import { MembersSheet } from "./_components/members-sheet";
 
 extend(relativeTime);
 
@@ -53,10 +54,7 @@ export default async function Page(props: Props) {
                 <Clock className="text-black-200 size-5" />
                 <span className="text-sm text-black-200">Created {dayjs(group.created_at).fromNow()}</span>
               </div>
-              <div className="flex items-center gap-1">
-                <InforCircleSolid className="text-blue-300 size-5" />
-                <span className="font-medium text-blue-300 text-sm">About</span>
-              </div>
+              <MembersSheet groupId={group.id} about={group.about} name={group.name} />
             </div>
           </div>
           <p className="text-sm text-gray-300">{group.about}</p>

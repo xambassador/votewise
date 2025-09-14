@@ -479,7 +479,7 @@ const awesomePeople = [
     firstName: "Kachara",
     lastName: "Seth",
     email: "kachara.seth@gmail.com",
-    avatar: "avatars/kachara_seth.jpg",
+    avatar: "avatars/kachara_seth.jpeg",
     background: "",
     about: "150rs dega!",
     location: "Mumbai",
