@@ -46,13 +46,13 @@ async function SuggestedGroupsList() {
       {suggestedGroups.map((group) => (
         <SuggestedGroupCard.SuggestedGroupCard key={group.id}>
           <SuggestedGroupCard.Header>
-            <div className="flex-1 flex gap-1">
+            <div className="flex-1 flex gap-2">
               <Avatar className="rounded size-10">
                 <AvatarFallback name={group.author ? group.author.first_name + group.author.last_name : ""} />
                 <AvatarImage
                   src={group.author?.avatar_url || ""}
                   alt={group.author?.first_name}
-                  className="overflow-clip-margin-unset"
+                  className="overflow-clip-margin-unset object-cover"
                 />
               </Avatar>
               <div className="flex flex-col">
@@ -62,7 +62,10 @@ async function SuggestedGroupsList() {
                   </Link>
                 </SuggestedGroupCard.GroupName>
                 <SuggestedGroupCard.GroupCreatorHandle>
-                  <Link href={routes.group.view(group.id)} className="focus-presets focus-primary rounded">
+                  <Link
+                    href={routes.user.profile(group.author?.user_name || "")}
+                    className="focus-presets focus-primary rounded"
+                  >
                     {group.author?.user_name}
                   </Link>
                 </SuggestedGroupCard.GroupCreatorHandle>

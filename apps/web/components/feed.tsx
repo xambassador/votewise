@@ -48,7 +48,7 @@ export const FeedMolecule = memo(function FeedMolecule(props: Props) {
       <Separator orientation="vertical" className="h-auto" />
       <FeedContainer>
         <div className="flex gap-2">
-          <Link href={routes.user.profile(feed.author.id)} className="focus-visible h-fit">
+          <Link href={routes.user.profile(feed.author.user_name)} className="focus-visible h-fit">
             <FeedAvatar
               name={feed.author.first_name + " " + feed.author.last_name}
               url={feed.author.avatar_url || ""}
@@ -56,7 +56,7 @@ export const FeedMolecule = memo(function FeedMolecule(props: Props) {
           </Link>
           <FeedContent>
             <FeedHeader>
-              <Link href={routes.user.profile(feed.author.id)} className="focus-visible rounded">
+              <Link href={routes.user.profile(feed.author.user_name)} className="focus-visible rounded">
                 <FeedUserName>{feed.author.first_name + " " + feed.author.last_name}</FeedUserName>
               </Link>
               <FeedTimeAgo>{dayjs(feed.created_at).fromNow()}</FeedTimeAgo>

@@ -335,6 +335,32 @@ export class GroupMemberRepository extends BaseRepository {
       return members;
     });
   }
+
+  public getMembers(groupId: string) {
+    return this.execute(async () => {
+      const members = await this.db.groupMember.findMany({
+        where: {
+          group_id: groupId,
+          is_removed: false
+        },
+        select: {
+          id: true,
+          role: true,
+          joined_at: true,
+          user: {
+            select: {
+              id: true,
+              avatar_url: true,
+              first_name: true,
+              last_name: true,
+              user_name: true
+            }
+          }
+        }
+      });
+      return members;
+    });
+  }
 }
 
 export class GroupInvitationRepository extends BaseRepository {

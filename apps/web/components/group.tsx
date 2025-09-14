@@ -45,7 +45,7 @@ export function GroupMolecule(props: Props) {
       </Link>
       <div className="flex items-center justify-between">
         <GroupAuthor>
-          <Link className="focus-visible" href={routes.user.profile(author?.id || "")}>
+          <Link className="focus-visible" href={routes.user.profile(author?.user_name || "")}>
             <Avatar>
               <AvatarFallback name={author?.first_name + " " + author?.last_name} />
               <AvatarImage
@@ -56,12 +56,12 @@ export function GroupMolecule(props: Props) {
             </Avatar>
           </Link>
           <div className="flex flex-col">
-            <Link className="focus-visible" href={routes.user.profile(author?.id || "")}>
+            <Link className="focus-visible" href={routes.user.profile(author?.user_name || "")}>
               <GroupAuthorName title={author?.first_name + " " + author?.last_name}>
                 {truncate(author?.first_name + " " + author?.last_name, 25)}
               </GroupAuthorName>
             </Link>
-            <Link className="focus-visible" href={routes.user.profile(author?.id || "")}>
+            <Link className="focus-visible" href={routes.user.profile(author?.user_name || "")}>
               <GroupAuthorHandle title={author?.user_name}>@{truncate(author?.user_name || "", 30)}</GroupAuthorHandle>
             </Link>
           </div>

@@ -13,3 +13,17 @@ export function Users(props: Props) {
     </svg>
   );
 }
+
+export function Users2(props: Props) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" {...props}>
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+        d="M13.333 17.5a5 5 0 0 0-5-5H6.666a5 5 0 0 0-5 5m11.667-15a3.333 3.333 0 0 1 .833 6.562M15 12.785a5.002 5.002 0 0 1 3.333 4.715m-7.5-11.667a3.333 3.333 0 1 1-6.667 0 3.333 3.333 0 0 1 6.667 0Z"
+      />
+    </svg>
+  );
+}

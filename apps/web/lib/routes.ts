@@ -29,7 +29,7 @@ export const routes = {
     view: (id: string) => `/feeds/${id}`
   },
   user: {
-    profile: (id: string) => `/profile/${id}`
+    profile: (username: string) => `/profile/${username}`
   },
   group: {
     root: () => "/groups",

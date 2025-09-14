@@ -122,6 +122,10 @@ export const user = {
       get: (base: string) => base + "/users/recommendations",
       /** Get group recommendations for current user */
       getGroupRecommendations: (base: string) => base + "/users/recommendations/groups"
+    },
+    profile: {
+      /** Get a user's profile by username */
+      getByUsername: (base: string, username: string) => base + `/users/${username}/profile`
     }
   }
 };

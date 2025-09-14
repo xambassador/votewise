@@ -41,8 +41,8 @@ export function GroupCreatorHandle(props: React.HTMLAttributes<HTMLSpanElement>)
   const { className, children, ...rest } = props;
   useProvider("GroupCreatorHandle");
   return (
-    <span {...rest} className={cn("text-xs text-gray-400", className)}>
-      Group by <b>{children}</b>
+    <span {...rest} className={cn("text-xs text-gray-300", className)}>
+      Group by <span className="font-medium">{children}</span>
     </span>
   );
 }

@@ -1,6 +1,7 @@
 import type {
   GetGroupRecommendationsResponse,
   GetMeResponse,
+  GetUserProfileResponse,
   GetUserRecommendationsResponse,
   UsernameExistsResponse
 } from "@votewise/api";
@@ -46,6 +47,18 @@ export class User {
     const res = await this.client.get<GetGroupRecommendationsResponse>(path);
     return res;
   }
+
+  public async getUser(userName: string) {
+    const path = user.runtime.profile.getByUsername("", userName);
+    const res = await this.client.get<GetUserProfileResponse>(path);
+    return res;
+  }
 }
 
-export type { UsernameExistsResponse, GetMeResponse, GetUserRecommendationsResponse, GetGroupRecommendationsResponse };
+export type {
+  UsernameExistsResponse,
+  GetMeResponse,
+  GetUserRecommendationsResponse,
+  GetGroupRecommendationsResponse,
+  GetUserProfileResponse
+};

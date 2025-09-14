@@ -53,7 +53,7 @@ export function FeedContent(props: Props) {
   return (
     <>
       <FeedHeader>
-        <Link href={routes.user.profile(feed.author.id)} className="focus-visible">
+        <Link href={routes.user.profile(feed.author.user_name)} className="focus-visible">
           <Avatar className="size-12">
             <AvatarFallback name={feed.author.first_name + " " + feed.author.last_name} />
             <AvatarImage
@@ -65,10 +65,10 @@ export function FeedContent(props: Props) {
         </Link>
         <div className="flex gap-3">
           <div className="flex flex-col">
-            <Link href={routes.user.profile(feed.author.id)} className="focus-visible">
+            <Link href={routes.user.profile(feed.author.user_name)} className="focus-visible">
               <FeedUserName>{feed.author.first_name + " " + feed.author.last_name}</FeedUserName>
             </Link>
-            <Link href={routes.user.profile(feed.author.id)} className="focus-visible">
+            <Link href={routes.user.profile(feed.author.user_name)} className="focus-visible">
               <FeedUserHandle>@{feed.author.user_name}</FeedUserHandle>
             </Link>
           </div>

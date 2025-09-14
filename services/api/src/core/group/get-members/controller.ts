@@ -25,7 +25,7 @@ export class Controller {
     this.ctx.assert.unprocessableEntity(!validate.success, "Invalid request");
     const query = validate.data!;
 
-    const membersResult = await this.ctx.groupRepository.groupMember.getModeratingMembers(query.groupId);
+    const membersResult = await this.ctx.groupRepository.groupMember.getMembers(query.groupId);
     const members = membersResult.map((member) => ({
       id: member.id,
       role: member.role,
