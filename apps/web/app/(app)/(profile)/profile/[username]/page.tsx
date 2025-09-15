@@ -2,17 +2,17 @@ import dayjs, { extend } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
-import { Button } from "@votewise/ui/button";
 import { Error } from "@votewise/ui/error";
 import { Clock } from "@votewise/ui/icons/clock";
 import { Comment } from "@votewise/ui/icons/comment";
 import { Heart } from "@votewise/ui/icons/heart";
 import { LocationPin } from "@votewise/ui/icons/location-pin";
-import { UserPlus } from "@votewise/ui/icons/user-plus";
 import { Users2 } from "@votewise/ui/icons/users";
 import { Image } from "@votewise/ui/image";
 
 import { getUserClient } from "@/lib/client.server";
+
+import { FollowButton } from "./follow-button";
 
 extend(relativeTime);
 
@@ -49,10 +49,7 @@ export default async function Page(props: Props) {
             <h1 className="text-2xl text-gray-200">{name}</h1>
             <span className="text-base text-gray-400 font-medium">@{profile.user_name}</span>
           </div>
-          <Button>
-            <UserPlus />
-            Follow
-          </Button>
+          <FollowButton username={profile.user_name} isFollowing={profile.self_follow} />
         </div>
         <p className="text-base text-gray-300">{profile.about}</p>
         <div>

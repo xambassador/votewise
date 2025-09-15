@@ -8,9 +8,9 @@ import { makeToast } from "@votewise/ui/toast";
 
 import { followClient } from "@/lib/client";
 
-export function useFollowUser(username: string) {
+export function useFollowUser(username: string, defaultIsFollowing: boolean) {
   const [status, setStatus] = useState<AsyncState>("idle");
-  const [isFollowing, setIsFollowing] = useState<boolean>(false);
+  const [isFollowing, setIsFollowing] = useState<boolean>(defaultIsFollowing || false);
   const isLoading = status === "loading";
 
   async function follow() {
@@ -25,5 +25,17 @@ export function useFollowUser(username: string) {
     setStatus("success");
   }
 
-  return { isFollowing, follow, isLoading };
+  async function unFollow() {
+    setStatus("loading");
+    const res = await followClient.unfollow(username);
+    if (!res.success) {
+      makeToast.error("Oops!!", res.error);
+      setStatus("error");
+      return;
+    }
+    setIsFollowing(false);
+    setStatus("success");
+  }
+
+  return { isFollowing, follow, isLoading, unFollow };
 }
