@@ -40,8 +40,8 @@ export class Controller {
       about: group.about,
       type: group.type,
       status: group.status,
-      logo_url: group.logo_url,
-      cover_url: group.cover_image_url,
+      logo_url: this.ctx.bucketService.generatePublicUrl(group.logo_url ?? "", "avatar"),
+      cover_url: this.ctx.bucketService.generatePublicUrl(group.cover_image_url ?? "", "background"),
       created_at: group.created_at,
       updated_at: group.updated_at,
       admin: {

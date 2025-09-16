@@ -5,10 +5,13 @@ import type { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 
+import { getAuthenticateLocals } from "@/utils/locals";
+
 type ControllerOptions = {
   assert: AppContext["assert"];
   userRepository: AppContext["repositories"]["user"];
   bucketService: AppContext["services"]["bucket"];
+  followRepository: AppContext["repositories"]["follow"];
 };
 
 const ZParam = z.object({ username: z.string() });
@@ -21,12 +24,15 @@ export class Controller {
   }
 
   async handle(req: Request, res: Response) {
+    const locals = getAuthenticateLocals(res);
+    const currentUserId = locals.payload.sub;
     const validate = ZParam.safeParse(req.params);
     this.ctx.assert.unprocessableEntity(!validate.success, "Invalid request");
     const { username } = validate.data!;
 
     const user = await this.ctx.userRepository.getProfile(username);
     this.ctx.assert.resourceNotFound(!user, `User with username "${username}" not found`);
+    const following = await this.ctx.followRepository.isFollowing(currentUserId, user!.id);
 
     const result = {
       id: user!.id,
@@ -38,6 +44,7 @@ export class Controller {
       about: user!.about,
       gender: user!.gender,
       location: user!.location,
+      self_follow: !!following,
       aggregation: {
         total_comments: user!.userAggregates?.total_comments ?? 0,
         total_posts: user!.userAggregates?.total_posts ?? 0,

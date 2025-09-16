@@ -11,7 +11,8 @@ export function getUserProfileControllerFactory() {
   const controller = new Controller({
     assert: ctx.assert,
     bucketService: ctx.services.bucket,
-    userRepository: ctx.repositories.user
+    userRepository: ctx.repositories.user,
+    followRepository: ctx.repositories.follow
   });
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "get-profile" });

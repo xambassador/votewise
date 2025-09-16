@@ -118,4 +118,35 @@ export class UserRepository extends BaseRepository {
       return user;
     });
   }
+
+  public getMyProfile(id: string) {
+    return this.execute(async () => {
+      const user = await this.db.user.findUnique({
+        where: { id },
+        select: {
+          about: true,
+          avatar_url: true,
+          first_name: true,
+          id: true,
+          last_name: true,
+          user_name: true,
+          cover_image_url: true,
+          location: true,
+          gender: true,
+          created_at: true,
+          userAggregates: {
+            select: {
+              total_comments: true,
+              total_votes: true,
+              total_posts: true,
+              total_followers: true,
+              total_following: true,
+              total_groups: true
+            }
+          }
+        }
+      });
+      return user;
+    });
+  }
 }
