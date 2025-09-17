@@ -38,7 +38,7 @@ beforeEach(() => {
 const { locals, user } = getLocals();
 const getOnboardBody = (step: number) => ({
   step,
-  user_name: faker.internet.userName(),
+  user_name: faker.internet.userName().slice(0, 20),
   first_name: faker.person.firstName(),
   last_name: faker.person.lastName(),
   gender: "MALE",

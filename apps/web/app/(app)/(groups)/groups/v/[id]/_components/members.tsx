@@ -11,6 +11,8 @@ import { Users as UsersIcon } from "@votewise/ui/icons/users";
 import { Spinner } from "@votewise/ui/ring-spinner";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@votewise/ui/sheet";
 
+import { useMe } from "@/components/user-provider";
+
 import { routes } from "@/lib/routes";
 
 type Props = SheetProps & { groupId: string; name: string; about: string };
@@ -76,7 +78,7 @@ function Admins(props: { groupId: string }) {
             avatar={admin.user.avatar_url}
             username={admin.user.user_name}
           />
-          <FollowButton name={admin.user.first_name + " " + admin.user.last_name} />
+          <FollowButton name={admin.user.first_name + " " + admin.user.last_name} id={admin.user.id} />
         </li>
       ))}
     </ul>
@@ -116,7 +118,7 @@ function Moderators(props: { groupId: string }) {
             avatar={moderator.user.avatar_url}
             username={moderator.user.user_name}
           />
-          <FollowButton name={moderator.user.first_name + " " + moderator.user.last_name} />
+          <FollowButton name={moderator.user.first_name + " " + moderator.user.last_name} id={moderator.user.id} />
         </li>
       ))}
     </ul>
@@ -142,21 +144,21 @@ function Users(props: { groupId: string }) {
     return (
       <div>
         <UsersIcon className="text-gray-400 size-8 mx-auto" />
-        <p className="text-center text-gray-400 mt-2">No moderators</p>
+        <p className="text-center text-gray-400 mt-2">No members</p>
       </div>
     );
   }
 
   return (
     <ul className="flex flex-col gap-5">
-      {members.map((moderator) => (
-        <li key={moderator.id} className="flex items-center w-full justify-between pr-2">
+      {members.map((member) => (
+        <li key={member.id} className="flex items-center w-full justify-between pr-2">
           <User
-            name={moderator.user.first_name + " " + moderator.user.last_name}
-            avatar={moderator.user.avatar_url}
-            username={moderator.user.user_name}
+            name={member.user.first_name + " " + member.user.last_name}
+            avatar={member.user.avatar_url}
+            username={member.user.user_name}
           />
-          <FollowButton name={moderator.user.first_name + " " + moderator.user.last_name} />
+          <FollowButton name={member.user.first_name + " " + member.user.last_name} id={member.user.id} />
         </li>
       ))}
     </ul>
@@ -189,8 +191,10 @@ function User(props: { name: string; username: string; avatar: string }) {
   );
 }
 
-function FollowButton(props: { name: string }) {
-  const { name } = props;
+function FollowButton(props: { name: string; id: string }) {
+  const { name, id } = props;
+  const me = useMe("FollowButton");
+  if (me.id === id) return null;
   return (
     <button title={`Follow ${name}`} aria-label={`Follow ${name}`} className="focus-presets focus-primary rounded">
       <UserPlus className="text-gray-400 size-5" />

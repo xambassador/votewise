@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import { ZPagination } from "@votewise/schemas";
 
+import { getAuthenticateLocals } from "@/utils/locals";
+
 type ControllerOptions = {
   assert: AppContext["assert"];
   groupRepository: AppContext["repositories"]["group"];
@@ -23,6 +25,7 @@ export class Controller {
   }
 
   public async handle(req: Request, res: Response) {
+    const locals = getAuthenticateLocals(res);
     const validate = ZQuery.safeParse(req.params);
     this.ctx.assert.unprocessableEntity(!validate.success, "Invalid request");
     const query = validate.data!;
@@ -34,6 +37,14 @@ export class Controller {
     this.ctx.assert.unprocessableEntity(!_admin, "This group is no longer available");
     const admin = _admin!;
 
+    const isMember = await this.ctx.groupRepository.groupMember.isMember(group.id, locals.payload.sub);
+    let isInviteSent = false;
+
+    if (!isMember && group.type === "PRIVATE") {
+      const invite = await this.ctx.groupRepository.groupInvitation.findByUserWithGroup(locals.payload.sub, group.id);
+      if (invite) isInviteSent = true;
+    }
+
     const result = {
       id: group.id,
       name: group.name,
@@ -44,6 +55,8 @@ export class Controller {
       cover_url: this.ctx.bucketService.generatePublicUrl(group.cover_image_url ?? "", "background"),
       created_at: group.created_at,
       updated_at: group.updated_at,
+      self_is_member: isMember,
+      is_invite_sent: isInviteSent,
       admin: {
         id: admin.id,
         username: admin.user.user_name,

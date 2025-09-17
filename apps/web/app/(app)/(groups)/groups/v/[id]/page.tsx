@@ -13,6 +13,7 @@ import { Image } from "@votewise/ui/image";
 
 import { getGroupClient } from "@/lib/client.server";
 
+import { JoinGroupBtn } from "./_components/join-group-btn";
 import { MembersSheet } from "./_components/members-sheet";
 
 extend(relativeTime);
@@ -41,8 +42,10 @@ export default async function Page(props: Props) {
             <AvatarFallback name={group.name} />
           </Avatar>
         </div>
-        <div className="w-full flex items-center justify-end">
+        <div className="w-full flex items-center justify-end gap-2">
           <Badge>{group.type.toLowerCase()}</Badge>
+          {group.is_invite_sent && <Badge variant="outline">Invite Sent</Badge>}
+          {!group.self_is_member && !group.is_invite_sent && <JoinGroupBtn groupId={group.id} />}
         </div>
       </div>
       <div className="flex flex-col gap-7">
