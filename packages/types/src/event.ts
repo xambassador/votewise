@@ -46,3 +46,4 @@ export type Events = {
 
 export type EventNames = keyof Events;
 export type EventData<T extends EventNames> = Events[T] & { event: T };
+export type DeserializedEvent = { data: EventData<EventNames>; success: true } | { error: string; success: false };

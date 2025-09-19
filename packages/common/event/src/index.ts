@@ -1,4 +1,4 @@
-import type { EventData, EventNames } from "@votewise/types";
+import type { DeserializedEvent, EventData, EventNames } from "@votewise/types";
 
 export class EventBuilder<T extends EventNames> {
   private readonly eventName: T;
@@ -36,5 +36,19 @@ export class EventBuilder<T extends EventNames> {
 
   get name(): T {
     return this.eventName;
+  }
+}
+
+export class EventDeserializer {
+  public deserialize(serializedEvent: string): DeserializedEvent {
+    try {
+      const parsed = JSON.parse(serializedEvent);
+      if (!parsed.event) {
+        return { success: false, error: "Malformed event" };
+      }
+      return { success: true, data: parsed as EventData<EventNames> };
+    } catch (e) {
+      return { success: false, error: "Malformed event" };
+    }
   }
 }

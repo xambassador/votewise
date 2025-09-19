@@ -7974,6 +7974,7 @@ __metadata:
     "@votewise/crypto": "npm:*"
     "@votewise/debug": "npm:*"
     "@votewise/env": "npm:*"
+    "@votewise/event": "npm:*"
     "@votewise/schemas": "npm:*"
     "@votewise/tsconfig": "npm:*"
     "@votewise/types": "npm:*"
@@ -7998,6 +7999,7 @@ __metadata:
     react-dom: "npm:^18.3.1"
     react-dropzone: "npm:^14.2.9"
     react-hook-form: "npm:^7.53.0"
+    react-image-crop: "npm:^11.0.10"
     react-intersection-observer: "npm:^9.16.0"
     react-virtuoso: "npm:^4.12.3"
     server-only: "npm:^0.0.1"
@@ -20875,6 +20877,15 @@ __metadata:
   peerDependencies:
     react: ^16.8.0 || ^17 || ^18 || ^19
   checksum: 6d62b150618a833c17d59e669b707661499e2bb516a8d340ca37699f99eb448bbba7b5b78324938c8948014e21efaa32e3510c2ba246fd5e97a96fca0cfa7c98
+  languageName: node
+  linkType: hard
+
+"react-image-crop@npm:^11.0.10":
+  version: 11.0.10
+  resolution: "react-image-crop@npm:11.0.10"
+  peerDependencies:
+    react: ">=16.13.1"
+  checksum: 2c2c7066c3a51838fc074a4a125ee2063170e01c26e3b1c8fc8b66155cf7ef576b5747089b4f365ce9dd2728794c39f57643b37eb78116e9db3f4b6299d3f682
   languageName: node
   linkType: hard
 
