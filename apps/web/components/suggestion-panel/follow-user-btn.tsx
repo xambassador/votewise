@@ -11,7 +11,7 @@ type Props = {
 
 export function FollowUserButton(props: Props) {
   const { name, username } = props;
-  const { isLoading, follow, isFollowing } = useFollowUser(username);
+  const { isLoading, follow, isFollowing } = useFollowUser(username, false);
   if (isFollowing) return null;
   return (
     <UserFollowButton aria-label={`Follow ${name}`} title={`Follow ${name}`} loading={isLoading} onClick={follow} />

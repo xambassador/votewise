@@ -17,6 +17,7 @@ type ControllerOptions = {
   groupRepository: AppContext["repositories"]["group"];
   notificationRepository: AppContext["repositories"]["notification"];
   transactionManager: AppContext["repositories"]["transactionManager"];
+  aggregator: AppContext["repositories"]["aggregator"];
 };
 
 const invitationNotFoundMessage = "Invitation not found. It may have been revoked or expired.";
@@ -61,10 +62,21 @@ export class Controller {
     this.ctx.assert.unprocessableEntity(isAlreadyMember, "You are already a member of this group.");
 
     await this.ctx.transactionManager.withTransaction(async (tx) => {
-      await this.ctx.groupRepository.groupMember.addMember(groupId, userId, "MEMBER", tx);
-      await this.ctx.groupRepository.groupInvitation.update(invitation!.id, { status: "ACCEPTED" }, tx);
+      await Promise.all([
+        this.ctx.groupRepository.groupMember.addMember(groupId, userId, "MEMBER", tx),
+        this.ctx.groupRepository.groupInvitation.update(invitation!.id, { status: "ACCEPTED" }, tx),
+        this.ctx.aggregator.groupAggregator.aggregate(
+          groupId,
+          (data) => ({
+            ...data,
+            total_members: (data?.total_members ?? 0) + 1
+          }),
+          tx
+        )
+      ]);
+
       if (notificationId) {
-        await this.ctx.notificationRepository.markAsRead(notificationId, tx);
+        await this.ctx.notificationRepository.deleteById(notificationId, tx);
       }
     });
 

@@ -1,4 +1,4 @@
-import type { SocketClient } from "@/types";
+import type { LiveUser } from "@/types";
 
 import Websocket from "ws";
 
@@ -8,7 +8,7 @@ import { EventBus } from "@/lib/event-bus";
 
 type ServiceOptions = {
   wss: Websocket.Server | null;
-  clients: Map<string, SocketClient[]>;
+  clients: Map<string, LiveUser>;
 };
 
 export class NotificationService {
@@ -36,15 +36,26 @@ export class NotificationService {
       const event = new EventBuilder("groupInviteNotification").setData(data).serialize();
       this.sendNotificationToClient(data.invitedUserId, event);
     });
+
+    this.eventBus.on("notificationCount", (data) => {
+      const event = new EventBuilder("notificationCount").setData(data).serialize();
+      this.sendNotificationToClient(data.userId, event);
+    });
   }
 
   private sendNotificationToClient(clientId: string, event: string) {
     const sockets = this.ctx.clients.get(clientId);
     if (!sockets) return;
-    sockets.forEach((client) => {
+    const totalNotifications = sockets.notifications + 1;
+    const countEvent = new EventBuilder("notificationCount")
+      .setData({ userId: clientId, count: totalNotifications })
+      .serialize();
+    sockets.sessions.forEach((client) => {
       if (client.ws.readyState === Websocket.OPEN) {
+        client.ws.send(countEvent);
         client.ws.send(event);
       }
     });
+    sockets.notifications = totalNotifications;
   }
 }

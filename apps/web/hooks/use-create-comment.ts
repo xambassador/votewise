@@ -55,7 +55,7 @@ export function useCreateComment(feedId: string) {
               avatar_url: currentUser.avatar_url,
               first_name: currentUser.first_name,
               last_name: currentUser.last_name,
-              user_name: currentUser.username,
+              user_name: currentUser.user_name,
               id: currentUser.id
             }
           };
@@ -103,7 +103,7 @@ export function useCreateComment(feedId: string) {
                 avatar_url: currentUser.avatar_url,
                 first_name: currentUser.first_name,
                 last_name: currentUser.last_name,
-                user_name: currentUser.username,
+                user_name: currentUser.user_name,
                 id: currentUser.id
               },
               replies: [],

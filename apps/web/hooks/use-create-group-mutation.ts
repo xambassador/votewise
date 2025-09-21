@@ -5,11 +5,13 @@ import type { TGroupCreate } from "@votewise/schemas/group";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { groupClient, uploadClient } from "@/lib/client";
-import { getMyGroupsKey } from "@/lib/constants";
+import { getGroupsKey, getMyGroupsKey } from "@/lib/constants";
+
+const queryKey = getMyGroupsKey();
+const groupsKey = getGroupsKey();
 
 export function useCreateGroupMutation() {
   const queryClient = useQueryClient();
-  const queryKey = getMyGroupsKey();
   const mutation = useMutation({
     mutationFn: async (data: TGroupCreate & { coverImageFile?: File | null }) => {
       let coverImageUrl: string | undefined;
@@ -29,6 +31,7 @@ export function useCreateGroupMutation() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: groupsKey });
     }
   });
   return mutation;

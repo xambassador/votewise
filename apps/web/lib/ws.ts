@@ -1,8 +1,14 @@
+"use client";
+
 import type { EventData, EventNames } from "@votewise/types";
 
 import { EventDeserializer } from "@votewise/event";
 
-const WS_URL = "/api/realtime";
+function getWebSocketURL(): string {
+  const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+  const host = window.location.host;
+  return `${protocol}://${host}/api/realtime`;
+}
 
 export class WS {
   private static _instance: WS | null = null;
@@ -12,7 +18,7 @@ export class WS {
 
   static init(): WS {
     if (!WS._instance) {
-      WS.instance = new WebSocket(WS_URL);
+      WS.instance = new WebSocket(getWebSocketURL());
       WS._instance = new WS();
       WS.registerEventListener();
     }
@@ -97,6 +103,13 @@ export class WS {
           }
           break;
         }
+        case "notificationCount": {
+          const listeners = WS.listeners.notificationCount;
+          if (listeners && listeners.length > 0) {
+            listeners.forEach((listener) => listener(deserializedEvent.data as EventData<"notificationCount">));
+          }
+          break;
+        }
         case "ping": {
           const listeners = WS.listeners.ping;
           if (listeners && listeners.length > 0) {
@@ -111,6 +124,14 @@ export class WS {
   public on<K extends EventNames>(eventName: K, callback: (data: EventData<K>) => void) {
     WS.listeners[eventName] = WS.listeners[eventName] || [];
     WS.listeners[eventName].push(callback);
+  }
+
+  public off<K extends EventNames>(eventName: K, callback: (data: EventData<K>) => void) {
+    if (!WS.listeners[eventName]) return;
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    WS.listeners[eventName] = WS.listeners[eventName]?.filter((listener) => listener !== callback);
   }
 
   public static removeAllListeners() {

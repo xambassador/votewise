@@ -80,7 +80,6 @@ enum NotificationType {
     GROUP_JOIN_REQUEST
     GROUP_JOIN_REQUEST_ACCEPTED
     GROUP_JOIN_REQUEST_REJECTED
-    JOIN_GROUP_REQUEST // @deprecated
 }
 
 enum FactorType {
@@ -430,6 +429,8 @@ model RefreshToken {
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
+
+    @@index([user_id], name: "user_refresh_token_index")
 }
 
 model PostTopic {
@@ -478,6 +479,8 @@ model Timeline {
     post Post @relation(fields: [post_id], references: [id], onDelete: Cascade)
 
     @@unique([user_id, post_id], name: "user_post_unique")
+    @@index([created_at], name: "timeline_created_at_index")
+    @@index([user_id], name: "timeline_user_index")
 }
 
 model PostAggregates {

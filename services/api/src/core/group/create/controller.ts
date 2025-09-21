@@ -39,12 +39,20 @@ export class Controller {
           status: "OPEN",
           type: body.type,
           cover_image_url: body.cover_image_url,
-          logo_url: body.logo_url
+          logo_url: body.logo_url,
+          groupAggregates: {
+            create: {
+              total_comments: 0,
+              total_members: 1,
+              total_posts: 0,
+              total_votes: 0
+            }
+          }
         },
         tx
       );
-      const member = await this.ctx.groupRepository.groupMember.addMember(group.id, sub, "ADMIN", tx);
-      await this.ctx.aggregator.userAggregator.aggregate(
+      const memberPromise = this.ctx.groupRepository.groupMember.addMember(group.id, sub, "ADMIN", tx);
+      const userAggregatePromise = this.ctx.aggregator.userAggregator.aggregate(
         sub,
         (stats) => ({
           ...stats,
@@ -52,6 +60,15 @@ export class Controller {
         }),
         tx
       );
+      const groupAggregatePromise = this.ctx.aggregator.groupAggregator.aggregate(
+        group.id,
+        (data) => ({
+          ...data,
+          total_members: (data?.total_members ?? 0) + 1
+        }),
+        tx
+      );
+      const [member] = await Promise.all([memberPromise, userAggregatePromise, groupAggregatePromise]);
       return { group, member };
     });
 

@@ -52,6 +52,10 @@
     "./group": {
       "import": "./dist/services/group.mjs",
       "require": "./dist/services/group.js"
+    },
+    "./notification": {
+      "import": "./dist/services/notification.mjs",
+      "require": "./dist/services/notification.js"
     }
   },
   "scripts": {

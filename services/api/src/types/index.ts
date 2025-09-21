@@ -49,3 +49,5 @@ export type SocketClient = {
   connectedAt: number;
   ws: Websocket;
 };
+
+export type LiveUser = { sessions: SocketClient[]; notifications: number };

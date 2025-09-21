@@ -11,6 +11,8 @@ type ControllerOptions = {
   assert: AppContext["assert"];
   groupRepository: AppContext["repositories"]["group"];
   userRepository: AppContext["repositories"]["user"];
+  aggregator: AppContext["repositories"]["aggregator"];
+  transactionManager: AppContext["repositories"]["transactionManager"];
 };
 
 const ZQuery = z.object({ groupId: z.string(), username: z.string() });
@@ -49,7 +51,19 @@ export class Controller {
     this.ctx.assert.unprocessableEntity(!_role, memberNotInGroupMessage);
     this.ctx.assert.forbidden(role.role !== "ADMIN", permissionError);
 
-    await this.ctx.groupRepository.groupMember.kick(groupId, locals.payload.sub);
+    await this.ctx.transactionManager.withTransaction(async (tx) => {
+      await Promise.all([
+        this.ctx.groupRepository.groupMember.kick(groupId, locals.payload.sub, tx),
+        this.ctx.aggregator.groupAggregator.aggregate(
+          groupId,
+          (data) => ({
+            ...data,
+            total_members: (data?.total_members ?? 0) + 1
+          }),
+          tx
+        )
+      ]);
+    });
 
     return res.status(StatusCodes.NO_CONTENT).send() as Response<null>;
   }

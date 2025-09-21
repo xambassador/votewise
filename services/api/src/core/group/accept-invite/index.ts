@@ -12,7 +12,8 @@ export function acceptGroupInviteControllerFactory() {
     assert: ctx.assert,
     groupRepository: ctx.repositories.group,
     notificationRepository: ctx.repositories.notification,
-    transactionManager: ctx.repositories.transactionManager
+    transactionManager: ctx.repositories.transactionManager,
+    aggregator: ctx.repositories.aggregator
   });
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "accept-group-invite" });

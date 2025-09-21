@@ -453,7 +453,10 @@ export class GroupInvitationRepository extends BaseRepository {
       const invitations = await this.db.groupInvitation.findMany({
         where: { group_id: { in: groupIds }, status: "PENDING", type: "JOIN" },
         orderBy: { created_at: "desc" },
-        include: {
+        select: {
+          id: true,
+          created_at: true,
+          sent_at: true,
           user: {
             select: {
               id: true,

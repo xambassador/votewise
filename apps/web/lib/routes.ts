@@ -34,5 +34,8 @@ export const routes = {
   group: {
     root: () => "/groups",
     view: (id: string) => `/groups/v/${id}`
+  },
+  notification: {
+    root: () => "/notifications"
   }
 };

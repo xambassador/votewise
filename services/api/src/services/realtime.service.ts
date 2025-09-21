@@ -1,7 +1,7 @@
 import type { IncomingMessage, Server } from "http";
 import type Websocket from "ws";
 import type { AppContext } from "../context";
-import type { SocketClient } from "../types";
+import type { LiveUser, SocketClient } from "../types";
 
 import { WebSocketServer } from "ws";
 
@@ -28,7 +28,7 @@ export class Realtime {
   private wss: Websocket.Server | null = null;
 
   // We are supporting multiple sessions per user
-  private clients!: Map<string, SocketClient[]>;
+  private clients!: Map<string, LiveUser>;
 
   constructor(opts: RealtimeOpts) {
     this.ctx = opts;
@@ -67,8 +67,13 @@ export class Realtime {
         client.ws = ws;
         (ws as WebsocketInstance).socketId = socketId;
         (ws as WebsocketInstance).userId = client.sub;
-        const existingClient = this.clients.get(client.sub) || [];
-        existingClient.push(client);
+        const existingClient = this.clients.get(client.sub);
+        if (!existingClient) {
+          this.clients.set(client.sub, { sessions: [client], notifications: 0 });
+          this.wss?.emit("connection", ws, req, socketId, client);
+          return;
+        }
+        existingClient.sessions.push(client);
         this.clients.set(client.sub, existingClient);
         this.wss?.emit("connection", ws, req, socketId, client);
       });
@@ -83,9 +88,9 @@ export class Realtime {
         const userId = (ws as WebsocketInstance).userId;
         const existingClients = this.clients.get(userId);
         if (existingClients) {
-          const filterClients = existingClients.filter((client) => client.ws !== ws);
+          const filterClients = existingClients.sessions.filter((client) => client.ws !== ws);
           if (filterClients.length > 0) {
-            this.clients.set(userId, filterClients);
+            this.clients.set(userId, { ...existingClients, sessions: filterClients });
           } else {
             this.clients.delete(userId);
           }

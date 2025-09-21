@@ -12,6 +12,8 @@ export type StrategyOptions = {
   eventBus: AppContext["eventBus"];
   bucketService: AppContext["services"]["bucket"];
   assert: AppContext["assert"];
+  aggregator: AppContext["repositories"]["aggregator"];
+  transactionManager: AppContext["repositories"]["transactionManager"];
 };
 
 export abstract class Strategy {
@@ -44,15 +46,35 @@ export class PublicGroupStrategy extends Strategy {
   public override async handle(data: { group: Group; groupId: string; currentUserId: string }): Promise<Result> {
     const admin = await this.getAdmin(data.groupId);
     const user = await this.getUser(data.currentUserId);
-    const member = await this.ctx.groupRepository.groupMember.addMember(data.groupId, data.currentUserId, "MEMBER");
-    await this.ctx.notificationRepository.create({
-      event_type: "GROUP_JOINED",
-      user_id: admin.user_id,
-      content: {
-        type: "GROUP_JOINED",
-        joinedUserId: user.id,
-        groupId: data.groupId
-      }
+    const { member } = await this.ctx.transactionManager.withTransaction(async (tx) => {
+      const memberPromise = this.ctx.groupRepository.groupMember.addMember(
+        data.groupId,
+        data.currentUserId,
+        "MEMBER",
+        tx
+      );
+      const notificationPromise = this.ctx.notificationRepository.create(
+        {
+          event_type: "GROUP_JOINED",
+          user_id: admin.user_id,
+          content: {
+            type: "GROUP_JOINED",
+            joinedUserId: user.id,
+            groupId: data.groupId
+          }
+        },
+        tx
+      );
+      const aggregatePromise = this.ctx.aggregator.groupAggregator.aggregate(
+        data.groupId,
+        (data) => ({
+          ...data,
+          total_members: (data?.total_members ?? 0) + 1
+        }),
+        tx
+      );
+      const [member] = await Promise.all([memberPromise, notificationPromise, aggregatePromise]);
+      return { member };
     });
     const event = new EventBuilder("groupJoinNotification").setData({
       adminId: admin.user_id,
@@ -84,22 +106,31 @@ export class PrivateGroupStrategy extends Strategy {
     );
     this.ctx.assert.unprocessableEntity(!!isAlreadySent, `You have already sent a join request to this group`);
     const sentAt = new Date();
-    const invitation = await this.ctx.groupRepository.groupInvitation.create({
-      status: "PENDING",
-      type: "JOIN",
-      group_id: data.groupId,
-      user_id: data.currentUserId,
-      sent_at: sentAt
-    });
-    await this.ctx.notificationRepository.create({
-      event_type: "JOIN_GROUP_REQUEST",
-      user_id: admin.user_id,
-      content: {
-        type: "GROUP_JOIN_REQUEST",
-        groupId: data.groupId,
-        invitationId: invitation.id,
-        userId: user.id
-      }
+    const { invitation, notification } = await this.ctx.transactionManager.withTransaction(async (tx) => {
+      const invitation = await this.ctx.groupRepository.groupInvitation.create(
+        {
+          status: "PENDING",
+          type: "JOIN",
+          group_id: data.groupId,
+          user_id: data.currentUserId,
+          sent_at: sentAt
+        },
+        tx
+      );
+      const notification = await this.ctx.notificationRepository.create(
+        {
+          event_type: "GROUP_JOIN_REQUEST",
+          user_id: admin.user_id,
+          content: {
+            type: "GROUP_JOIN_REQUEST",
+            groupId: data.groupId,
+            invitationId: invitation.id,
+            userId: user.id
+          }
+        },
+        tx
+      );
+      return { invitation, notification };
     });
     const event = new EventBuilder("groupJoinRequestNotification").setData({
       adminId: admin.user_id,
@@ -111,7 +142,9 @@ export class PrivateGroupStrategy extends Strategy {
       type: "JOIN",
       userName: user.user_name,
       groupId: data.groupId,
-      invitationId: invitation.id
+      invitationId: invitation.id,
+      userId: user.id,
+      notificationId: notification.id
     });
     this.ctx.eventBus.emit(event.name, event.data);
     return { id: "PENDING" };

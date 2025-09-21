@@ -1,5 +1,6 @@
 import type { AppContext } from "@/context";
 import type { Group, NotificationType, User } from "@votewise/prisma/client";
+import type { NotificationContentSerialized } from "@votewise/types";
 
 import { z } from "zod";
 
@@ -12,16 +13,6 @@ const ZGroupJoined = z.object({
   joinedUserId: z.string()
 });
 
-type GroupJoinedSerialized = {
-  type: "GROUP_JOINED";
-  group_id: string;
-  group_name: string;
-  username: string;
-  first_name: string;
-  last_name: string;
-  avatar_url: string;
-};
-
 /**
  * When a user is invited to join a group
  */
@@ -31,17 +22,6 @@ const ZGroupInvite = z.object({
   invitationId: z.string(),
   userId: z.string()
 });
-
-type GroupInviteSerialized = {
-  type: "GROUP_INVITATION";
-  group_id: string;
-  group_name: string;
-  username: string;
-  first_name: string;
-  last_name: string;
-  avatar_url: string;
-  invitation_id: string;
-};
 
 /**
  * When a user requests to join a private group.
@@ -53,21 +33,8 @@ const ZGroupJoinRequest = z.object({
   invitationId: z.string()
 });
 
-type GroupJoinRequestSerialized = {
-  type: "GROUP_JOIN_REQUEST";
-  group_id: string;
-  group_name: string;
-  username: string;
-  first_name: string;
-  last_name: string;
-  avatar_url: string;
-  user_id: string;
-  invitation_id: string;
-};
-
 export const ZNotification = z.discriminatedUnion("type", [ZGroupJoined, ZGroupInvite, ZGroupJoinRequest]);
 export type NotificationContent = z.infer<typeof ZNotification>;
-export type NotificationContentSerialized = GroupJoinedSerialized | GroupInviteSerialized | GroupJoinRequestSerialized;
 
 type NotificationBuilderOpts = {
   userRepository: AppContext["repositories"]["user"];

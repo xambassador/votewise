@@ -1,3 +1,6 @@
+// These types are used in EventBuilder from "common/event" package for serialization and deserialization
+// They represent the data that will be sent over WebSocket events
+
 export type GroupJoinRequestPayload = {
   adminId: string;
   groupName: string;
@@ -9,6 +12,8 @@ export type GroupJoinRequestPayload = {
   lastName: string;
   avatarUrl: string;
   invitationId: string;
+  userId: string;
+  notificationId: string;
 };
 
 export type GroupJoinPayload = {
@@ -36,12 +41,18 @@ export type GroupInviteNotificationPayload = {
   invitationId: string;
 };
 
+export type NotificationCountPayload = {
+  count: number;
+  userId: string;
+};
+
 export type Events = {
   connected: { message: string };
   ping: { message: string };
   groupJoinRequestNotification: GroupJoinRequestPayload;
   groupJoinNotification: GroupJoinPayload;
   groupInviteNotification: GroupInviteNotificationPayload;
+  notificationCount: NotificationCountPayload;
 };
 
 export type EventNames = keyof Events;

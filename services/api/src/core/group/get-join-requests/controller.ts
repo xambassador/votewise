@@ -30,6 +30,8 @@ export class Controller {
       }
       return {
         id: r.id,
+        created_at: r.created_at,
+        sent_at: r.sent_at,
         user: {
           id: r.user.id,
           username: r.user.user_name,

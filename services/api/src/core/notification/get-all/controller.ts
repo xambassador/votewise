@@ -1,7 +1,7 @@
 import type { AppContext } from "@/context";
-import type { NotificationContentSerialized } from "@/lib/notification-builder";
 import type { ExtractControllerResponse } from "@/types";
 import type { NotificationType } from "@votewise/prisma/client";
+import type { NotificationContentSerialized } from "@votewise/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
@@ -17,6 +17,10 @@ type ControllerOptions = {
   bucketService: AppContext["services"]["bucket"];
 };
 
+// The same type is declared in notification-builder.ts
+// but we cannot import it here or create a new type from notificationBuilder
+// because if we do then in @votewise/client/notification, the getAll method
+// start complaining about `cannot be named without a reference to notificationBuilder`
 type Notification = {
   id: string;
   content: NotificationContentSerialized;

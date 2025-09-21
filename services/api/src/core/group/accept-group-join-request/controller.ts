@@ -12,6 +12,7 @@ type ControllerOptions = {
   groupRepository: AppContext["repositories"]["group"];
   notificationRepository: AppContext["repositories"]["notification"];
   transactionManager: AppContext["repositories"]["transactionManager"];
+  aggregator: AppContext["repositories"]["aggregator"];
 };
 
 const ZParams = z.object({ id: z.string({ invalid_type_error: "id must be a string" }) });
@@ -49,8 +50,18 @@ export class Controller {
     }
 
     await this.ctx.transactionManager.withTransaction(async (tx) => {
-      await this.ctx.groupRepository.groupInvitation.update(joinRequestId, { status: "ACCEPTED" }, tx);
-      await this.ctx.groupRepository.groupMember.addMember(groupId, userId, "MEMBER", tx);
+      await Promise.all([
+        this.ctx.groupRepository.groupInvitation.update(joinRequestId, { status: "ACCEPTED" }, tx),
+        this.ctx.groupRepository.groupMember.addMember(groupId, userId, "MEMBER", tx),
+        this.ctx.aggregator.groupAggregator.aggregate(
+          groupId,
+          (data) => ({
+            ...data,
+            total_members: (data?.total_members ?? 0) + 1
+          }),
+          tx
+        )
+      ]);
     });
 
     const result = { id: joinRequestId };

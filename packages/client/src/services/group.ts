@@ -1,12 +1,15 @@
 import type {
+  AcceptGroupJoinRequestResponse,
   CreateGroupResponse,
   GetAllGroupsResponse,
+  GetGroupJoinRequestsResponse,
   GetGroupMembersResponse,
   GetGroupResponse,
   GetMyGroupsResponse,
   JoinGroupResponse,
   KickMemberResponse,
   LeaveGroupResponse,
+  RejectGroupJoinRequestResponse,
   SendGroupInviteResponse
 } from "@votewise/api";
 import type { TGroupCreate } from "@votewise/schemas/group";
@@ -82,6 +85,24 @@ export class Group {
     const response = await this.client.get<GetGroupMembersResponse>(path);
     return response;
   }
+
+  public async getJoinRequests() {
+    const path = groups.runtime.joinRequests("");
+    const response = await this.client.get<GetGroupJoinRequestsResponse>(path);
+    return response;
+  }
+
+  public async acceptJoinRequest(id: string, query?: { notification_id?: string }) {
+    const path = groups.runtime.acceptJoinRequest("", id);
+    const response = await this.client.post<AcceptGroupJoinRequestResponse, object>(qs(path, query), {});
+    return response;
+  }
+
+  public async rejectJoinRequest(id: string, query?: { notification_id?: string }) {
+    const path = groups.runtime.declineJoinRequest("", id);
+    const response = await this.client.delete<RejectGroupJoinRequestResponse>(qs(path, query));
+    return response;
+  }
 }
 
 export type {
@@ -92,5 +113,8 @@ export type {
   JoinGroupResponse,
   KickMemberResponse,
   LeaveGroupResponse,
-  SendGroupInviteResponse
+  SendGroupInviteResponse,
+  GetGroupJoinRequestsResponse,
+  AcceptGroupJoinRequestResponse,
+  RejectGroupJoinRequestResponse
 };

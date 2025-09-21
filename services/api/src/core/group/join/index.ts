@@ -15,7 +15,9 @@ export function joinGroupControllerFactory() {
     notificationRepository: ctx.repositories.notification,
     bucketService: ctx.services.bucket,
     eventBus: ctx.eventBus,
-    userRepository: ctx.repositories.user
+    userRepository: ctx.repositories.user,
+    aggregator: ctx.repositories.aggregator,
+    transactionManager: ctx.repositories.transactionManager
   });
   const privateGroupStrategy = new PrivateGroupStrategy({
     assert: ctx.assert,
@@ -23,7 +25,9 @@ export function joinGroupControllerFactory() {
     notificationRepository: ctx.repositories.notification,
     bucketService: ctx.services.bucket,
     eventBus: ctx.eventBus,
-    userRepository: ctx.repositories.user
+    userRepository: ctx.repositories.user,
+    aggregator: ctx.repositories.aggregator,
+    transactionManager: ctx.repositories.transactionManager
   });
   const controller = new Controller({
     assert: ctx.assert,

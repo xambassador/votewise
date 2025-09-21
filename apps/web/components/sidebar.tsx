@@ -9,6 +9,7 @@ import { Users } from "@votewise/ui/icons/users";
 import { CreatePostDialog } from "./create-post";
 import { Link } from "./link";
 import { Logout } from "./logout";
+import { NotificationButton } from "./notification-button";
 
 type Props = {
   name: string;
@@ -20,11 +21,18 @@ const links: {
   href: string;
   icon: React.ReactNode;
   name: string;
+  component?: React.ComponentType;
 }[] = [
   { id: "home", href: "/", icon: <Home className="text-inherit" />, name: "Home" },
   { id: "groups", href: "/groups", icon: <Users className="text-inherit" />, name: "Groups" },
   { id: "search", href: "/search", icon: <Search className="text-inherit" />, name: "Search" },
-  { id: "notifications", href: "/notifications", icon: <Bell className="text-inherit" />, name: "Notifications" },
+  {
+    id: "notifications",
+    href: "/notifications",
+    icon: <Bell className="text-inherit" />,
+    name: "Notifications",
+    component: NotificationButton
+  },
   { id: "profile", href: "/profile", icon: <User className="text-inherit" />, name: "Profile" },
   { id: "settings", href: "/settings", icon: <Cog className="text-inherit" />, name: "Settings" }
 ];
@@ -42,12 +50,17 @@ export function Sidebar(props: Props) {
         </div>
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-3 pr-1">
-            {links.map((link) => (
-              <Link key={link.id} href={link.href} className="focus-visible rounded">
-                {link.icon}
-                {link.name}
-              </Link>
-            ))}
+            {links.map((link) => {
+              if (link.component) {
+                return <link.component key={link.id} />;
+              }
+              return (
+                <Link key={link.id} href={link.href} className="focus-visible rounded">
+                  {link.icon}
+                  {link.name}
+                </Link>
+              );
+            })}
             <Logout />
           </div>
           <CreatePostDialog />

@@ -10,6 +10,8 @@ import { getAuthenticateLocals } from "@/utils/locals";
 type ControllerOptions = {
   assert: AppContext["assert"];
   groupRepository: AppContext["repositories"]["group"];
+  aggregator: AppContext["repositories"]["aggregator"];
+  transactionManager: AppContext["repositories"]["transactionManager"];
 };
 
 const ZQuery = z.object({ groupId: z.string() });
@@ -37,7 +39,19 @@ export class Controller {
     const role = _role!;
     this.ctx.assert.unprocessableEntity(role.role === "ADMIN", canNotLeaveAsAdminMsg);
 
-    const member = await this.ctx.groupRepository.groupMember.leaveGroup(groupId, locals.payload.sub);
+    const { member } = await this.ctx.transactionManager.withTransaction(async (tx) => {
+      const memberPromise = this.ctx.groupRepository.groupMember.leaveGroup(groupId, locals.payload.sub, tx);
+      const aggregatePromise = this.ctx.aggregator.groupAggregator.aggregate(
+        groupId,
+        (data) => ({
+          ...data,
+          total_members: (data?.total_members ?? 1) - 1
+        }),
+        tx
+      );
+      const [member] = await Promise.all([memberPromise, aggregatePromise]);
+      return { member };
+    });
     const result = { id: member.id };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }

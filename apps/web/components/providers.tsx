@@ -4,6 +4,8 @@ import { isServer, QueryClient, QueryClientProvider } from "@tanstack/react-quer
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { domAnimation, LazyMotion } from "framer-motion";
 
+import { Realtime } from "./realtime";
+
 function queryClientFactory() {
   return new QueryClient({
     defaultOptions: { queries: { staleTime: 60 * 1000, refetchOnWindowFocus: false, retry: false } }
@@ -26,7 +28,7 @@ export default function Providers(props: Props) {
   return (
     <QueryClientProvider client={queryClient}>
       <LazyMotion strict features={domAnimation}>
-        {children}
+        <Realtime>{children}</Realtime>
       </LazyMotion>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

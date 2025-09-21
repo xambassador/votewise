@@ -6,3 +6,6 @@ export const getMyGroupsKey = () => ["my-groups"];
 export const getFeedKey = (id: string) => ["feed", id];
 export const getMembersKey = (groupId: string) => ["members", groupId];
 export const getUserProfileKey = (username: string) => ["user-profile", username];
+export const getNotificationsKey = () => ["notifications"];
+export const getGroupNotificationsKey = () => ["group-notifications"];
+export const getGroupKey = (id: string) => ["group", id];

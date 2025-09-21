@@ -1,13 +1,15 @@
 import type { Prisma } from "@votewise/prisma";
-import type { PostAggregates, UserAggregates } from "@votewise/prisma/client";
+import type { GroupAggregates, PostAggregates, UserAggregates } from "@votewise/prisma/client";
 import type { TransactionCtx } from "./transaction";
 
 import { BaseRepository } from "./base.repository";
 
 type PostAggregatorData = Prisma.PostAggregatesUncheckedCreateInput;
 type UserAggregatorData = Prisma.UserAggregatesUncheckedCreateInput;
+type GroupAggregatorData = Prisma.GroupAggregatesUncheckedCreateInput;
 type PostAggregation = Omit<PostAggregatorData, "post_id">;
 type UserAggregation = Omit<UserAggregatorData, "user_id">;
+type GroupAggregation = Omit<GroupAggregatorData, "group_id">;
 
 class PostAggregator extends BaseRepository {
   private readonly db: RepositoryConfig["db"];
@@ -55,13 +57,38 @@ class UserAggregator extends BaseRepository {
   }
 }
 
+class GroupAggregator extends BaseRepository {
+  private readonly db: RepositoryConfig["db"];
+
+  constructor(cfg: RepositoryConfig) {
+    super();
+    this.db = cfg.db;
+  }
+
+  public aggregate(groupId: string, fn: (data: GroupAggregates | null) => GroupAggregation, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
+    return this.execute(async () => {
+      const existing = await db.groupAggregates.findUnique({ where: { group_id: groupId } });
+      const toUpdate = fn(existing);
+      await db.groupAggregates.upsert({
+        where: { group_id: groupId },
+        create: { group_id: groupId, ...toUpdate },
+        update: toUpdate
+      });
+      return toUpdate;
+    });
+  }
+}
+
 export class Aggregator extends BaseRepository {
   public postAggregator: PostAggregator;
   public userAggregator: UserAggregator;
+  public groupAggregator: GroupAggregator;
 
   constructor(cfg: RepositoryConfig) {
     super();
     this.postAggregator = new PostAggregator(cfg);
     this.userAggregator = new UserAggregator(cfg);
+    this.groupAggregator = new GroupAggregator(cfg);
   }
 }

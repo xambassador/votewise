@@ -649,6 +649,50 @@ const awesomePeople = [
     about: "Share market se bada koi game nahi.",
     location: "Lost in stock market",
     gender: "MALE"
+  },
+  {
+    username: "mangal_singh",
+    firstName: "Daku",
+    lastName: "Mangal Singh",
+    email: "dakumangal.singh@gmail.com",
+    avatar: "avatars/mangal_singh.jpg",
+    background: "",
+    about: "Most wanted daku of dholakpur.",
+    location: "Dholakpur",
+    gender: "MALE"
+  },
+  {
+    username: "action_ka_men",
+    firstName: "Action",
+    lastName: "Ka men",
+    email: "actionkamen@gmail.com",
+    avatar: "avatars/action_men.jpg",
+    background: "",
+    about: "Just like my name, I am full of action and always ready for an adventure.",
+    location: "Tokyo, Japan",
+    gender: "MALE"
+  },
+  {
+    username: "lucky_man",
+    firstName: "Lucky",
+    lastName: "Men",
+    email: "lucky.men@gmail.com",
+    avatar: "avatars/lucky_men.jpg",
+    background: "",
+    about: "They call me Lucky because I always find a way out of tricky situations.",
+    location: "Tokyo, Japan",
+    gender: "MALE"
+  },
+  {
+    username: "hagemaru",
+    firstName: "Tsurupika",
+    lastName: "Hagemaru",
+    email: "hagemaru@gmail.com",
+    avatar: "avatars/hagemaru.jpg",
+    background: "",
+    about: "A kanjus kid in tokyo.",
+    location: "Tokyo, Japan",
+    gender: "MALE"
   }
 ];
 

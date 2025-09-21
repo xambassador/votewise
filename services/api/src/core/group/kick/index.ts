@@ -11,7 +11,9 @@ export function kickMemberControllerFactory() {
   const controller = new Controller({
     assert: ctx.assert,
     groupRepository: ctx.repositories.group,
-    userRepository: ctx.repositories.user
+    userRepository: ctx.repositories.user,
+    aggregator: ctx.repositories.aggregator,
+    transactionManager: ctx.repositories.transactionManager
   });
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "kick-member" });

@@ -58,10 +58,14 @@ export class Controller {
     this.ctx.assert.forbidden(invitation!.user_id !== currentUserId, permissionErrorMessage);
 
     await this.ctx.transactionManager.withTransaction(async (tx) => {
-      await this.ctx.groupRepository.groupInvitation.update(invitation!.id, { status: "REJECTED" }, tx);
+      let deletePromise: Promise<void> = Promise.resolve();
       if (notificationId) {
-        await this.ctx.notificationRepository.markAsRead(notificationId, tx);
+        deletePromise = this.ctx.notificationRepository.deleteById(notificationId, tx);
       }
+      await Promise.all([
+        this.ctx.groupRepository.groupInvitation.update(invitation!.id, { status: "REJECTED" }, tx),
+        deletePromise
+      ]);
     });
 
     return res.status(StatusCodes.NO_CONTENT).send();

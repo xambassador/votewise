@@ -49,4 +49,11 @@ export class NotificationRepository extends BaseRepository {
       return notification;
     });
   }
+
+  public async deleteById(id: string, tx?: TransactionCtx) {
+    return this.execute(async () => {
+      const db = tx ?? this.db;
+      await db.notification.delete({ where: { id } });
+    });
+  }
 }

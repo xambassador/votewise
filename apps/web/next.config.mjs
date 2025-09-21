@@ -26,6 +26,22 @@ const nextConfig = bundleAnalyzer({
       bufferutil: "bufferutil",
       "utf-8-validate": "utf-8-validate"
     });
+
+    // Support for mp3 imports
+    config.module.rules.push({
+      test: /\.mp3$/,
+      use: [
+        {
+          loader: "file-loader",
+          options: {
+            name: "[name].[hash].[ext]",
+            outputPath: "static/media/",
+            publicPath: "/_next/static/media/"
+          }
+        }
+      ]
+    });
+
     return config;
   },
   experimental: {
