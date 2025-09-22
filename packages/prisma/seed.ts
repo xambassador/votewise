@@ -748,15 +748,16 @@ async function createUsers() {
 async function createUserInterests(users: User[], topics: Topics[]) {
   for (const user of users) {
     const userTopics = faker.helpers.arrayElements(topics, { min: 3, max: 7 });
-
-    for (const topic of userTopics) {
-      await prisma.userInterests.create({
-        data: {
-          user_id: user.id,
-          topic_id: topic.id
-        }
-      });
-    }
+    await Promise.all(
+      userTopics.map((topic) =>
+        prisma.userInterests.create({
+          data: {
+            user_id: user.id,
+            topic_id: topic.id
+          }
+        })
+      )
+    );
   }
 
   console.log("✅ User interests created!");
@@ -769,16 +770,22 @@ async function createFollows(users: User[]) {
     const followees = faker.helpers.arrayElements(potentialFollowees, Math.min(followCount, potentialFollowees.length));
 
     for (const followee of followees) {
-      await prisma.follow.create({
-        data: {
-          follower_id: user.id,
-          following_id: followee.id
-        }
-      });
-      await prisma.userAggregates.update({
-        where: { user_id: followee.id },
-        data: { total_followers: { increment: 1 } }
-      });
+      await Promise.all([
+        prisma.follow.create({
+          data: {
+            follower_id: user.id,
+            following_id: followee.id
+          }
+        }),
+        prisma.userAggregates.update({
+          where: { user_id: followee.id },
+          data: { total_followers: { increment: 1 } }
+        }),
+        prisma.userAggregates.update({
+          where: { user_id: user.id },
+          data: { total_following: { increment: 1 } }
+        })
+      ]);
     }
   }
 
@@ -880,42 +887,46 @@ async function addUsersToGroups(users: User[], groups: Group[]) {
   for (const group of groups) {
     // Select a random user as admin
     const adminUser = faker.helpers.arrayElement(users);
-    await prisma.groupMember.create({
-      data: {
-        role: "ADMIN",
-        user_id: adminUser.id,
-        group_id: group.id
-      }
-    });
-    await prisma.userAggregates.update({
-      where: { user_id: adminUser.id },
-      data: { total_groups: { increment: 1 } }
-    });
-    await prisma.groupAggregates.update({
-      where: { group_id: group.id },
-      data: { total_members: { increment: 1 } }
-    });
+    await Promise.all([
+      prisma.groupMember.create({
+        data: {
+          role: "ADMIN",
+          user_id: adminUser.id,
+          group_id: group.id
+        }
+      }),
+      prisma.userAggregates.update({
+        where: { user_id: adminUser.id },
+        data: { total_groups: { increment: 1 } }
+      }),
+      prisma.groupAggregates.update({
+        where: { group_id: group.id },
+        data: { total_members: { increment: 1 } }
+      })
+    ]);
 
     const moderatorCount = faker.number.int({ min: 2, max: 5 });
     const potentialModerators = users.filter((u) => u.id !== adminUser.id);
     const moderators = faker.helpers.arrayElements(potentialModerators, moderatorCount);
 
     for (const moderator of moderators) {
-      await prisma.groupMember.create({
-        data: {
-          role: "MODERATOR",
-          user_id: moderator.id,
-          group_id: group.id
-        }
-      });
-      await prisma.userAggregates.update({
-        where: { user_id: moderator.id },
-        data: { total_groups: { increment: 1 } }
-      });
-      await prisma.groupAggregates.update({
-        where: { group_id: group.id },
-        data: { total_members: { increment: 1 } }
-      });
+      await Promise.all([
+        prisma.groupMember.create({
+          data: {
+            role: "MODERATOR",
+            user_id: moderator.id,
+            group_id: group.id
+          }
+        }),
+        prisma.userAggregates.update({
+          where: { user_id: moderator.id },
+          data: { total_groups: { increment: 1 } }
+        }),
+        prisma.groupAggregates.update({
+          where: { group_id: group.id },
+          data: { total_members: { increment: 1 } }
+        })
+      ]);
     }
 
     const memberCount = faker.number.int({ min: 10, max: 50 });
@@ -924,22 +935,24 @@ async function addUsersToGroups(users: User[], groups: Group[]) {
     const members = faker.helpers.arrayElements(potentialMembers, Math.min(memberCount, potentialMembers.length));
 
     for (const member of members) {
-      await prisma.groupMember.create({
-        data: {
-          role: "MEMBER",
-          user_id: member.id,
-          group_id: group.id,
-          blocked: faker.helpers.maybe(() => true, { probability: 0.05 })
-        }
-      });
-      await prisma.userAggregates.update({
-        where: { user_id: member.id },
-        data: { total_groups: { increment: 1 } }
-      });
-      await prisma.groupAggregates.update({
-        where: { group_id: group.id },
-        data: { total_members: { increment: 1 } }
-      });
+      await Promise.all([
+        prisma.groupMember.create({
+          data: {
+            role: "MEMBER",
+            user_id: member.id,
+            group_id: group.id,
+            blocked: faker.helpers.maybe(() => true, { probability: 0.05 })
+          }
+        }),
+        prisma.userAggregates.update({
+          where: { user_id: member.id },
+          data: { total_groups: { increment: 1 } }
+        }),
+        prisma.groupAggregates.update({
+          where: { group_id: group.id },
+          data: { total_members: { increment: 1 } }
+        })
+      ]);
     }
   }
 
@@ -1107,14 +1120,17 @@ async function createComments(users: User[], posts: Post[]) {
           created_at: faker.date.recent()
         }
       });
-      await prisma.postAggregates.update({
-        where: { post_id: post.id },
-        data: { comments: { increment: 1 } }
-      });
-      await prisma.userAggregates.update({
-        where: { user_id: user.id },
-        data: { total_comments: { increment: 1 } }
-      });
+      await Promise.all([
+        prisma.postAggregates.update({
+          where: { post_id: post.id },
+          data: { comments: { increment: 1 } }
+        }),
+        prisma.userAggregates.update({
+          where: { user_id: user.id },
+          data: { total_comments: { increment: 1 } }
+        })
+      ]);
+
       if (post.group_id) {
         await prisma.groupAggregates.update({
           where: { group_id: post.group_id },
@@ -1136,24 +1152,26 @@ async function createUpvotes(users: User[], posts: Post[]) {
     const upvoters = faker.helpers.arrayElements(users, upvoteCount);
 
     for (const user of upvoters) {
-      await prisma.upvote.create({
-        data: {
-          post_id: post.id,
-          user_id: user.id
-        }
-      });
-      await prisma.postAggregates.update({
-        where: { post_id: post.id },
-        data: { votes: { increment: 1 } }
-      });
-      await prisma.userAggregates.update({
-        where: { user_id: user.id },
-        data: { total_votes: { increment: 1 } }
-      });
-      await prisma.groupAggregates.updateMany({
-        where: { group_id: post.group_id || undefined },
-        data: { total_votes: { increment: 1 } }
-      });
+      await Promise.all([
+        prisma.upvote.create({
+          data: {
+            post_id: post.id,
+            user_id: user.id
+          }
+        }),
+        prisma.postAggregates.update({
+          where: { post_id: post.id },
+          data: { votes: { increment: 1 } }
+        }),
+        prisma.userAggregates.update({
+          where: { user_id: user.id },
+          data: { total_votes: { increment: 1 } }
+        }),
+        prisma.groupAggregates.updateMany({
+          where: { group_id: post.group_id || undefined },
+          data: { total_votes: { increment: 1 } }
+        })
+      ]);
     }
   }
 

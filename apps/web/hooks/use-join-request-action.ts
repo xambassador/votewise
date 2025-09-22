@@ -41,7 +41,7 @@ export function useGroupJoinRequestAction(action: "accept" | "reject") {
       queryClient.setQueryData<GetAllNotificationsResponse>(notificationQueryKey, (old) => {
         if (!old) return old;
         return {
-          notifications: old.notifications.filter((n) => n.id !== variables.id)
+          notifications: old.notifications.filter((n) => n.id !== variables.notificationId)
         } as GetAllNotificationsResponse;
       });
       queryClient.setQueryData<GetGroupJoinRequestsResponse>(groupNotificationsKey, (old) => {

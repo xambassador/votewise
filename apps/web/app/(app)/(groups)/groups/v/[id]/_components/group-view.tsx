@@ -42,10 +42,14 @@ export function GroupView(props: Props) {
       <div className="flex flex-col gap-4">
         <div className="relative">
           <figure className="relative w-full h-[calc((200/16)*1rem)] max-h-[calc((200/16)*1rem)] rounded-xl overflow-hidden">
-            <Image className="max-w-full" src={group.cover_url ?? ""} alt={group.name} />
+            <Image className="max-w-full size-full object-cover" src={group.cover_url ?? ""} alt={group.name} />
           </figure>
           <Avatar className="size-20 absolute -bottom-10 left-5">
-            <AvatarImage src={group.logo_url ?? ""} alt={group.name} />
+            <AvatarImage
+              src={group.logo_url ?? ""}
+              alt={group.name}
+              className="object-cover overflow-clip-margin-unset"
+            />
             <AvatarFallback name={group.name} />
           </Avatar>
         </div>

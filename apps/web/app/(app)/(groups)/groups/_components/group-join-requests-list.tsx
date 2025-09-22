@@ -43,7 +43,7 @@ export function GroupJoinRequestsList(props: Props) {
         <GroupJoinRequestNotification
           key={req.id}
           notification={{
-            id: req.id,
+            id: req.notification_id ?? "",
             content: {
               avatar_url: req.user.avatar_url ?? "",
               user_id: req.user.id,

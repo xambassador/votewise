@@ -17,14 +17,18 @@ import { chain } from "@/lib/chain";
 
 import { useCreateGroupMutation } from "./use-create-group-mutation";
 
-export function useCreateGroup() {
-  const [open, setOpen] = useState(false);
+export function useCreateGroup(props?: DialogProps) {
+  const { open: controlledOpen, onOpenChange: controlledOnOpenChange } = props ?? {};
+  const [_open, _setOpen] = useState(false);
+  const open = controlledOpen ?? _open;
+  const setOpen = controlledOnOpenChange ?? _setOpen;
+
   const form = useForm<TGroupCreate>({ resolver: zodResolver(ZGroupCreate) });
   const fileRef = useRef<File | null>(null);
   const mutation = useCreateGroupMutation();
   const isPending = mutation.isPending;
 
-  function getDialogProps(props?: DialogProps): DialogProps {
+  function getDialogProps(): DialogProps {
     return {
       ...props,
       open,

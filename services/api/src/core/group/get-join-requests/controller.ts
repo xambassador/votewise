@@ -32,6 +32,7 @@ export class Controller {
         id: r.id,
         created_at: r.created_at,
         sent_at: r.sent_at,
+        notification_id: r.groupNotification?.notification_id,
         user: {
           id: r.user.id,
           username: r.user.user_name,

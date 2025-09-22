@@ -402,7 +402,17 @@ model GroupInvitation {
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
 
+    groupNotification GroupNotification?
+
     @@unique([user_id, group_id])
+}
+
+model GroupNotification {
+    group_invitation_id String          @unique
+    group_invitation    GroupInvitation @relation(fields: [group_invitation_id], references: [id], onDelete: Cascade)
+
+    notification_id String       @unique
+    notification    Notification @relation(fields: [notification_id], references: [id], onDelete: Cascade)
 }
 
 model Notification {
@@ -416,6 +426,8 @@ model Notification {
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
+
+    groupNotification GroupNotification?
 
     @@index([user_id], name: "user_notification_index")
 }

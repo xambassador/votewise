@@ -7,17 +7,20 @@ import { BaseRepository } from "./base.repository";
 type CreateGroup = Prisma.GroupCreateInput;
 type CreateGroupInvitation = Prisma.GroupInvitationUncheckedCreateInput;
 type UpdateGroupInvitation = Prisma.GroupInvitationUncheckedUpdateInput;
+type CreateGroupNotification = Prisma.GroupNotificationUncheckedCreateInput;
 
 export class GroupRepository extends BaseRepository {
   private readonly db: RepositoryConfig["db"];
   public readonly groupMember: GroupMemberRepository;
   public readonly groupInvitation: GroupInvitationRepository;
+  public readonly groupNotifications: GroupNotificationsRepository;
 
   constructor(cfg: RepositoryConfig) {
     super();
     this.db = cfg.db;
     this.groupMember = new GroupMemberRepository(cfg);
     this.groupInvitation = new GroupInvitationRepository(cfg);
+    this.groupNotifications = new GroupNotificationsRepository(cfg);
   }
 
   public getGroupsById(ids: string[]) {
@@ -437,7 +440,10 @@ export class GroupInvitationRepository extends BaseRepository {
 
   public findPendingJoinRequest(id: string) {
     return this.execute(async () =>
-      this.db.groupInvitation.findUnique({ where: { id, status: "PENDING", type: "JOIN" } })
+      this.db.groupInvitation.findUnique({
+        where: { id, status: "PENDING", type: "JOIN" },
+        include: { groupNotification: { select: { notification_id: true } } }
+      })
     );
   }
 
@@ -471,10 +477,30 @@ export class GroupInvitationRepository extends BaseRepository {
               id: true,
               name: true
             }
-          }
+          },
+          groupNotification: { select: { notification_id: true } }
         }
       });
       return invitations;
+    });
+  }
+}
+
+export class GroupNotificationsRepository extends BaseRepository {
+  private readonly db: RepositoryConfig["db"];
+
+  constructor(cfg: RepositoryConfig) {
+    super();
+    this.db = cfg.db;
+  }
+
+  public create(data: CreateGroupNotification, tx?: TransactionCtx) {
+    const db = tx ?? this.db;
+    return this.execute(async () => {
+      const notification = await db.groupNotification.create({
+        data: { group_invitation_id: data.group_invitation_id, notification_id: data.notification_id }
+      });
+      return notification;
     });
   }
 }

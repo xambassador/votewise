@@ -130,6 +130,10 @@ export class PrivateGroupStrategy extends Strategy {
         },
         tx
       );
+      await this.ctx.groupRepository.groupNotifications.create(
+        { group_invitation_id: invitation.id, notification_id: notification.id },
+        tx
+      );
       return { invitation, notification };
     });
     const event = new EventBuilder("groupJoinRequestNotification").setData({
