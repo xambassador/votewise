@@ -29,7 +29,7 @@ type Props = { group: TGroup };
 
 export function GroupMolecule(props: Props) {
   const { group } = props;
-  const author = group.members.find((m) => m.role === "ADMIN");
+  const admin = group.admin;
   return (
     <Group>
       <GroupHeader>
@@ -45,24 +45,24 @@ export function GroupMolecule(props: Props) {
       </Link>
       <div className="flex items-center justify-between">
         <GroupAuthor>
-          <Link className="focus-visible" href={routes.user.profile(author?.user_name || "")}>
+          <Link className="focus-visible" href={routes.user.profile(admin?.user_name || "")}>
             <Avatar>
-              <AvatarFallback name={author?.first_name + " " + author?.last_name} />
+              <AvatarFallback name={admin?.first_name + " " + admin?.last_name} />
               <AvatarImage
-                src={author?.avatar_url}
-                alt={author?.first_name + " " + author?.last_name}
+                src={admin?.avatar_url}
+                alt={admin?.first_name + " " + admin?.last_name}
                 className="overflow-clip-margin-unset object-cover"
               />
             </Avatar>
           </Link>
           <div className="flex flex-col">
-            <Link className="focus-visible" href={routes.user.profile(author?.user_name || "")}>
-              <GroupAuthorName title={author?.first_name + " " + author?.last_name}>
-                {truncate(author?.first_name + " " + author?.last_name, 25)}
+            <Link className="focus-visible" href={routes.user.profile(admin?.user_name || "")}>
+              <GroupAuthorName title={admin?.first_name + " " + admin?.last_name}>
+                {truncate(admin?.first_name + " " + admin?.last_name, 25)}
               </GroupAuthorName>
             </Link>
-            <Link className="focus-visible" href={routes.user.profile(author?.user_name || "")}>
-              <GroupAuthorHandle title={author?.user_name}>@{truncate(author?.user_name || "", 30)}</GroupAuthorHandle>
+            <Link className="focus-visible" href={routes.user.profile(admin?.user_name || "")}>
+              <GroupAuthorHandle title={admin?.user_name}>@{truncate(admin?.user_name || "", 30)}</GroupAuthorHandle>
             </Link>
           </div>
         </GroupAuthor>

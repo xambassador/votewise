@@ -1,6 +1,6 @@
 "use client";
 
-import type { GetAllGroupsResponse } from "@votewise/client/group";
+import type { GetMyGroupsResponse } from "@votewise/client/group";
 
 import Link from "next/link";
 import { useFetchMyGroups } from "@/hooks/use-fetch-my-groups";
@@ -15,9 +15,7 @@ import { routes } from "@/lib/routes";
 
 import Loading from "../loading";
 
-type Props = {
-  groups: GetAllGroupsResponse;
-};
+type Props = { groups: GetMyGroupsResponse };
 
 export function MyGroupsList(props: Props) {
   const { groups: initialData } = props;

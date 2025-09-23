@@ -6,7 +6,7 @@ import type { DialogProps } from "@votewise/ui/dialog";
 import type { FormFieldProps, TFieldControllerProps, TFormProps } from "@votewise/ui/form";
 import type { ImagePickerButtonProps } from "@votewise/ui/image-picker";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { ZGroupCreate } from "@votewise/schemas/group";
@@ -24,7 +24,8 @@ export function useCreateGroup(props?: DialogProps) {
   const setOpen = controlledOnOpenChange ?? _setOpen;
 
   const form = useForm<TGroupCreate>({ resolver: zodResolver(ZGroupCreate) });
-  const fileRef = useRef<File | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [openCropper, setOpenCropper] = useState(false);
   const mutation = useCreateGroupMutation();
   const isPending = mutation.isPending;
 
@@ -59,14 +60,15 @@ export function useCreateGroup(props?: DialogProps) {
     return {
       ...props,
       onFileSelect: chain(props?.onFileSelect, (file: File | null) => {
-        fileRef.current = file;
+        setFile(file);
+        setOpenCropper(!!file);
       })
     };
   }
 
   const onSubmit = form.handleSubmit((data) => {
     mutation.mutate(
-      { ...data, coverImageFile: fileRef.current },
+      { ...data, coverImageFile: file },
       {
         onSuccess: () => setOpen(false),
         onError: (error) => {
@@ -85,6 +87,10 @@ export function useCreateGroup(props?: DialogProps) {
     };
   }
 
+  function onFileCrop(file: File) {
+    setFile(file);
+  }
+
   return {
     getFormFieldProps,
     getRootFormProps,
@@ -92,6 +98,10 @@ export function useCreateGroup(props?: DialogProps) {
     getButtonProps,
     register,
     getImagePickerButtonProps,
-    getDialogProps
+    getDialogProps,
+    file,
+    openCropper,
+    setOpenCropper,
+    onFileCrop
   };
 }

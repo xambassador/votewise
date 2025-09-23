@@ -9,6 +9,8 @@ import { Input } from "@votewise/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@votewise/ui/select";
 import { Textarea } from "@votewise/ui/textarea";
 
+import { EditImage } from "../edit-image";
+
 export function CreateGroup(props: React.ComponentProps<typeof Dialog>) {
   const form = useCreateGroup(props);
   return (
@@ -45,11 +47,18 @@ export function CreateGroup(props: React.ComponentProps<typeof Dialog>) {
                 </FormField>
               )}
             />
-            <ImagePicker className="w-full max-h-[140px]">
+            <ImagePicker className="w-full max-h-[200px]">
               <ImagePreview imageWrapperProps={{ className: "rounded-lg" }} />
               <ImagePickerButton {...form.getImagePickerButtonProps()} />
               <ResetPreviewButton className="rounded-lg" />
             </ImagePicker>
+            <EditImage
+              src={form.file}
+              cropperProps={{ minWidth: 600, minHeight: 200, maxWidth: 600, maxHeight: 200, locked: true }}
+              open={form.openCropper}
+              onOpenChange={form.setOpenCropper}
+              onSave={form.onFileCrop}
+            />
           </div>
         </Form>
         <Dash className="text-nobelBlack-200" />
