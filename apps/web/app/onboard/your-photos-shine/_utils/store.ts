@@ -1,5 +1,6 @@
 "use client";
 
+import type { EditImageProps } from "@/components/edit-image";
 import type { Dialog } from "@votewise/ui/dialog";
 
 import { useEffect } from "react";
@@ -24,6 +25,12 @@ const selectedAvatarAtom = atom<string | File | null>(null);
  */
 const savedAvatarAtom = atom<string | File | null>(null);
 
+/**
+ * Atom to trigger the edit image dialog.
+ */
+const editImageDialogAtom = atom(false);
+const editingFileAtom = atom<File | null>(null);
+
 /* -----------------------------------------------------------------------------------------------
  * Derived Atoms
  * -----------------------------------------------------------------------------------------------*/
@@ -39,7 +46,8 @@ const onSelectAvatarFromList = atom(null, (_, set, avatar: string) => {
 });
 const onFileDropAtom = atom(null, (_, set, files: File[]) => {
   const file = files[0];
-  set(selectedAvatarAtom, file);
+  set(editingFileAtom, file);
+  set(editImageDialogAtom, true);
 });
 
 /* -----------------------------------------------------------------------------------------------
@@ -115,4 +123,24 @@ export function useGetChooseAvatarDialogProps(props?: DialogProps): DialogProps 
   const open = useAtomValue(isChooseAvatarDialogOpen);
   const setDialogOpen = useSetChooseAvatarDialogOpen();
   return { ...props, open, onOpenChange: setDialogOpen };
+}
+
+export function useGetEditImageDialogProps(props?: EditImageProps): EditImageProps {
+  const open = useAtomValue(editImageDialogAtom);
+  const file = useAtomValue(editingFileAtom);
+  const setOpen = useSetAtom(editImageDialogAtom);
+  const setSelectedAvatar = useSetAtom(selectedAvatarAtom);
+  return {
+    src: file,
+    open,
+    onOpenChange: setOpen,
+    onSave: (editedFile) => {
+      setSelectedAvatar(editedFile);
+    },
+    onCancel: () => {
+      setSelectedAvatar(null);
+      setOpen(false);
+    },
+    ...props
+  };
 }

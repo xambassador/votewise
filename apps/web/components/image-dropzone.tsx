@@ -28,13 +28,13 @@ export function ImageDropZone(props: Props) {
       ...dropzoneProps?.accept
     },
     onDrop(acceptedFiles, fileRejections, event) {
-      onFileDrop?.(acceptedFiles as File[]);
-      dropzoneProps?.onDrop?.(acceptedFiles, fileRejections, event);
+      let hasError = false;
       setError(null);
       onErrorReset?.();
       fileRejections.forEach((file) => {
         file.errors.forEach((error) => {
           if (error.code === "file-too-large") {
+            hasError = true;
             if (dropzoneProps?.maxSize) {
               setError(`File is too large. Max size is ${dropzoneProps?.maxSize / 1024 / 1024}MB`);
             }
@@ -42,6 +42,9 @@ export function ImageDropZone(props: Props) {
           }
         });
       });
+      if (hasError) return;
+      onFileDrop?.(acceptedFiles as File[]);
+      dropzoneProps?.onDrop?.(acceptedFiles, fileRejections, event);
     }
   });
 

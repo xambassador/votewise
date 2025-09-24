@@ -12,6 +12,7 @@ import {
   useSetSelectedAvatar
 } from "../_utils/store";
 import { AvatarDropZone } from "./avatar-dropzone";
+import { AvatarEditor } from "./avatar-editor";
 
 /* ----------------------------------------------------------------------------------------------- */
 
@@ -31,6 +32,7 @@ export function AvatarPickerDialog(props: Props) {
         <DialogDescription className="sr-only">Choose an avatar to express your style!</DialogDescription>
         <div className="flex flex-col gap-10">
           <AvatarDropZone />
+          <AvatarEditor />
           <SeparatorWithLabel>Or</SeparatorWithLabel>
           <div className="flex flex-col gap-2">
             <ChooseAvatarButton />

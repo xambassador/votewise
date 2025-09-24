@@ -91,6 +91,11 @@ export function useCreateGroup(props?: DialogProps) {
     setFile(file);
   }
 
+  function onFileCropCancel() {
+    setOpenCropper(false);
+    setFile(null);
+  }
+
   return {
     getFormFieldProps,
     getRootFormProps,
@@ -102,6 +107,7 @@ export function useCreateGroup(props?: DialogProps) {
     file,
     openCropper,
     setOpenCropper,
-    onFileCrop
+    onFileCrop,
+    onFileCropCancel
   };
 }

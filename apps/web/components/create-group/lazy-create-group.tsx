@@ -54,10 +54,11 @@ export function CreateGroup(props: React.ComponentProps<typeof Dialog>) {
             </ImagePicker>
             <EditImage
               src={form.file}
-              cropperProps={{ minWidth: 600, minHeight: 200, maxWidth: 600, maxHeight: 200, locked: true }}
+              cropperProps={{ minWidth: 600, minHeight: 200, maxWidth: 600, maxHeight: 200 }}
               open={form.openCropper}
               onOpenChange={form.setOpenCropper}
               onSave={form.onFileCrop}
+              onCancel={form.onFileCropCancel}
             />
           </div>
         </Form>
