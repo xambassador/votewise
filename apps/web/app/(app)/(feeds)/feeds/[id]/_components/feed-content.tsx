@@ -21,11 +21,11 @@ import {
   VotersStack
 } from "@votewise/ui/cards/feed";
 import { Error } from "@votewise/ui/error";
-import { Spinner } from "@votewise/ui/ring-spinner";
 
 import { routes } from "@/lib/routes";
 
 import { FeedAssets } from "./feed-assets";
+import { FeedSkeletonShell } from "./skeleton";
 import { VoteButton } from "./vote-btn";
 
 extend(relativeTime);
@@ -40,14 +40,17 @@ export function FeedContent(props: Props) {
 
   switch (status) {
     case "pending":
-      return (
-        <div className="content-height center">
-          <Spinner />
-        </div>
-      );
+      return <FeedSkeletonShell />;
 
     case "error":
-      return <Error error={error.message} errorInfo={{ componentStack: error.stack }} />;
+      return (
+        <Error
+          shellProps={{ className: "border-none shadow-none" }}
+          iconWrapperProps={{ className: "bg-nobelBlack-200" }}
+          error={error.message}
+          errorInfo={{ componentStack: error.stack }}
+        />
+      );
   }
 
   return (
@@ -82,7 +85,7 @@ export function FeedContent(props: Props) {
       </_FeedContent>
 
       <div className="flex flex-col gap-8 pb-4 border-b border-nobelBlack-200">
-        <VoteButton is_voted={feed.is_voted} upvote_count={feed.upvote_count} feedId={feed.id} />
+        <VoteButton isVoted={feed.is_voted} upvoteCount={feed.upvote_count} feedId={feed.id} />
         {feed.voters.length > 0 && (
           <VotersStack>
             <span className="text-sm text-black-200 inline-block mr-3">Voters:</span>

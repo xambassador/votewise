@@ -1,9 +1,5 @@
-import { Spinner } from "@votewise/ui/ring-spinner";
+import { FeedListSkeleton } from "./_components/skeleton";
 
 export default function Loading() {
-  return (
-    <div className="content-height center">
-      <Spinner />
-    </div>
-  );
+  return <FeedListSkeleton />;
 }

@@ -57,7 +57,14 @@ export function DiscussionPanel(props: Props) {
     case "pending":
       return <CommentsFetcherFallback />;
     case "error":
-      return <Error error={error.message} errorInfo={{ componentStack: error.stack }} />;
+      return (
+        <Error
+          shellProps={{ className: "border-none shadow-none" }}
+          iconWrapperProps={{ className: "bg-nobelBlack-200" }}
+          error={error.message}
+          errorInfo={{ componentStack: error.stack }}
+        />
+      );
   }
 
   if (!data) return noDataElement;

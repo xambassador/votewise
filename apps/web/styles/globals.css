@@ -157,6 +157,10 @@ html {
   .overflow-clip-margin-unset {
     overflow-clip-margin: unset;
   }
+
+  .avatar-stack-skeleton {
+    @apply border-nobelBlack-100 rounded-full border;
+  }
 }
 
 @layer components {

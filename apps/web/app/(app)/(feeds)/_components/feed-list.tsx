@@ -8,9 +8,8 @@ import { Error } from "@votewise/ui/error";
 
 import { FeedMolecule } from "@/components/feed";
 import { InView } from "@/components/in-view";
-import { LoadMoreSpinner } from "@/components/load-more-spinner";
 
-import Loading from "../loading";
+import { FeedListSkeleton, FeedSkeleton } from "./skeleton";
 
 export function FeedList(props: { feeds: GetAllFeedsResponse }) {
   const { feeds } = props;
@@ -26,7 +25,7 @@ export function FeedList(props: { feeds: GetAllFeedsResponse }) {
 
   switch (status) {
     case "pending":
-      return <Loading />;
+      return <FeedListSkeleton />;
     case "error":
       return <Error error={error.message} errorInfo={{ componentStack: error.stack }} />;
   }
@@ -40,7 +39,7 @@ export function FeedList(props: { feeds: GetAllFeedsResponse }) {
       {data.feeds.map((feed) => (
         <FeedMolecule data={feed} key={feed.id} />
       ))}
-      {nextPageStatus === "loading" && <LoadMoreSpinner />}
+      {nextPageStatus === "loading" && Array.from({ length: 5 }).map((_, i) => <FeedSkeleton key={i} />)}
       <InView onInView={handleInView} />
     </div>
   );
