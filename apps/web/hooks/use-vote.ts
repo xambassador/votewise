@@ -32,11 +32,18 @@ export function useVote(props: Props) {
       const previousFeed = queryClient.getQueryData<GetFeedResponse>(queryKey);
       queryClient.setQueryData<GetFeedResponse>(queryKey, (oldFeed) => {
         if (!oldFeed) return oldFeed;
+        if (oldFeed.voters.length < 10) {
+          return {
+            ...oldFeed,
+            is_voted: true,
+            upvote_count: oldFeed.upvote_count + 1,
+            voters: [...oldFeed.voters, { avatar_url: me.avatar_url, id: me.id }]
+          };
+        }
         return {
           ...oldFeed,
           is_voted: true,
-          upvote_count: oldFeed.upvote_count + 1,
-          voters: [...oldFeed.voters, { avatar_url: me.avatar_url, id: me.id }]
+          upvote_count: oldFeed.upvote_count + 1
         };
       });
       return { previousFeed };

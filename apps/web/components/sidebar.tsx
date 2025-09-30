@@ -55,7 +55,7 @@ export function Sidebar(props: Props) {
                 return <link.component key={link.id} />;
               }
               return (
-                <Link key={link.id} href={link.href} className="focus-visible rounded">
+                <Link key={link.id} href={link.href} className="focus-visible">
                   {link.icon}
                   {link.name}
                 </Link>
