@@ -1,10 +1,10 @@
-import { useCreateGroup } from "@/hooks/use-create-group";
+import { useCreateGroup, useUploadAsset } from "@/hooks/use-create-group";
 
 import { Button } from "@votewise/ui/button";
 import { Close, Dialog, DialogContent, DialogDescription, DialogTitle } from "@votewise/ui/dialog";
 import { FieldController, Form, FormControl, FormField, FormLabel, FormMessage } from "@votewise/ui/form";
 import { Dash } from "@votewise/ui/icons/dash";
-import { ImagePicker, ImagePickerButton, ImagePreview, ResetPreviewButton } from "@votewise/ui/image-picker";
+import { ImagePickerPill } from "@votewise/ui/image-picker";
 import { Input } from "@votewise/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@votewise/ui/select";
 import { Textarea } from "@votewise/ui/textarea";
@@ -47,19 +47,8 @@ export function CreateGroup(props: React.ComponentProps<typeof Dialog>) {
                 </FormField>
               )}
             />
-            <ImagePicker className="w-full max-h-[200px]">
-              <ImagePreview imageWrapperProps={{ className: "rounded-lg" }} />
-              <ImagePickerButton {...form.getImagePickerButtonProps()} />
-              <ResetPreviewButton className="rounded-lg" />
-            </ImagePicker>
-            <EditImage
-              src={form.file}
-              cropperProps={{ minWidth: 600, minHeight: 200, maxWidth: 600, maxHeight: 200 }}
-              open={form.openCropper}
-              onOpenChange={form.setOpenCropper}
-              onSave={form.onFileCrop}
-              onCancel={form.onFileCropCancel}
-            />
+            <UploadLogo onUploadDone={form.onUploadDone} />
+            <UploadCover onUploadDone={form.onUploadDone} />
           </div>
         </Form>
         <Dash className="text-nobelBlack-200" />
@@ -82,5 +71,31 @@ function GroupType(props: React.ComponentProps<typeof Select>) {
         <SelectItem value="PRIVATE">Private</SelectItem>
       </SelectContent>
     </Select>
+  );
+}
+
+type UploadProps = { onUploadDone?: (url: string, type: "LOGO" | "COVER") => void };
+
+function UploadLogo(props: UploadProps) {
+  const form = useUploadAsset({ onUploadDone: (url) => props.onUploadDone?.(url, "LOGO") });
+  return (
+    <>
+      <ImagePickerPill {...form.getImagePickerProps({ children: "Upload logo" })} />
+      <EditImage
+        {...form.getEditorProps({ cropperProps: { minWidth: 200, minHeight: 200, maxWidth: 400, maxHeight: 400 } })}
+      />
+    </>
+  );
+}
+
+function UploadCover(props: UploadProps) {
+  const form = useUploadAsset({ onUploadDone: (url) => props.onUploadDone?.(url, "COVER") });
+  return (
+    <>
+      <ImagePickerPill {...form.getImagePickerProps({ children: "Upload cover" })} />
+      <EditImage
+        {...form.getEditorProps({ cropperProps: { minWidth: 600, minHeight: 200, maxWidth: 600, maxHeight: 200 } })}
+      />
+    </>
   );
 }

@@ -16,11 +16,6 @@ type ControllerOptions = {
   bucketService: AppContext["services"]["bucket"];
 };
 
-type Group = Awaited<ReturnType<ControllerOptions["groupRepository"]["getByUserId"]>>[0];
-type GroupWithAdmin = Group & {
-  admin: { id: string; first_name: string; user_name: string; last_name: string; avatar_url: string };
-};
-
 export class Controller {
   private readonly ctx: ControllerOptions;
 
@@ -38,29 +33,13 @@ export class Controller {
     const limit = query.limit < 1 ? PAGINATION.groups.limit : query.limit;
     const total = await this.ctx.groupRepository.getCountByUserId(sub);
     const _groups = await this.ctx.groupRepository.getByUserId(sub, { page, limit });
-    const groupWithAdmins: GroupWithAdmin[] = [];
-    for (const group of _groups) {
-      const admin = await this.ctx.groupRepository.groupMember.getAdminDetails(group.id);
-      if (admin) {
-        groupWithAdmins.push({
-          ...group,
-          admin: {
-            id: admin.user.id,
-            first_name: admin.user.first_name,
-            user_name: admin.user.user_name,
-            last_name: admin.user.last_name,
-            avatar_url: this.ctx.bucketService.generatePublicUrl(admin.user.avatar_url || "", "avatar")
-          }
-        });
-      }
-    }
-    const groups = groupWithAdmins.map((group) => ({
+    const groups = _groups.map((group) => ({
       id: group.id,
       name: group.name,
       about: group.about,
       type: group.type,
       status: group.status,
-      admin: group.admin,
+      logo_url: group.logo_url,
       members: group.members.map((member) => ({
         member_id: member.id,
         role: member.role,

@@ -16,7 +16,7 @@ export const Group = forwardRef<HTMLDivElement, GroupProps>((props, ref) => {
     <Comp
       ref={ref}
       {...rest}
-      className={cn("flex flex-col gap-4 p-4 rounded-xl border border-nobelBlack-200 bg-nobelBlack-100", className)}
+      className={cn("p-4 rounded-xl border border-nobelBlack-200 bg-nobelBlack-100", className)}
     >
       {children}
     </Comp>
@@ -24,9 +24,23 @@ export const Group = forwardRef<HTMLDivElement, GroupProps>((props, ref) => {
 });
 Group.displayName = "Group";
 
+export type GroupContentProps = React.HTMLAttributes<HTMLDivElement> & {
+  asChild?: boolean;
+};
+export const GroupContent = forwardRef<HTMLDivElement, GroupContentProps>((props, ref) => {
+  const { className, asChild = false, children, ...rest } = props;
+  const Comp = asChild ? Slot : "div";
+  return (
+    <Comp ref={ref} {...rest} className={cn("flex flex-col gap-1 w-full", className)}>
+      {children}
+    </Comp>
+  );
+});
+GroupContent.displayName = "GroupContent";
+
 export type GroupHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 export const GroupHeader = forwardRef<HTMLDivElement, GroupHeaderProps>((props, ref) => (
-  <div ref={ref} {...props} className={cn("flex items-start justify-between w-full", props.className)} />
+  <div ref={ref} {...props} className={cn("flex items-center justify-between w-full", props.className)} />
 ));
 GroupHeader.displayName = "GroupHeader";
 
@@ -36,7 +50,7 @@ export type GroupNameProps = React.HTMLAttributes<HTMLSpanElement> & {
 export const GroupName = forwardRef<HTMLSpanElement, GroupNameProps>((props, ref) => {
   const { className, asChild = false, ...rest } = props;
   const Comp = asChild ? Slot : "span";
-  return <Comp ref={ref} {...rest} className={cn("text-gray-200 text-lg break-words w-full max-w-[80%]", className)} />;
+  return <Comp ref={ref} {...rest} className={cn("text-gray-200 text-lg break-words", className)} />;
 });
 GroupName.displayName = "GroupName";
 
@@ -46,28 +60,18 @@ export const GroupDescription = forwardRef<HTMLSpanElement, GroupDescriptionProp
 ));
 GroupDescription.displayName = "GroupDescription";
 
-type GroupStatusBadgeProps = Omit<React.ComponentProps<typeof Badge>, "children"> & { children?: string };
+type GroupStatusBadgeProps = Omit<React.ComponentProps<typeof Badge>, "children"> & {
+  children?: string | React.ReactNode;
+};
 export const GroupStatusBadge = forwardRef<HTMLSpanElement, GroupStatusBadgeProps>((props, ref) => {
   const { className, children, ...rest } = props;
   return (
     <Badge {...rest} ref={ref} variant="default" className={cn("text-xs", className)}>
-      {children?.toLowerCase()}
+      {typeof children === "string" ? children?.toLowerCase() : children}
     </Badge>
   );
 });
 GroupStatusBadge.displayName = "GroupStatusBadge";
-
-export type GroupAuthorProps = React.HTMLAttributes<HTMLDivElement>;
-export const GroupAuthor = forwardRef<HTMLDivElement, GroupAuthorProps>((props, ref) => (
-  <div ref={ref} {...props} className={cn("flex items-center gap-2", props.className)} />
-));
-GroupAuthor.displayName = "GroupAuthor";
-
-export type GroupTypeProps = React.HTMLAttributes<HTMLSpanElement>;
-export const GroupType = forwardRef<HTMLSpanElement, GroupTypeProps>((props, ref) => (
-  <span ref={ref} {...props} className={cn("text-xs text-gray-300", props.className)} />
-));
-GroupType.displayName = "GroupType";
 
 export type GroupMembersProps = React.HTMLAttributes<HTMLDivElement>;
 export const GroupMembers = forwardRef<HTMLDivElement, GroupMembersProps>((props, ref) => (
@@ -81,14 +85,8 @@ export const GroupCreatedAt = forwardRef<HTMLSpanElement, GroupCreatedAtProps>((
 ));
 GroupCreatedAt.displayName = "GroupCreatedAt";
 
-export type GroupAuthorNameProps = React.HTMLAttributes<HTMLSpanElement>;
-export const GroupAuthorName = forwardRef<HTMLSpanElement, GroupAuthorNameProps>((props, ref) => (
-  <span ref={ref} {...props} className={cn("text-gray-200 text-sm", props.className)} />
+export type GroupFooterProps = React.HTMLAttributes<HTMLDivElement>;
+export const GroupFooter = forwardRef<HTMLDivElement, GroupFooterProps>((props, ref) => (
+  <div ref={ref} {...props} className={cn("flex items-center justify-between w-full mt-4", props.className)} />
 ));
-GroupAuthorName.displayName = "GroupAuthorName";
-
-export type GroupAuthorHandleProps = React.HTMLAttributes<HTMLSpanElement>;
-export const GroupAuthorHandle = forwardRef<HTMLSpanElement, GroupAuthorHandleProps>((props, ref) => (
-  <span ref={ref} {...props} className={cn("text-gray-400 text-xs", props.className)} />
-));
-GroupAuthorHandle.displayName = "GroupAuthorHandle";
+GroupFooter.displayName = "GroupFooter";

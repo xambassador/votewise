@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { getRandomImage } from "./_story-helpers";
-import { ImagePicker, ImagePickerButton, ImagePreview, ResetPreviewButton } from "./image-picker";
+import { ImagePicker, ImagePickerButton, ImagePickerPill, ImagePreview, ResetPreviewButton } from "./image-picker";
 
 const meta = {
   title: "ui/ImagePicker",
@@ -66,4 +66,13 @@ export const WithReset: Story = {
       <ResetPreviewButton />
     </ImagePicker>
   )
+};
+
+type PillStory = StoryObj<typeof ImagePickerPill>;
+export const Pill: PillStory = {
+  render: (args) => <ImagePickerPill {...args} />
+};
+
+export const PillMultiple: PillStory = {
+  render: (args) => <ImagePickerPill {...args} inputProps={{ multiple: true }} />
 };

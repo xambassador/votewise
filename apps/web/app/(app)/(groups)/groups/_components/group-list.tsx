@@ -10,7 +10,7 @@ import { GroupMolecule } from "@/components/group";
 import { InView } from "@/components/in-view";
 import { LoadMoreSpinner } from "@/components/load-more-spinner";
 
-import Loading from "../loading";
+import { GroupListSkeleton } from "./skeleton";
 
 type Props = {
   groups: GetAllGroupsResponse;
@@ -30,7 +30,7 @@ export function GroupList(props: Props) {
 
   switch (status) {
     case "pending":
-      return <Loading />;
+      return <GroupListSkeleton />;
     case "error":
       return <Error error={error.message} errorInfo={{ componentStack: error.stack }} />;
   }

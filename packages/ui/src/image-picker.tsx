@@ -101,19 +101,17 @@ export function ImagePickerButton(props: ImagePickerButtonProps) {
   }
 
   return (
-    <>
+    <label
+      {...rest}
+      htmlFor={preventDefaultBehavior ? "__optout__" + id : id}
+      className={cn(
+        "absolute bottom-3 cursor-pointer right-0 size-11 flex items-center justify-center rounded-full overflow-hidden bg-nobelBlack-100 border border-nobelBlack-200 focus-within-presets focus-within-primary",
+        rest?.className
+      )}
+    >
       <input type="file" id={id} className="sr-only" multiple={isMultiple} accept={accept} onChange={handleChange} />
-      <label
-        {...rest}
-        htmlFor={preventDefaultBehavior ? "__optout__" + id : id}
-        className={cn(
-          "absolute bottom-3 cursor-pointer right-0 size-11 flex items-center justify-center rounded-full overflow-hidden bg-nobelBlack-100 border border-nobelBlack-200",
-          rest?.className
-        )}
-      >
-        {rest?.children || <ImgIcon className="text-black-200" />}
-      </label>
-    </>
+      {rest?.children || <ImgIcon className="text-black-200" />}
+    </label>
   );
 }
 
@@ -156,4 +154,70 @@ export function ResetPreviewButton(props: ResetPreviewButtonProps) {
 function Img(props: React.ImgHTMLAttributes<HTMLImageElement>) {
   // eslint-disable-next-line @next/next/no-img-element
   return <img {...props} src={props.src} alt={props.alt} className={cn(theme.img, props.className)} />;
+}
+
+export type ImagePickerPillProps = React.HTMLAttributes<HTMLLabelElement> & {
+  inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
+  files?: File[] | null;
+  hasError?: boolean;
+  isLoading?: boolean;
+};
+
+export function ImagePickerPill(props: ImagePickerPillProps) {
+  const { children, inputProps, files: controlledFiles, hasError, isLoading, ...rest } = props;
+  const id = useId();
+  const [files, setFiles] = useState<File[]>(controlledFiles ?? []);
+
+  useEffect(() => {
+    setFiles(controlledFiles ?? []);
+  }, [controlledFiles]);
+
+  const isDisabled = isLoading || inputProps?.disabled;
+  const hasFiles = !!files?.length;
+
+  let label = children || <span>Upload Image</span>;
+  if (hasFiles && files) {
+    if (files.length === 1) {
+      label = <span className="text-blue-400">{files[0].name}</span>;
+    } else {
+      label = <span className="text-blue-400">{files.length} files selected</span>;
+    }
+  }
+
+  if (hasError) {
+    label = <span className="text-red-400">{label}</span>;
+  }
+
+  if (isLoading) {
+    label = <span className="text-green-400">Uploading...</span>;
+  }
+
+  return (
+    <label
+      {...rest}
+      htmlFor={id}
+      className={cn(
+        "flex items-center gap-3 text-sm text-black-200 cursor-pointer focus-within-presets focus-within-primary",
+        rest?.className
+      )}
+      aria-invalid={hasError || undefined}
+    >
+      <input
+        {...inputProps}
+        disabled={isDisabled}
+        type="file"
+        id={id}
+        className="sr-only"
+        onChange={(e) => {
+          setFiles(e.target.files ? Array.from(e.target.files) : []);
+          inputProps?.onChange?.(e);
+          e.target.value = "";
+        }}
+      />
+      <div className="cursor-pointer size-11 flex items-center justify-center rounded-full overflow-hidden bg-nobelBlack-100 border border-nobelBlack-200">
+        <ImgIcon className={cn("text-black-200", hasFiles && "text-blue-400", hasError && "text-red-400")} />
+      </div>
+      {label}
+    </label>
+  );
 }

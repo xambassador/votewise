@@ -134,8 +134,16 @@ html {
     @apply focus:shadow-input-ring focus:ring-offset-nobelBlack-50 outline-none focus:outline-none focus:outline-0 focus:ring-offset-2 focus-visible:outline-0;
   }
 
+  .focus-within-presets {
+    @apply focus-within:shadow-input-ring focus-within:ring-offset-nobelBlack-50 outline-none focus-within:outline-none focus-within:outline-0 focus-within:ring-offset-2 focus-visible:outline-0;
+  }
+
   .focus-primary {
     @apply focus:border-blue-500 focus:ring-blue-500/30;
+  }
+
+  .focus-within-primary {
+    @apply focus-within:border-blue-500 focus-within:ring-blue-500/30;
   }
 
   .focus-visible {

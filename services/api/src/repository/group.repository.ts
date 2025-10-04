@@ -117,6 +117,7 @@ export class GroupRepository extends BaseRepository {
           id: true,
           name: true,
           about: true,
+          logo_url: true,
           created_at: true,
           updated_at: true,
           status: true,
@@ -170,6 +171,7 @@ export class GroupRepository extends BaseRepository {
           updated_at: true,
           status: true,
           type: true,
+          logo_url: true,
           members: {
             select: {
               id: true,

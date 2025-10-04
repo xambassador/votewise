@@ -20,9 +20,6 @@ export const Skeleton = forwardRef<SkeletonElement, SkeletonProps>((props, ref) 
       )}
       data-inline-skeleton={isValidElement(children) ? undefined : true}
       tabIndex={-1}
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      inert={false}
       {...rest}
     >
       {children}
