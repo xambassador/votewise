@@ -558,13 +558,7 @@ export class GroupMemberRepository extends BaseRepository {
       const members = await this.dataLayer
         .selectFrom("GroupMember as member")
         .innerJoin("User as u", "u.id", "member.user_id")
-        .where((eb) =>
-          eb.and([
-            eb("group_id", "=", groupId),
-            eb("role", "not in", ["MODERATOR", "ADMIN"]),
-            eb("is_removed", "=", false)
-          ])
-        )
+        .where((eb) => eb.and([eb("group_id", "=", groupId), eb("is_removed", "=", false)]))
         .select([
           "member.id",
           "member.role",
@@ -575,6 +569,7 @@ export class GroupMemberRepository extends BaseRepository {
           "u.last_name",
           "u.user_name"
         ])
+        .orderBy("u.user_name", "asc")
         .execute();
       return members.map((m) => ({
         user: {
