@@ -5,9 +5,11 @@ export const ZPage = z.coerce
   .default(1)
   .transform((val) => (val < 1 ? 1 : val));
 export const ZLimit = z.coerce.number().default(-1); // Let the controller decide the limit
+export const ZCursor = z.string().optional();
 export const ZPagination = z.object({
   page: ZPage,
-  limit: ZLimit
+  limit: ZLimit,
+  cursor: ZCursor
 });
 
 export type TPage = z.infer<typeof ZPage>;

@@ -7,6 +7,7 @@ import { StatusCodes } from "http-status-codes";
 import { PAGINATION } from "@votewise/constant";
 import { ZPagination } from "@votewise/schemas";
 
+import { unpack } from "@/lib/cursor";
 import { PaginationBuilder } from "@/lib/pagination";
 import { getAuthenticateLocals } from "@/utils/locals";
 
@@ -29,19 +30,18 @@ export class Controller {
     const schema = ZPagination.safeParse(req.query);
     this.ctx.assert.unprocessableEntity(!schema.success, "Invalid query");
     const query = schema.data!;
-    const total = await this.ctx.timelineRepository.countByUserId(locals.payload.sub);
     const { page } = query;
     const limit = query.limit < 1 ? PAGINATION.feeds.limit : query.limit;
-    const timeline = await this.ctx.timelineRepository.findByUserId(locals.payload.sub, { page, limit });
+    const cursor = unpack(query.cursor, () => this.ctx.assert.unprocessableEntity(true, "Invalid cursor"));
+    const total = await this.ctx.timelineRepository.countByUserId(locals.payload.sub);
+    const timeline = await this.ctx.timelineRepository.findByUserId(locals.payload.sub, { page, limit, cursor });
     const timelineFeedPromises = timeline.map((timeline) => ({
       id: timeline.post.id,
       title: timeline.post.title,
       slug: timeline.post.slug,
       created_at: timeline.post.created_at,
       updated_at: timeline.post.updated_at,
-      hash_tags: timeline.post.hashTags.map((tag) => ({
-        name: tag.hash_tag.name
-      })),
+      hash_tags: [],
       author: {
         id: timeline.post.author.id,
         user_name: timeline.post.author.user_name,
@@ -57,11 +57,14 @@ export class Controller {
       comments: timeline.post.postAggregates?.comments ?? 0
     }));
     const feeds = await Promise.all(timelineFeedPromises);
-    const pagination = new PaginationBuilder({ total, page, limit }).build();
-    const result = {
-      feeds,
-      ...pagination
-    };
+    const nextCursor = timeline.at(-1);
+    const pagination = new PaginationBuilder({
+      total,
+      page,
+      limit,
+      cursor: nextCursor ? { primary: nextCursor.created_at, secondary: nextCursor.post.id } : undefined
+    }).build();
+    const result = { feeds, ...pagination };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 }

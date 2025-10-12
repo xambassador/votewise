@@ -40,7 +40,7 @@ describe("MFA Enroll Controller", () => {
     const req = buildReq({ params });
     const res = buildRes({ locals });
 
-    mockUserRepository.findById.mockResolvedValue(null);
+    mockUserRepository.findById.mockResolvedValue(undefined);
 
     const error = await controller.handle(req, res).catch((e) => e);
     expect(error.message).toBe("A valid session and a registered user are required to enroll a factor");
@@ -63,7 +63,7 @@ describe("MFA Enroll Controller", () => {
 
     const factor = buildFactor({ user_id: user.id });
     mockUserRepository.findById.mockResolvedValue(user);
-    mockFactorRepository.findByUserIdAndType.mockResolvedValue(null);
+    mockFactorRepository.findByUserIdAndType.mockResolvedValue(undefined);
     mockCryptoService.generate2FASecret.mockReturnValue("totp_secret");
     mockFactorRepository.create.mockResolvedValue(factor);
     mockCryptoService.symmetricEncrypt.mockReturnValue("encrypted_secret");

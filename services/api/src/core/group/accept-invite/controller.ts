@@ -61,7 +61,7 @@ export class Controller {
     const isAlreadyMember = await this.ctx.groupRepository.groupMember.isMember(groupId, currentUserId);
     this.ctx.assert.unprocessableEntity(isAlreadyMember, "You are already a member of this group.");
 
-    await this.ctx.transactionManager.withTransaction(async (tx) => {
+    await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
       await Promise.all([
         this.ctx.groupRepository.groupMember.addMember(groupId, userId, "MEMBER", tx),
         this.ctx.groupRepository.groupInvitation.update(invitation!.id, { status: "ACCEPTED" }, tx),

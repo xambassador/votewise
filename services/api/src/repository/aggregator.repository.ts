@@ -1,80 +1,107 @@
-import type { Prisma } from "@votewise/prisma";
-import type { GroupAggregates, PostAggregates, UserAggregates } from "@votewise/prisma/client";
-import type { TransactionCtx } from "./transaction";
+import type {
+  GroupAggregates,
+  NewGroupAggregates,
+  NewPostAggregates,
+  NewUserAggregates,
+  PostAggregates,
+  UserAggregates
+} from "@votewise/prisma/db";
+import type { Tx } from "./transaction";
 
 import { BaseRepository } from "./base.repository";
 
-type PostAggregatorData = Prisma.PostAggregatesUncheckedCreateInput;
-type UserAggregatorData = Prisma.UserAggregatesUncheckedCreateInput;
-type GroupAggregatorData = Prisma.GroupAggregatesUncheckedCreateInput;
+type PostAggregatorData = NewPostAggregates;
+type UserAggregatorData = NewUserAggregates;
+type GroupAggregatorData = NewGroupAggregates;
 type PostAggregation = Omit<PostAggregatorData, "post_id">;
 type UserAggregation = Omit<UserAggregatorData, "user_id">;
 type GroupAggregation = Omit<GroupAggregatorData, "group_id">;
 
 class PostAggregator extends BaseRepository {
-  private readonly db: RepositoryConfig["db"];
+  private readonly dataLayer: RepositoryConfig["dataLayer"];
 
   constructor(cfg: RepositoryConfig) {
     super();
-    this.db = cfg.db;
+    this.dataLayer = cfg.dataLayer;
   }
 
-  public aggregate(postId: string, fn: (data: PostAggregates | null) => PostAggregation, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public aggregate(postId: string, fn: (data: PostAggregates | undefined) => PostAggregation, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const existing = await db.postAggregates.findUnique({ where: { post_id: postId } });
+      const existing = await db
+        .selectFrom("PostAggregates")
+        .selectAll()
+        .where("post_id", "=", postId)
+        .executeTakeFirst();
       const toUpdate = fn(existing);
-      await db.postAggregates.upsert({
-        where: { post_id: postId },
-        create: { post_id: postId, ...toUpdate },
-        update: toUpdate
-      });
+      if (existing) {
+        await db.updateTable("PostAggregates").set(toUpdate).where("post_id", "=", postId).execute();
+      } else {
+        await db
+          .insertInto("PostAggregates")
+          .values({ post_id: postId, ...toUpdate })
+          .execute();
+      }
       return toUpdate;
     });
   }
 }
 
 class UserAggregator extends BaseRepository {
-  private readonly db: RepositoryConfig["db"];
+  private readonly dataLayer: RepositoryConfig["dataLayer"];
 
   constructor(cfg: RepositoryConfig) {
     super();
-    this.db = cfg.db;
+    this.dataLayer = cfg.dataLayer;
   }
 
-  public aggregate(userId: string, fn: (data: UserAggregates | null) => UserAggregation, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public aggregate(userId: string, fn: (data: UserAggregates | undefined) => UserAggregation, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const existing = await db.userAggregates.findUnique({ where: { user_id: userId } });
+      const existing = await db
+        .selectFrom("UserAggregates")
+        .selectAll()
+        .where("user_id", "=", userId)
+        .executeTakeFirst();
       const toUpdate = fn(existing);
-      await db.userAggregates.upsert({
-        where: { user_id: userId },
-        create: { user_id: userId, ...toUpdate },
-        update: toUpdate
-      });
+      if (existing) {
+        await db.updateTable("UserAggregates").set(toUpdate).where("user_id", "=", userId).execute();
+      } else {
+        await db
+          .insertInto("UserAggregates")
+          .values({ user_id: userId, ...toUpdate })
+          .execute();
+      }
       return toUpdate;
     });
   }
 }
 
 class GroupAggregator extends BaseRepository {
-  private readonly db: RepositoryConfig["db"];
+  private readonly dataLayer: RepositoryConfig["dataLayer"];
 
   constructor(cfg: RepositoryConfig) {
     super();
-    this.db = cfg.db;
+    this.dataLayer = cfg.dataLayer;
   }
 
-  public aggregate(groupId: string, fn: (data: GroupAggregates | null) => GroupAggregation, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public aggregate(groupId: string, fn: (data: GroupAggregates | undefined) => GroupAggregation, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const existing = await db.groupAggregates.findUnique({ where: { group_id: groupId } });
+      const existing = await db
+        .selectFrom("GroupAggregates")
+        .selectAll()
+        .where("group_id", "=", groupId)
+        .executeTakeFirst();
       const toUpdate = fn(existing);
-      await db.groupAggregates.upsert({
-        where: { group_id: groupId },
-        create: { group_id: groupId, ...toUpdate },
-        update: toUpdate
-      });
+      if (existing) {
+        await db.updateTable("GroupAggregates").set(toUpdate).where("group_id", "=", groupId).execute();
+      } else {
+        await db
+          .insertInto("GroupAggregates")
+          .values({ group_id: groupId, ...toUpdate })
+          .execute();
+      }
       return toUpdate;
     });
   }

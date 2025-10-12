@@ -58,7 +58,7 @@ describe("Reset Password Controller", () => {
     const req = buildReq({ body, query: { token: helpers.invalidSessionId } });
     const res = buildRes({ locals });
     sessionManagerMockDeps.mockCache.get.mockResolvedValue(helpers.sessionData);
-    helpers.mockUserRepository.findById.mockResolvedValue(null);
+    helpers.mockUserRepository.findById.mockResolvedValue(undefined);
 
     const error = await controller.handle(req, res).catch((e) => e);
     expect(helpers.mockUserRepository.findById).toHaveBeenCalledWith(user.id);

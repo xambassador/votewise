@@ -96,7 +96,7 @@ describe("Verify Email Controller", () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
     helpers.setupHappyPath();
-    helpers.mockUserRepository.findByEmail.mockResolvedValue(null);
+    helpers.mockUserRepository.findByEmail.mockResolvedValue(undefined);
     helpers.mockCache.get.mockResolvedValue(
       JSON.stringify({
         ...helpers.locals.meta,

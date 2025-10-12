@@ -69,7 +69,11 @@ describe("Register Controller", () => {
       password: hashedPassword,
       user_name: defaultUserName,
       first_name: "INVALID_FIRST_NAME",
-      last_name: "INVALID_LAST_NAME"
+      last_name: "INVALID_LAST_NAME",
+      is_email_verify: false,
+      is_onboarded: false,
+      vote_bucket: 10,
+      secret: expect.any(String)
     };
     const queueData = {
       name: "email",

@@ -46,12 +46,12 @@ export class Controller {
       this.ctx.assert.resourceNotFound(!parent, `Parent comment with ID ${body.parent_id} not found`);
     }
 
-    const comment = await this.ctx.transactionManager.withTransaction(async (tx) => {
+    const comment = await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
       const comment = await this.ctx.commentRepository.create({
         text: body.text,
-        parentId: body.parent_id,
-        postId: feedId,
-        userId: currentUserId
+        parent_id: body.parent_id,
+        post_id: feedId,
+        user_id: currentUserId
       });
 
       // We are only aggregating comments and not replies

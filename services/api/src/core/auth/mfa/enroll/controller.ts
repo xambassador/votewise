@@ -38,7 +38,7 @@ export class Controller {
     const user = _user!;
 
     const userHasTOTPFactor = await this.ctx.factorRepository.findByUserIdAndType(user.id, "TOTP");
-    this.ctx.assert.unprocessableEntity(userHasTOTPFactor !== null, CONFLICTING_FACTOR_MSG, CONFLICTING_FACTOR);
+    this.ctx.assert.unprocessableEntity(!!userHasTOTPFactor, CONFLICTING_FACTOR_MSG, CONFLICTING_FACTOR);
 
     const totpSecret = this.ctx.cryptoService.generate2FASecret();
     const encryptedSecret = this.ctx.cryptoService.symmetricEncrypt(totpSecret, this.ctx.environment.APP_SECRET);

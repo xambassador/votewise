@@ -39,7 +39,7 @@ export class Controller {
     const role = _role!;
     this.ctx.assert.unprocessableEntity(role.role === "ADMIN", canNotLeaveAsAdminMsg);
 
-    const { member } = await this.ctx.transactionManager.withTransaction(async (tx) => {
+    const { member } = await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
       const memberPromise = this.ctx.groupRepository.groupMember.leaveGroup(groupId, locals.payload.sub, tx);
       const aggregatePromise = this.ctx.aggregator.groupAggregator.aggregate(
         groupId,

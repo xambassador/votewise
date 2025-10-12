@@ -62,8 +62,8 @@ describe("Signin Controller", () => {
     const res = buildRes({ locals });
 
     helpers.setupHappyPath();
-    helpers.mockUserRepository.findByEmail.mockResolvedValue(null);
-    helpers.mockUserRepository.findByUsername.mockResolvedValue(null);
+    helpers.mockUserRepository.findByEmail.mockResolvedValue(undefined);
+    helpers.mockUserRepository.findByUsername.mockResolvedValue(undefined);
 
     let error = await controller.handle(req, res).catch((e) => e);
     expect(helpers.mockCryptoService.comparePassword).not.toHaveBeenCalled();

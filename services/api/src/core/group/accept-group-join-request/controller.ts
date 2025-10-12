@@ -49,7 +49,7 @@ export class Controller {
       return res.status(StatusCodes.CREATED).json(result) as Response<typeof result>;
     }
 
-    await this.ctx.transactionManager.withTransaction(async (tx) => {
+    await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
       await Promise.all([
         this.ctx.groupRepository.groupInvitation.update(joinRequestId, { status: "ACCEPTED" }, tx),
         this.ctx.groupRepository.groupMember.addMember(groupId, userId, "MEMBER", tx),
@@ -61,8 +61,8 @@ export class Controller {
           }),
           tx
         ),
-        joinRequest?.groupNotification?.notification_id
-          ? this.ctx.notificationRepository.deleteById(joinRequest.groupNotification.notification_id)
+        joinRequest?.notification_id
+          ? this.ctx.notificationRepository.deleteById(joinRequest.notification_id)
           : Promise.resolve()
       ]);
     });

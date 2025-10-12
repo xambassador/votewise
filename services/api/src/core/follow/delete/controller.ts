@@ -39,7 +39,7 @@ export class Controller {
       if (!follow) {
         return res.status(StatusCodes.NO_CONTENT).send() as Response<void>;
       }
-      await this.ctx.transactionManager.withTransaction(async (tx) => {
+      await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
         await this.ctx.followRepository.delete(follow.id, tx);
         await this.ctx.aggregator.userAggregator.aggregate(
           currentUserId,
@@ -72,7 +72,7 @@ export class Controller {
       if (!follow) {
         return res.status(StatusCodes.NO_CONTENT).send() as Response<void>;
       }
-      await this.ctx.transactionManager.withTransaction(async (tx) => {
+      await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
         await this.ctx.followRepository.delete(follow.id);
         await this.ctx.aggregator.userAggregator.aggregate(
           currentUserId,

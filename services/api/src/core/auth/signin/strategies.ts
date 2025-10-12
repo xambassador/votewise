@@ -1,12 +1,12 @@
 import type { AppContext } from "@/context";
-import type { User } from "@votewise/prisma/client";
+import type { User } from "@votewise/prisma/db";
 
 export type StrategyOptions = {
   userRepository: AppContext["repositories"]["user"];
 };
 
 export abstract class Strategy {
-  public abstract handle(value: string): Promise<User | null>;
+  public abstract handle(value: string): Promise<User | undefined>;
 }
 
 export class UsernameStrategy implements Strategy {

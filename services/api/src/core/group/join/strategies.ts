@@ -46,7 +46,7 @@ export class PublicGroupStrategy extends Strategy {
   public override async handle(data: { group: Group; groupId: string; currentUserId: string }): Promise<Result> {
     const admin = await this.getAdmin(data.groupId);
     const user = await this.getUser(data.currentUserId);
-    const { member } = await this.ctx.transactionManager.withTransaction(async (tx) => {
+    const { member } = await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
       const memberPromise = this.ctx.groupRepository.groupMember.addMember(
         data.groupId,
         data.currentUserId,
@@ -106,7 +106,7 @@ export class PrivateGroupStrategy extends Strategy {
     );
     this.ctx.assert.unprocessableEntity(!!isAlreadySent, `You have already sent a join request to this group`);
     const sentAt = new Date();
-    const { invitation, notification } = await this.ctx.transactionManager.withTransaction(async (tx) => {
+    const { invitation, notification } = await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
       const invitation = await this.ctx.groupRepository.groupInvitation.create(
         {
           status: "PENDING",

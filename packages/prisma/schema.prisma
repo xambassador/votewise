@@ -17,6 +17,14 @@ generator zod {
     relationModel = "default"
 }
 
+generator kysely {
+    provider           = "prisma-kysely"
+    output             = "./db"
+    fileName           = "schema.ts"
+    enumFileName       = "enums.ts"
+    exportWrappedTypes = true
+}
+
 enum Gender {
     MALE
     FEMALE
@@ -120,8 +128,8 @@ model User {
     vote_bucket                Int       @default(10)
     last_bucket_reset_at       DateTime?
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at DateTime @default(now()) @db.Timestamptz
+    updated_at DateTime @updatedAt @db.Timestamptz
 
     posts            Post[]
     upvotes          Upvote[]
@@ -154,8 +162,8 @@ model Factor {
     user_id String
     user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at DateTime @default(now()) @db.Timestamptz
+    updated_at DateTime @updatedAt @db.Timestamptz
 
     sessions   Session[] // Sessions authenticated using this factor
     challenges Challenge[] // Challenges for this factor
@@ -171,7 +179,7 @@ model Challenge {
     factor_id String
     factor    Factor @relation(fields: [factor_id], references: [id], onDelete: Cascade)
 
-    created_at  DateTime  @default(now())
+    created_at  DateTime  @default(now()) @db.Timestamptz
     verified_at DateTime?
 }
 
@@ -186,8 +194,8 @@ model Session {
     factor_id String? // Optional if the session requires a factor
     factor    Factor? @relation(fields: [factor_id], references: [id], onDelete: Cascade)
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at DateTime @default(now()) @db.Timestamptz
+    updated_at DateTime @updatedAt @db.Timestamptz
 
     @@index([user_id], name: "user_session_id_index")
 }
@@ -206,8 +214,8 @@ model Post {
     author_id String
     author    User   @relation(fields: [author_id], references: [id], onDelete: Cascade)
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at DateTime @default(now()) @db.Timestamptz
+    updated_at DateTime @updatedAt @db.Timestamptz
 
     upvotes        Upvote[]
     comments       Comment[]
@@ -232,8 +240,8 @@ model PostAsset {
     post_id String
     post    Post   @relation(fields: [post_id], references: [id], onDelete: Cascade)
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at DateTime @default(now()) @db.Timestamptz
+    updated_at DateTime @updatedAt @db.Timestamptz
 }
 
 model Upvote {
@@ -243,8 +251,8 @@ model Upvote {
     user_id String
     user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at DateTime @default(now()) @db.Timestamptz
+    updated_at DateTime @updatedAt @db.Timestamptz
 
     @@unique([post_id, user_id], name: "post_user_unique")
 }
@@ -264,8 +272,8 @@ model Comment {
     replies Comment[] @relation("Replies")
     parent  Comment?  @relation("Replies", fields: [parent_id], references: [id], onDelete: Cascade)
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at DateTime @default(now()) @db.Timestamptz
+    updated_at DateTime @updatedAt @db.Timestamptz
 
     upvotes CommentUpvote[]
 
@@ -285,8 +293,8 @@ model CommentUpvote {
     user_id String
     user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at DateTime @default(now()) @db.Timestamptz
+    updated_at DateTime @updatedAt @db.Timestamptz
 }
 
 model HashTag {
@@ -294,8 +302,8 @@ model HashTag {
     count Int    @default(0)
     name  String @unique
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at DateTime @default(now()) @db.Timestamptz
+    updated_at DateTime @updatedAt @db.Timestamptz
 
     postHashTags PostHashTag[]
 }
@@ -309,8 +317,8 @@ model PostHashTag {
     hash_tag_id String
     hash_tag    HashTag @relation(fields: [hash_tag_id], references: [id], onDelete: Cascade)
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at DateTime @default(now()) @db.Timestamptz
+    updated_at DateTime @updatedAt @db.Timestamptz
 }
 
 model Follow {
@@ -324,8 +332,8 @@ model Follow {
     following_id String
     following    User   @relation("following", fields: [following_id], references: [id], onDelete: Cascade)
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at DateTime @default(now()) @db.Timestamptz
+    updated_at DateTime @updatedAt @db.Timestamptz
 
     @@index([follower_id, following_id], name: "follower_following_index")
 }
@@ -340,8 +348,8 @@ model Friend {
     friend_id String
     friend    User   @relation("friend", fields: [friend_id], references: [id], onDelete: Cascade)
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at DateTime @default(now()) @db.Timestamptz
+    updated_at DateTime @updatedAt @db.Timestamptz
 }
 
 model Group {
@@ -353,8 +361,8 @@ model Group {
     type            GroupType
     status          GroupStatus
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at DateTime @default(now()) @db.Timestamptz
+    updated_at DateTime @updatedAt @db.Timestamptz
 
     members         GroupMember[]
     invitations     GroupInvitation[]
@@ -375,8 +383,8 @@ model GroupMember {
     group_id String
     group    Group  @relation(fields: [group_id], references: [id], onDelete: Cascade)
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at DateTime @default(now()) @db.Timestamptz
+    updated_at DateTime @updatedAt @db.Timestamptz
 
     @@unique([user_id, group_id], name: "user_group_unique")
 }
@@ -399,8 +407,8 @@ model GroupInvitation {
     user_id String
     user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at DateTime @default(now()) @db.Timestamptz
+    updated_at DateTime @updatedAt @db.Timestamptz
 
     groupNotification GroupNotification?
 
@@ -424,8 +432,8 @@ model Notification {
     user_id String
     user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at DateTime @default(now()) @db.Timestamptz
+    updated_at DateTime @updatedAt @db.Timestamptz
 
     groupNotification GroupNotification?
 
@@ -439,8 +447,8 @@ model RefreshToken {
     user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
     revoked Boolean @default(false)
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at DateTime @default(now()) @db.Timestamptz
+    updated_at DateTime @updatedAt @db.Timestamptz
 
     @@index([user_id], name: "user_refresh_token_index")
 }
@@ -459,8 +467,8 @@ model Topics {
     name            String  @unique @db.VarChar(20)
     is_system_topic Boolean @default(true)
 
-    created_at    DateTime        @default(now())
-    updated_at    DateTime        @updatedAt
+    created_at    DateTime        @default(now()) @db.Timestamptz
+    updated_at    DateTime        @updatedAt @db.Timestamptz
     userInterests UserInterests[]
     postTopics    PostTopic[]
 }
@@ -485,7 +493,7 @@ model UserSimilarity {
 model Timeline {
     user_id    String
     post_id    String
-    created_at DateTime @default(now())
+    created_at DateTime @default(now()) @db.Timestamptz
 
     user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
     post Post @relation(fields: [post_id], references: [id], onDelete: Cascade)

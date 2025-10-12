@@ -127,7 +127,8 @@ export class Controller {
       group_id: groupId,
       user_id: userId,
       status: "PENDING",
-      type: "INVITE"
+      type: "INVITE",
+      sent_at: new Date()
     });
     const notification = await this.ctx.notificationRepository.create({
       event_type: "GROUP_INVITATION",

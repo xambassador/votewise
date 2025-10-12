@@ -136,6 +136,7 @@ export function useGetEditImageDialogProps(props?: EditImageProps): EditImagePro
     onOpenChange: setOpen,
     onSave: (editedFile) => {
       setSelectedAvatar(editedFile);
+      setOpen(false);
     },
     onCancel: () => {
       setSelectedAvatar(null);

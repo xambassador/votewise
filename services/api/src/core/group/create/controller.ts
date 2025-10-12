@@ -31,7 +31,7 @@ export class Controller {
     const isNameTaken = await this.ctx.groupRepository.getByName(body.name);
     this.ctx.assert.unprocessableEntity(!!isNameTaken, "Group name is already taken");
 
-    const { group, member } = await this.ctx.transactionManager.withTransaction(async (tx) => {
+    const { group, member } = await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
       const group = await this.ctx.groupRepository.create(
         {
           name: body.name,
@@ -39,15 +39,7 @@ export class Controller {
           status: "OPEN",
           type: body.type,
           cover_image_url: body.cover_image_url,
-          logo_url: body.logo_url,
-          groupAggregates: {
-            create: {
-              total_comments: 0,
-              total_members: 1,
-              total_posts: 0,
-              total_votes: 0
-            }
-          }
+          logo_url: body.logo_url
         },
         tx
       );

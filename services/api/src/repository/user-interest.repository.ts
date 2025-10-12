@@ -1,42 +1,35 @@
-import type { TransactionCtx } from "./transaction";
+import type { Tx } from "./transaction";
 
 import { BaseRepository } from "./base.repository";
 
 export class UserInterestRepository extends BaseRepository {
-  private readonly db: RepositoryConfig["db"];
+  private readonly dataLayer: RepositoryConfig["dataLayer"];
 
   constructor(cfg: RepositoryConfig) {
     super();
-    this.db = cfg.db;
+    this.dataLayer = cfg.dataLayer;
   }
 
-  public async create(userId: string, topics: string[], tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public async create(userId: string, topics: string[], tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(() =>
-      db.userInterests.createMany({
-        data: topics.map((topic) => ({ topic_id: topic, user_id: userId }))
-      })
+      db
+        .insertInto("UserInterests")
+        .values(topics.map((topic) => ({ topic_id: topic, user_id: userId })))
+        .execute()
     );
   }
 
-  public async delete(userId: string, topics: string[], tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public async delete(userId: string, topics: string[], tx?: Tx) {
+    const db = (tx ?? this.dataLayer) as Tx;
     return this.execute(() =>
-      db.userInterests.deleteMany({
-        where: {
-          user_id: userId,
-          topic_id: { in: topics }
-        }
-      })
+      db.deleteFrom("UserInterests").where("user_id", "=", userId).where("topic_id", "in", topics).execute()
     );
   }
 
   public async findByUserId(userId: string) {
     return this.execute(() =>
-      this.db.userInterests.findMany({
-        where: { user_id: userId },
-        select: { topic_id: true }
-      })
+      this.dataLayer.selectFrom("UserInterests").where("user_id", "=", userId).select("topic_id").execute()
     );
   }
 }

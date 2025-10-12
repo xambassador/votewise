@@ -13,8 +13,8 @@ export function setupHappyPath() {
   const hashedPassword = faker.string.alphanumeric(32);
   const otp = faker.string.numeric(6);
   const uuid = faker.string.uuid();
-  mockUserRepository.findByEmail.mockResolvedValue(null);
-  mockUserRepository.findByUsername.mockResolvedValue(null);
+  mockUserRepository.findByEmail.mockResolvedValue(undefined);
+  mockUserRepository.findByUsername.mockResolvedValue(undefined);
   mockUserRepository.create.mockResolvedValue(user);
   mockCryptoService.hashPassword.mockResolvedValue(hashedPassword);
   mockCryptoService.getOtp.mockReturnValue(otp);

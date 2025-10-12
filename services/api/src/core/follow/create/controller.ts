@@ -39,7 +39,7 @@ export class Controller {
       if (isAlreadyFollowing) {
         return res.status(StatusCodes.CREATED).json({ id: isAlreadyFollowing.id }) as Response<{ id: string }>;
       }
-      const follow = await this.ctx.transactionManager.withTransaction(async (tx) => {
+      const follow = await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
         const follow = await this.ctx.followRepository.create(currentUserId, user.id, tx);
         await this.ctx.aggregator.userAggregator.aggregate(
           currentUserId,
@@ -74,7 +74,7 @@ export class Controller {
         return res.status(StatusCodes.CREATED).json({ id: isAlreadyFollowing.id }) as Response<{ id: string }>;
       }
 
-      const follow = await this.ctx.transactionManager.withTransaction(async (tx) => {
+      const follow = await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
         const follow = await this.ctx.followRepository.create(currentUserId, userByUsername.id);
         await this.ctx.aggregator.userAggregator.aggregate(
           currentUserId,

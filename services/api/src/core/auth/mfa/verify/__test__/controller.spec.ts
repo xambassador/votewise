@@ -46,7 +46,7 @@ describe("Verify MFA Challenge Controller", () => {
     const req = buildReq({ params: { factor_id: factorId }, body });
     const res = buildRes({ locals });
 
-    mockFactorRepository.findById.mockResolvedValue(null);
+    mockFactorRepository.findById.mockResolvedValue(undefined);
 
     const error = await controller.handle(req, res).catch((err) => err);
     expect(mockChallengeRepository.findById).not.toHaveBeenCalled();
@@ -64,7 +64,7 @@ describe("Verify MFA Challenge Controller", () => {
     const res = buildRes({ locals });
 
     mockFactorRepository.findById.mockResolvedValueOnce(buildFactor({ id: factorId, user_id: userId }));
-    mockChallengeRepository.findById.mockResolvedValue(null);
+    mockChallengeRepository.findById.mockResolvedValue(undefined);
 
     const error = await controller.handle(req, res).catch((err) => err);
     expect(mockChallengeRepository.findById).toHaveBeenCalledWith(body.challenge_id);
@@ -102,7 +102,7 @@ describe("Verify MFA Challenge Controller", () => {
     const expiredError = await controller.handle(req, res).catch((err) => err);
     expect(mockCryptoService.symmetricDecrypt).not.toHaveBeenCalled();
     expect(expiredError.message).toBe(
-      `MFA challenge ${body.challenge_id} has expired, verify against another challenge or create a new challenge.`
+      `MFA challenge has expired, verify against another challenge or create a new challenge.`
     );
   });
 

@@ -41,7 +41,7 @@ describe("Forgot Password Controller", () => {
   it("should return generic message if user not found", async () => {
     const req = buildReq({ body: { email: user.email } });
     const res = buildRes({ locals });
-    mockUserRepository.findByEmail.mockResolvedValueOnce(null);
+    mockUserRepository.findByEmail.mockResolvedValueOnce(undefined);
 
     await controller.handle(req, res);
     expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(user.email);

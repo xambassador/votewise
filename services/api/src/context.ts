@@ -1,9 +1,11 @@
+import type { DataLayer } from "@votewise/prisma";
+
 import { yellow } from "chalk";
 import * as Minio from "minio";
 
 import { Assertions } from "@votewise/errors";
 import logger from "@votewise/log";
-import { prisma } from "@votewise/prisma";
+import { dataLayer, prisma } from "@votewise/prisma";
 
 import { Mailer } from "@/emails/mailer";
 import { EventBus } from "@/lib/event-bus";
@@ -21,7 +23,11 @@ type ServerSecrets = ApplicationConfigs["secrets"];
 export type AppContextOptions = {
   config: ServerConfig;
   secrets: ServerSecrets;
+  /**
+   * @deprecated Use `dataLayer` instead.
+   */
   db: typeof prisma;
+  dataLayer: DataLayer;
   logger: typeof logger;
   environment: Environment;
   cache: Cache;
@@ -46,6 +52,7 @@ export class AppContext {
   public config: ServerConfig;
   public secrets: ServerSecrets;
   public db: typeof prisma;
+  public dataLayer: DataLayer;
   public logger: typeof logger;
   public environment: Environment;
   public cache: Cache;
@@ -83,6 +90,7 @@ export class AppContext {
     this.minio = opts.minio;
     this.services = opts.services;
     this.eventBus = opts.eventBus;
+    this.dataLayer = opts.dataLayer;
 
     this.logger.info(`[${yellow("AppContext")}] dependencies initialized`);
   }
@@ -107,7 +115,7 @@ export class AppContext {
     const assert = new Assertions();
     const cache = new Cache();
     const db = prisma;
-    const repositories = createRepositories(db);
+    const repositories = createRepositories(db, dataLayer);
     const mailer = new Mailer({ env: environment });
     const tasksQueue = new Queues.TasksQueue({ env: environment });
     const uploadQueue = new Queues.UploadQueue({ env: environment });
@@ -153,6 +161,7 @@ export class AppContext {
       config: cfg,
       secrets,
       db,
+      dataLayer,
       logger,
       environment,
       cache,

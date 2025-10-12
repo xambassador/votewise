@@ -1,5 +1,5 @@
 import type { Prisma } from "@votewise/prisma";
-import type { TransactionCtx } from "./transaction";
+import type { Tx } from "./transaction";
 
 import { BaseRepository } from "./base.repository";
 
@@ -13,57 +13,70 @@ type TCreate = {
 };
 
 export class FactorRepository extends BaseRepository {
-  private readonly db: RepositoryConfig["db"];
+  private readonly dataLayer: RepositoryConfig["dataLayer"];
 
   constructor(cfg: RepositoryConfig) {
     super();
-    this.db = cfg.db;
+    this.dataLayer = cfg.dataLayer;
   }
 
-  public create(data: TCreate, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public create(data: TCreate, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const factor = await db.factor.create({
-        data: {
+      const factor = await db
+        .insertInto("Factor")
+        .values({
+          id: this.dataLayer.createId(),
           user_id: data.userId,
           factor_type: data.factorType,
           status: data.status,
           secret: data.secret,
           friendly_name: data.friendlyName,
-          created_at: new Date()
-        }
-      });
+          created_at: new Date(),
+          updated_at: new Date()
+        })
+        .returningAll()
+        .executeTakeFirstOrThrow();
       return factor;
     });
   }
 
   public findById(id: string) {
     return this.execute(async () => {
-      const factor = await this.db.factor.findUnique({ where: { id } });
+      const factor = await this.dataLayer.selectFrom("Factor").where("id", "=", id).selectAll().executeTakeFirst();
       return factor;
     });
   }
 
-  public verifyFactor(id: string, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public verifyFactor(id: string, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const factor = await db.factor.update({ where: { id }, data: { status: "VERIFIED" } });
+      const factor = await db
+        .updateTable("Factor")
+        .set({ status: "VERIFIED" })
+        .where("id", "=", id)
+        .returningAll()
+        .executeTakeFirstOrThrow();
       return factor;
     });
   }
 
   public findByUserId(userId: string) {
     return this.execute(async () => {
-      const factors = await this.db.factor.findMany({ where: { user_id: userId } });
+      const factors = await this.dataLayer.selectFrom("Factor").where("user_id", "=", userId).selectAll().execute();
       return factors;
     });
   }
 
   public findByUserIdAndType(userId: string, type: TFactorCreate["factor_type"]) {
     return this.execute(async () => {
-      const factor = await this.db.factor.findFirst({
-        where: { user_id: userId, factor_type: type, status: "VERIFIED" }
-      });
+      const factor = await this.dataLayer
+        .selectFrom("Factor")
+        .where("user_id", "=", userId)
+        .where("factor_type", "=", type)
+        .where("status", "=", "VERIFIED")
+        .selectAll()
+        .executeTakeFirst();
       return factor;
     });
   }

@@ -24,24 +24,24 @@ import { UserRepository } from "./user.repository";
  * @param db Database instance from AppContext
  * @returns {Repositories} Repositories container
  */
-export function createRepositories(db: AppContext["db"]): Repositories {
-  const userRepository = new UserRepository({ db });
-  const factorRepository = new FactorRepository({ db });
-  const challengeRepository = new ChallengeRepository({ db });
-  const refreshTokenRepository = new RefreshTokenRepository({ db });
-  const sessionRepository = new SessionRepository({ db });
-  const topicRepository = new TopicRepository({ db });
-  const userInterestRepository = new UserInterestRepository({ db });
-  const feedRepository = new FeedRepository({ db });
-  const followRepository = new FollowRepository({ db });
-  const timelineRepository = new TimelineRepository({ db });
-  const feedAssetRepository = new FeedAssetRepository({ db });
-  const postTopicRepository = new PostTopicRepository({ db });
-  const groupRepository = new GroupRepository({ db });
-  const commentRepository = new CommentRepository({ db });
-  const notificationRepository = new NotificationRepository({ db });
-  const transactionManager = new TransactionManager({ db });
-  const aggregator = new Aggregator({ db });
+export function createRepositories(db: AppContext["db"], dataLayer: AppContext["dataLayer"]): Repositories {
+  const userRepository = new UserRepository({ db, dataLayer });
+  const factorRepository = new FactorRepository({ db, dataLayer });
+  const challengeRepository = new ChallengeRepository({ db, dataLayer });
+  const refreshTokenRepository = new RefreshTokenRepository({ db, dataLayer });
+  const sessionRepository = new SessionRepository({ db, dataLayer });
+  const topicRepository = new TopicRepository({ db, dataLayer });
+  const userInterestRepository = new UserInterestRepository({ db, dataLayer });
+  const feedRepository = new FeedRepository({ db, dataLayer });
+  const followRepository = new FollowRepository({ db, dataLayer });
+  const timelineRepository = new TimelineRepository({ db, dataLayer });
+  const feedAssetRepository = new FeedAssetRepository({ db, dataLayer });
+  const postTopicRepository = new PostTopicRepository({ db, dataLayer });
+  const groupRepository = new GroupRepository({ db, dataLayer });
+  const commentRepository = new CommentRepository({ db, dataLayer });
+  const notificationRepository = new NotificationRepository({ db, dataLayer });
+  const transactionManager = new TransactionManager({ db, dataLayer });
+  const aggregator = new Aggregator({ db, dataLayer });
   return {
     user: userRepository,
     factor: factorRepository,
@@ -86,5 +86,6 @@ declare global {
 
   interface RepositoryConfig {
     db: AppContext["db"];
+    dataLayer: AppContext["dataLayer"];
   }
 }

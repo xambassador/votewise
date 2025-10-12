@@ -1,77 +1,86 @@
-import type { Prisma } from "@votewise/prisma";
-import type { TransactionCtx } from "./transaction";
+import type { NewUser, UserUpdate } from "@votewise/prisma/db";
+import type { Tx } from "./transaction";
 
 import { BaseRepository } from "./base.repository";
 
-type TCreate = Prisma.UserCreateInput;
-type TUpdate = Prisma.UserUpdateInput;
-
 export class UserRepository extends BaseRepository {
-  private readonly db: RepositoryConfig["db"];
+  private readonly dataLayer: RepositoryConfig["dataLayer"];
 
   constructor(cfg: RepositoryConfig) {
     super();
-    this.db = cfg.db;
+    this.dataLayer = cfg.dataLayer;
   }
 
-  public create(data: TCreate, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public create(data: NewUser, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const user = await db.user.create({ data });
+      const user = await db
+        .insertInto("User")
+        .values({ ...data, id: this.dataLayer.createId(), created_at: new Date(), updated_at: new Date() })
+        .returningAll()
+        .executeTakeFirstOrThrow();
       return user;
     });
   }
 
   public findById(id: string) {
     return this.execute(async () => {
-      const user = await this.db.user.findUnique({ where: { id } });
+      const user = await this.dataLayer.selectFrom("User").where("id", "=", id).selectAll().executeTakeFirst();
       return user;
     });
   }
 
   public findByEmail(email: string) {
     return this.execute(async () => {
-      const user = await this.db.user.findUnique({ where: { email } });
+      const user = await this.dataLayer.selectFrom("User").where("email", "=", email).selectAll().executeTakeFirst();
       return user;
     });
   }
 
   public findByUsername(username: string) {
     return this.execute(async () => {
-      const user = await this.db.user.findUnique({ where: { user_name: username } });
+      const user = await this.dataLayer
+        .selectFrom("User")
+        .where("user_name", "=", username)
+        .selectAll()
+        .executeTakeFirst();
       return user;
     });
   }
 
-  public update(id: string, data: TUpdate, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public update(id: string, data: UserUpdate, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const user = await db.user.update({ where: { id }, data });
+      const user = await db
+        .updateTable("User")
+        .set({ ...data, updated_at: new Date() })
+        .where("id", "=", id)
+        .returningAll()
+        .executeTakeFirstOrThrow();
       return user;
     });
   }
 
-  public updateByEmail(email: string, data: TUpdate, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public updateByEmail(email: string, data: UserUpdate, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const user = await db.user.update({ where: { email }, data });
+      const user = await db
+        .updateTable("User")
+        .set({ ...data, updated_at: new Date() })
+        .where("email", "=", email)
+        .returningAll()
+        .executeTakeFirstOrThrow();
       return user;
     });
   }
 
   public findManyByIds(ids: string[]) {
     return this.execute(async () => {
-      const users = await this.db.user.findMany({
-        where: { id: { in: ids } },
-        select: {
-          id: true,
-          user_name: true,
-          first_name: true,
-          last_name: true,
-          avatar_url: true,
-          about: true
-        }
-      });
+      const users = await this.dataLayer
+        .selectFrom("User")
+        .where("id", "in", ids)
+        .select(["id", "user_name", "first_name", "last_name", "avatar_url", "about"])
+        .execute();
       return users;
     });
   }
@@ -80,73 +89,114 @@ export class UserRepository extends BaseRepository {
 
   public getRemainingVotes(userId: string) {
     return this.execute(async () => {
-      const user = await this.db.user.findUnique({
-        where: { id: userId },
-        select: { vote_bucket: true }
-      });
+      const user = await this.dataLayer.selectFrom("User").where("id", "=", userId).selectAll().executeTakeFirst();
       return user?.vote_bucket ?? 0;
     });
   }
 
   public getProfile(username: string) {
     return this.execute(async () => {
-      const user = await this.db.user.findUnique({
-        where: { user_name: username },
-        select: {
-          about: true,
-          avatar_url: true,
-          first_name: true,
-          id: true,
-          last_name: true,
-          user_name: true,
-          cover_image_url: true,
-          location: true,
-          gender: true,
-          created_at: true,
-          userAggregates: {
-            select: {
-              total_comments: true,
-              total_votes: true,
-              total_posts: true,
-              total_followers: true,
-              total_following: true,
-              total_groups: true
-            }
-          }
+      const user = await this.dataLayer
+        .selectFrom("User as u")
+        .leftJoin("UserAggregates as ua", "ua.user_id", "u.id")
+        .where("user_name", "=", username)
+        .select([
+          "u.id",
+          "u.first_name",
+          "u.last_name",
+          "u.user_name",
+          "u.avatar_url",
+          "u.cover_image_url",
+          "u.location",
+          "u.gender",
+          "u.about",
+          "u.created_at",
+          "ua.total_comments",
+          "ua.total_votes",
+          "ua.total_followers",
+          "ua.total_following",
+          "ua.total_posts",
+          "ua.total_groups"
+        ])
+        .executeTakeFirst();
+
+      if (!user) {
+        return null;
+      }
+
+      return {
+        about: user.about,
+        avatar_url: user.avatar_url,
+        first_name: user.first_name,
+        id: user.id,
+        last_name: user.last_name,
+        user_name: user.user_name,
+        cover_image_url: user.cover_image_url,
+        location: user.location,
+        gender: user.gender,
+        created_at: user.created_at,
+        userAggregates: {
+          total_comments: user.total_comments,
+          total_votes: user.total_votes,
+          total_posts: user.total_posts,
+          total_followers: user.total_followers,
+          total_following: user.total_following,
+          total_groups: user.total_groups
         }
-      });
-      return user;
+      };
     });
   }
 
   public getMyProfile(id: string) {
     return this.execute(async () => {
-      const user = await this.db.user.findUnique({
-        where: { id },
-        select: {
-          about: true,
-          avatar_url: true,
-          first_name: true,
-          id: true,
-          last_name: true,
-          user_name: true,
-          cover_image_url: true,
-          location: true,
-          gender: true,
-          created_at: true,
-          userAggregates: {
-            select: {
-              total_comments: true,
-              total_votes: true,
-              total_posts: true,
-              total_followers: true,
-              total_following: true,
-              total_groups: true
-            }
-          }
+      const user = await this.dataLayer
+        .selectFrom("User as u")
+        .leftJoin("UserAggregates as ua", "ua.user_id", "u.id")
+        .where("id", "=", id)
+        .select([
+          "u.id",
+          "u.first_name",
+          "u.last_name",
+          "u.user_name",
+          "u.avatar_url",
+          "u.cover_image_url",
+          "u.location",
+          "u.gender",
+          "u.about",
+          "u.created_at",
+          "ua.total_comments",
+          "ua.total_votes",
+          "ua.total_followers",
+          "ua.total_following",
+          "ua.total_posts",
+          "ua.total_groups"
+        ])
+        .executeTakeFirst();
+
+      if (!user) {
+        return null;
+      }
+
+      return {
+        about: user.about,
+        avatar_url: user.avatar_url,
+        first_name: user.first_name,
+        id: user.id,
+        last_name: user.last_name,
+        user_name: user.user_name,
+        cover_image_url: user.cover_image_url,
+        location: user.location,
+        gender: user.gender,
+        created_at: user.created_at,
+        userAggregates: {
+          total_comments: user.total_comments,
+          total_votes: user.total_votes,
+          total_posts: user.total_posts,
+          total_followers: user.total_followers,
+          total_following: user.total_following,
+          total_groups: user.total_groups
         }
-      });
-      return user;
+      };
     });
   }
 }

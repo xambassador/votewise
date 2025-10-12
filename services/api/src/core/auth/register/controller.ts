@@ -40,7 +40,11 @@ export class Controller {
       password: hash,
       user_name: defaultUserName, // We will update this later in onboarding process
       first_name: "INVALID_FIRST_NAME",
-      last_name: "INVALID_LAST_NAME"
+      last_name: "INVALID_LAST_NAME",
+      secret: this.ctx.cryptoService.generateUUID(),
+      is_email_verify: false,
+      is_onboarded: false,
+      vote_bucket: 10
     });
 
     const { verificationCode, expiresIn } = await this.ctx.userRegisterService.startVerificationProcess({

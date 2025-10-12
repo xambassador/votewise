@@ -24,8 +24,7 @@ type ControllerOptions = {
 const { FACTOR_NOT_FOUND, CHALLENGE_NOT_FOUND, INVALID_CHALLENGE, CHALLENGE_EXPIRED } = ERROR_CODES["2FA"];
 const CHALLENGE_NOT_FOUND_MSG = "MFA factor with the provided challenge ID not found";
 const INVALID_CHALLENGE_MSG = "Challenge and verify IP address mismatch. Try enrollment again";
-const CHALLENGE_EXPIRED_MSG = (id: string) =>
-  `MFA challenge ${id} has expired, verify against another challenge or create a new challenge.`;
+const CHALLENGE_EXPIRED_MSG = `MFA challenge has expired, verify against another challenge or create a new challenge.`;
 
 export class Controller {
   private readonly ctx: ControllerOptions;
@@ -57,7 +56,7 @@ export class Controller {
     const fiveMinutesAgoInSecs = 300;
     this.ctx.assert.unprocessableEntity(
       this.hasExpired(challenge.created_at, fiveMinutesAgoInSecs),
-      CHALLENGE_EXPIRED_MSG(challenge.id),
+      CHALLENGE_EXPIRED_MSG,
       CHALLENGE_EXPIRED
     );
 

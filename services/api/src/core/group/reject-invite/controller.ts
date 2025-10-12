@@ -57,7 +57,7 @@ export class Controller {
     this.ctx.assert.unprocessableEntity(invitation!.status === "REJECTED", invitationRejectedMessage);
     this.ctx.assert.forbidden(invitation!.user_id !== currentUserId, permissionErrorMessage);
 
-    await this.ctx.transactionManager.withTransaction(async (tx) => {
+    await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
       let deletePromise: Promise<void> = Promise.resolve();
       if (notificationId) {
         deletePromise = this.ctx.notificationRepository.deleteById(notificationId, tx);

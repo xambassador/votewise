@@ -1,48 +1,52 @@
-import type { TransactionCtx } from "./transaction";
+import type { NewChallenge } from "@votewise/prisma/db";
+import type { Tx } from "./transaction";
+
+import { sql } from "@votewise/prisma";
 
 import { BaseRepository } from "./base.repository";
 
 /* ----------------------------------------------------------------------------------------------- */
 
-type TCreate = {
-  ip: string;
-  factor_id: string;
-  otp_code?: string;
-};
-
 export class ChallengeRepository extends BaseRepository {
-  private readonly db: RepositoryConfig["db"];
+  private readonly dataLayer: RepositoryConfig["dataLayer"];
 
   constructor(cfg: RepositoryConfig) {
     super();
-    this.db = cfg.db;
+    this.dataLayer = cfg.dataLayer;
   }
 
-  public create(data: TCreate, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public create(data: NewChallenge, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const challenge = await db.challenge.create({
-        data: {
-          ip: data.ip,
-          factor_id: data.factor_id,
-          otp_code: data.otp_code
-        }
-      });
+      const challenge = await db
+        .insertInto("Challenge")
+        .values({ ...data, id: this.dataLayer.createId() })
+        .returningAll()
+        .executeTakeFirstOrThrow();
       return challenge;
     });
   }
 
   public findById(id: string) {
     return this.execute(async () => {
-      const challenge = await this.db.challenge.findUnique({ where: { id } });
+      const challenge = await this.dataLayer
+        .selectFrom("Challenge")
+        .where("id", "=", id)
+        .selectAll()
+        .executeTakeFirst();
       return challenge;
     });
   }
 
-  public verifyChallenge(id: string, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public verifyChallenge(id: string, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const challenge = await db.challenge.update({ data: { verified_at: new Date() }, where: { id } });
+      const challenge = await db
+        .updateTable("Challenge")
+        .set({ verified_at: sql`NOW()` })
+        .where("id", "=", id)
+        .returningAll()
+        .executeTakeFirstOrThrow();
       return challenge;
     });
   }

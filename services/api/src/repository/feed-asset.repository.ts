@@ -1,4 +1,4 @@
-import type { TransactionCtx } from "./transaction";
+import type { Tx } from "./transaction";
 
 import { BaseRepository } from "./base.repository";
 
@@ -9,36 +9,45 @@ type TCreate = {
 };
 
 export class FeedAssetRepository extends BaseRepository {
-  private readonly db: RepositoryConfig["db"];
+  private readonly dataLayer: RepositoryConfig["dataLayer"];
 
   constructor(cfg: RepositoryConfig) {
     super();
-    this.db = cfg.db;
+    this.dataLayer = cfg.dataLayer;
   }
 
-  public create(data: TCreate, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public create(data: TCreate, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      await db.postAsset.create({
-        data: {
+      await db
+        .insertInto("PostAsset")
+        .values({
+          id: this.dataLayer.createId(),
           type: data.type,
           url: data.url,
-          post_id: data.post_id
-        }
-      });
+          post_id: data.post_id,
+          created_at: new Date(),
+          updated_at: new Date()
+        })
+        .execute();
     });
   }
 
-  public createMany(data: TCreate[], tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public createMany(data: TCreate[], tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      await db.postAsset.createMany({
-        data: data.map((item) => ({
-          type: item.type,
-          url: item.url,
-          post_id: item.post_id
-        }))
-      });
+      db.insertInto("PostAsset")
+        .values(
+          data.map((item) => ({
+            id: this.dataLayer.createId(),
+            type: item.type,
+            url: item.url,
+            post_id: item.post_id,
+            created_at: new Date(),
+            updated_at: new Date()
+          }))
+        )
+        .execute();
     });
   }
 }

@@ -62,7 +62,7 @@ describe("Onboard Controller", () => {
   it("should throw an error if the user is not found", async () => {
     const req = buildReq({ body: getOnboardBody(1) });
     const res = buildRes({ locals });
-    mockUserRepository.findById.mockResolvedValue(null);
+    mockUserRepository.findById.mockResolvedValue(undefined);
     const error = await controller.handle(req, res).catch((err) => err);
     expect(error.message).toBe("User not found");
   });
@@ -85,7 +85,7 @@ describe("Onboard Controller", () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
     mockUserRepository.findById.mockResolvedValue(user);
-    mockUserRepository.findByUsername.mockResolvedValue(null);
+    mockUserRepository.findByUsername.mockResolvedValue(undefined);
 
     const data = { user_name: body.user_name, first_name: body.first_name, last_name: body.last_name };
     await controller.handle(req, res);
@@ -98,7 +98,7 @@ describe("Onboard Controller", () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
     mockUserRepository.findById.mockResolvedValue(user);
-    mockUserRepository.findByUsername.mockResolvedValue(null);
+    mockUserRepository.findByUsername.mockResolvedValue(undefined);
 
     const data = { gender: body.gender, about: body.about };
     await controller.handle(req, res);
@@ -112,7 +112,7 @@ describe("Onboard Controller", () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
     mockUserRepository.findById.mockResolvedValue(user);
-    mockUserRepository.findByUsername.mockResolvedValue(null);
+    mockUserRepository.findByUsername.mockResolvedValue(undefined);
 
     const error = await controller.handle(req, res).catch((err) => err);
     expect(mockUserRepository.update).not.toHaveBeenCalled();
@@ -127,7 +127,7 @@ describe("Onboard Controller", () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
     mockUserRepository.findById.mockResolvedValue(user);
-    mockUserRepository.findByUsername.mockResolvedValue(null);
+    mockUserRepository.findByUsername.mockResolvedValue(undefined);
 
     const data = { avatar_url: body.avatar };
     await controller.handle(req, res);
@@ -150,7 +150,7 @@ describe("Onboard Controller", () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
     mockUserRepository.findById.mockResolvedValue(user);
-    mockUserRepository.findByUsername.mockResolvedValue(null);
+    mockUserRepository.findByUsername.mockResolvedValue(undefined);
 
     const data = { avatar_url: body.avatar };
     await controller.handle(req, res);
@@ -165,7 +165,7 @@ describe("Onboard Controller", () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
     mockUserRepository.findById.mockResolvedValue(user);
-    mockUserRepository.findByUsername.mockResolvedValue(null);
+    mockUserRepository.findByUsername.mockResolvedValue(undefined);
 
     const error = await controller.handle(req, res).catch((err) => err);
     expect(mockUserRepository.update).not.toHaveBeenCalled();
@@ -180,7 +180,7 @@ describe("Onboard Controller", () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
     mockUserRepository.findById.mockResolvedValue(user);
-    mockUserRepository.findByUsername.mockResolvedValue(null);
+    mockUserRepository.findByUsername.mockResolvedValue(undefined);
 
     const data = { cover_image_url: body.cover };
     await controller.handle(req, res);
@@ -203,7 +203,7 @@ describe("Onboard Controller", () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
     mockUserRepository.findById.mockResolvedValue(user);
-    mockUserRepository.findByUsername.mockResolvedValue(null);
+    mockUserRepository.findByUsername.mockResolvedValue(undefined);
 
     const data = { cover_image_url: body.cover };
     await controller.handle(req, res);
@@ -217,7 +217,7 @@ describe("Onboard Controller", () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
     mockUserRepository.findById.mockResolvedValue(user);
-    mockUserRepository.findByUsername.mockResolvedValue(null);
+    mockUserRepository.findByUsername.mockResolvedValue(undefined);
 
     const data = { location: body.location };
     await controller.handle(req, res);
@@ -230,7 +230,7 @@ describe("Onboard Controller", () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
     mockUserRepository.findById.mockResolvedValue(user);
-    mockUserRepository.findByUsername.mockResolvedValue(null);
+    mockUserRepository.findByUsername.mockResolvedValue(undefined);
     mockUserInterestRepository.findByUserId.mockResolvedValue([]);
     mockPostTopicRepository.getInterestedFeedIds.mockResolvedValue([{ post_id: "post1", topic_id: "topic1" }]);
 
@@ -258,7 +258,7 @@ describe("Onboard Controller", () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
     mockUserRepository.findById.mockResolvedValue(user);
-    mockUserRepository.findByUsername.mockResolvedValue(null);
+    mockUserRepository.findByUsername.mockResolvedValue(undefined);
 
     await controller.handle(req, res);
     expect(mockUserRepository.update).toHaveBeenCalledWith(user.id, { is_onboarded: true });

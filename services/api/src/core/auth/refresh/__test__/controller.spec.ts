@@ -53,7 +53,7 @@ describe("Refresh Controller", () => {
     const req = buildReq({ body: { access_token: helpers.accessToken, refresh_token: "invalid_refresh_token" } });
     const res = buildRes({ locals: helpers.locals });
     helpers.setupHappyPath();
-    helpers.mockRefreshTokenRepository.find.mockResolvedValue(null);
+    helpers.mockRefreshTokenRepository.find.mockResolvedValue(undefined);
     let error = await controller.handle(req, res).catch((e) => e);
     expect(helpers.mockUserRepository.findById).not.toHaveBeenCalledWith();
     expect(error.message).toBe("Invalid refresh token");
@@ -68,7 +68,7 @@ describe("Refresh Controller", () => {
     const req = buildReq({ body: { access_token: helpers.accessToken, refresh_token: helpers.refreshToken } });
     const res = buildRes({ locals: helpers.locals });
     helpers.setupHappyPath();
-    helpers.mockUserRepository.findById.mockResolvedValueOnce(null);
+    helpers.mockUserRepository.findById.mockResolvedValueOnce(undefined);
 
     const error = await controller.handle(req, res).catch((e) => e);
     expect(helpers.mockUserRepository.findById).toHaveBeenCalledWith(helpers.user.id);

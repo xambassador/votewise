@@ -1,23 +1,20 @@
-import type { Prisma } from "@votewise/prisma";
 import type { GroupMemberRole, GroupStatus } from "@votewise/prisma/client";
-import type { TransactionCtx } from "./transaction";
+import type { GroupInvitationUpdate, NewGroup, NewGroupInvitation, NewGroupNotification } from "@votewise/prisma/db";
+import type { Tx } from "./transaction";
+
+import { sql } from "@votewise/prisma";
 
 import { BaseRepository } from "./base.repository";
 
-type CreateGroup = Prisma.GroupCreateInput;
-type CreateGroupInvitation = Prisma.GroupInvitationUncheckedCreateInput;
-type UpdateGroupInvitation = Prisma.GroupInvitationUncheckedUpdateInput;
-type CreateGroupNotification = Prisma.GroupNotificationUncheckedCreateInput;
-
 export class GroupRepository extends BaseRepository {
-  private readonly db: RepositoryConfig["db"];
+  private readonly dataLayer: RepositoryConfig["dataLayer"];
   public readonly groupMember: GroupMemberRepository;
   public readonly groupInvitation: GroupInvitationRepository;
   public readonly groupNotifications: GroupNotificationsRepository;
 
   constructor(cfg: RepositoryConfig) {
     super();
-    this.db = cfg.db;
+    this.dataLayer = cfg.dataLayer;
     this.groupMember = new GroupMemberRepository(cfg);
     this.groupInvitation = new GroupInvitationRepository(cfg);
     this.groupNotifications = new GroupNotificationsRepository(cfg);
@@ -25,40 +22,42 @@ export class GroupRepository extends BaseRepository {
 
   public getGroupsById(ids: string[]) {
     return this.execute(async () => {
-      const groups = await this.db.group.findMany({
-        where: { id: { in: ids } },
-        select: {
-          id: true,
-          name: true,
-          about: true,
-          members: {
-            where: {
-              role: "ADMIN"
-            },
-            select: {
-              user: {
-                select: {
-                  id: true,
-                  first_name: true,
-                  last_name: true,
-                  avatar_url: true,
-                  user_name: true
-                }
-              }
-            }
-          }
+      const groups = await this.dataLayer
+        .selectFrom("Group")
+        .where("id", "in", ids)
+        .select(["id", "name", "about"])
+        .execute();
+
+      if (groups.length === 0) return [];
+
+      const groupIds = groups.map((g) => g.id);
+
+      const admins = await this.dataLayer
+        .selectFrom("GroupMember as gm")
+        .innerJoin("User as u", "u.id", "gm.user_id")
+        .select(["gm.group_id", "u.id as user_id", "u.first_name", "u.last_name", "u.avatar_url", "u.user_name"])
+        .where("gm.group_id", "in", groupIds)
+        .where("gm.role", "=", "ADMIN")
+        .execute();
+
+      const adminByGroup = new Map<string, typeof admins>();
+      for (const admin of admins) {
+        if (!adminByGroup.has(admin.group_id)) {
+          adminByGroup.set(admin.group_id, []);
         }
-      });
+        adminByGroup.get(admin.group_id)!.push(admin);
+      }
+
       return groups.map((group) => ({
         id: group.id,
         name: group.name,
         about: group.about,
-        admins: group.members.map((member) => ({
-          id: member.user.id,
-          first_name: member.user.first_name,
-          last_name: member.user.last_name,
-          avatar_url: member.user.avatar_url,
-          user_name: member.user.user_name
+        admins: (adminByGroup.get(group.id) || []).map((a) => ({
+          id: a.user_id,
+          first_name: a.first_name,
+          last_name: a.last_name,
+          avatar_url: a.avatar_url,
+          user_name: a.user_name
         }))
       }));
     });
@@ -66,442 +65,733 @@ export class GroupRepository extends BaseRepository {
 
   public count(params?: { status?: GroupStatus }) {
     const { status } = params || {};
-    return this.execute(async () => this.db.group.count({ where: { status } }));
+    return this.execute(async () => {
+      const res = await this.dataLayer
+        .selectFrom("Group")
+        .$if(!!status, (qb) => qb.where("status", "=", status!))
+        .select([sql<number>`count(*)`.as("count")])
+        .executeTakeFirstOrThrow();
+      return res.count;
+    });
   }
 
   public findById(id: string) {
     return this.execute(async () => {
-      const group = await this.db.group.findUnique({
-        where: { id },
-        select: {
-          id: true,
-          name: true,
-          about: true,
-          cover_image_url: true,
-          created_at: true,
-          logo_url: true,
-          status: true,
-          type: true,
-          updated_at: true,
-          groupAggregates: {
-            select: {
-              total_comments: true,
-              total_members: true,
-              total_posts: true,
-              total_votes: true
-            }
-          },
-          members: {
-            select: {
-              user_id: true,
-              user: {
-                select: {
-                  avatar_url: true
-                }
-              }
-            },
-            take: 5
-          }
-        }
-      });
-      return group;
+      const group = await this.dataLayer
+        .selectFrom("Group as g")
+        .leftJoin("GroupAggregates as ga", "ga.group_id", "g.id")
+        .select([
+          "g.id",
+          "g.name",
+          "g.about",
+          "g.cover_image_url",
+          "g.created_at",
+          "g.logo_url",
+          "g.status",
+          "g.type",
+          "g.updated_at",
+          "ga.total_comments",
+          "ga.total_members",
+          "ga.total_posts",
+          "ga.total_votes"
+        ])
+        .where("g.id", "=", id)
+        .executeTakeFirst();
+
+      if (!group) {
+        return null;
+      }
+
+      const members = await this.dataLayer
+        .selectFrom(
+          this.dataLayer
+            .selectFrom("GroupMember as gm")
+            .innerJoin("User as u", "u.id", "gm.user_id")
+            .select(["gm.user_id", "u.avatar_url", sql<number>`row_number() over (order by gm.joined_at asc)`.as("rn")])
+            .where("gm.group_id", "=", id)
+            .as("ranked_members")
+        )
+        .selectAll()
+        .where("rn", "<=", 5)
+        .execute();
+
+      return {
+        id: group.id,
+        name: group.name,
+        about: group.about,
+        cover_image_url: group.cover_image_url,
+        created_at: group.created_at,
+        logo_url: group.logo_url,
+        status: group.status,
+        type: group.type,
+        updated_at: group.updated_at,
+        groupAggregates: {
+          total_comments: group.total_comments,
+          total_members: group.total_members,
+          total_posts: group.total_posts,
+          total_votes: group.total_votes
+        },
+        members: members.map((m) => ({ user_id: m.user_id, user: { avatar_url: m.avatar_url } }))
+      };
     });
   }
 
   public getAll(props: { page: number; limit: number; status?: GroupStatus }) {
     const { page, limit, status = "OPEN" } = props;
     const offset = (page - 1) * limit;
-    return this.execute(async () =>
-      this.db.group.findMany({
-        select: {
-          id: true,
-          name: true,
-          about: true,
-          logo_url: true,
-          created_at: true,
-          updated_at: true,
-          status: true,
-          type: true,
-          members: {
-            select: {
-              id: true,
-              role: true,
-              user: {
-                select: {
-                  id: true,
-                  user_name: true,
-                  first_name: true,
-                  last_name: true,
-                  avatar_url: true
-                }
-              }
-            },
-            take: 5
-          },
-          _count: { select: { members: true } }
-        },
-        where: { status },
-        orderBy: { created_at: "desc" },
-        skip: offset,
-        take: limit
-      })
-    );
+    return this.execute(async () => {
+      const groups = await this.dataLayer
+        .selectFrom("Group as g")
+        .leftJoin("GroupMember as gm", "gm.group_id", "g.id")
+        .select([
+          "g.id",
+          "g.name",
+          "g.about",
+          "g.logo_url",
+          "g.created_at",
+          "g.updated_at",
+          "g.status",
+          "g.type",
+          sql<number>`count(gm.id)`.as("member_count")
+        ])
+        .where("g.status", "=", status)
+        .groupBy("g.id")
+        .orderBy("g.created_at", "desc")
+        .limit(limit)
+        .offset(offset)
+        .execute();
+
+      if (groups.length === 0) {
+        return [];
+      }
+
+      const groupIds = groups.map((g) => g.id);
+
+      const members = await this.dataLayer
+        .selectFrom(
+          this.dataLayer
+            .selectFrom("GroupMember as gm")
+            .innerJoin("User as u", "u.id", "gm.user_id")
+            .select([
+              "gm.id",
+              "gm.group_id",
+              "gm.role",
+              "u.id as user_id",
+              "u.user_name",
+              "u.first_name",
+              "u.last_name",
+              "u.avatar_url",
+              sql<number>`row_number() over (partition by gm.group_id order by gm.joined_at asc)`.as("rn")
+            ])
+            .where("gm.group_id", "in", groupIds)
+            .as("ranked_members")
+        )
+        .selectAll()
+        .where("rn", "<=", 5)
+        .execute();
+
+      const membersByGroup = new Map<string, typeof members>();
+      for (const member of members) {
+        if (!membersByGroup.has(member.group_id)) {
+          membersByGroup.set(member.group_id, []);
+        }
+        membersByGroup.get(member.group_id)!.push(member);
+      }
+
+      return groups.map((group) => ({
+        id: group.id,
+        name: group.name,
+        about: group.about,
+        logo_url: group.logo_url,
+        created_at: group.created_at,
+        updated_at: group.updated_at,
+        status: group.status,
+        type: group.type,
+        members: (membersByGroup.get(group.id) || []).map((m) => ({
+          id: m.id,
+          role: m.role,
+          user: {
+            id: m.user_id,
+            user_name: m.user_name,
+            first_name: m.first_name,
+            last_name: m.last_name,
+            avatar_url: m.avatar_url
+          }
+        })),
+        _count: { members: group.member_count }
+      }));
+    });
   }
 
   public getCountByUserId(userId: string) {
     return this.execute(async () => {
-      const count = await this.db.group.count({
-        where: { members: { some: { user_id: userId } } }
-      });
-      return count;
+      const res = await this.dataLayer
+        .selectFrom("UserAggregates")
+        .where("user_id", "=", userId)
+        .select(["total_groups"])
+        .executeTakeFirstOrThrow();
+      return res.total_groups;
     });
   }
 
   public getByUserId(userId: string, props: { page: number; limit: number }) {
     const { page, limit } = props;
     const offset = (page - 1) * limit;
-    return this.execute(() =>
-      this.db.group.findMany({
-        where: { members: { some: { user_id: userId, is_removed: false } } },
-        select: {
-          id: true,
-          name: true,
-          about: true,
-          created_at: true,
-          updated_at: true,
-          status: true,
-          type: true,
-          logo_url: true,
-          members: {
-            select: {
-              id: true,
-              role: true,
-              user: {
-                select: {
-                  id: true,
-                  user_name: true,
-                  first_name: true,
-                  last_name: true,
-                  avatar_url: true
-                }
-              }
-            },
-            orderBy: { created_at: "desc" },
-            take: 5
-          },
-          _count: { select: { members: true } }
-        },
-        orderBy: { created_at: "desc" },
-        skip: offset,
-        take: limit
-      })
-    );
+    return this.execute(async () => {
+      const skeleton = await this.dataLayer
+        .selectFrom("GroupMember")
+        .where("user_id", "=", userId)
+        .where("is_removed", "=", false)
+        .select("group_id")
+        .execute();
+
+      if (skeleton.length === 0) {
+        return [];
+      }
+
+      const ids = skeleton.map((s) => s.group_id);
+      const groups = await this.dataLayer
+        .selectFrom("Group as g")
+        .leftJoin("GroupMember as gm", "gm.group_id", "g.id")
+        .where("g.id", "in", ids)
+        .select([
+          "g.id",
+          "g.name",
+          "g.about",
+          "g.logo_url",
+          "g.created_at",
+          "g.updated_at",
+          "g.status",
+          "g.type",
+          sql<number>`count(gm.id)`.as("member_count")
+        ])
+        .groupBy("g.id")
+        .orderBy("g.created_at", "desc")
+        .limit(limit)
+        .offset(offset)
+        .execute();
+
+      if (groups.length === 0) {
+        return [];
+      }
+
+      const groupIds = groups.map((g) => g.id);
+      const members = await this.dataLayer
+        .selectFrom(
+          this.dataLayer
+            .selectFrom("GroupMember as gm")
+            .innerJoin("User as u", "u.id", "gm.user_id")
+            .select([
+              "gm.id",
+              "gm.group_id",
+              "gm.role",
+              "u.id as user_id",
+              "u.user_name",
+              "u.first_name",
+              "u.last_name",
+              "u.avatar_url",
+              sql<number>`row_number() over (partition by gm.group_id order by gm.joined_at asc)`.as("rn")
+            ])
+            .where("gm.group_id", "in", groupIds)
+            .as("ranked_members")
+        )
+        .selectAll()
+        .where("rn", "<=", 5)
+        .execute();
+
+      const membersByGroup = new Map<string, typeof members>();
+      for (const member of members) {
+        if (!membersByGroup.has(member.group_id)) {
+          membersByGroup.set(member.group_id, []);
+        }
+        membersByGroup.get(member.group_id)!.push(member);
+      }
+
+      return groups.map((group) => ({
+        id: group.id,
+        name: group.name,
+        about: group.about,
+        logo_url: group.logo_url,
+        created_at: group.created_at,
+        updated_at: group.updated_at,
+        status: group.status,
+        type: group.type,
+        members: (membersByGroup.get(group.id) || []).map((m) => ({
+          id: m.id,
+          role: m.role,
+          user: {
+            id: m.user_id,
+            user_name: m.user_name,
+            first_name: m.first_name,
+            last_name: m.last_name,
+            avatar_url: m.avatar_url
+          }
+        })),
+        _count: { members: group.member_count }
+      }));
+    });
   }
 
-  public create(data: CreateGroup, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public create(data: NewGroup, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const group = await db.group.create({
-        data: {
+      const group = await db
+        .insertInto("Group")
+        .values({
+          id: this.dataLayer.createId(),
           about: data.about,
           name: data.name,
           type: data.type,
           status: data.status,
           cover_image_url: data.cover_image_url,
-          logo_url: data.logo_url
-        }
-      });
+          logo_url: data.logo_url,
+          created_at: new Date(),
+          updated_at: new Date()
+        })
+        .returningAll()
+        .executeTakeFirstOrThrow();
+
+      await db
+        .insertInto("GroupAggregates")
+        .values({
+          group_id: group.id,
+          total_comments: 0,
+          total_members: 1,
+          total_posts: 0,
+          total_votes: 0
+        })
+        .execute();
+
       return group;
     });
   }
 
   public getByName(name: string) {
     return this.execute(async () => {
-      const group = await this.db.group.findUnique({
-        where: { name }
-      });
+      const group = await this.dataLayer
+        .selectFrom("Group")
+        .where("name", "=", name)
+        .selectAll()
+        .executeTakeFirstOrThrow();
       return group;
     });
   }
 }
 
 export class GroupMemberRepository extends BaseRepository {
-  private readonly db: RepositoryConfig["db"];
+  private readonly dataLayer: RepositoryConfig["dataLayer"];
 
   constructor(cfg: RepositoryConfig) {
     super();
-    this.db = cfg.db;
+    this.dataLayer = cfg.dataLayer;
   }
 
-  public addMember(groupId: string, userId: string, role: GroupMemberRole, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public addMember(groupId: string, userId: string, role: GroupMemberRole, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const member = await db.groupMember.create({
-        data: { group_id: groupId, user_id: userId, role }
-      });
+      const member = await db
+        .insertInto("GroupMember")
+        .values({
+          group_id: groupId,
+          user_id: userId,
+          role,
+          joined_at: new Date(),
+          created_at: new Date(),
+          updated_at: new Date()
+        })
+        .returningAll()
+        .executeTakeFirstOrThrow();
       return member;
     });
   }
 
   public isMember(groupId: string, userId: string) {
     return this.execute(async () => {
-      const member = await this.db.groupMember.findUnique({
-        where: { user_group_unique: { user_id: userId, group_id: groupId } },
-        select: { id: true }
-      });
+      const member = await this.dataLayer
+        .selectFrom("GroupMember")
+        .where("group_id", "=", groupId)
+        .where("user_id", "=", userId)
+        .where("is_removed", "=", false)
+        .select(["id"])
+        .executeTakeFirst();
       return !!member;
     });
   }
 
   public getAdmin(groupId: string) {
     return this.execute(async () => {
-      const admin = await this.db.groupMember.findFirst({
-        where: { group_id: groupId, role: "ADMIN" }
-      });
+      const admin = await this.dataLayer
+        .selectFrom("GroupMember")
+        .where("group_id", "=", groupId)
+        .where("role", "=", "ADMIN")
+        .selectAll()
+        .executeTakeFirst();
       return admin;
     });
   }
 
   public getAdminDetails(groupId: string) {
     return this.execute(async () => {
-      const admin = await this.db.groupMember.findFirst({
-        where: { group_id: groupId, role: "ADMIN" },
-        include: {
-          user: {
-            select: {
-              id: true,
-              user_name: true,
-              first_name: true,
-              last_name: true,
-              avatar_url: true
-            }
-          }
-        }
-      });
-      return admin;
+      const admin = await this.dataLayer
+        .selectFrom("GroupMember as member")
+        .innerJoin("User as u", "u.id", "member.user_id")
+        .where("group_id", "=", groupId)
+        .where("role", "=", "ADMIN")
+        .select([
+          "u.id as user_id",
+          "u.user_name",
+          "u.first_name",
+          "u.last_name",
+          "u.avatar_url",
+          "member.id as member_id",
+          "member.blocked",
+          "member.role",
+          "member.group_id",
+          "member.created_at",
+          "member.is_removed",
+          "member.joined_at",
+          "member.role",
+          "member.updated_at"
+        ])
+        .executeTakeFirst();
+      if (!admin) {
+        return null;
+      }
+
+      return {
+        user: {
+          id: admin.user_id,
+          user_name: admin.user_name,
+          first_name: admin.first_name,
+          last_name: admin.last_name,
+          avatar_url: admin.avatar_url
+        },
+        id: admin.member_id,
+        blocked: admin.blocked,
+        role: admin.role,
+        group_id: admin.group_id,
+        created_at: admin.created_at,
+        is_removed: admin.is_removed,
+        joined_at: admin.joined_at,
+        updated_at: admin.updated_at
+      };
     });
   }
 
   public whatIsMyRole(groupId: string, userId: string) {
-    return this.execute(async () =>
-      this.db.groupMember.findUnique({
-        where: { user_group_unique: { user_id: userId, group_id: groupId } },
-        select: { role: true }
-      })
-    );
+    return this.execute(async () => {
+      const res = await this.dataLayer
+        .selectFrom("GroupMember")
+        .where("group_id", "=", groupId)
+        .where("user_id", "=", userId)
+        .select("role")
+        .executeTakeFirst();
+      return res;
+    });
   }
 
-  public leaveGroup(groupId: string, userId: string, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public leaveGroup(groupId: string, userId: string, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const member = await db.groupMember.delete({
-        where: { user_group_unique: { user_id: userId, group_id: groupId } }
-      });
+      const member = await db
+        .deleteFrom("GroupMember")
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        .where("group_id", "=", groupId)
+        .where("user_id", "=", userId)
+        .returningAll()
+        .executeTakeFirstOrThrow();
       return member;
     });
   }
 
-  public kick(groupId: string, userId: string, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public kick(groupId: string, userId: string, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const member = await db.groupMember.update({
-        where: { user_group_unique: { user_id: userId, group_id: groupId } },
-        data: { is_removed: true }
-      });
+      const member = await db
+        .updateTable("GroupMember")
+        .set({ is_removed: true, updated_at: new Date() })
+        .where("group_id", "=", groupId)
+        .where("user_id", "=", userId)
+        .returningAll()
+        .executeTakeFirstOrThrow();
       return member;
     });
   }
 
   public getModeratingMembers(groupId: string) {
     return this.execute(async () => {
-      const members = await this.db.groupMember.findMany({
-        where: {
-          group_id: groupId,
-          role: {
-            in: ["MODERATOR", "ADMIN"]
-          },
-          is_removed: false
+      const members = await this.dataLayer
+        .selectFrom("GroupMember as member")
+        .innerJoin("User as u", "u.id", "member.user_id")
+        .where((eb) =>
+          eb.and([eb("group_id", "=", groupId), eb("role", "in", ["MODERATOR", "ADMIN"]), eb("is_removed", "=", false)])
+        )
+        .select([
+          "member.id",
+          "member.role",
+          "member.joined_at",
+          "u.id as user_id",
+          "u.avatar_url",
+          "u.first_name",
+          "u.last_name",
+          "u.user_name"
+        ])
+        .execute();
+      return members.map((m) => ({
+        user: {
+          id: m.user_id,
+          avatar_url: m.avatar_url,
+          first_name: m.first_name,
+          last_name: m.last_name,
+          user_name: m.user_name
         },
-        select: {
-          id: true,
-          role: true,
-          joined_at: true,
-          user: {
-            select: {
-              id: true,
-              avatar_url: true,
-              first_name: true,
-              last_name: true,
-              user_name: true
-            }
-          }
-        }
-      });
-      return members;
+        id: m.id,
+        role: m.role,
+        joined_at: m.joined_at
+      }));
     });
   }
 
   public getMembers(groupId: string) {
     return this.execute(async () => {
-      const members = await this.db.groupMember.findMany({
-        where: {
-          group_id: groupId,
-          is_removed: false
+      const members = await this.dataLayer
+        .selectFrom("GroupMember as member")
+        .innerJoin("User as u", "u.id", "member.user_id")
+        .where((eb) =>
+          eb.and([
+            eb("group_id", "=", groupId),
+            eb("role", "not in", ["MODERATOR", "ADMIN"]),
+            eb("is_removed", "=", false)
+          ])
+        )
+        .select([
+          "member.id",
+          "member.role",
+          "member.joined_at",
+          "u.id as user_id",
+          "u.avatar_url",
+          "u.first_name",
+          "u.last_name",
+          "u.user_name"
+        ])
+        .execute();
+      return members.map((m) => ({
+        user: {
+          id: m.user_id,
+          avatar_url: m.avatar_url,
+          first_name: m.first_name,
+          last_name: m.last_name,
+          user_name: m.user_name
         },
-        select: {
-          id: true,
-          role: true,
-          joined_at: true,
-          user: {
-            select: {
-              id: true,
-              avatar_url: true,
-              first_name: true,
-              last_name: true,
-              user_name: true
-            }
-          }
-        }
-      });
-      return members;
+        id: m.id,
+        role: m.role,
+        joined_at: m.joined_at
+      }));
     });
   }
 }
 
 export class GroupInvitationRepository extends BaseRepository {
-  private readonly db: RepositoryConfig["db"];
+  private readonly dataLayer: RepositoryConfig["dataLayer"];
 
   constructor(cfg: RepositoryConfig) {
     super();
-    this.db = cfg.db;
+    this.dataLayer = cfg.dataLayer;
   }
 
-  public create(data: CreateGroupInvitation, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public create(data: NewGroupInvitation, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const invitation = await db.groupInvitation.create({
-        data,
-        select: { id: true }
-      });
+      const invitation = await db
+        .insertInto("GroupInvitation")
+        .values({
+          ...data,
+          id: this.dataLayer.createId(),
+          created_at: new Date(),
+          updated_at: new Date()
+        })
+        .returningAll()
+        .executeTakeFirstOrThrow();
       return invitation;
     });
   }
 
   public findById(id: string) {
-    return this.execute(async () => this.db.groupInvitation.findUnique({ where: { id } }));
+    return this.execute(async () =>
+      this.dataLayer.selectFrom("GroupInvitation").where("id", "=", id).selectAll().executeTakeFirst()
+    );
   }
 
   public findByUserWithGroup(userId: string, groupId: string) {
     return this.execute(async () =>
-      this.db.groupInvitation.findUnique({
-        where: {
-          user_id_group_id: {
-            user_id: userId,
-            group_id: groupId
-          }
-        }
-      })
+      this.dataLayer
+        .selectFrom("GroupInvitation")
+        .where("user_id", "=", userId)
+        .where("group_id", "=", groupId)
+        .selectAll()
+        .executeTakeFirst()
     );
   }
 
-  public update(id: string, data: UpdateGroupInvitation, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public update(id: string, data: GroupInvitationUpdate, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const invitation = await db.groupInvitation.update({ where: { id }, data });
+      const invitation = await db
+        .updateTable("GroupInvitation")
+        .set({ ...data, updated_at: new Date() })
+        .where("id", "=", id)
+        .returningAll()
+        .executeTakeFirstOrThrow();
       return invitation;
     });
   }
 
   public getAllJointRequests(groupId: string) {
     return this.execute(async () => {
-      const invitations = await this.db.groupInvitation.findMany({
-        where: { group_id: groupId, status: "PENDING", type: "JOIN" },
-        include: {
-          group: {
-            select: {
-              id: true,
-              name: true
-            }
-          },
-          user: {
-            select: {
-              id: true,
-              user_name: true,
-              first_name: true,
-              last_name: true,
-              avatar_url: true
-            }
-          }
+      const invitations = await this.dataLayer
+        .selectFrom("GroupInvitation as invitation")
+        .innerJoin("User as u", "invitation.user_id", "u.id")
+        .innerJoin("Group as g", "invitation.group_id", "g.id")
+        .where((eb) =>
+          eb.and([
+            eb("invitation.group_id", "=", groupId),
+            eb("invitation.status", "=", "PENDING"),
+            eb("invitation.type", "=", "JOIN")
+          ])
+        )
+        .select([
+          "g.id as group_id",
+          "g.name",
+          "u.id as user_id",
+          "u.user_name",
+          "u.first_name",
+          "u.last_name",
+          "u.avatar_url",
+          "invitation.id",
+          "invitation.sent_at",
+          "invitation.status",
+          "invitation.type",
+          "invitation.created_at",
+          "invitation.updated_at"
+        ])
+        .execute();
+
+      return invitations.map((invitation) => ({
+        group: {
+          id: invitation.group_id,
+          name: invitation.name
         },
-        orderBy: { created_at: "desc" },
-        take: 50
-      });
-      return invitations;
+        user: {
+          id: invitation.user_id,
+          user_name: invitation.user_name,
+          first_name: invitation.first_name,
+          last_name: invitation.last_name,
+          avatar_url: invitation.avatar_url
+        },
+        id: invitation.id,
+        sent_at: invitation.sent_at,
+        status: invitation.status,
+        type: invitation.type,
+        created_at: invitation.created_at,
+        updated_at: invitation.updated_at
+      }));
     });
   }
 
   public findPendingJoinRequest(id: string) {
-    return this.execute(async () =>
-      this.db.groupInvitation.findUnique({
-        where: { id, status: "PENDING", type: "JOIN" },
-        include: { groupNotification: { select: { notification_id: true } } }
-      })
-    );
+    return this.execute(async () => {
+      const req = await this.dataLayer
+        .selectFrom("GroupInvitation as invitation")
+        .leftJoin("GroupNotification as notification", "notification.group_invitation_id", "invitation.id")
+        .where((eb) =>
+          eb.and([
+            eb("invitation.id", "=", id),
+            eb("invitation.status", "=", "PENDING"),
+            eb("invitation.type", "=", "JOIN")
+          ])
+        )
+        .selectAll(["invitation", "notification"])
+        .executeTakeFirst();
+      return req;
+    });
   }
 
   public getUserGroupsJoinRequests(userId: string) {
     return this.execute(async () => {
-      const groups = await this.db.groupMember.findMany({
-        where: { user_id: userId, is_removed: false, role: { in: ["ADMIN", "MODERATOR"] } },
-        select: {
-          group_id: true
-        }
-      });
+      const groups = await this.dataLayer
+        .selectFrom("GroupMember")
+        .where((eb) =>
+          eb.and([eb("user_id", "=", userId), eb("is_removed", "=", false), eb("role", "in", ["ADMIN", "MODERATOR"])])
+        )
+        .select("group_id")
+        .execute();
+
+      if (groups.length === 0) {
+        return [];
+      }
+
       const groupIds = groups.map((g) => g.group_id);
-      const invitations = await this.db.groupInvitation.findMany({
-        where: { group_id: { in: groupIds }, status: "PENDING", type: "JOIN" },
-        orderBy: { created_at: "desc" },
-        select: {
-          id: true,
-          created_at: true,
-          sent_at: true,
-          user: {
-            select: {
-              id: true,
-              user_name: true,
-              first_name: true,
-              last_name: true,
-              avatar_url: true
-            }
-          },
-          group: {
-            select: {
-              id: true,
-              name: true
-            }
-          },
-          groupNotification: { select: { notification_id: true } }
-        }
-      });
-      return invitations;
+
+      const invitations = await this.dataLayer
+        .selectFrom("GroupInvitation as invitation")
+        .innerJoin("User as u", "invitation.user_id", "u.id")
+        .innerJoin("Group as g", "invitation.group_id", "g.id")
+        .innerJoin("GroupNotification as gn", "gn.group_invitation_id", "invitation.id")
+        .where((eb) => eb.and([eb("group_id", "in", groupIds), eb("status", "=", "PENDING"), eb("type", "=", "JOIN")]))
+        .select([
+          "invitation.id",
+          "invitation.created_at",
+          "invitation.sent_at",
+          "u.id as user_id",
+          "u.user_name",
+          "u.first_name",
+          "u.last_name",
+          "u.avatar_url",
+          "g.id as group_id",
+          "g.name",
+          "gn.notification_id"
+        ])
+        .orderBy("created_at", "desc")
+        .execute();
+
+      return invitations.map((invitation) => ({
+        id: invitation.id,
+        created_at: invitation.created_at,
+        sent_at: invitation.sent_at,
+        user: {
+          id: invitation.user_id,
+          user_name: invitation.user_name,
+          first_name: invitation.first_name,
+          last_name: invitation.last_name,
+          avatar_url: invitation.avatar_url
+        },
+        group: {
+          id: invitation.group_id,
+          name: invitation.name
+        },
+        groupNotification: { notification_id: invitation.notification_id }
+      }));
     });
   }
 }
 
 export class GroupNotificationsRepository extends BaseRepository {
-  private readonly db: RepositoryConfig["db"];
+  private readonly dataLayer: RepositoryConfig["dataLayer"];
 
   constructor(cfg: RepositoryConfig) {
     super();
-    this.db = cfg.db;
+    this.dataLayer = cfg.dataLayer;
   }
 
-  public create(data: CreateGroupNotification, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public create(data: NewGroupNotification, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const notification = await db.groupNotification.create({
-        data: { group_invitation_id: data.group_invitation_id, notification_id: data.notification_id }
-      });
+      const notification = await db
+        .insertInto("GroupNotification")
+        .values(data)
+        .returningAll()
+        .executeTakeFirstOrThrow();
       return notification;
     });
   }

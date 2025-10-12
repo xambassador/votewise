@@ -1,18 +1,20 @@
 import { BaseRepository } from "./base.repository";
 
 export class TopicRepository extends BaseRepository {
-  private readonly db: RepositoryConfig["db"];
+  private readonly dataLayer: RepositoryConfig["dataLayer"];
 
   constructor(cfg: RepositoryConfig) {
     super();
-    this.db = cfg.db;
+    this.dataLayer = cfg.dataLayer;
   }
 
   public findAll() {
-    return this.execute(() => this.db.topics.findMany());
+    return this.execute(() => this.dataLayer.selectFrom("Topics").selectAll().execute());
   }
 
   public findById(id: string) {
-    return this.execute(() => this.db.topics.findUnique({ where: { id }, select: { id: true, name: true } }));
+    return this.execute(() =>
+      this.dataLayer.selectFrom("Topics").selectAll().where("id", "=", id).executeTakeFirstOrThrow()
+    );
   }
 }

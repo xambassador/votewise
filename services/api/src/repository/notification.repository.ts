@@ -1,59 +1,74 @@
 import type { NotificationContent } from "@/lib/notification-builder";
-import type { Prisma } from "@votewise/prisma";
-import type { TransactionCtx } from "./transaction";
+import type { NewNotification } from "@votewise/prisma/db";
+import type { Tx } from "./transaction";
 
 import { BaseRepository } from "./base.repository";
 
-type TCreate = Omit<Prisma.NotificationUncheckedCreateInput, "content"> & {
+type TCreate = Omit<NewNotification, "content"> & {
   content: NotificationContent;
 };
 
 export class NotificationRepository extends BaseRepository {
-  private readonly db: RepositoryConfig["db"];
+  private readonly dataLayer: RepositoryConfig["dataLayer"];
 
   constructor(cfg: RepositoryConfig) {
     super();
-    this.db = cfg.db;
+    this.dataLayer = cfg.dataLayer;
   }
 
-  public create(data: TCreate, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public create(data: TCreate, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const notification = await db.notification.create({ data, select: { id: true } });
+      const notification = await db
+        .insertInto("Notification")
+        .values({ ...data, id: this.dataLayer.createId(), created_at: new Date(), updated_at: new Date() })
+        .returningAll()
+        .executeTakeFirstOrThrow();
       return notification;
     });
   }
 
   public async findByUserId(userId: string) {
     return this.execute(async () => {
-      const notifications = await this.db.notification.findMany({
-        where: { user_id: userId, is_read: false },
-        orderBy: { created_at: "desc" },
-        take: 10
-      });
+      const notifications = await this.dataLayer
+        .selectFrom("Notification")
+        .where((eb) => eb.and([eb("user_id", "=", userId), eb("is_read", "=", false)]))
+        .selectAll()
+        .orderBy("created_at", "desc")
+        .limit(10)
+        .execute();
       return notifications;
     });
   }
 
   public async findById(id: string) {
     return this.execute(async () => {
-      const notification = await this.db.notification.findUnique({ where: { id } });
+      const notification = await this.dataLayer
+        .selectFrom("Notification")
+        .where("id", "=", id)
+        .selectAll()
+        .executeTakeFirst();
       return notification;
     });
   }
 
-  public async markAsRead(id: string, tx?: TransactionCtx) {
-    const db = tx ?? this.db;
+  public async markAsRead(id: string, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      const notification = await db.notification.update({ where: { id }, data: { is_read: true } });
+      const notification = await db
+        .updateTable("Notification")
+        .set({ is_read: true })
+        .where("id", "=", id)
+        .returningAll()
+        .executeTakeFirstOrThrow();
       return notification;
     });
   }
 
-  public async deleteById(id: string, tx?: TransactionCtx) {
+  public async deleteById(id: string, tx?: Tx) {
+    const db = (tx ?? this.dataLayer) as Tx;
     return this.execute(async () => {
-      const db = tx ?? this.db;
-      await db.notification.delete({ where: { id } });
+      db.deleteFrom("Notification").where("id", "=", id).execute();
     });
   }
 }

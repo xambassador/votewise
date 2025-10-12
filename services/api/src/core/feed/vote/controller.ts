@@ -41,7 +41,7 @@ export class Controller {
     const remainingVotes = await this.ctx.userRepository.getRemainingVotes(currentUserId);
     this.ctx.assert.unprocessableEntity(remainingVotes <= 0, "You have no votes left for today");
 
-    await this.ctx.transactionManager.withTransaction(async (tx) => {
+    await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
       await this.ctx.feedRepository.vote(currentUserId, feed.id, tx);
       await this.ctx.userRepository.update(currentUserId, { vote_bucket: remainingVotes - 1 }, tx);
       await this.ctx.aggregator.postAggregator.aggregate(

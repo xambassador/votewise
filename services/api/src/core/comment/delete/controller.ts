@@ -42,7 +42,7 @@ export class Controller {
     this.ctx.assert.unprocessableEntity(comment.post_id !== body.feedId, "Comment does not belong to this feed");
     this.ctx.assert.forbidden(comment.user_id !== currentUserId, "You are not allowed to delete this comment");
 
-    await this.ctx.transactionManger.withTransaction(async (tx) => {
+    await this.ctx.transactionManger.withDataLayerTransaction(async (tx) => {
       await this.ctx.commentRepository.delete(comment.id, tx);
 
       if (!comment.parent_id) {

@@ -51,7 +51,7 @@ export class Controller {
     this.ctx.assert.unprocessableEntity(!_role, memberNotInGroupMessage);
     this.ctx.assert.forbidden(role.role !== "ADMIN", permissionError);
 
-    await this.ctx.transactionManager.withTransaction(async (tx) => {
+    await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
       await Promise.all([
         this.ctx.groupRepository.groupMember.kick(groupId, locals.payload.sub, tx),
         this.ctx.aggregator.groupAggregator.aggregate(

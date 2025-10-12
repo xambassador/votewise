@@ -20,7 +20,7 @@ describe("MFA Challenge Controller", () => {
   test("should throw factor not found", async () => {
     const req = buildReq({ params });
     const res = buildRes({ locals });
-    mockFactorRepository.findById.mockResolvedValue(null);
+    mockFactorRepository.findById.mockResolvedValue(undefined);
 
     const error = await controller.handle(req, res).catch((e) => e);
     expect(error.message).toBe("Factor not found with the given id");

@@ -41,7 +41,7 @@ export class Controller {
     const invalidMessage = body.topics.length > 1 ? "Invalid topics provided" : "Invalid topic provided";
     this.ctx.assert.unprocessableEntity(invalidTopics.length > 0, invalidMessage);
 
-    const { feed } = await this.ctx.transaction.withTransaction(async (tx) => {
+    const { feed } = await this.ctx.transaction.withDataLayerTransaction(async (tx) => {
       const feed = await this.ctx.feedRepository.create(
         {
           authorId: locals.payload.sub,
