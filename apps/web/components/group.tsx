@@ -4,6 +4,7 @@ import Link from "next/link";
 import dayjs, { extend } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
+import { truncateOnWord } from "@votewise/text";
 import { truncate } from "@votewise/text/truncate";
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
 import {
@@ -47,7 +48,7 @@ export function GroupMolecule(props: Props) {
             </GroupName>
             <GroupCreatedAt>{dayjs(group.created_at).fromNow()}</GroupCreatedAt>
           </GroupHeader>
-          <GroupDescription>{group.about}</GroupDescription>
+          <GroupDescription>{truncateOnWord(group.about, 120)}</GroupDescription>
           <GroupFooter>
             <GroupMembers>
               {group.members.map((member) => (

@@ -350,29 +350,13 @@ export class GroupRepository extends BaseRepository {
         })
         .returningAll()
         .executeTakeFirstOrThrow();
-
-      await db
-        .insertInto("GroupAggregates")
-        .values({
-          group_id: group.id,
-          total_comments: 0,
-          total_members: 1,
-          total_posts: 0,
-          total_votes: 0
-        })
-        .execute();
-
       return group;
     });
   }
 
   public getByName(name: string) {
     return this.execute(async () => {
-      const group = await this.dataLayer
-        .selectFrom("Group")
-        .where("name", "=", name)
-        .selectAll()
-        .executeTakeFirstOrThrow();
+      const group = await this.dataLayer.selectFrom("Group").where("name", "=", name).selectAll().executeTakeFirst();
       return group;
     });
   }
@@ -392,6 +376,9 @@ export class GroupMemberRepository extends BaseRepository {
       const member = await db
         .insertInto("GroupMember")
         .values({
+          id: this.dataLayer.createId(),
+          blocked: false,
+          is_removed: false,
           group_id: groupId,
           user_id: userId,
           role,
@@ -733,7 +720,13 @@ export class GroupInvitationRepository extends BaseRepository {
         .innerJoin("User as u", "invitation.user_id", "u.id")
         .innerJoin("Group as g", "invitation.group_id", "g.id")
         .innerJoin("GroupNotification as gn", "gn.group_invitation_id", "invitation.id")
-        .where((eb) => eb.and([eb("group_id", "in", groupIds), eb("status", "=", "PENDING"), eb("type", "=", "JOIN")]))
+        .where((eb) =>
+          eb.and([
+            eb("invitation.group_id", "in", groupIds),
+            eb("invitation.status", "=", "PENDING"),
+            eb("invitation.type", "=", "JOIN")
+          ])
+        )
         .select([
           "invitation.id",
           "invitation.created_at",
