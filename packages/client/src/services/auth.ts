@@ -17,15 +17,12 @@ import type {
   TVerifyEmail
 } from "@votewise/schemas/auth";
 import type { AccessTokenPayload } from "@votewise/types";
-import type { Client } from "../client";
-import type { Client as ServerClient } from "../server";
+import type { BaseOptions, TClient } from "../utils";
 
 import { auth } from "@votewise/constant/routes";
 import { Debugger } from "@votewise/debug";
 
 import { COOKIE_KEYS, jwt } from "../utils";
-
-type AuthOptions = { client: Client | ServerClient };
 
 const debug = new Debugger("auth");
 debug.enable();
@@ -37,9 +34,9 @@ if (typeof window !== "undefined") {
 }
 
 export class Auth {
-  private readonly client: Client | ServerClient;
+  private readonly client: TClient;
 
-  constructor(opts: AuthOptions) {
+  constructor(opts: BaseOptions) {
     this.client = opts.client;
   }
 

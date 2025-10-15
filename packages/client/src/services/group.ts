@@ -14,21 +14,16 @@ import type {
 } from "@votewise/api";
 import type { TGroupCreate } from "@votewise/schemas/group";
 import type { TPagination } from "@votewise/schemas/pagination";
-import type { Client } from "../client";
-import type { Client as ServerClient } from "../server";
+import type { BaseOptions, TClient } from "../utils";
 
 import { groups } from "@votewise/constant/routes";
 
 import { qs } from "./qs";
 
-type GroupOptions = {
-  client: Client | ServerClient;
-};
-
 export class Group {
-  private readonly client: Client | ServerClient;
+  private readonly client: TClient;
 
-  constructor(opts: GroupOptions) {
+  constructor(opts: BaseOptions) {
     this.client = opts.client;
   }
 

@@ -1,17 +1,12 @@
 import type { FollowResponse, UnFollowResponse } from "@votewise/api";
-import type { Client } from "../client";
-import type { Client as ServerClient } from "../server";
+import type { BaseOptions, TClient } from "../utils";
 
 import { follow } from "@votewise/constant/routes";
 
-type FollowOptions = {
-  client: Client | ServerClient;
-};
-
 export class Follow {
-  private readonly client: Client | ServerClient;
+  private readonly client: TClient;
 
-  constructor(opts: FollowOptions) {
+  constructor(opts: BaseOptions) {
     this.client = opts.client;
   }
 

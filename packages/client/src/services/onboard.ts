@@ -5,19 +5,14 @@ import type {
   OnboardUserResponse
 } from "@votewise/api";
 import type { TOnboard } from "@votewise/schemas/onboard";
-import type { Client } from "../client";
-import type { Client as ServerClient } from "../server";
+import type { BaseOptions, TClient } from "../utils";
 
 import { topics, user } from "@votewise/constant/routes";
 
-type OnboardOptions = {
-  client: Client | ServerClient;
-};
-
 export class Onboard {
-  private readonly client: Client | ServerClient;
+  private readonly client: TClient;
 
-  constructor(opts: OnboardOptions) {
+  constructor(opts: BaseOptions) {
     this.client = opts.client;
   }
 

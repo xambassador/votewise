@@ -1,16 +1,13 @@
 import type { ChallengeFactorResponse, EnrollMFAResponse, VerifyMFAResponse } from "@votewise/api";
 import type { TVerifyChallenge } from "@votewise/schemas/auth";
-import type { Client } from "../client";
-import type { Client as ServerClient } from "../server";
+import type { BaseOptions, TClient } from "../utils";
 
 import { auth } from "@votewise/constant/routes";
 
-type MFAOptions = { client: Client | ServerClient };
-
 export class MFA {
-  private readonly client: Client | ServerClient;
+  private readonly client: TClient;
 
-  constructor(opts: MFAOptions) {
+  constructor(opts: BaseOptions) {
     this.client = opts.client;
   }
 

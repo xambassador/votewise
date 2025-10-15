@@ -1,17 +1,12 @@
 import type { GetAllNotificationsResponse, MarkNotificationReadResponse } from "@votewise/api";
-import type { Client } from "../client";
-import type { Client as ServerClient } from "../server";
+import type { BaseOptions, TClient } from "../utils";
 
 import { notifications } from "@votewise/constant/routes";
 
-type NotificationOptions = {
-  client: Client | ServerClient;
-};
-
 export class Notification {
-  private readonly client: Client | ServerClient;
+  private readonly client: TClient;
 
-  constructor(opts: NotificationOptions) {
+  constructor(opts: BaseOptions) {
     this.client = opts.client;
   }
 

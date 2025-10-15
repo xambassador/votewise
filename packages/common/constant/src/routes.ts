@@ -320,3 +320,14 @@ export const notifications = {
     markAsRead: (base: string, id: string) => base + `/notifications/${id}/mark-as-read`
   }
 };
+
+export const search = {
+  paths: {
+    /** Generic search */
+    all: (base: string) => base + "/search"
+  },
+  runtime: {
+    /** Generic search */
+    all: (base: string) => base + "/search"
+  }
+};

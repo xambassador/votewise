@@ -1,19 +1,16 @@
 import type { CreateFeedResponse, GetAllFeedsResponse, GetFeedResponse, VoteResponse } from "@votewise/api";
 import type { TFeedCreate } from "@votewise/schemas/feed";
 import type { TPagination } from "@votewise/schemas/pagination";
-import type { Client } from "../client";
-import type { Client as ServerClient } from "../server";
+import type { BaseOptions, TClient } from "../utils";
 
 import { feeds } from "@votewise/constant/routes";
 
 import { qs } from "./qs";
 
-type FeedOptions = { client: Client | ServerClient };
-
 export class Feed {
-  private readonly client: Client | ServerClient;
+  private readonly client: TClient;
 
-  constructor(opts: FeedOptions) {
+  constructor(opts: BaseOptions) {
     this.client = opts.client;
   }
 

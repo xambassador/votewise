@@ -44,3 +44,4 @@ export type { MarkNotificationReadResponse } from "@/core/notification/mark-read
 export type { LeaveGroupResponse } from "@/core/group/leave/controller";
 export type { AcceptGroupJoinRequestResponse } from "@/core/group/accept-group-join-request/controller";
 export type { RejectGroupJoinRequestResponse } from "@/core/group/reject-group-join-request/controller";
+export type { SearchResponse } from "@/core/search/controller";

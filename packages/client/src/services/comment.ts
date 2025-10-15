@@ -7,19 +7,16 @@ import type {
 } from "@votewise/api";
 import type { TCommentCreate, TCommentUpdate } from "@votewise/schemas/comment";
 import type { TPagination } from "@votewise/schemas/pagination";
-import type { Client } from "../client";
-import type { Client as ServerClient } from "../server";
+import type { BaseOptions, TClient } from "../utils";
 
 import { comments } from "@votewise/constant/routes";
 
 import { qs } from "./qs";
 
-type CommentOptions = { client: Client | ServerClient };
-
 export class Comment {
-  private readonly client: Client | ServerClient;
+  private readonly client: TClient;
 
-  constructor(opts: CommentOptions) {
+  constructor(opts: BaseOptions) {
     this.client = opts.client;
   }
 

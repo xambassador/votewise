@@ -6,21 +6,16 @@ import type {
   UsernameExistsResponse
 } from "@votewise/api";
 import type { TRecommendUserQuery } from "@votewise/schemas/user";
-import type { Client } from "../client";
-import type { Client as ServerClient } from "../server";
+import type { BaseOptions, TClient } from "../utils";
 
 import { user } from "@votewise/constant/routes";
 
 import { qs } from "./qs";
 
-type UserOptions = {
-  client: Client | ServerClient;
-};
-
 export class User {
-  private readonly client: Client | ServerClient;
+  private readonly client: TClient;
 
-  constructor(opts: UserOptions) {
+  constructor(opts: BaseOptions) {
     this.client = opts.client;
   }
 

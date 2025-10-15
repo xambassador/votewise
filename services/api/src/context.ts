@@ -115,7 +115,7 @@ export class AppContext {
     const assert = new Assertions();
     const cache = new Cache();
     const db = prisma;
-    const repositories = createRepositories(db, dataLayer);
+    const repositories = createRepositories(dataLayer);
     const mailer = new Mailer({ env: environment });
     const tasksQueue = new Queues.TasksQueue({ env: environment });
     const uploadQueue = new Queues.UploadQueue({ env: environment });
