@@ -6,23 +6,16 @@ import { StatusCodes } from "http-status-codes";
 
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  assert: AppContext["assert"];
-  mlService: AppContext["services"]["ml"];
-  bucketService: AppContext["services"]["bucket"];
-  groupRepository: AppContext["repositories"]["group"];
-};
-
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
   async handle(_: Request, res: Response) {
     const locals = getAuthenticateLocals(res);
-    const recommendationResult = await this.ctx.mlService.getGroupRecommendations({ user_id: locals.payload.sub });
+    const recommendationResult = await this.ctx.services.ml.getGroupRecommendations({ user_id: locals.payload.sub });
     if (!recommendationResult.success) {
       this.ctx.assert.internalServer(!recommendationResult.success, "Failed to get group recommendations");
       throw new Error("Failed to get group recommendations");
@@ -33,7 +26,7 @@ export class Controller {
       return res.status(StatusCodes.OK).json({ groups: [] });
     }
 
-    const groupsResult = await this.ctx.groupRepository.getGroupsById(recommendationResult.data.recommended_groups);
+    const groupsResult = await this.ctx.repositories.group.getGroupsById(recommendationResult.data.recommended_groups);
     const groupsPromises = groupsResult.map((g) => {
       const group = {
         id: g.id,
@@ -42,7 +35,7 @@ export class Controller {
         author: g.admins[0]
       };
       return new Promise<typeof group>((resolve) => {
-        this.ctx.bucketService
+        this.ctx.services.bucket
           .getUrlForType(group.author?.avatar_url || "", "avatar")
           .then((url) => {
             if (group.author) {

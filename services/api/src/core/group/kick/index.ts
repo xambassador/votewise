@@ -7,14 +7,8 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { Controller } from "./controller";
 
 export function kickMemberControllerFactory() {
-  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "logger"]);
-  const controller = new Controller({
-    assert: ctx.assert,
-    groupRepository: ctx.repositories.group,
-    userRepository: ctx.repositories.user,
-    aggregator: ctx.repositories.aggregator,
-    transactionManager: ctx.repositories.transactionManager
-  });
+  const ctx = AppContext.instance;
+  const controller = new Controller(ctx);
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "kick-member" });
   ctx.logger.info(`[${yellow("KickMemberController")}] dependencies initialized`);

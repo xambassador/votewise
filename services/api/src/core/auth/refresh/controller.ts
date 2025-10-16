@@ -18,6 +18,8 @@ type ControllerOptions = {
 
 const { INVALID_ACCESS_TOKEN, INVALID_REFRESH_TOKEN, USER_NOT_FOUND } = ERROR_CODES.AUTH;
 
+const invalidTokenMsg = "Invalid access token";
+
 export class Controller {
   private readonly ctx: ControllerOptions;
 
@@ -31,11 +33,11 @@ export class Controller {
     const userAgent = req.headers["user-agent"] || "";
 
     const _accessTokenPayload = this.ctx.jwtService.decodeAccessToken(body.access_token);
-    this.ctx.assert.unprocessableEntity(!_accessTokenPayload, "Invalid access token", INVALID_ACCESS_TOKEN);
+    this.ctx.assert.unprocessableEntity(!_accessTokenPayload, invalidTokenMsg, INVALID_ACCESS_TOKEN);
 
     const accessTokenPayload = _accessTokenPayload!;
-    this.ctx.assert.unprocessableEntity(!accessTokenPayload.session_id, "Invalid access token", INVALID_ACCESS_TOKEN);
-    this.ctx.assert.unprocessableEntity(!accessTokenPayload.sub, "Invalid access token", INVALID_ACCESS_TOKEN);
+    this.ctx.assert.unprocessableEntity(!accessTokenPayload.session_id, invalidTokenMsg, INVALID_ACCESS_TOKEN);
+    this.ctx.assert.unprocessableEntity(!accessTokenPayload.sub, invalidTokenMsg, INVALID_ACCESS_TOKEN);
 
     const _token = await this.ctx.refreshTokensRepository.find(body.refresh_token);
     const isInvalid = !_token || _token.revoked || _token.user_id !== accessTokenPayload.sub;

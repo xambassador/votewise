@@ -16,13 +16,13 @@ const cfg = new ServerConfig({
   publicUrl: environment.VOTEWISE_API_URL,
   port: environment.VOTEWISE_API_PORT,
   devMode: environment.NODE_ENV === "development",
-  blobUploadLimit: 10 * 1024 * 1024, // TODO: Move to env
+  blobUploadLimit: environment.BLOB_UPLOAD_LIMIT,
   appUrl: environment.VOTEWISE_APP_URL,
   bucketUrl: environment.VOTEWISE_BUCKET_URL,
-  appName: "Votewise",
-  avatarsBucket: "avatars",
-  backgroundsBucket: "backgrounds",
-  uploadBucket: "uploads" // TODO: Move to env
+  appName: environment.APP_NAME,
+  avatarsBucket: environment.AVATAR_BUCKET_NAME,
+  backgroundsBucket: environment.BACKGROUND_BUCKET_NAME,
+  uploadBucket: environment.UPLOAD_BUCKET_NAME
 });
 const secrets = new ServerSecrets({
   cronSecret: environment.CRON_SECRET,

@@ -12,22 +12,14 @@ const ZQuery = z.object({
   notification_id: z.string({ invalid_type_error: "notification_id must be a string" }).optional()
 });
 
-type ControllerOptions = {
-  assert: AppContext["assert"];
-  groupRepository: AppContext["repositories"]["group"];
-  notificationRepository: AppContext["repositories"]["notification"];
-  transactionManager: AppContext["repositories"]["transactionManager"];
-  aggregator: AppContext["repositories"]["aggregator"];
-};
-
 const invitationNotFoundMessage = "Invitation not found. It may have been revoked or expired.";
 const invitationAlreadyAcceptedMessage = "This invitation has already been accepted.";
 const permissionMessage = "You do not have permission to accept this invitation.";
 
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(ctx: ControllerOptions) {
+  constructor(ctx: AppContext) {
     this.ctx = ctx;
   }
 
@@ -49,7 +41,7 @@ export class Controller {
     const locals = getAuthenticateLocals(res);
     const currentUserId = locals.payload.sub;
 
-    const invitation = await this.ctx.groupRepository.groupInvitation.findById(invitationId);
+    const invitation = await this.ctx.repositories.group.groupInvitation.findById(invitationId);
 
     this.ctx.assert.resourceNotFound(!invitation, invitationNotFoundMessage);
     this.ctx.assert.unprocessableEntity(invitation!.status === "ACCEPTED", invitationAlreadyAcceptedMessage);
@@ -58,14 +50,14 @@ export class Controller {
     const groupId = invitation!.group_id;
     const userId = invitation!.user_id;
 
-    const isAlreadyMember = await this.ctx.groupRepository.groupMember.isMember(groupId, currentUserId);
+    const isAlreadyMember = await this.ctx.repositories.group.groupMember.isMember(groupId, currentUserId);
     this.ctx.assert.unprocessableEntity(isAlreadyMember, "You are already a member of this group.");
 
-    await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
+    await this.ctx.repositories.transactionManager.withDataLayerTransaction(async (tx) => {
       await Promise.all([
-        this.ctx.groupRepository.groupMember.addMember(groupId, userId, "MEMBER", tx),
-        this.ctx.groupRepository.groupInvitation.update(invitation!.id, { status: "ACCEPTED" }, tx),
-        this.ctx.aggregator.groupAggregator.aggregate(
+        this.ctx.repositories.group.groupMember.addMember(groupId, userId, "MEMBER", tx),
+        this.ctx.repositories.group.groupInvitation.update(invitation!.id, { status: "ACCEPTED" }, tx),
+        this.ctx.repositories.aggregator.groupAggregator.aggregate(
           groupId,
           (data) => ({
             ...data,
@@ -76,7 +68,7 @@ export class Controller {
       ]);
 
       if (notificationId) {
-        await this.ctx.notificationRepository.deleteById(notificationId, tx);
+        await this.ctx.repositories.notification.deleteById(notificationId, tx);
       }
     });
 

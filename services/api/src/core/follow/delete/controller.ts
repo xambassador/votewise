@@ -8,18 +8,10 @@ import { ERROR_CODES } from "@votewise/constant";
 
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  userRepository: AppContext["repositories"]["user"];
-  followRepository: AppContext["repositories"]["follow"];
-  assert: AppContext["assert"];
-  transactionManager: AppContext["repositories"]["transactionManager"];
-  aggregator: AppContext["repositories"]["aggregator"];
-};
-
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
@@ -32,16 +24,16 @@ export class Controller {
       "Invalid parameter provided. Expected a string."
     );
 
-    const user = await this.ctx.userRepository.findById(canBeUsernameOrId);
+    const user = await this.ctx.repositories.user.findById(canBeUsernameOrId);
     if (user) {
       this.ctx.assert.operationNotAllowed(user.id === currentUserId, `You cannot unfollow yourself.`);
-      const follow = await this.ctx.followRepository.getFollow(currentUserId, user.id);
+      const follow = await this.ctx.repositories.follow.getFollow(currentUserId, user.id);
       if (!follow) {
         return res.status(StatusCodes.NO_CONTENT).send() as Response<void>;
       }
-      await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
-        await this.ctx.followRepository.delete(follow.id, tx);
-        await this.ctx.aggregator.userAggregator.aggregate(
+      await this.ctx.repositories.transactionManager.withDataLayerTransaction(async (tx) => {
+        await this.ctx.repositories.follow.delete(follow.id, tx);
+        await this.ctx.repositories.aggregator.userAggregator.aggregate(
           currentUserId,
           (stats) => ({
             ...stats,
@@ -49,7 +41,7 @@ export class Controller {
           }),
           tx
         );
-        await this.ctx.aggregator.userAggregator.aggregate(
+        await this.ctx.repositories.aggregator.userAggregator.aggregate(
           user.id,
           (stats) => ({
             ...stats,
@@ -60,7 +52,7 @@ export class Controller {
       });
       return res.status(StatusCodes.NO_CONTENT).send() as Response<void>;
     } else {
-      const _userByUsername = await this.ctx.userRepository.findByUsername(canBeUsernameOrId);
+      const _userByUsername = await this.ctx.repositories.user.findByUsername(canBeUsernameOrId);
       this.ctx.assert.resourceNotFound(
         !_userByUsername,
         `User with username "${canBeUsernameOrId}" not found.`,
@@ -68,13 +60,13 @@ export class Controller {
       );
       const userByUsername = _userByUsername!;
       this.ctx.assert.operationNotAllowed(userByUsername.id === currentUserId, `You cannot unfollow yourself.`);
-      const follow = await this.ctx.followRepository.getFollow(currentUserId, userByUsername.id);
+      const follow = await this.ctx.repositories.follow.getFollow(currentUserId, userByUsername.id);
       if (!follow) {
         return res.status(StatusCodes.NO_CONTENT).send() as Response<void>;
       }
-      await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
-        await this.ctx.followRepository.delete(follow.id);
-        await this.ctx.aggregator.userAggregator.aggregate(
+      await this.ctx.repositories.transactionManager.withDataLayerTransaction(async (tx) => {
+        await this.ctx.repositories.follow.delete(follow.id);
+        await this.ctx.repositories.aggregator.userAggregator.aggregate(
           currentUserId,
           (stats) => ({
             ...stats,
@@ -82,7 +74,7 @@ export class Controller {
           }),
           tx
         );
-        await this.ctx.aggregator.userAggregator.aggregate(
+        await this.ctx.repositories.aggregator.userAggregator.aggregate(
           userByUsername.id,
           (stats) => ({
             ...stats,

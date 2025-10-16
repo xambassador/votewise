@@ -8,11 +8,7 @@ import { z } from "zod";
 
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  assert: AppContext["assert"];
-  groupRepository: AppContext["repositories"]["group"];
-  strategies: Record<"public" | "private", Strategy>;
-};
+type ControllerOptions = AppContext & { strategies: Record<"public" | "private", Strategy> };
 
 const ZQuery = z.object({ groupId: z.string({ invalid_type_error: "groupId must be a string" }) });
 
@@ -32,7 +28,7 @@ export class Controller {
     const locals = getAuthenticateLocals(res);
     const currentUserId = locals.payload.sub;
 
-    const _group = await this.ctx.groupRepository.findById(data.groupId);
+    const _group = await this.ctx.repositories.group.findById(data.groupId);
     this.ctx.assert.resourceNotFound(!_group, `Group with id ${data.groupId} not found`);
     const group = _group!;
 
@@ -40,7 +36,7 @@ export class Controller {
     const isPrivateGroup = group.type === "PRIVATE";
     this.ctx.assert.unprocessableEntity(!isJoinable, "This group is not open for joining");
 
-    const isAlreadyMember = await this.ctx.groupRepository.groupMember.isMember(data.groupId, currentUserId);
+    const isAlreadyMember = await this.ctx.repositories.group.groupMember.isMember(data.groupId, currentUserId);
     this.ctx.assert.unprocessableEntity(isAlreadyMember, "You are already a member of this group");
 
     if (isPrivateGroup) {

@@ -14,22 +14,15 @@ const ZQuery = z.object({
   notification_id: z.string({ invalid_type_error: "notification_id must be a string" }).optional()
 });
 
-type ControllerOptions = {
-  assert: AppContext["assert"];
-  groupRepository: AppContext["repositories"]["group"];
-  notificationRepository: AppContext["repositories"]["notification"];
-  transactionManager: AppContext["repositories"]["transactionManager"];
-};
-
 const invitationNotFoundMessage = "Invitation not found. It may have been revoked or expired.";
 const acceptedInvitationMessage = "This invitation has already been accepted.";
 const invitationRejectedMessage = "This invitation has already been rejected.";
 const permissionErrorMessage = "You do not have permission to reject this invitation.";
 
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(ctx: ControllerOptions) {
+  constructor(ctx: AppContext) {
     this.ctx = ctx;
   }
 
@@ -51,19 +44,19 @@ export class Controller {
     const locals = getAuthenticateLocals(res);
     const currentUserId = locals.payload.sub;
 
-    const invitation = await this.ctx.groupRepository.groupInvitation.findById(invitationId);
+    const invitation = await this.ctx.repositories.group.groupInvitation.findById(invitationId);
     this.ctx.assert.resourceNotFound(!invitation, invitationNotFoundMessage);
     this.ctx.assert.unprocessableEntity(invitation!.status === "ACCEPTED", acceptedInvitationMessage);
     this.ctx.assert.unprocessableEntity(invitation!.status === "REJECTED", invitationRejectedMessage);
     this.ctx.assert.forbidden(invitation!.user_id !== currentUserId, permissionErrorMessage);
 
-    await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
+    await this.ctx.repositories.transactionManager.withDataLayerTransaction(async (tx) => {
       let deletePromise: Promise<void> = Promise.resolve();
       if (notificationId) {
-        deletePromise = this.ctx.notificationRepository.deleteById(notificationId, tx);
+        deletePromise = this.ctx.repositories.notification.deleteById(notificationId, tx);
       }
       await Promise.all([
-        this.ctx.groupRepository.groupInvitation.update(invitation!.id, { status: "REJECTED" }, tx),
+        this.ctx.repositories.group.groupInvitation.update(invitation!.id, { status: "REJECTED" }, tx),
         deletePromise
       ]);
     });

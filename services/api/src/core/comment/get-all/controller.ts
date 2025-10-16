@@ -9,20 +9,13 @@ import { ZPagination } from "@votewise/schemas";
 
 import { PaginationBuilder } from "@/lib/pagination";
 
-type ControllerOptions = {
-  feedRepository: AppContext["repositories"]["feed"];
-  commentRepository: AppContext["repositories"]["comment"];
-  bucketService: AppContext["services"]["bucket"];
-  assert: AppContext["assert"];
-};
-
 const defaultReplyPage = 1;
 const repliesLimit = PAGINATION.comments.reply.limit;
 
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
@@ -34,8 +27,10 @@ export class Controller {
     const query = schema.data!;
     const { page } = query;
     const limit = query.limit < 1 ? PAGINATION.comments.limit : query.limit;
-    const totalComments = await this.ctx.commentRepository.count(feedId);
-    const comments = await this.ctx.commentRepository.findByFeedId(feedId, page, limit);
+    const [totalComments, comments] = await Promise.all([
+      this.ctx.repositories.comment.count(feedId),
+      this.ctx.repositories.comment.findByFeedId(feedId, page, limit)
+    ]);
     const commentsWithMetadata = comments.map((c) => {
       const isEdited = c.created_at.getTime() !== c.updated_at.getTime();
       const comment = {
@@ -47,9 +42,9 @@ export class Controller {
         replies: c.replies,
         is_edited: isEdited
       };
-      comment.user.avatar_url = this.ctx.bucketService.generatePublicUrl(comment.user.avatar_url ?? "", "avatar");
+      comment.user.avatar_url = this.ctx.services.bucket.generatePublicUrl(comment.user.avatar_url ?? "", "avatar");
       comment.replies.forEach((reply) => {
-        reply.user.avatar_url = this.ctx.bucketService.generatePublicUrl(reply.user.avatar_url ?? "", "avatar");
+        reply.user.avatar_url = this.ctx.services.bucket.generatePublicUrl(reply.user.avatar_url ?? "", "avatar");
       });
       const totalReplies = c._count.replies;
       const pagination = new PaginationBuilder({

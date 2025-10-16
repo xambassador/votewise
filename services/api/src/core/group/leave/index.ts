@@ -7,13 +7,8 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { Controller } from "./controller";
 
 export function leaveGroupControllerFactory() {
-  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "logger"]);
-  const controller = new Controller({
-    assert: ctx.assert,
-    groupRepository: ctx.repositories.group,
-    aggregator: ctx.repositories.aggregator,
-    transactionManager: ctx.repositories.transactionManager
-  });
+  const ctx = AppContext.instance;
+  const controller = new Controller(ctx);
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "leave-group" });
   ctx.logger.info(`[${yellow("LeaveGroupController")}] dependencies initialized`);

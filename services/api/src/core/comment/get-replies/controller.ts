@@ -10,22 +10,15 @@ import { ZPagination } from "@votewise/schemas";
 
 import { PaginationBuilder } from "@/lib/pagination";
 
-type ControllerOptions = {
-  feedRepository: AppContext["repositories"]["feed"];
-  commentRepository: AppContext["repositories"]["comment"];
-  bucketService: AppContext["services"]["bucket"];
-  assert: AppContext["assert"];
-};
-
 const ZQuery = z.object({
   feedId: z.string(),
   commentId: z.string()
 });
 
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
@@ -38,10 +31,12 @@ export class Controller {
     const query = schema.data!;
     const { page } = query;
     const limit = query.limit < 1 ? PAGINATION.comments.reply.limit : query.limit;
-    const totalReplies = await this.ctx.commentRepository.reply.count(feedId, commentId);
-    const repliesResult = await this.ctx.commentRepository.reply.findByParentId(feedId, commentId, page, limit);
+    const [totalReplies, repliesResult] = await Promise.all([
+      this.ctx.repositories.comment.reply.count(feedId, commentId),
+      this.ctx.repositories.comment.reply.findByParentId(feedId, commentId, page, limit)
+    ]);
     const replies = repliesResult.map((reply) => {
-      reply.user.avatar_url = this.ctx.bucketService.generatePublicUrl(reply.user.avatar_url ?? "", "avatar");
+      reply.user.avatar_url = this.ctx.services.bucket.generatePublicUrl(reply.user.avatar_url ?? "", "avatar");
       return reply;
     });
     const pagination = new PaginationBuilder({ limit, page, total: totalReplies }).build();

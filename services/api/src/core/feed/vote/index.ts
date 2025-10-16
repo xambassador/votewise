@@ -9,15 +9,8 @@ import { rateLimitStrategies } from "@/lib/rate-limiter";
 import { Controller } from "./controller";
 
 export function voteControllerFactory(path: string) {
-  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "logger", "services"]);
-  const controller = new Controller({
-    assert: ctx.assert,
-    feedRepository: ctx.repositories.feed,
-    bucketService: ctx.services.bucket,
-    transactionManager: ctx.repositories.transactionManager,
-    userRepository: ctx.repositories.user,
-    aggregator: ctx.repositories.aggregator
-  });
+  const ctx = AppContext.instance;
+  const controller = new Controller(ctx);
   const auth = authMiddlewareFactory();
   const limiter = rateLimitMiddlewareFactory(path, {
     ...rateLimitStrategies.FIFTEEN_PER_MINUTE,

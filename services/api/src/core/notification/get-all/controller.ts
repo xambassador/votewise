@@ -9,14 +9,6 @@ import { StatusCodes } from "http-status-codes";
 import { notificationBuilder, ZNotification } from "@/lib/notification-builder";
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  assert: AppContext["assert"];
-  notificationRepository: AppContext["repositories"]["notification"];
-  userRepository: AppContext["repositories"]["user"];
-  groupRepository: AppContext["repositories"]["group"];
-  bucketService: AppContext["services"]["bucket"];
-};
-
 // The same type is declared in notification-builder.ts
 // but we cannot import it here or create a new type from notificationBuilder
 // because if we do then in @votewise/client/notification, the getAll method
@@ -30,16 +22,16 @@ type Notification = {
 };
 
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(ctx: ControllerOptions) {
+  constructor(ctx: AppContext) {
     this.ctx = ctx;
   }
 
   public async handle(_: Request, res: Response) {
     const locals = getAuthenticateLocals(res);
     const currentUserId = locals.payload.sub;
-    const unknownNotifications = await this.ctx.notificationRepository.findByUserId(currentUserId);
+    const unknownNotifications = await this.ctx.repositories.notification.findByUserId(currentUserId);
     const notificationsResult = unknownNotifications
       .map((notification) => {
         const content = ZNotification.safeParse(notification.content);
@@ -57,9 +49,9 @@ export class Controller {
     const notifications: Notification[] = [];
 
     const builder = notificationBuilder({
-      bucketService: this.ctx.bucketService,
-      groupRepository: this.ctx.groupRepository,
-      userRepository: this.ctx.userRepository
+      bucketService: this.ctx.services.bucket,
+      groupRepository: this.ctx.repositories.group,
+      userRepository: this.ctx.repositories.user
     });
 
     for (const unHydratedNotification of notificationsResult) {

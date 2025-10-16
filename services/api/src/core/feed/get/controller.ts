@@ -8,16 +8,10 @@ import { ERROR_CODES } from "@votewise/constant";
 
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  feedRepository: AppContext["repositories"]["feed"];
-  assert: AppContext["assert"];
-  bucketService: AppContext["services"]["bucket"];
-};
-
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
@@ -28,11 +22,11 @@ export class Controller {
     const locals = getAuthenticateLocals(res);
     const currentUserId = locals.payload.sub;
 
-    const _feed = await this.ctx.feedRepository.findById(id);
+    const _feed = await this.ctx.repositories.feed.findById(id);
     this.ctx.assert.resourceNotFound(!_feed, `Feed with id ${id} not found`, ERROR_CODES.FEED.FEED_NOT_FOUND);
     const feed = _feed!;
 
-    const isVotedByMe = await this.ctx.feedRepository.isVoted(currentUserId, feed.id);
+    const isVotedByMe = await this.ctx.repositories.feed.isVoted(currentUserId, feed.id);
 
     const result = {
       id: feed.id,
@@ -55,7 +49,7 @@ export class Controller {
       }))
     };
     const authorAvatarPromise = new Promise<typeof result>((resolve) => {
-      this.ctx.bucketService
+      this.ctx.services.bucket
         .getUrlForType(result.author.avatar_url ?? "", "avatar")
         .then((url) => {
           result.author.avatar_url = url;
@@ -71,7 +65,7 @@ export class Controller {
       .map(
         (upvote) =>
           new Promise<typeof result>((resolve) => {
-            this.ctx.bucketService
+            this.ctx.services.bucket
               .getUrlForType(upvote.avatar_url || "", "avatar")
               .then((url) => {
                 upvote.avatar_url = url;

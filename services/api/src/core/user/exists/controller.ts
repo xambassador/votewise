@@ -8,17 +8,12 @@ import { ERROR_CODES } from "@votewise/constant";
 
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  userRepository: AppContext["repositories"]["user"];
-  assert: AppContext["assert"];
-};
-
 const { USERNAME_ALREADY_EXISTS } = ERROR_CODES.USER;
 
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
@@ -27,7 +22,7 @@ export class Controller {
     const _username = req.params.username;
     this.ctx.assert.badRequest(!_username, "Username is required");
     const username = _username!;
-    const user = await this.ctx.userRepository.findByUsername(username);
+    const user = await this.ctx.repositories.user.findByUsername(username);
     if (user && user.id === locals.payload.sub) {
       const result = { is_available: true };
       return res.status(StatusCodes.OK).json(result) as Response<typeof result>;

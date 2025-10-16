@@ -7,16 +7,10 @@ import { z } from "zod";
 
 const ZQuery = z.object({ groupId: z.string() });
 
-type ControllerOptions = {
-  assert: AppContext["assert"];
-  groupRepository: AppContext["repositories"]["group"];
-  bucketService: AppContext["services"]["bucket"];
-};
-
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
@@ -25,14 +19,14 @@ export class Controller {
     this.ctx.assert.unprocessableEntity(!validate.success, "Invalid request");
     const query = validate.data!;
 
-    const membersResult = await this.ctx.groupRepository.groupMember.getMembers(query.groupId);
+    const membersResult = await this.ctx.repositories.group.groupMember.getMembers(query.groupId);
     const members = membersResult.map((member) => ({
       id: member.id,
       role: member.role,
       joined_at: member.joined_at,
       user: {
         id: member.user.id,
-        avatar_url: this.ctx.bucketService.generatePublicUrl(member.user.avatar_url ?? "", "avatar"),
+        avatar_url: this.ctx.services.bucket.generatePublicUrl(member.user.avatar_url ?? "", "avatar"),
         first_name: member.user.first_name,
         last_name: member.user.last_name,
         user_name: member.user.user_name

@@ -7,18 +7,12 @@ import { z } from "zod";
 
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  assert: AppContext["assert"];
-  groupRepository: AppContext["repositories"]["group"];
-  notificationRepository: AppContext["repositories"]["notification"];
-};
-
 const ZParams = z.object({ id: z.string({ invalid_type_error: "id must be a string" }) });
 
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(ctx: ControllerOptions) {
+  constructor(ctx: AppContext) {
     this.ctx = ctx;
   }
 
@@ -30,18 +24,18 @@ export class Controller {
     const locals = getAuthenticateLocals(res);
     const currentUserId = locals.payload.sub;
 
-    const joinRequest = await this.ctx.groupRepository.groupInvitation.findPendingJoinRequest(joinRequestId);
+    const joinRequest = await this.ctx.repositories.group.groupInvitation.findPendingJoinRequest(joinRequestId);
     this.ctx.assert.resourceNotFound(!joinRequest, "Join request not found");
 
     const groupId = joinRequest!.group_id;
 
-    const role = await this.ctx.groupRepository.groupMember.whatIsMyRole(groupId, currentUserId);
+    const role = await this.ctx.repositories.group.groupMember.whatIsMyRole(groupId, currentUserId);
     this.ctx.assert.forbidden(
       !role || (role.role !== "ADMIN" && role.role !== "MODERATOR"),
       "You have no permission to do this"
     );
 
-    await this.ctx.groupRepository.groupInvitation.update(joinRequestId, { status: "REJECTED" });
+    await this.ctx.repositories.group.groupInvitation.update(joinRequestId, { status: "REJECTED" });
 
     const result = { id: joinRequestId };
     return res.status(StatusCodes.CREATED).json(result) as Response<typeof result>;

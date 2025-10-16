@@ -8,31 +8,23 @@ import { ZGroupCreate } from "@votewise/schemas/group";
 
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  assert: AppContext["assert"];
-  groupRepository: AppContext["repositories"]["group"];
-  requestParser: AppContext["plugins"]["requestParser"];
-  transactionManager: AppContext["repositories"]["transactionManager"];
-  aggregator: AppContext["repositories"]["aggregator"];
-};
-
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
   public async handle(req: Request, res: Response) {
-    const { body } = this.ctx.requestParser.getParser(ZGroupCreate).parseRequest(req, res);
+    const { body } = this.ctx.plugins.requestParser.getParser(ZGroupCreate).parseRequest(req, res);
     const locals = getAuthenticateLocals(res);
     const { sub } = locals.payload;
 
-    const isNameTaken = await this.ctx.groupRepository.getByName(body.name);
+    const isNameTaken = await this.ctx.repositories.group.getByName(body.name);
     this.ctx.assert.unprocessableEntity(!!isNameTaken, "Group name is already taken");
 
-    const { group, member } = await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
-      const group = await this.ctx.groupRepository.create(
+    const { group, member } = await this.ctx.repositories.transactionManager.withDataLayerTransaction(async (tx) => {
+      const group = await this.ctx.repositories.group.create(
         {
           name: body.name,
           about: body.description,
@@ -43,8 +35,8 @@ export class Controller {
         },
         tx
       );
-      const memberPromise = this.ctx.groupRepository.groupMember.addMember(group.id, sub, "ADMIN", tx);
-      const userAggregatePromise = this.ctx.aggregator.userAggregator.aggregate(
+      const memberPromise = this.ctx.repositories.group.groupMember.addMember(group.id, sub, "ADMIN", tx);
+      const userAggregatePromise = this.ctx.repositories.aggregator.userAggregator.aggregate(
         sub,
         (stats) => ({
           ...stats,
@@ -52,7 +44,7 @@ export class Controller {
         }),
         tx
       );
-      const groupAggregatePromise = this.ctx.aggregator.groupAggregator.aggregate(
+      const groupAggregatePromise = this.ctx.repositories.aggregator.groupAggregator.aggregate(
         group.id,
         (data) => ({
           ...data,

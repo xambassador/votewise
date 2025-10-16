@@ -2,10 +2,20 @@
 
 import { z } from "zod";
 
+function parseBooleanValue(val: string | undefined): boolean | Promise<boolean> {
+  return val === "true" || val === "1" || val === "yes" || val === "y" || val === "Y";
+}
+
 const DEFAULT_REDIS_PORT = 6379;
 const DEFAULT_VOTEWISE_API_PORT = 5000;
 const DEFAULT_VOTEWISE_APP_PORT = 3000;
 const DEFAULT_VOTEWISE_BUCKET_PORT = 5001;
+const DEFAULT_BLOB_UPLOAD_LIMIT = 10 * 1024 * 1024; // 10 MB
+const DEFAULT_APP_NAME = "Votewise";
+const DEFAULT_AVATAR_BUCKET_NAME = "avatars";
+const DEFAULT_BACKGROUND_BUCKET_NAME = "backgrounds";
+const DEFAULT_UPLOAD_BUCKET_NAME = "uploads";
+const DEFAULT_USE_SSL = false;
 
 const ACCESS_TOKEN_SECRET = z
   .string({ required_error: "ACCESS_TOKEN is required" })
@@ -89,11 +99,24 @@ const APP_COOKIE_SECRET = z
 const API_COOKIE_SECRET = z
   .string({ required_error: "API_COOKIE_SECRET is required" })
   .min(1, { message: "API_COOKIE_SECRET is required" });
-const ENABLE_CHAOS_MONKEY = z
+const ENABLE_CHAOS_MONKEY = z.string().default("false").optional().transform(parseBooleanValue);
+const BLOB_UPLOAD_LIMIT = z
   .string()
-  .default("false")
-  .optional()
-  .transform((val) => val === "true" || val === "1" || val === "yes" || val === "y" || val === "Y");
+  .default(DEFAULT_BLOB_UPLOAD_LIMIT.toString())
+  .transform((val) => parseInt(val, 10));
+const APP_NAME = z.string().default(DEFAULT_APP_NAME);
+const AVATAR_BUCKET_NAME = z.string().default(DEFAULT_AVATAR_BUCKET_NAME);
+const BACKGROUND_BUCKET_NAME = z.string().default(DEFAULT_BACKGROUND_BUCKET_NAME);
+const UPLOAD_BUCKET_NAME = z.string().default(DEFAULT_UPLOAD_BUCKET_NAME);
+const USE_SSL = z.string().default(DEFAULT_USE_SSL.toString()).transform(parseBooleanValue);
+const VOTEWISE_ML_API_URL = z
+  .string({
+    required_error: "VOTEWISE_ML_API_URL is required"
+  })
+  .min(1, { message: "VOTEWISE_ML_API_URL is required" })
+  .url({
+    message: "VOTEWISE_ML_API_URL should be a valid URL"
+  });
 
 export const envBaseSchema = z.object({
   ACCESS_TOKEN_SECRET,
@@ -128,7 +151,14 @@ export const envBaseSchema = z.object({
   APP_COOKIE_SECRET,
   API_COOKIE_SECRET,
   VOTEWISE_BUCKET_NAME,
-  ENABLE_CHAOS_MONKEY
+  ENABLE_CHAOS_MONKEY,
+  BLOB_UPLOAD_LIMIT,
+  APP_NAME,
+  AVATAR_BUCKET_NAME,
+  BACKGROUND_BUCKET_NAME,
+  UPLOAD_BUCKET_NAME,
+  USE_SSL,
+  VOTEWISE_ML_API_URL
 });
 
 export const envSchema = z.object({
@@ -155,9 +185,7 @@ export const envSchema = z.object({
   SMTP_USERNAME,
   SMTP_PASSWORD,
   SMTP_FROM,
-  SMTP_SECURE_ENABLED: SMTP_SECURE_ENABLED.transform(
-    (val) => val === "true" || val === "1" || val === "yes" || val === "y" || val === "Y"
-  ),
+  SMTP_SECURE_ENABLED: SMTP_SECURE_ENABLED.transform(parseBooleanValue),
   REQUEST_TIMEOUT: REQUEST_TIMEOUT.transform((val) => parseInt(val, 10)),
   CONCURRENCY: CONCURRENCY.transform((val) => parseInt(val, 10)),
   SSL_KEY,
@@ -169,7 +197,14 @@ export const envSchema = z.object({
   APP_COOKIE_SECRET,
   API_COOKIE_SECRET,
   VOTEWISE_BUCKET_NAME,
-  ENABLE_CHAOS_MONKEY
+  ENABLE_CHAOS_MONKEY,
+  BLOB_UPLOAD_LIMIT,
+  APP_NAME,
+  AVATAR_BUCKET_NAME,
+  BACKGROUND_BUCKET_NAME,
+  UPLOAD_BUCKET_NAME,
+  USE_SSL,
+  VOTEWISE_ML_API_URL
 });
 
 envSchema.superRefine((data) => {

@@ -7,14 +7,8 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { Controller } from "./controller";
 
 export function deleteCommentControllerFactory() {
-  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "services", "logger"]);
-  const controller = new Controller({
-    assert: ctx.assert,
-    commentRepository: ctx.repositories.comment,
-    feedRepository: ctx.repositories.feed,
-    transactionManger: ctx.repositories.transactionManager,
-    aggregator: ctx.repositories.aggregator
-  });
+  const ctx = AppContext.instance;
+  const controller = new Controller(ctx);
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "get-comments" });
   ctx.logger.info(`[${yellow("DeleteCommentController")}] dependencies initialized`);

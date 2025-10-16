@@ -8,17 +8,10 @@ import { ZRecommendUserQuery } from "@votewise/schemas/user";
 
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  userRepository: AppContext["repositories"]["user"];
-  mlService: AppContext["services"]["ml"];
-  assert: AppContext["assert"];
-  bucketService: AppContext["services"]["bucket"];
-};
-
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
@@ -31,7 +24,7 @@ export class Controller {
     );
     const q = validate.data!;
     const topN = q.top_n || 10;
-    const recommendationResult = await this.ctx.mlService.getUserRecommendations({
+    const recommendationResult = await this.ctx.services.ml.getUserRecommendations({
       user_id: locals.payload.sub,
       top_n: topN
     });
@@ -45,7 +38,7 @@ export class Controller {
       return res.status(StatusCodes.OK).json({ users: [] });
     }
 
-    const usersResults = await this.ctx.userRepository.findManyByIds(recommendations);
+    const usersResults = await this.ctx.repositories.user.findManyByIds(recommendations);
     const usersPromises = usersResults.map((u) => {
       const user = {
         id: u.id,
@@ -56,7 +49,7 @@ export class Controller {
         user_name: u.user_name
       };
       return new Promise<typeof user>((resolve) => {
-        this.ctx.bucketService
+        this.ctx.services.bucket
           .getUrlForType(u.avatar_url || "", "avatar")
           .then((url) => {
             user.avatar_url = url;

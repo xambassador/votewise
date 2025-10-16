@@ -7,21 +7,13 @@ import { z } from "zod";
 
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  assert: AppContext["assert"];
-  groupRepository: AppContext["repositories"]["group"];
-  notificationRepository: AppContext["repositories"]["notification"];
-  transactionManager: AppContext["repositories"]["transactionManager"];
-  aggregator: AppContext["repositories"]["aggregator"];
-};
-
 const ZParams = z.object({ id: z.string({ invalid_type_error: "id must be a string" }) });
 const permissionErrorMessage = "You have no permission to do this";
 
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(ctx: ControllerOptions) {
+  constructor(ctx: AppContext) {
     this.ctx = ctx;
   }
 
@@ -33,27 +25,27 @@ export class Controller {
     const locals = getAuthenticateLocals(res);
     const currentUserId = locals.payload.sub;
 
-    const joinRequest = await this.ctx.groupRepository.groupInvitation.findPendingJoinRequest(joinRequestId);
+    const joinRequest = await this.ctx.repositories.group.groupInvitation.findPendingJoinRequest(joinRequestId);
     this.ctx.assert.resourceNotFound(!joinRequest, "Join request not found");
 
     const groupId = joinRequest!.group_id;
     const userId = joinRequest!.user_id;
 
-    const role = await this.ctx.groupRepository.groupMember.whatIsMyRole(groupId, currentUserId);
+    const role = await this.ctx.repositories.group.groupMember.whatIsMyRole(groupId, currentUserId);
     this.ctx.assert.forbidden(!role || (role.role !== "ADMIN" && role.role !== "MODERATOR"), permissionErrorMessage);
 
-    const isAlreadyMember = await this.ctx.groupRepository.groupMember.isMember(groupId, userId);
+    const isAlreadyMember = await this.ctx.repositories.group.groupMember.isMember(groupId, userId);
     if (isAlreadyMember) {
-      await this.ctx.groupRepository.groupInvitation.update(joinRequestId, { status: "ACCEPTED" });
+      await this.ctx.repositories.group.groupInvitation.update(joinRequestId, { status: "ACCEPTED" });
       const result = { id: joinRequestId };
       return res.status(StatusCodes.CREATED).json(result) as Response<typeof result>;
     }
 
-    await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
+    await this.ctx.repositories.transactionManager.withDataLayerTransaction(async (tx) => {
       await Promise.all([
-        this.ctx.groupRepository.groupInvitation.update(joinRequestId, { status: "ACCEPTED" }, tx),
-        this.ctx.groupRepository.groupMember.addMember(groupId, userId, "MEMBER", tx),
-        this.ctx.aggregator.groupAggregator.aggregate(
+        this.ctx.repositories.group.groupInvitation.update(joinRequestId, { status: "ACCEPTED" }, tx),
+        this.ctx.repositories.group.groupMember.addMember(groupId, userId, "MEMBER", tx),
+        this.ctx.repositories.aggregator.groupAggregator.aggregate(
           groupId,
           (data) => ({
             ...data,
@@ -62,7 +54,7 @@ export class Controller {
           tx
         ),
         joinRequest?.notification_id
-          ? this.ctx.notificationRepository.deleteById(joinRequest.notification_id)
+          ? this.ctx.repositories.notification.deleteById(joinRequest.notification_id)
           : Promise.resolve()
       ]);
     });

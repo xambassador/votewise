@@ -7,13 +7,8 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { Controller } from "./controller";
 
 export function getRepliesControllerFactory() {
-  const ctx = AppContext.getInjectionTokens(["assert", "services", "repositories", "logger"]);
-  const controller = new Controller({
-    assert: ctx.assert,
-    bucketService: ctx.services.bucket,
-    commentRepository: ctx.repositories.comment,
-    feedRepository: ctx.repositories.feed
-  });
+  const ctx = AppContext.instance;
+  const controller = new Controller(ctx);
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "get-replies" });
   ctx.logger.info(`[${yellow("GetRepliesController")}] dependencies initialized`);

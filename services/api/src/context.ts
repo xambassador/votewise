@@ -11,7 +11,7 @@ import { Mailer } from "@/emails/mailer";
 import { EventBus } from "@/lib/event-bus";
 import { RateLimiterManager } from "@/lib/rate-limiter";
 import * as Plugins from "@/plugins";
-import * as Queues from "@/queues";
+import { createQueues } from "@/queues";
 import { createRepositories } from "@/repository";
 import * as Services from "@/services";
 import { Cache } from "@/storage/redis";
@@ -115,11 +115,9 @@ export class AppContext {
     const assert = new Assertions();
     const cache = new Cache();
     const db = prisma;
-    const repositories = createRepositories(dataLayer);
     const mailer = new Mailer({ env: environment });
-    const tasksQueue = new Queues.TasksQueue({ env: environment });
-    const uploadQueue = new Queues.UploadQueue({ env: environment });
-    const uploadCompletedEventQueue = new Queues.UploadCompletedEventQueue({ env: environment });
+    const repositories = createRepositories(dataLayer);
+    const { tasksQueue, uploadCompletedEventQueue, uploadQueue } = createQueues({ env: environment });
     const jwtService = new Services.JWTService({ accessTokenSecret: secrets.jwtSecret });
     const cryptoService = new Services.CryptoService();
     const requestParser = Plugins.requestParserPluginFactory();
@@ -128,7 +126,7 @@ export class AppContext {
     const minio = new Minio.Client({
       endPoint: environment.MINIO_ENDPOINT,
       port: environment.MINIO_PORT,
-      useSSL: false, // TODO: Get this from env
+      useSSL: environment.USE_SSL,
       accessKey: environment.MINIO_ACCESS_KEY,
       secretKey: environment.MINIO_SECRET_KEY
     });
@@ -155,7 +153,7 @@ export class AppContext {
       assert,
       bucketService
     });
-    const mlService = new Services.MLService("http://localhost:5003"); // TODO: Move to env
+    const mlService = new Services.MLService(environment.VOTEWISE_ML_API_URL);
     const realtime = new Services.Realtime({ cryptoService, env: environment, jwtService, logger });
     const ctx = new AppContext({
       config: cfg,

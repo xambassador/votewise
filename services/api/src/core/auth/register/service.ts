@@ -32,7 +32,7 @@ export class UserRegisterService {
 
   async startVerificationProcess(payload: User) {
     const key = `email:${payload.email}:verification`;
-    const previousWindow = await this.getPreviouseWindow(key);
+    const previousWindow = await this.getPreviousWindow(key);
     if (!previousWindow) {
       const otp = this.ctx.cryptoService.getOtp(payload.secret);
       const verificationCode = this.ctx.cryptoService.generateUUID().replace(/-/g, "");
@@ -58,7 +58,7 @@ export class UserRegisterService {
     return { verificationCode: previousWindow.data.verificationCode, expiresIn: previousWindow.ttl };
   }
 
-  private async getPreviouseWindow(key: string) {
+  private async getPreviousWindow(key: string) {
     const data = await this.ctx.cache.get(key);
     if (!data) return null;
     const remaining = await this.ctx.cache.getRemainingTime(key);

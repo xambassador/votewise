@@ -8,19 +8,10 @@ import { ERROR_CODES } from "@votewise/constant";
 
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  feedRepository: AppContext["repositories"]["feed"];
-  userRepository: AppContext["repositories"]["user"];
-  assert: AppContext["assert"];
-  bucketService: AppContext["services"]["bucket"];
-  transactionManager: AppContext["repositories"]["transactionManager"];
-  aggregator: AppContext["repositories"]["aggregator"];
-};
-
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
@@ -31,35 +22,37 @@ export class Controller {
     const locals = getAuthenticateLocals(res);
     const currentUserId = locals.payload.sub;
 
-    const _feed = await this.ctx.feedRepository.findById(id);
+    const _feed = await this.ctx.repositories.feed.findById(id);
     this.ctx.assert.resourceNotFound(!_feed, `Feed with id ${id} not found`, ERROR_CODES.FEED.FEED_NOT_FOUND);
     const feed = _feed!;
 
-    const isVotedByMe = await this.ctx.feedRepository.isVoted(currentUserId, feed.id);
+    const isVotedByMe = await this.ctx.repositories.feed.isVoted(currentUserId, feed.id);
     this.ctx.assert.unprocessableEntity(!!isVotedByMe, "You have already voted on this feed");
 
-    const remainingVotes = await this.ctx.userRepository.getRemainingVotes(currentUserId);
+    const remainingVotes = await this.ctx.repositories.user.getRemainingVotes(currentUserId);
     this.ctx.assert.unprocessableEntity(remainingVotes <= 0, "You have no votes left for today");
 
-    await this.ctx.transactionManager.withDataLayerTransaction(async (tx) => {
-      await this.ctx.feedRepository.vote(currentUserId, feed.id, tx);
-      await this.ctx.userRepository.update(currentUserId, { vote_bucket: remainingVotes - 1 }, tx);
-      await this.ctx.aggregator.postAggregator.aggregate(
-        id,
-        (currentStats) => ({
-          ...currentStats,
-          votes: (currentStats?.votes ?? 0) + 1
-        }),
-        tx
-      );
-      await this.ctx.aggregator.userAggregator.aggregate(
-        currentUserId,
-        (currentStats) => ({
-          ...currentStats,
-          total_votes: (currentStats?.total_votes ?? 0) + 1
-        }),
-        tx
-      );
+    await this.ctx.repositories.transactionManager.withDataLayerTransaction(async (tx) => {
+      await Promise.all([
+        this.ctx.repositories.feed.vote(currentUserId, feed.id, tx),
+        this.ctx.repositories.user.update(currentUserId, { vote_bucket: remainingVotes - 1 }, tx),
+        this.ctx.repositories.aggregator.postAggregator.aggregate(
+          id,
+          (currentStats) => ({
+            ...currentStats,
+            votes: (currentStats?.votes ?? 0) + 1
+          }),
+          tx
+        ),
+        this.ctx.repositories.aggregator.userAggregator.aggregate(
+          currentUserId,
+          (currentStats) => ({
+            ...currentStats,
+            total_votes: (currentStats?.total_votes ?? 0) + 1
+          }),
+          tx
+        )
+      ]);
     });
 
     const result = { message: "Ok" };

@@ -9,13 +9,8 @@ import { rateLimitStrategies } from "@/lib/rate-limiter";
 import { Controller } from "./controller";
 
 export function getGroupRecommendationsControllerFactory(path: string) {
-  const ctx = AppContext.getInjectionTokens(["assert", "services", "repositories", "logger"]);
-  const controller = new Controller({
-    mlService: ctx.services.ml,
-    assert: ctx.assert,
-    bucketService: ctx.services.bucket,
-    groupRepository: ctx.repositories.group
-  });
+  const ctx = AppContext.instance;
+  const controller = new Controller(ctx);
   const auth = authMiddlewareFactory();
   const limiter = rateLimitMiddlewareFactory(path, {
     ...rateLimitStrategies.FIFTEEN_PER_MINUTE,

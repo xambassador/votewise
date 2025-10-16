@@ -1,4 +1,4 @@
-import type { TasksQueue } from "..";
+import type { TasksQueue } from "../task";
 
 export const mockTaskQueue = {
   init: jest.fn(),

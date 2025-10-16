@@ -7,13 +7,8 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { Controller } from "./controller";
 
 export function rejectGroupInviteControllerFactory() {
-  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "logger", "plugins"]);
-  const controller = new Controller({
-    assert: ctx.assert,
-    groupRepository: ctx.repositories.group,
-    notificationRepository: ctx.repositories.notification,
-    transactionManager: ctx.repositories.transactionManager
-  });
+  const ctx = AppContext.instance;
+  const controller = new Controller(ctx);
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "reject-group-invite" });
   ctx.logger.info(`[${yellow("RejectGroupInviteController")}] dependencies initialized`);

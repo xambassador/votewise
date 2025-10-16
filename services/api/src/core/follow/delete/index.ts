@@ -7,14 +7,8 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { Controller } from "./controller";
 
 export function deleteFollowControllerFactory() {
-  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "logger"]);
-  const controller = new Controller({
-    assert: ctx.assert,
-    followRepository: ctx.repositories.follow,
-    userRepository: ctx.repositories.user,
-    transactionManager: ctx.repositories.transactionManager,
-    aggregator: ctx.repositories.aggregator
-  });
+  const ctx = AppContext.instance;
+  const controller = new Controller(ctx);
   const auth = authMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "delete-follow" });
   ctx.logger.info(`[${yellow("DeleteFollowController")}] dependencies initialized`);

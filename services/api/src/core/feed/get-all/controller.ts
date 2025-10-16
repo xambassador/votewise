@@ -11,17 +11,10 @@ import { unpack } from "@/lib/cursor";
 import { PaginationBuilder } from "@/lib/pagination";
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  timelineRepository: AppContext["repositories"]["timeline"];
-  assert: AppContext["assert"];
-  bucketService: AppContext["services"]["bucket"];
-  aggregator: AppContext["repositories"]["aggregator"];
-};
-
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
@@ -33,8 +26,8 @@ export class Controller {
     const { page } = query;
     const limit = query.limit < 1 ? PAGINATION.feeds.limit : query.limit;
     const cursor = unpack(query.cursor, () => this.ctx.assert.unprocessableEntity(true, "Invalid cursor"));
-    const total = await this.ctx.timelineRepository.countByUserId(locals.payload.sub);
-    const timeline = await this.ctx.timelineRepository.findByUserId(locals.payload.sub, { page, limit, cursor });
+    const total = await this.ctx.repositories.timeline.countByUserId(locals.payload.sub);
+    const timeline = await this.ctx.repositories.timeline.findByUserId(locals.payload.sub, { page, limit, cursor });
     const timelineFeedPromises = timeline.map((timeline) => ({
       id: timeline.post.id,
       title: timeline.post.title,
@@ -47,12 +40,12 @@ export class Controller {
         user_name: timeline.post.author.user_name,
         first_name: timeline.post.author.first_name,
         last_name: timeline.post.author.last_name,
-        avatar_url: this.ctx.bucketService.generatePublicUrl(timeline.post.author.avatar_url ?? "", "avatar")
+        avatar_url: this.ctx.services.bucket.generatePublicUrl(timeline.post.author.avatar_url ?? "", "avatar")
       },
       votes: timeline.post.postAggregates?.votes ?? 0,
       voters: timeline.post.upvotes.map((vote) => ({
         id: vote.user.id,
-        avatar_url: this.ctx.bucketService.generatePublicUrl(vote.user.avatar_url ?? "", "avatar")
+        avatar_url: this.ctx.services.bucket.generatePublicUrl(vote.user.avatar_url ?? "", "avatar")
       })),
       comments: timeline.post.postAggregates?.comments ?? 0
     }));

@@ -10,12 +10,6 @@ import { ZPagination } from "@votewise/schemas";
 
 import { PaginationBuilder } from "@/lib/pagination";
 
-type ControllerOptions = {
-  assert: AppContext["assert"];
-  groupRepository: AppContext["repositories"]["group"];
-  bucketService: AppContext["services"]["bucket"];
-};
-
 const ZQuery = ZPagination.extend({
   status: z
     .enum(["CLOSED", "OPEN", "INACTIVE"], {
@@ -27,9 +21,9 @@ const ZQuery = ZPagination.extend({
 });
 
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
@@ -37,10 +31,10 @@ export class Controller {
     const schema = ZQuery.safeParse(req.query);
     this.ctx.assert.unprocessableEntity(!schema.success, schema.error?.errors[0]?.message || "Invalid query");
     const query = schema.data!;
-    const total = await this.ctx.groupRepository.count({ status: query.status });
+    const total = await this.ctx.repositories.group.count({ status: query.status });
     const { page } = query;
     const limit = query.limit < 1 ? PAGINATION.groups.limit : query.limit;
-    const _groups = await this.ctx.groupRepository.getAll({ page, limit, status: query.status });
+    const _groups = await this.ctx.repositories.group.getAll({ page, limit, status: query.status });
     const groups = _groups.map((group) => ({
       id: group.id,
       name: group.name,
@@ -55,7 +49,7 @@ export class Controller {
         first_name: member.user.first_name,
         user_name: member.user.user_name,
         last_name: member.user.last_name,
-        avatar_url: this.ctx.bucketService.generatePublicUrl(member.user.avatar_url || "", "avatar")
+        avatar_url: this.ctx.services.bucket.generatePublicUrl(member.user.avatar_url || "", "avatar")
       })),
       total_members: group._count.members,
       created_at: group.created_at,

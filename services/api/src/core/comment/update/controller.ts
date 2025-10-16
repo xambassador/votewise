@@ -9,38 +9,31 @@ import { ZCommentUpdate } from "@votewise/schemas/comment";
 
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  assert: AppContext["assert"];
-  commentRepository: AppContext["repositories"]["comment"];
-  feedRepository: AppContext["repositories"]["feed"];
-  requestParser: AppContext["plugins"]["requestParser"];
-};
-
 const ZQuery = z.object({ feedId: z.string(), commentId: z.string() });
 
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
   public async handle(req: Request, res: Response) {
     const locals = getAuthenticateLocals(res);
-    const { body } = this.ctx.requestParser.getParser(ZCommentUpdate).parseRequest(req, res);
+    const { body } = this.ctx.plugins.requestParser.getParser(ZCommentUpdate).parseRequest(req, res);
     const currentUserId = locals.payload.sub;
     const validate = ZQuery.safeParse(req.params);
     this.ctx.assert.unprocessableEntity(!validate.success, "Invalid request");
     const { commentId, feedId } = validate.data!;
 
-    const _comment = await this.ctx.commentRepository.findById(commentId);
+    const _comment = await this.ctx.repositories.comment.findById(commentId);
     this.ctx.assert.resourceNotFound(!_comment, "Comment not found");
     const comment = _comment!;
 
     this.ctx.assert.resourceNotFound(comment.post_id !== feedId, "Comment not found");
     this.ctx.assert.forbidden(comment.user_id !== currentUserId, "You are not allowed to update this comment");
 
-    await this.ctx.commentRepository.update({
+    await this.ctx.repositories.comment.update({
       commentId,
       userId: currentUserId,
       text: body.text

@@ -9,15 +9,8 @@ import { rateLimitStrategies } from "@/lib/rate-limiter";
 import { Controller } from "./controller";
 
 export function createCommentControllerFactory(path: string) {
-  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "plugins", "logger"]);
-  const controller = new Controller({
-    assert: ctx.assert,
-    commentRepository: ctx.repositories.comment,
-    feedRepository: ctx.repositories.feed,
-    requestParser: ctx.plugins.requestParser,
-    transactionManager: ctx.repositories.transactionManager,
-    aggregator: ctx.repositories.aggregator
-  });
+  const ctx = AppContext.instance;
+  const controller = new Controller(ctx);
   const auth = authMiddlewareFactory();
   const limiter = rateLimitMiddlewareFactory(path, {
     ...rateLimitStrategies.FIVE_PER_MINUTE,

@@ -9,18 +9,12 @@ import { ZPagination } from "@votewise/schemas";
 
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  assert: AppContext["assert"];
-  groupRepository: AppContext["repositories"]["group"];
-  bucketService: AppContext["services"]["bucket"];
-};
-
 const ZQuery = ZPagination.extend({ groupId: z.string() });
 
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
@@ -29,19 +23,23 @@ export class Controller {
     const validate = ZQuery.safeParse(req.params);
     this.ctx.assert.unprocessableEntity(!validate.success, "Invalid request");
     const query = validate.data!;
-    const _group = await this.ctx.groupRepository.findById(query.groupId);
+
+    const _group = await this.ctx.repositories.group.findById(query.groupId);
     this.ctx.assert.resourceNotFound(!_group, `Group with id ${query.groupId} not found`);
     const group = _group!;
 
-    const _admin = await this.ctx.groupRepository.groupMember.getAdminDetails(group.id);
+    const _admin = await this.ctx.repositories.group.groupMember.getAdminDetails(group.id);
     this.ctx.assert.unprocessableEntity(!_admin, "This group is no longer available");
     const admin = _admin!;
 
-    const isMember = await this.ctx.groupRepository.groupMember.isMember(group.id, locals.payload.sub);
+    const isMember = await this.ctx.repositories.group.groupMember.isMember(group.id, locals.payload.sub);
     let isInviteSent = false;
 
     if (!isMember && group.type === "PRIVATE") {
-      const invite = await this.ctx.groupRepository.groupInvitation.findByUserWithGroup(locals.payload.sub, group.id);
+      const invite = await this.ctx.repositories.group.groupInvitation.findByUserWithGroup(
+        locals.payload.sub,
+        group.id
+      );
       if (invite) isInviteSent = true;
     }
 
@@ -51,8 +49,8 @@ export class Controller {
       about: group.about,
       type: group.type,
       status: group.status,
-      logo_url: this.ctx.bucketService.generatePublicUrl(group.logo_url ?? "", "avatar"),
-      cover_url: this.ctx.bucketService.generatePublicUrl(group.cover_image_url ?? "", "background"),
+      logo_url: this.ctx.services.bucket.generatePublicUrl(group.logo_url ?? "", "avatar"),
+      cover_url: this.ctx.services.bucket.generatePublicUrl(group.cover_image_url ?? "", "background"),
       created_at: group.created_at,
       updated_at: group.updated_at,
       self_is_member: isMember,
@@ -62,7 +60,7 @@ export class Controller {
         username: admin.user.user_name,
         first_name: admin.user.first_name,
         last_name: admin.user.last_name,
-        avatar: this.ctx.bucketService.generatePublicUrl(admin.user.avatar_url || "", "avatar")
+        avatar: this.ctx.services.bucket.generatePublicUrl(admin.user.avatar_url || "", "avatar")
       },
       aggregate: {
         total_members: group.groupAggregates?.total_members || 0,
@@ -72,7 +70,7 @@ export class Controller {
       },
       members: group.members.map((member) => ({
         id: member.user_id,
-        avatar_url: this.ctx.bucketService.generatePublicUrl(member.user.avatar_url || "", "avatar")
+        avatar_url: this.ctx.services.bucket.generatePublicUrl(member.user.avatar_url || "", "avatar")
       }))
     };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;

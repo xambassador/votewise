@@ -4,19 +4,15 @@ import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
-type ControllerOptions = {
-  topicRepository: AppContext["repositories"]["topic"];
-};
-
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
   async handle(_: Request, res: Response) {
-    const topicsList = await this.ctx.topicRepository.findAll();
+    const topicsList = await this.ctx.repositories.topic.findAll();
     const topics = topicsList.map((topic) => ({ id: topic.id, name: topic.name }));
     const result = { topics };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;

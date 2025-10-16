@@ -8,30 +8,11 @@ import { Controller } from "./controller";
 import { PrivateGroupStrategy, PublicGroupStrategy } from "./strategies";
 
 export function joinGroupControllerFactory() {
-  const ctx = AppContext.getInjectionTokens(["assert", "repositories", "logger", "services", "eventBus"]);
-  const publicGroupStrategy = new PublicGroupStrategy({
-    assert: ctx.assert,
-    groupRepository: ctx.repositories.group,
-    notificationRepository: ctx.repositories.notification,
-    bucketService: ctx.services.bucket,
-    eventBus: ctx.eventBus,
-    userRepository: ctx.repositories.user,
-    aggregator: ctx.repositories.aggregator,
-    transactionManager: ctx.repositories.transactionManager
-  });
-  const privateGroupStrategy = new PrivateGroupStrategy({
-    assert: ctx.assert,
-    groupRepository: ctx.repositories.group,
-    notificationRepository: ctx.repositories.notification,
-    bucketService: ctx.services.bucket,
-    eventBus: ctx.eventBus,
-    userRepository: ctx.repositories.user,
-    aggregator: ctx.repositories.aggregator,
-    transactionManager: ctx.repositories.transactionManager
-  });
+  const ctx = AppContext.instance;
+  const publicGroupStrategy = new PublicGroupStrategy(ctx);
+  const privateGroupStrategy = new PrivateGroupStrategy(ctx);
   const controller = new Controller({
-    assert: ctx.assert,
-    groupRepository: ctx.repositories.group,
+    ...ctx,
     strategies: {
       private: privateGroupStrategy,
       public: publicGroupStrategy

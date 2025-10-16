@@ -7,19 +7,12 @@ import { z } from "zod";
 
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  assert: AppContext["assert"];
-  userRepository: AppContext["repositories"]["user"];
-  bucketService: AppContext["services"]["bucket"];
-  followRepository: AppContext["repositories"]["follow"];
-};
-
 const ZParam = z.object({ username: z.string() });
 
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
@@ -30,17 +23,17 @@ export class Controller {
     this.ctx.assert.unprocessableEntity(!validate.success, "Invalid request");
     const { username } = validate.data!;
 
-    const user = await this.ctx.userRepository.getProfile(username);
+    const user = await this.ctx.repositories.user.getProfile(username);
     this.ctx.assert.resourceNotFound(!user, `User with username "${username}" not found`);
-    const following = await this.ctx.followRepository.isFollowing(currentUserId, user!.id);
+    const following = await this.ctx.repositories.follow.isFollowing(currentUserId, user!.id);
 
     const result = {
       id: user!.id,
       first_name: user!.first_name,
       last_name: user!.last_name,
       user_name: user!.user_name,
-      avatar_url: this.ctx.bucketService.generatePublicUrl(user!.avatar_url ?? "", "avatar"),
-      cover_image_url: this.ctx.bucketService.generatePublicUrl(user!.cover_image_url ?? "", "background"),
+      avatar_url: this.ctx.services.bucket.generatePublicUrl(user!.avatar_url ?? "", "avatar"),
+      cover_image_url: this.ctx.services.bucket.generatePublicUrl(user!.cover_image_url ?? "", "background"),
       about: user!.about,
       gender: user!.gender,
       location: user!.location,

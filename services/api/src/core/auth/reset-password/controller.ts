@@ -19,6 +19,7 @@ type ControllerOptions = {
 };
 
 const { USER_NOT_FOUND, FORGOT_PASSWORD_SESSION_EXPIRED } = ERROR_CODES.AUTH;
+const sessionExpiredMessage = "Your session has expired. Please try again";
 
 export class Controller {
   private readonly ctx: ControllerOptions;
@@ -34,11 +35,7 @@ export class Controller {
     const { token } = query;
 
     const _session = await this.ctx.sessionManager.getForgotPasswordSession(token);
-    this.ctx.assert.resourceNotFound(
-      !_session,
-      "Your session has expired. Please try again",
-      FORGOT_PASSWORD_SESSION_EXPIRED
-    );
+    this.ctx.assert.resourceNotFound(!_session, sessionExpiredMessage, FORGOT_PASSWORD_SESSION_EXPIRED);
     const session = _session!;
 
     const _user = await this.ctx.userRepository.findById(session.userId);

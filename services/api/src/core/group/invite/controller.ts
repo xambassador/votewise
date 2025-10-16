@@ -15,19 +15,10 @@ const ZQuery = z.object({
   username: z.string({ invalid_type_error: "username must be a string" })
 });
 
-type ControllerOptions = {
-  assert: AppContext["assert"];
-  groupRepository: AppContext["repositories"]["group"];
-  notificationRepository: AppContext["repositories"]["notification"];
-  eventBus: AppContext["eventBus"];
-  userRepository: AppContext["repositories"]["user"];
-  bucketService: AppContext["services"]["bucket"];
-};
-
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(ctx: ControllerOptions) {
+  constructor(ctx: AppContext) {
     this.ctx = ctx;
   }
 
@@ -55,7 +46,7 @@ export class Controller {
       invitationId: invitation.id,
       groupName: group.name,
       type: "INVITE",
-      avatarUrl: this.ctx.bucketService.generatePublicUrl(currentUserDetails.avatar_url || "", "avatar"),
+      avatarUrl: this.ctx.services.bucket.generatePublicUrl(currentUserDetails.avatar_url || "", "avatar"),
       createdAt: new Date(),
       firstName: currentUserDetails.first_name,
       lastName: currentUserDetails.last_name,
@@ -69,7 +60,7 @@ export class Controller {
   }
 
   private async hasSufficientPermissions(groupId: string, userId: string) {
-    const _myRole = await this.ctx.groupRepository.groupMember.whatIsMyRole(groupId, userId);
+    const _myRole = await this.ctx.repositories.group.groupMember.whatIsMyRole(groupId, userId);
     this.ctx.assert.forbidden(!_myRole, "You are not a member of this group");
     const myRole = _myRole!;
     this.ctx.assert.forbidden(
@@ -80,26 +71,26 @@ export class Controller {
   }
 
   private async getGroup(groupId: string) {
-    const _group = await this.ctx.groupRepository.findById(groupId);
+    const _group = await this.ctx.repositories.group.findById(groupId);
     this.ctx.assert.resourceNotFound(!_group, `Group with id ${groupId} not found`);
     const group = _group!;
     return group;
   }
 
   private async getUser(username: string) {
-    const user = await this.ctx.userRepository.findByUsername(username);
+    const user = await this.ctx.repositories.user.findByUsername(username);
     this.ctx.assert.resourceNotFound(!user, `User with username ${username} not found`);
     return user!;
   }
 
   private async isAlreadyMember(groupId: string, userId: string) {
-    const isAlreadyMember = await this.ctx.groupRepository.groupMember.isMember(groupId, userId);
+    const isAlreadyMember = await this.ctx.repositories.group.groupMember.isMember(groupId, userId);
     this.ctx.assert.unprocessableEntity(isAlreadyMember, "This user is already a member of this group");
     return isAlreadyMember;
   }
 
   private async isAlreadyInvited(groupId: string, userId: string, username: string) {
-    const isAlreadyInvited = await this.ctx.groupRepository.groupInvitation.findByUserWithGroup(userId, groupId);
+    const isAlreadyInvited = await this.ctx.repositories.group.groupInvitation.findByUserWithGroup(userId, groupId);
 
     this.ctx.assert.unprocessableEntity(
       !!isAlreadyInvited && isAlreadyInvited.status === "ACCEPTED",
@@ -123,14 +114,14 @@ export class Controller {
   }
 
   private async sendInvitation(groupId: string, userId: string, currentUserId: string) {
-    const invitation = await this.ctx.groupRepository.groupInvitation.create({
+    const invitation = await this.ctx.repositories.group.groupInvitation.create({
       group_id: groupId,
       user_id: userId,
       status: "PENDING",
       type: "INVITE",
       sent_at: new Date()
     });
-    const notification = await this.ctx.notificationRepository.create({
+    const notification = await this.ctx.repositories.notification.create({
       event_type: "GROUP_INVITATION",
       user_id: userId,
       content: {
@@ -144,7 +135,7 @@ export class Controller {
   }
 
   private async getUserById(userId: string) {
-    const user = await this.ctx.userRepository.findById(userId);
+    const user = await this.ctx.repositories.user.findById(userId);
     this.ctx.assert.resourceNotFound(!user, `User with id ${userId} not found`);
     return user!;
   }

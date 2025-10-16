@@ -10,16 +10,10 @@ import { ZPagination } from "@votewise/schemas";
 import { PaginationBuilder } from "@/lib/pagination";
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  assert: AppContext["assert"];
-  groupRepository: AppContext["repositories"]["group"];
-  bucketService: AppContext["services"]["bucket"];
-};
-
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
@@ -31,8 +25,8 @@ export class Controller {
     const query = schema.data!;
     const { page } = query;
     const limit = query.limit < 1 ? PAGINATION.groups.limit : query.limit;
-    const total = await this.ctx.groupRepository.getCountByUserId(sub);
-    const _groups = await this.ctx.groupRepository.getByUserId(sub, { page, limit });
+    const total = await this.ctx.repositories.group.getCountByUserId(sub);
+    const _groups = await this.ctx.repositories.group.getByUserId(sub, { page, limit });
     const groups = _groups.map((group) => ({
       id: group.id,
       name: group.name,
@@ -47,7 +41,7 @@ export class Controller {
         first_name: member.user.first_name,
         user_name: member.user.user_name,
         last_name: member.user.last_name,
-        avatar_url: this.ctx.bucketService.generatePublicUrl(member.user.avatar_url || "", "avatar")
+        avatar_url: this.ctx.services.bucket.generatePublicUrl(member.user.avatar_url || "", "avatar")
       })),
       total_members: group._count.members,
       created_at: group.created_at,

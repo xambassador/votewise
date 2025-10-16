@@ -6,22 +6,16 @@ import { StatusCodes } from "http-status-codes";
 
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  assert: AppContext["assert"];
-  userRepository: AppContext["repositories"]["user"];
-  bucketService: AppContext["services"]["bucket"];
-};
-
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
   async handle(_: Request, res: Response) {
     const locals = getAuthenticateLocals(res);
-    const _user = await this.ctx.userRepository.getMyProfile(locals.payload.sub);
+    const _user = await this.ctx.repositories.user.getMyProfile(locals.payload.sub);
     this.ctx.assert.resourceNotFound(!_user, "User not found");
     const user = _user!;
     const result = {
@@ -29,8 +23,8 @@ export class Controller {
       first_name: user!.first_name,
       last_name: user!.last_name,
       user_name: user!.user_name,
-      avatar_url: this.ctx.bucketService.generatePublicUrl(user!.avatar_url ?? "", "avatar"),
-      cover_image_url: this.ctx.bucketService.generatePublicUrl(user!.cover_image_url ?? "", "background"),
+      avatar_url: this.ctx.services.bucket.generatePublicUrl(user!.avatar_url ?? "", "avatar"),
+      cover_image_url: this.ctx.services.bucket.generatePublicUrl(user!.cover_image_url ?? "", "background"),
       about: user!.about,
       gender: user!.gender,
       location: user!.location,
