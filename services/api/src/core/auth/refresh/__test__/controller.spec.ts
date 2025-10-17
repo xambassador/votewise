@@ -1,3 +1,5 @@
+import type { AppContext } from "@/context";
+
 import { faker } from "@faker-js/faker";
 import { StatusCodes } from "http-status-codes";
 
@@ -17,13 +19,11 @@ const jwtService = new JWTService({ accessTokenSecret: "secret" });
 const assert = new Assertions();
 
 const controller = new Controller({
-  useRepository: helpers.mockUserRepository,
-  sessionManager: mockSessionManager,
+  repositories: { user: helpers.mockUserRepository, refreshToken: helpers.mockRefreshTokenRepository },
+  services: { session: mockSessionManager, jwt: jwtService },
   assert,
-  requestParser: requestParserPluginFactory(),
-  refreshTokensRepository: helpers.mockRefreshTokenRepository,
-  jwtService
-});
+  plugins: { requestParser: requestParserPluginFactory() }
+} as unknown as AppContext);
 
 beforeEach(() => {
   jest.clearAllMocks();

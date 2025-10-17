@@ -1,3 +1,5 @@
+import type { AppContext } from "@/context";
+
 import { Assertions, InvalidInputError } from "@votewise/errors";
 import { Minute } from "@votewise/times";
 
@@ -13,15 +15,17 @@ import { Controller } from "../controller";
 
 const user = buildUser();
 const controller = new Controller({
-  userRepository: mockUserRepository,
   assert: new Assertions(),
-  jwtService: mockJWTService,
-  cryptoService: mockCryptoService,
-  tasksQueue: mockTaskQueue,
-  appUrl,
-  requestParser: requestParserPluginFactory(),
-  sessionManager: mockSessionManager
-});
+  repositories: { user: mockUserRepository },
+  services: {
+    jwt: mockJWTService,
+    crypto: mockCryptoService,
+    session: mockSessionManager
+  },
+  queues: { tasksQueue: mockTaskQueue },
+  config: { appUrl },
+  plugins: { requestParser: requestParserPluginFactory() }
+} as unknown as AppContext);
 
 beforeEach(() => {
   jest.clearAllMocks();

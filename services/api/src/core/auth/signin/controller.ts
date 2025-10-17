@@ -12,17 +12,8 @@ import { Day } from "@votewise/times";
 
 import { getCookieOptions } from "@/utils/cookie";
 
-type ControllerOptions = {
-  requestParser: AppContext["plugins"]["requestParser"];
-  cryptoService: AppContext["services"]["crypto"];
-  jwtService: AppContext["services"]["jwt"];
-  assert: AppContext["assert"];
+export type ControllerOptions = AppContext & {
   strategies: Record<"email" | "username", Strategy>;
-  sessionManager: AppContext["services"]["session"];
-  refreshTokenRepository: AppContext["repositories"]["refreshToken"];
-  userRepository: AppContext["repositories"]["user"];
-  sessionRepository: AppContext["repositories"]["session"];
-  factorRepository: AppContext["repositories"]["factor"];
   userRegisterService: UserRegisterService;
 };
 
@@ -35,7 +26,7 @@ export class Controller {
   }
 
   public async handle(req: Request, res: Response) {
-    const { body, locals } = this.ctx.requestParser.getParser(ZSignin).parseRequest(req, res);
+    const { body, locals } = this.ctx.plugins.requestParser.getParser(ZSignin).parseRequest(req, res);
     const { password, username, email } = body;
     const userAgent = req.headers["user-agent"] || "";
     const ip = locals.meta.ip;
@@ -45,7 +36,7 @@ export class Controller {
     this.ctx.assert.resourceNotFound(!_user, `User with ${type} ${value} not found`, USER_NOT_FOUND);
 
     const user = _user!;
-    const isValid = await this.ctx.cryptoService.comparePassword(password, user.password);
+    const isValid = await this.ctx.services.crypto.comparePassword(password, user.password);
     this.ctx.assert.invalidInput(!isValid, "Invalid credentials", INVALID_CREDENTIALS);
 
     const hasEmailVerified = user.is_email_verify;
@@ -68,13 +59,13 @@ export class Controller {
       });
     }
 
-    const factors = await this.ctx.factorRepository.findByUserId(user.id);
+    const factors = await this.ctx.repositories.factor.findByUserId(user.id);
     const verifiedFactors = factors
       .filter((f) => f.status === "VERIFIED")
       .map((f) => ({ id: f.id, type: f.factor_type, status: f.status, name: f.friendly_name }));
     const aal = verifiedFactors.length > 0 ? "aal2" : "aal1";
 
-    const session = this.ctx.sessionManager.create({
+    const session = this.ctx.services.session.create({
       subject: user.id,
       aal: "aal1", // This will always be aal1, because user has not completed the MFA yet or if they dent have any MFA
       amr: [{ method: "password", timestamp: Date.now() }],
@@ -85,13 +76,13 @@ export class Controller {
     });
 
     await Promise.all([
-      this.ctx.sessionManager.save(session.sessionId, { ip, userAgent, aal, userId: user.id }),
-      this.ctx.refreshTokenRepository.create({ token: session.refreshToken, userId: user.id }),
-      this.ctx.sessionManager.saveOnboardStatus(user.id, user.is_onboarded ? "ONBOARDED" : "NOT_ONBOARDED")
+      this.ctx.services.session.save(session.sessionId, { ip, userAgent, aal, userId: user.id }),
+      this.ctx.repositories.refreshToken.create({ token: session.refreshToken, userId: user.id }),
+      this.ctx.services.session.saveOnboardStatus(user.id, user.is_onboarded ? "ONBOARDED" : "NOT_ONBOARDED")
     ]);
 
     const lastLogin = new Date();
-    this.ctx.userRepository.update(user.id, { last_login: lastLogin });
+    this.ctx.repositories.user.update(user.id, { last_login: lastLogin });
 
     const { accessToken, refreshToken } = COOKIE_KEYS;
     res.cookie(

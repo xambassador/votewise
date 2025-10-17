@@ -7,26 +7,18 @@ import { StatusCodes } from "http-status-codes";
 import { ERROR_CODES } from "@votewise/constant";
 import { ZVerifyEmail } from "@votewise/schemas";
 
-type ControllerOptions = {
-  assert: AppContext["assert"];
-  userRepository: AppContext["repositories"]["user"];
-  cache: AppContext["cache"];
-  requestParser: AppContext["plugins"]["requestParser"];
-  cryptoService: AppContext["services"]["crypto"];
-};
-
 const { INVALID_VERIFICATION_CODE, USER_NOT_FOUND, INVALID_EMAIL, INVALID_OTP, VERIFICATION_CODE_EXPIRED } =
   ERROR_CODES.AUTH;
 
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
   public async handle(req: Request, res: Response) {
-    const { body } = this.ctx.requestParser.getParser(ZVerifyEmail).parseRequest(req, res);
+    const { body } = this.ctx.plugins.requestParser.getParser(ZVerifyEmail).parseRequest(req, res);
 
     const key = `email:${body.email}:verification`;
     const _session = await this.ctx.cache.get(key);
@@ -41,7 +33,7 @@ export class Controller {
 
     this.ctx.assert.invalidInput(session.email !== body.email, "Invalid email", INVALID_EMAIL);
 
-    const _user = await this.ctx.userRepository.findByEmail(body.email);
+    const _user = await this.ctx.repositories.user.findByEmail(body.email);
     this.ctx.assert.resourceNotFound(!_user, `User with email ${body.email} not found`, USER_NOT_FOUND);
     const user = _user!;
 
@@ -50,14 +42,14 @@ export class Controller {
     }
 
     const secret = user.secret;
-    const isValidOtp = this.ctx.cryptoService.verifyOtp(secret, body.otp);
+    const isValidOtp = this.ctx.services.crypto.verifyOtp(secret, body.otp);
     this.ctx.assert.invalidInput(!isValidOtp, "Invalid otp", INVALID_OTP);
 
     await this.ctx.cache.del(key);
-    await this.ctx.userRepository.update(user.id, {
+    await this.ctx.repositories.user.update(user.id, {
       is_email_verify: true,
       email_confirmed_at: new Date(),
-      secret: this.ctx.cryptoService.generateUUID()
+      secret: this.ctx.services.crypto.generateUUID()
     });
 
     const result = { user_id: user.id, email: user.email, is_email_verify: true };

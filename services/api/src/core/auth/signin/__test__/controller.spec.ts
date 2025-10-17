@@ -1,3 +1,6 @@
+import type { AppContext } from "@/context";
+import type { ControllerOptions } from "../controller";
+
 import { faker } from "@faker-js/faker";
 import { StatusCodes } from "http-status-codes";
 
@@ -20,27 +23,27 @@ const body = { email: faker.internet.email(), password: "password" };
 const userNameBody = { username: faker.internet.userName(), password: "password" };
 
 const userRegisterService = new UserRegisterService({
-  tasksQueue: helpers.mockTaskQueue,
-  cache: helpers.mockCache,
-  cryptoService: helpers.mockCryptoService,
-  appUrl
-});
+  services: { crypto: helpers.mockCryptoService },
+  queues: { tasksQueue: helpers.mockTaskQueue },
+  config: { appUrl },
+  cache: helpers.mockCache
+} as unknown as AppContext);
 const controller = new Controller({
-  requestParser: requestParserPluginFactory(),
-  cryptoService: helpers.mockCryptoService,
-  jwtService: helpers.mockJWTService,
+  plugins: { requestParser: requestParserPluginFactory() },
+  services: { crypto: helpers.mockCryptoService, jwt: helpers.mockJWTService, session: mockSessionManager },
   assert: new Assertions(),
-  sessionManager: mockSessionManager,
   strategies: {
-    email: new EmailStrategy({ userRepository: helpers.mockUserRepository }),
-    username: new UsernameStrategy({ userRepository: helpers.mockUserRepository })
+    email: new EmailStrategy({ repositories: { user: helpers.mockUserRepository } } as unknown as AppContext),
+    username: new UsernameStrategy({ repositories: { user: helpers.mockUserRepository } } as unknown as AppContext)
   },
-  userRepository: helpers.mockUserRepository,
-  sessionRepository: helpers.mockSessionRepository,
-  refreshTokenRepository: helpers.mockRefreshTokenRepository,
-  factorRepository: helpers.mockFactorRepository,
+  repositories: {
+    user: helpers.mockUserRepository,
+    session: helpers.mockSessionRepository,
+    refreshToken: helpers.mockRefreshTokenRepository,
+    factor: helpers.mockFactorRepository
+  },
   userRegisterService
-});
+} as unknown as ControllerOptions);
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -176,18 +179,18 @@ describe("Signin Controller", () => {
 
   describe("Signin strategy", () => {
     const controller = new Controller({
-      requestParser: requestParserPluginFactory(),
-      cryptoService: helpers.mockCryptoService,
-      jwtService: helpers.mockJWTService,
+      plugins: { requestParser: requestParserPluginFactory() },
+      services: { crypto: helpers.mockCryptoService, jwt: helpers.mockJWTService, session: mockSessionManager },
       assert: new Assertions(),
-      sessionManager: mockSessionManager,
       strategies: { email: helpers.mockEmailStrategy, username: helpers.mockUsernameStrategy },
-      userRepository: helpers.mockUserRepository,
-      sessionRepository: helpers.mockSessionRepository,
-      refreshTokenRepository: helpers.mockRefreshTokenRepository,
-      factorRepository: helpers.mockFactorRepository,
+      repositories: {
+        user: helpers.mockUserRepository,
+        session: helpers.mockSessionRepository,
+        refreshToken: helpers.mockRefreshTokenRepository,
+        factor: helpers.mockFactorRepository
+      },
       userRegisterService
-    });
+    } as unknown as ControllerOptions);
 
     it("should pick correct strategy", async () => {
       const req = buildReq({ body });

@@ -9,15 +9,8 @@ import { rateLimitStrategies } from "@/lib/rate-limiter";
 import { Controller } from "./controller";
 
 export function enrollMFAControllerFactory(path: string) {
-  const ctx = AppContext.getInjectionTokens(["services", "repositories", "environment", "config", "assert", "logger"]);
-  const controller = new Controller({
-    cryptoService: ctx.services.crypto,
-    userRepository: ctx.repositories.user,
-    factorRepository: ctx.repositories.factor,
-    environment: ctx.environment,
-    config: ctx.config,
-    assert: ctx.assert
-  });
+  const ctx = AppContext.instance;
+  const controller = new Controller(ctx);
   const auth = authMiddlewareFactory();
   const limiter = rateLimitMiddlewareFactory(path, {
     ...rateLimitStrategies.THREE_PER_MINUTE,

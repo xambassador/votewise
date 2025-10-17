@@ -1,3 +1,5 @@
+import type { AppContext } from "@/context";
+
 import { faker } from "@faker-js/faker";
 
 import { Assertions } from "@votewise/errors";
@@ -16,20 +18,24 @@ import { appUrl, buildReq, buildRes, buildUser, getLocals } from "../../../../..
 import { Controller } from "../controller";
 
 const controller = new Controller({
-  requestParser: requestParserPluginFactory(),
+  plugins: { requestParser: requestParserPluginFactory() },
   assert: new Assertions(),
-  appUrl,
-  avatarsBucket: "avatars",
-  backgroundsBucket: "backgrounds",
-  userRepository: mockUserRepository,
-  onboardService: mockOnboardService,
-  sessionManager: mockSessionManagerWithoutCtx,
-  taskQueue: mockTaskQueue,
-  uploadQueue: mockUploadQueue,
-  postTopicRepository: mockPostTopicRepository,
-  timelineRepository: mockTimelineRepository,
-  userInterestRepository: mockUserInterestRepository
-});
+  config: { appUrl, avatarsBucket: "avatars", backgroundsBucket: "backgrounds" },
+  repositories: {
+    user: mockUserRepository,
+    postTopic: mockPostTopicRepository,
+    timeline: mockTimelineRepository,
+    userInterest: mockUserInterestRepository
+  },
+  services: {
+    onboard: mockOnboardService,
+    session: mockSessionManagerWithoutCtx
+  },
+  queues: {
+    tasksQueue: mockTaskQueue,
+    uploadQueue: mockUploadQueue
+  }
+} as unknown as AppContext);
 
 beforeEach(() => {
   jest.clearAllMocks();

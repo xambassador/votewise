@@ -1,3 +1,5 @@
+import type { AppContext } from "@/context";
+
 import { faker } from "@faker-js/faker";
 import { StatusCodes } from "http-status-codes";
 
@@ -11,10 +13,9 @@ import { Controller } from "../controller";
 
 const params = { factor_id: faker.string.uuid() };
 const controller = new Controller({
-  factorRepository: mockFactorRepository,
-  challengeRepository: mockChallengeRepository,
+  repositories: { factor: mockFactorRepository, challenge: mockChallengeRepository },
   assert: new Assertions()
-});
+} as unknown as AppContext);
 
 describe("MFA Challenge Controller", () => {
   test("should throw factor not found", async () => {

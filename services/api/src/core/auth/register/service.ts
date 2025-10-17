@@ -2,13 +2,6 @@ import type { AppContext } from "@/context";
 
 import { Minute } from "@votewise/times";
 
-type RegisterServiceOptions = {
-  cryptoService: AppContext["services"]["crypto"];
-  cache: AppContext["cache"];
-  tasksQueue: AppContext["queues"]["tasksQueue"];
-  appUrl: AppContext["config"]["appUrl"];
-};
-
 type User = {
   secret: string;
   userId: string;
@@ -24,9 +17,9 @@ type VerificationData = {
 };
 
 export class UserRegisterService {
-  private readonly ctx: RegisterServiceOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: RegisterServiceOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
@@ -34,12 +27,12 @@ export class UserRegisterService {
     const key = `email:${payload.email}:verification`;
     const previousWindow = await this.getPreviousWindow(key);
     if (!previousWindow) {
-      const otp = this.ctx.cryptoService.getOtp(payload.secret);
-      const verificationCode = this.ctx.cryptoService.generateUUID().replace(/-/g, "");
+      const otp = this.ctx.services.crypto.getOtp(payload.secret);
+      const verificationCode = this.ctx.services.crypto.generateUUID().replace(/-/g, "");
       const expiresIn = 5 * Minute;
       const data: VerificationData = { userId: payload.userId, ip: payload.ip, email: payload.email, verificationCode };
       await this.ctx.cache.setWithExpiry(key, JSON.stringify(data), expiresIn);
-      this.ctx.tasksQueue.add({
+      this.ctx.queues.tasksQueue.add({
         name: "email",
         payload: {
           to: payload.email,
@@ -47,7 +40,7 @@ export class UserRegisterService {
           templateName: "signup",
           locals: {
             otp,
-            logo: this.ctx.appUrl + "/assets/logo.png",
+            logo: this.ctx.config.appUrl + "/assets/logo.png",
             expiresIn: expiresIn / Minute,
             expiresInUnit: "minutes"
           }

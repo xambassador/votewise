@@ -1,3 +1,5 @@
+import type { AppContext } from "@/context";
+
 import { Assertions, InvalidInputError, ResourceNotFoundError } from "@votewise/errors";
 
 import { requestParserPluginFactory } from "@/plugins/request-parser";
@@ -12,15 +14,13 @@ const body = { password: helpers.password };
 const user = helpers.user;
 
 const controller = new Controller({
-  requestParser: requestParserPluginFactory(),
-  jwtService: helpers.jwtService,
+  plugins: { requestParser: requestParserPluginFactory() },
+  services: { jwt: helpers.jwtService, crypto: helpers.mockCryptoService, session: mockSessionManager },
   assert: new Assertions(),
-  userRepository: helpers.mockUserRepository,
-  cryptoService: helpers.mockCryptoService,
-  sessionManager: mockSessionManager,
-  appUrl: helpers.appUrl,
-  taskQueue: helpers.mockTaskQueue
-});
+  repositories: { user: helpers.mockUserRepository },
+  config: { appUrl: helpers.appUrl },
+  queues: { tasksQueue: helpers.mockTaskQueue }
+} as unknown as AppContext);
 
 beforeEach(() => {
   jest.clearAllMocks();

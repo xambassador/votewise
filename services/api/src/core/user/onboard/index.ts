@@ -9,32 +9,8 @@ import { rateLimitStrategies } from "@/lib/rate-limiter";
 import { Controller } from "./controller";
 
 export function onboardControllerFactory(path: string) {
-  const ctx = AppContext.getInjectionTokens([
-    "assert",
-    "repositories",
-    "plugins",
-    "queues",
-    "config",
-    "logger",
-    "cache",
-    "minio",
-    "services"
-  ]);
-  const controller = new Controller({
-    assert: ctx.assert,
-    requestParser: ctx.plugins.requestParser,
-    userRepository: ctx.repositories.user,
-    userInterestRepository: ctx.repositories.userInterest,
-    taskQueue: ctx.queues.tasksQueue,
-    uploadQueue: ctx.queues.uploadQueue,
-    appUrl: ctx.config.appUrl,
-    avatarsBucket: ctx.config.avatarsBucket,
-    backgroundsBucket: ctx.config.backgroundsBucket,
-    postTopicRepository: ctx.repositories.postTopic,
-    timelineRepository: ctx.repositories.timeline,
-    onboardService: ctx.services.onboard,
-    sessionManager: ctx.services.session
-  });
+  const ctx = AppContext.instance;
+  const controller = new Controller(ctx);
   const auth = authMiddlewareFactory();
   const limiter = rateLimitMiddlewareFactory(path, {
     ...rateLimitStrategies.FIFTEEN_PER_MINUTE,

@@ -8,25 +8,8 @@ import { rateLimitStrategies } from "@/lib/rate-limiter";
 import { Controller } from "./controller";
 
 export function resetPasswordControllerFactory(path: string) {
-  const ctx = AppContext.getInjectionTokens([
-    "plugins",
-    "repositories",
-    "services",
-    "assert",
-    "queues",
-    "config",
-    "logger"
-  ]);
-  const controller = new Controller({
-    requestParser: ctx.plugins.requestParser,
-    userRepository: ctx.repositories.user,
-    jwtService: ctx.services.jwt,
-    assert: ctx.assert,
-    cryptoService: ctx.services.crypto,
-    sessionManager: ctx.services.session,
-    taskQueue: ctx.queues.tasksQueue,
-    appUrl: ctx.config.appUrl
-  });
+  const ctx = AppContext.instance;
+  const controller = new Controller(ctx);
   const limiter = rateLimitMiddlewareFactory(path, {
     ...rateLimitStrategies.THREE_PER_HOUR,
     keyPrefix: "rtResetPassword",

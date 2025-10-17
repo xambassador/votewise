@@ -1,3 +1,5 @@
+import type { AppContext } from "@/context";
+
 import { StatusCodes } from "http-status-codes";
 
 import { Assertions } from "@votewise/errors";
@@ -10,13 +12,14 @@ import * as helpers from "./helpers";
 
 const body = helpers.body;
 const locals = helpers.locals;
+
 const controller = new Controller({
   assert: new Assertions(),
   cache: helpers.mockCache,
-  requestParser: requestParserPluginFactory(),
-  userRepository: helpers.mockUserRepository,
-  cryptoService: helpers.mockCryptoService
-});
+  plugins: { requestParser: requestParserPluginFactory() },
+  repositories: { user: helpers.mockUserRepository },
+  services: { crypto: helpers.mockCryptoService }
+} as unknown as AppContext);
 
 beforeEach(() => {
   jest.clearAllMocks();

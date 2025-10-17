@@ -10,18 +10,9 @@ import { Controller } from "./controller";
 import { EmailStrategy, UsernameStrategy } from "./strategies";
 
 export function singinControllerFactory(path: string) {
-  const ctx = AppContext.getInjectionTokens([
-    "repositories",
-    "assert",
-    "plugins",
-    "services",
-    "cache",
-    "queues",
-    "config",
-    "logger"
-  ]);
-  const emailStrategy = new EmailStrategy({ userRepository: ctx.repositories.user });
-  const usernameStrategy = new UsernameStrategy({ userRepository: ctx.repositories.user });
+  const ctx = AppContext.instance;
+  const emailStrategy = new EmailStrategy(ctx);
+  const usernameStrategy = new UsernameStrategy(ctx);
   const strategies = { email: emailStrategy, username: usernameStrategy };
   const service = new UserRegisterService({
     cache: ctx.cache,
@@ -30,16 +21,8 @@ export function singinControllerFactory(path: string) {
     appUrl: ctx.config.appUrl
   });
   const controller = new Controller({
+    ...ctx,
     strategies,
-    requestParser: ctx.plugins.requestParser,
-    jwtService: ctx.services.jwt,
-    cryptoService: ctx.services.crypto,
-    assert: ctx.assert,
-    sessionManager: ctx.services.session,
-    refreshTokenRepository: ctx.repositories.refreshToken,
-    userRepository: ctx.repositories.user,
-    sessionRepository: ctx.repositories.session,
-    factorRepository: ctx.repositories.factor,
     userRegisterService: service
   });
   const limiter = rateLimitMiddlewareFactory(path, {

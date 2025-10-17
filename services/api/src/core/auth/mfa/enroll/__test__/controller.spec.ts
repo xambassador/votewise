@@ -21,13 +21,15 @@ import { Controller } from "../controller";
 /* ----------------------------------------------------------------------------------------------- */
 
 const controller = new Controller({
-  userRepository: mockUserRepository,
-  factorRepository: mockFactorRepository,
-  environment: { APP_SECRET: "app_secret" } as unknown as AppContext["environment"],
-  cryptoService: mockCryptoService,
-  config: { appName: "Votewise" } as unknown as AppContext["config"],
+  repositories: {
+    user: mockUserRepository,
+    factor: mockFactorRepository
+  },
+  environment: { APP_SECRET: "app_secret" },
+  services: { crypto: mockCryptoService },
+  config: { appName: "Votewise" },
   assert: new Assertions()
-});
+} as unknown as AppContext);
 
 const params = { factor_id: faker.string.uuid() };
 const user = buildUser();

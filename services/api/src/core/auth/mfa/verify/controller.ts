@@ -11,40 +11,30 @@ import { Day } from "@votewise/times";
 import { getCookieOptions } from "@/utils/cookie";
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  challengeRepository: AppContext["repositories"]["challenge"];
-  factorRepository: AppContext["repositories"]["factor"];
-  requestParser: AppContext["plugins"]["requestParser"];
-  assert: AppContext["assert"];
-  cryptoService: AppContext["services"]["crypto"];
-  environment: AppContext["environment"];
-  sessionManager: AppContext["services"]["session"];
-};
-
 const { FACTOR_NOT_FOUND, CHALLENGE_NOT_FOUND, INVALID_CHALLENGE, CHALLENGE_EXPIRED } = ERROR_CODES["2FA"];
 const CHALLENGE_NOT_FOUND_MSG = "MFA factor with the provided challenge ID not found";
 const INVALID_CHALLENGE_MSG = "Challenge and verify IP address mismatch. Try enrollment again";
 const CHALLENGE_EXPIRED_MSG = `MFA challenge has expired, verify against another challenge or create a new challenge.`;
 
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
   async handle(req: Request, res: Response) {
-    const { body } = this.ctx.requestParser.getParser(ZVerifyChallenge).parseRequest(req, res);
+    const { body } = this.ctx.plugins.requestParser.getParser(ZVerifyChallenge).parseRequest(req, res);
     const locals = getAuthenticateLocals(res);
     const params = req.params as { factor_id: string };
     const { payload } = locals;
     const { factor_id } = params;
 
-    const _factor = await this.ctx.factorRepository.findById(factor_id);
+    const _factor = await this.ctx.repositories.factor.findById(factor_id);
     this.ctx.assert.resourceNotFound(!_factor, "Factor not found", FACTOR_NOT_FOUND);
     this.ctx.assert.resourceNotFound(_factor?.user_id !== payload.sub, "Factor not found", FACTOR_NOT_FOUND);
 
-    const _challenge = await this.ctx.challengeRepository.findById(body.challenge_id);
+    const _challenge = await this.ctx.repositories.challenge.findById(body.challenge_id);
     this.ctx.assert.resourceNotFound(!_challenge, CHALLENGE_NOT_FOUND_MSG, CHALLENGE_NOT_FOUND);
 
     const challenge = _challenge!;
@@ -60,15 +50,15 @@ export class Controller {
       CHALLENGE_EXPIRED
     );
 
-    const secret = this.ctx.cryptoService.symmetricDecrypt(factor.secret, this.ctx.environment.APP_SECRET);
-    const valid = this.ctx.cryptoService.verify2FACode(secret, body.code);
+    const secret = this.ctx.services.crypto.symmetricDecrypt(factor.secret, this.ctx.environment.APP_SECRET);
+    const valid = this.ctx.services.crypto.verify2FACode(secret, body.code);
     this.ctx.assert.unprocessableEntity(!valid, "Invalid TOTP code provided", ERROR_CODES["2FA"].INVALID_TOTP);
-    await this.ctx.challengeRepository.verifyChallenge(challenge.id);
+    await this.ctx.repositories.challenge.verifyChallenge(challenge.id);
     if (factor.status === "UNVERIFIED") {
-      await this.ctx.factorRepository.verifyFactor(factor.id);
+      await this.ctx.repositories.factor.verifyFactor(factor.id);
     }
 
-    const session = this.ctx.sessionManager.create({
+    const session = this.ctx.services.session.create({
       aal: "aal2",
       amr: [{ method: "totp", timestamp: Date.now() }, ...payload.amr],
       subject: payload.sub,
@@ -78,7 +68,7 @@ export class Controller {
       sessionId: payload.session_id,
       user_aal_level: payload.user_aal_level
     });
-    await this.ctx.sessionManager.update(session.sessionId, { aal: "aal2", factorId: factor.id });
+    await this.ctx.services.session.update(session.sessionId, { aal: "aal2", factorId: factor.id });
 
     res.cookie(
       COOKIE_KEYS.accessToken,

@@ -16,13 +16,14 @@ import { Controller } from "../controller";
 
 const controller = new Controller({
   assert: new Assertions(),
-  requestParser: requestParserPluginFactory(),
-  challengeRepository: mockChallengeRepository,
-  factorRepository: mockFactorRepository,
-  cryptoService: mockCryptoService,
-  environment: { APP_SECRET: "app_secret" } as AppContext["environment"],
-  sessionManager: mockSessionManagerWithoutCtx
-});
+  plugins: { requestParser: requestParserPluginFactory() },
+  repositories: {
+    challenge: mockChallengeRepository,
+    factor: mockFactorRepository
+  },
+  services: { crypto: mockCryptoService, session: mockSessionManagerWithoutCtx },
+  environment: { APP_SECRET: "app_secret" } as AppContext["environment"]
+} as unknown as AppContext);
 
 beforeEach(() => {
   jest.clearAllMocks();

@@ -7,41 +7,30 @@ import { StatusCodes } from "http-status-codes";
 import { ZForgotPassword } from "@votewise/schemas";
 import { Minute } from "@votewise/times";
 
-type ControllerOptions = {
-  userRepository: AppContext["repositories"]["user"];
-  assert: AppContext["assert"];
-  jwtService: AppContext["services"]["jwt"];
-  cryptoService: AppContext["services"]["crypto"];
-  tasksQueue: AppContext["queues"]["tasksQueue"];
-  appUrl: AppContext["config"]["appUrl"];
-  requestParser: AppContext["plugins"]["requestParser"];
-  sessionManager: AppContext["services"]["session"];
-};
-
 const msg = "If the email exists, a reset link will be sent.";
 
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
   public async handle(req: Request, res: Response) {
-    const { body } = this.ctx.requestParser.getParser(ZForgotPassword).parseRequest(req, res);
+    const { body } = this.ctx.plugins.requestParser.getParser(ZForgotPassword).parseRequest(req, res);
     const { email } = body;
 
-    const _user = await this.ctx.userRepository.findByEmail(email);
+    const _user = await this.ctx.repositories.user.findByEmail(email);
     if (!_user) {
       return res.status(StatusCodes.OK).json({ message: msg });
     }
 
     const user = _user!;
-    const { expiresIn, sessionId } = await this.ctx.sessionManager.createForgotPasswordSession({
+    const { expiresIn, sessionId } = await this.ctx.services.session.createForgotPasswordSession({
       userId: user.id,
       email
     });
-    this.ctx.tasksQueue.add({
+    this.ctx.queues.tasksQueue.add({
       name: "email",
       payload: {
         templateName: "forgot-password",
@@ -51,9 +40,9 @@ export class Controller {
           firstName: user.first_name,
           expiresInUnit: "minutes",
           expiresIn: expiresIn / Minute,
-          resetLink: this.ctx.appUrl + `/auth/reset-password?token=${sessionId}`,
+          resetLink: this.ctx.config.appUrl + `/auth/reset-password?token=${sessionId}`,
           email,
-          logo: this.ctx.appUrl + "/assets/logo.png"
+          logo: this.ctx.config.appUrl + "/assets/logo.png"
         }
       }
     });

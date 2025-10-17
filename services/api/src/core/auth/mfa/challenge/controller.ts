@@ -8,18 +8,12 @@ import { ERROR_CODES } from "@votewise/constant";
 
 import { getAuthenticateLocals } from "@/utils/locals";
 
-type ControllerOptions = {
-  challengeRepository: AppContext["repositories"]["challenge"];
-  factorRepository: AppContext["repositories"]["factor"];
-  assert: AppContext["assert"];
-};
-
 const { FACTOR_NOT_FOUND } = ERROR_CODES["2FA"];
 
 export class Controller {
-  private readonly ctx: ControllerOptions;
+  private readonly ctx: AppContext;
 
-  constructor(opts: ControllerOptions) {
+  constructor(opts: AppContext) {
     this.ctx = opts;
   }
 
@@ -28,13 +22,13 @@ export class Controller {
     const { meta } = locals;
     const params = req.params as { factor_id: string };
 
-    const _factor = await this.ctx.factorRepository.findById(params.factor_id);
+    const _factor = await this.ctx.repositories.factor.findById(params.factor_id);
     this.ctx.assert.resourceNotFound(!_factor, "Factor not found with the given id", FACTOR_NOT_FOUND);
 
     const factor = _factor!;
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + 5);
-    const challenge = await this.ctx.challengeRepository.create({ factor_id: factor.id, ip: meta.ip });
+    const challenge = await this.ctx.repositories.challenge.create({ factor_id: factor.id, ip: meta.ip });
     const result = { id: challenge.id, expires_at: expiresAt, type: factor.factor_type };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }

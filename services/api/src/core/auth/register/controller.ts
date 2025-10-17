@@ -8,13 +8,7 @@ import { StatusCodes } from "http-status-codes";
 import { ERROR_CODES } from "@votewise/constant";
 import { ZRegister } from "@votewise/schemas";
 
-type ControllerOptions = {
-  userRepository: AppContext["repositories"]["user"];
-  cryptoService: AppContext["services"]["crypto"];
-  assert: AppContext["assert"];
-  requestParser: AppContext["plugins"]["requestParser"];
-  userRegisterService: UserRegisterService;
-};
+export type ControllerOptions = AppContext & { userRegisterService: UserRegisterService };
 
 const { EMAIL_ALREADY_EXISTS } = ERROR_CODES.AUTH;
 
@@ -26,22 +20,22 @@ export class Controller {
   }
 
   async handle(req: Request, res: Response) {
-    const { body, locals } = this.ctx.requestParser.getParser(ZRegister).parseRequest(req, res);
+    const { body, locals } = this.ctx.plugins.requestParser.getParser(ZRegister).parseRequest(req, res);
     const ip = locals.meta.ip;
 
-    const user = await this.ctx.userRepository.findByEmail(body.email);
+    const user = await this.ctx.repositories.user.findByEmail(body.email);
     this.ctx.assert.invalidInput(!!user, `${body.email} already exists`, EMAIL_ALREADY_EXISTS);
 
-    const hash = await this.ctx.cryptoService.hashPassword(body.password);
-    const defaultUserName = this.ctx.cryptoService.generateNanoId(20);
+    const hash = await this.ctx.services.crypto.hashPassword(body.password);
+    const defaultUserName = this.ctx.services.crypto.generateNanoId(20);
     const email = body.email;
-    const createdUser = await this.ctx.userRepository.create({
+    const createdUser = await this.ctx.repositories.user.create({
       email,
       password: hash,
       user_name: defaultUserName, // We will update this later in onboarding process
       first_name: "INVALID_FIRST_NAME",
       last_name: "INVALID_LAST_NAME",
-      secret: this.ctx.cryptoService.generateUUID(),
+      secret: this.ctx.services.crypto.generateUUID(),
       is_email_verify: false,
       is_onboarded: false,
       vote_bucket: 10

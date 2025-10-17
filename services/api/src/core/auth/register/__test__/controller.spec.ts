@@ -1,3 +1,6 @@
+import type { AppContext } from "@/context";
+import type { ControllerOptions } from "../controller";
+
 import { StatusCodes } from "http-status-codes";
 
 import { Assertions } from "@votewise/errors";
@@ -11,24 +14,22 @@ import { UserRegisterService } from "../service";
 import * as helpers from "./helpers";
 
 const user = helpers.user;
-const body = {
-  email: user.email,
-  password: "Johndoe@123"
-};
+const body = { email: user.email, password: "Johndoe@123" };
 const assert = new Assertions();
+
 const service = new UserRegisterService({
   cache: helpers.mockCache,
-  cryptoService: helpers.mockCryptoService,
-  tasksQueue: helpers.mockTaskQueue,
-  appUrl
-});
+  services: { crypto: helpers.mockCryptoService },
+  queues: { tasksQueue: helpers.mockTaskQueue },
+  config: { appUrl }
+} as unknown as AppContext);
 const controller = new Controller({
   assert,
-  cryptoService: helpers.mockCryptoService,
-  userRepository: helpers.mockUserRepository,
-  requestParser: requestParserPluginFactory(),
+  services: { crypto: helpers.mockCryptoService },
+  repositories: { user: helpers.mockUserRepository },
+  plugins: { requestParser: requestParserPluginFactory() },
   userRegisterService: service
-});
+} as unknown as ControllerOptions);
 
 beforeEach(() => {
   jest.clearAllMocks();
