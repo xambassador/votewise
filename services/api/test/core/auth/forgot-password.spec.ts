@@ -3,15 +3,13 @@ import type { AppContext } from "@/context";
 import { Assertions, InvalidInputError } from "@votewise/errors";
 import { Minute } from "@votewise/times";
 
+import { Controller } from "@/core/auth/forgot-password/controller";
 import { requestParserPluginFactory } from "@/plugins/request-parser";
-import { mockTaskQueue } from "@/queues/__mock__";
-import { mockUserRepository } from "@/repository/__mock__/user.repository";
-import { mockCryptoService } from "@/services/__mock__/crypto.service";
-import { mockJWTService } from "@/services/__mock__/jwt.service";
-import { mockSessionManager, sessionManagerMockDeps } from "@/services/__mock__/session.service";
 
-import { appUrl, buildReq, buildRes, buildUser, locals } from "../../../../../test/helpers";
-import { Controller } from "../controller";
+import { mockTaskQueue } from "../../__mock__/queue";
+import { mockUserRepository } from "../../__mock__/repository";
+import { mockCryptoService, mockJWTService, mockSessionManager, sessionManagerMockDeps } from "../../__mock__/services";
+import { appUrl, buildReq, buildRes, buildUser, locals } from "../../helpers";
 
 const user = buildUser();
 const controller = new Controller({

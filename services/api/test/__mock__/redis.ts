@@ -1,4 +1,4 @@
-import type { Cache } from "../redis";
+import type { Cache } from "@/storage/redis";
 
 export const mockCache = {
   connect: jest.fn(),

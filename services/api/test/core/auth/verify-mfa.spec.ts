@@ -5,14 +5,12 @@ import { faker } from "@faker-js/faker";
 import { Assertions } from "@votewise/errors";
 import { Minute } from "@votewise/times";
 
+import { Controller } from "@/core/auth/mfa/verify/controller";
 import { requestParserPluginFactory } from "@/plugins";
-import { mockChallengeRepository } from "@/repository/__mock__/challenge.repository";
-import { mockFactorRepository } from "@/repository/__mock__/factor.repository";
-import { mockCryptoService } from "@/services/__mock__/crypto.service";
-import { mockSessionManagerWithoutCtx } from "@/services/__mock__/session.service";
 
-import { buildChallenge, buildFactor, buildReq, buildRes, getLocals } from "../../../../../../test/helpers";
-import { Controller } from "../controller";
+import { mockChallengeRepository, mockFactorRepository } from "../../__mock__/repository";
+import { mockCryptoService, mockSessionManagerWithoutCtx } from "../../__mock__/services";
+import { buildChallenge, buildFactor, buildReq, buildRes, getLocals } from "../../helpers";
 
 const controller = new Controller({
   assert: new Assertions(),

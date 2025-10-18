@@ -5,11 +5,10 @@ import { StatusCodes } from "http-status-codes";
 
 import { Assertions } from "@votewise/errors";
 
-import { mockChallengeRepository } from "@/repository/__mock__/challenge.repository";
-import { mockFactorRepository } from "@/repository/__mock__/factor.repository";
+import { Controller } from "@/core/auth/mfa/challenge/controller";
 
-import { buildChallenge, buildFactor, buildReq, buildRes, ip, locals } from "../../../../../../test/helpers";
-import { Controller } from "../controller";
+import { mockChallengeRepository, mockFactorRepository } from "../../__mock__/repository";
+import { buildChallenge, buildFactor, buildReq, buildRes, ip, locals } from "../../helpers";
 
 const params = { factor_id: faker.string.uuid() };
 const controller = new Controller({

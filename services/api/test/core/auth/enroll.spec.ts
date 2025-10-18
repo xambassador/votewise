@@ -4,19 +4,11 @@ import { faker } from "@faker-js/faker";
 
 import { Assertions } from "@votewise/errors";
 
-import { mockFactorRepository } from "@/repository/__mock__/factor.repository";
-import { mockUserRepository } from "@/repository/__mock__/user.repository";
-import { mockCryptoService } from "@/services/__mock__/crypto.service";
+import { Controller } from "@/core/auth/mfa/enroll/controller";
 
-import {
-  buildAccessToken,
-  buildFactor,
-  buildReq,
-  buildRes,
-  buildUser,
-  locals as defaultLocals
-} from "../../../../../../test/helpers";
-import { Controller } from "../controller";
+import { mockFactorRepository, mockUserRepository } from "../../__mock__/repository";
+import { mockCryptoService } from "../../__mock__/services";
+import { buildAccessToken, buildFactor, buildReq, buildRes, buildUser, locals as defaultLocals } from "../../helpers";
 
 /* ----------------------------------------------------------------------------------------------- */
 

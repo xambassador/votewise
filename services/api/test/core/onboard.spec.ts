@@ -4,18 +4,18 @@ import { faker } from "@faker-js/faker";
 
 import { Assertions } from "@votewise/errors";
 
+import { Controller } from "@/core/user/onboard/controller";
 import { requestParserPluginFactory } from "@/plugins";
-import { mockTaskQueue } from "@/queues/__mock__";
-import { mockUploadQueue } from "@/queues/__mock__/upload";
-import { mockPostTopicRepository } from "@/repository/__mock__/post-topic.repository";
-import { mockTimelineRepository } from "@/repository/__mock__/timeline.repository";
-import { mockUserInterestRepository } from "@/repository/__mock__/user-interest.repository";
-import { mockUserRepository } from "@/repository/__mock__/user.repository";
-import { mockOnboardService } from "@/services/__mock__/onboard.service";
-import { mockSessionManagerWithoutCtx } from "@/services/__mock__/session.service";
 
-import { appUrl, buildReq, buildRes, buildUser, getLocals } from "../../../../../test/helpers";
-import { Controller } from "../controller";
+import { mockTaskQueue, mockUploadQueue } from "../__mock__/queue";
+import {
+  mockPostTopicRepository,
+  mockTimelineRepository,
+  mockUserInterestRepository,
+  mockUserRepository
+} from "../__mock__/repository";
+import { mockOnboardService, mockSessionManagerWithoutCtx } from "../__mock__/services";
+import { appUrl, buildReq, buildRes, buildUser, getLocals } from "../helpers";
 
 const controller = new Controller({
   plugins: { requestParser: requestParserPluginFactory() },

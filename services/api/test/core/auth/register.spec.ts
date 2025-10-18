@@ -1,68 +1,100 @@
 import type { AppContext } from "@/context";
-import type { ControllerOptions } from "../controller";
+import type { ControllerOptions } from "@/core/auth/register/controller";
 
+import { faker } from "@faker-js/faker";
 import { StatusCodes } from "http-status-codes";
 
 import { Assertions } from "@votewise/errors";
 import { Minute } from "@votewise/times";
 
+import { Controller } from "@/core/auth/register/controller";
+import { UserRegisterService } from "@/core/auth/register/service";
 import { requestParserPluginFactory } from "@/plugins/request-parser";
 
-import { appUrl, buildReq, buildRes, ip, locals } from "../../../../../test/helpers";
-import { Controller } from "../controller";
-import { UserRegisterService } from "../service";
-import * as helpers from "./helpers";
+import { mockTaskQueue } from "../../__mock__/queue";
+import { mockCache } from "../../__mock__/redis";
+import { mockUserRepository } from "../../__mock__/repository";
+import { mockCryptoService } from "../../__mock__/services";
+import { appUrl, buildReq, buildRes, buildUser, ip, locals } from "../../helpers";
 
-const user = helpers.user;
+const user = buildUser();
 const body = { email: user.email, password: "Johndoe@123" };
 const assert = new Assertions();
 
+function setupHappyPath() {
+  const hashedPassword = faker.string.alphanumeric(32);
+  const otp = faker.string.numeric(6);
+  const uuid = faker.string.uuid();
+  mockUserRepository.findByEmail.mockResolvedValue(undefined);
+  mockUserRepository.findByUsername.mockResolvedValue(undefined);
+  mockUserRepository.create.mockResolvedValue(user);
+  mockCryptoService.hashPassword.mockResolvedValue(hashedPassword);
+  mockCryptoService.getOtp.mockReturnValue(otp);
+  mockCryptoService.generateUUID.mockReturnValue(uuid);
+  mockCryptoService.generateNanoId.mockReturnValue("some-random-username");
+  return {
+    hashedPassword,
+    otp,
+    uuid: uuid.replace(/-/g, ""),
+    defaultUserName: "some-random-username"
+  };
+}
+
+function clearAllMocks() {
+  mockUserRepository.findByEmail.mockClear();
+  mockUserRepository.findByUsername.mockClear();
+  mockUserRepository.create.mockClear();
+  mockCryptoService.hashPassword.mockClear();
+  mockCryptoService.getOtp.mockClear();
+  mockCryptoService.generateUUID.mockClear();
+}
+
 const service = new UserRegisterService({
-  cache: helpers.mockCache,
-  services: { crypto: helpers.mockCryptoService },
-  queues: { tasksQueue: helpers.mockTaskQueue },
+  cache: mockCache,
+  services: { crypto: mockCryptoService },
+  queues: { tasksQueue: mockTaskQueue },
   config: { appUrl }
 } as unknown as AppContext);
 const controller = new Controller({
   assert,
-  services: { crypto: helpers.mockCryptoService },
-  repositories: { user: helpers.mockUserRepository },
+  services: { crypto: mockCryptoService },
+  repositories: { user: mockUserRepository },
   plugins: { requestParser: requestParserPluginFactory() },
   userRegisterService: service
 } as unknown as ControllerOptions);
 
 beforeEach(() => {
   jest.clearAllMocks();
-  helpers.clearAllMocks();
+  clearAllMocks();
 });
 
 describe("Register Controller", () => {
   it("should throw error if request is invalid", async () => {
     const req = buildReq({ body: { email: "test" } });
     const res = buildRes({ locals });
-    helpers.setupHappyPath();
+    setupHappyPath();
 
     const error = await controller.handle(req, res).catch((e) => e);
-    expect(helpers.mockUserRepository.findByEmail).not.toHaveBeenCalled();
+    expect(mockUserRepository.findByEmail).not.toHaveBeenCalled();
     expect(error.message).toBe("Invalid email address");
   });
 
   it("should throw error email already exists", async () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
-    helpers.setupHappyPath();
-    helpers.mockUserRepository.findByEmail.mockResolvedValueOnce(user);
+    setupHappyPath();
+    mockUserRepository.findByEmail.mockResolvedValueOnce(user);
 
     const error = await controller.handle(req, res).catch((e) => e);
-    expect(helpers.mockUserRepository.findByEmail).toHaveBeenCalledWith(body.email);
-    expect(helpers.mockUserRepository.create).not.toHaveBeenCalled();
+    expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(body.email);
+    expect(mockUserRepository.create).not.toHaveBeenCalled();
     expect(error.message).toBe(`${body.email} already exists`);
   });
 
   it("should create user and send verification email", async () => {
     const req = buildReq({ body });
     const res = buildRes({ locals });
-    const { otp, uuid: verificationCode, defaultUserName, hashedPassword } = helpers.setupHappyPath();
+    const { otp, uuid: verificationCode, defaultUserName, hashedPassword } = setupHappyPath();
     const windowExpiryIn = 5 * Minute;
     const data = JSON.stringify({ userId: user.id, ip, email: body.email, verificationCode });
     const createBody = {
@@ -99,9 +131,9 @@ describe("Register Controller", () => {
 
     await controller.handle(req, res);
 
-    expect(helpers.mockUserRepository.create).toHaveBeenCalledWith(createBody);
-    expect(helpers.mockCache.setWithExpiry).toHaveBeenCalledWith(key, data, windowExpiryIn);
-    expect(helpers.mockTaskQueue.add).toHaveBeenCalledWith(queueData);
+    expect(mockUserRepository.create).toHaveBeenCalledWith(createBody);
+    expect(mockCache.setWithExpiry).toHaveBeenCalledWith(key, data, windowExpiryIn);
+    expect(mockTaskQueue.add).toHaveBeenCalledWith(queueData);
     expect(res.status).toHaveBeenCalledWith(StatusCodes.CREATED);
     expect(res.json).toHaveBeenCalledWith(response);
   });
