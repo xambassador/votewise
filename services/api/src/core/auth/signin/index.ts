@@ -14,12 +14,7 @@ export function singinControllerFactory(path: string) {
   const emailStrategy = new EmailStrategy(ctx);
   const usernameStrategy = new UsernameStrategy(ctx);
   const strategies = { email: emailStrategy, username: usernameStrategy };
-  const service = new UserRegisterService({
-    cache: ctx.cache,
-    tasksQueue: ctx.queues.tasksQueue,
-    cryptoService: ctx.services.crypto,
-    appUrl: ctx.config.appUrl
-  });
+  const service = new UserRegisterService(ctx);
   const controller = new Controller({
     ...ctx,
     strategies,

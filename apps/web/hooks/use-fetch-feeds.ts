@@ -6,8 +6,6 @@ import type { AsyncState } from "@votewise/types";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { PAGINATION } from "@votewise/constant";
-
 import { feedClient } from "@/lib/client";
 import { getFeedsKey } from "@/lib/constants";
 
@@ -32,9 +30,9 @@ export function useFetchFeeds(params: Params) {
     refetchOnWindowFocus: false
   });
 
-  async function fetchNextPage(page: number) {
+  async function fetchNextPage(cursor: string) {
     setNextPageStatus("loading");
-    const res = await feedClient.getAll({ page, limit: PAGINATION.feeds.limit });
+    const res = await feedClient.getAll({ cursor });
     if (!res.success) {
       setNextPageStatus("error");
       return;

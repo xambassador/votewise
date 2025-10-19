@@ -14,4 +14,4 @@ export const ZPagination = z.object({
 
 export type TPage = z.infer<typeof ZPage>;
 export type TLimit = z.infer<typeof ZLimit>;
-export type TPagination = z.infer<typeof ZPagination>;
+export type TPagination = Partial<z.infer<typeof ZPagination>>;

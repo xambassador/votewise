@@ -28,24 +28,11 @@ export class TimelineRepository extends BaseRepository {
         .selectFrom("Timeline as t")
         .select(["t.post_id", "t.created_at as timeline_created_at"])
         .where("t.user_id", "=", userId)
-        .$if(shouldUseCursor, (qb) => {
-          let primary: Date;
-          if (cursor?.primary instanceof Date) {
-            primary = cursor.primary;
-          } else {
-            primary = new Date(cursor?.primary as string);
-          }
-          return qb.where((eb) =>
-            eb.or([
-              eb("t.created_at", "<", primary),
-              eb.and([eb("t.created_at", "=", primary), eb("t.post_id", "<", cursor?.secondary as string)])
-            ])
-          );
-        })
+        .$if(shouldUseCursor, (qb) => qb.where((eb) => eb("t.post_id", "<", cursor?.secondary as string)))
         .orderBy("t.created_at", "desc")
         .orderBy("t.post_id", "desc")
         .limit(limit)
-        .offset(shouldUseCursor ? 0 : offset)
+        .$if(!shouldUseCursor, (qb) => qb.offset(offset))
         .execute();
 
       if (skeleton.length === 0) {

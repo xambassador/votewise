@@ -19,8 +19,8 @@ export function FeedList(props: { feeds: GetAllFeedsResponse }) {
     if (!inView) return;
     if (nextPageStatus === "loading") return;
     if (!data) return;
-    if (!data.pagination.next_page) return;
-    fetchNextPage(data.pagination.next_page);
+    if (!data.pagination.cursor) return;
+    fetchNextPage(data.pagination.cursor);
   }
 
   switch (status) {
