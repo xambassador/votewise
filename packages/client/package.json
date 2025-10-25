@@ -56,6 +56,10 @@
     "./notification": {
       "import": "./dist/services/notification.mjs",
       "require": "./dist/services/notification.js"
+    },
+    "./search": {
+      "import": "./dist/services/search.mjs",
+      "require": "./dist/services/search.js"
     }
   },
   "scripts": {

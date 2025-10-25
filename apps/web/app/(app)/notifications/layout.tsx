@@ -2,7 +2,7 @@ import { Fragment } from "react";
 
 import { Container } from "@/components/container";
 
-import { FeedTabs } from "../(feeds)/_components/tabs";
+import { FeedTabs } from "@/app/(app)/(feeds)/_components/tabs";
 
 export default function Layout(props: React.PropsWithChildren) {
   return (

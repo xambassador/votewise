@@ -9,3 +9,4 @@ export const getUserProfileKey = (username: string) => ["user-profile", username
 export const getNotificationsKey = () => ["notifications"];
 export const getGroupNotificationsKey = () => ["group-notifications"];
 export const getGroupKey = (id: string) => ["group", id];
+export const getSearchKey = (q?: string) => ["search", q];

@@ -8,7 +8,7 @@ import { Realtime } from "./realtime";
 
 function queryClientFactory() {
   return new QueryClient({
-    defaultOptions: { queries: { staleTime: 60 * 1000, refetchOnWindowFocus: false, retry: false } }
+    defaultOptions: { queries: { staleTime: 60 * 1000, refetchOnWindowFocus: false, retry: false, gcTime: 60 * 1000 } }
   });
 }
 

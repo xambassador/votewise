@@ -1,10 +1,8 @@
 import Image from "next/image";
 
-import { UserSearch } from "@votewise/ui/icons/user-search";
-import { Input, InputField } from "@votewise/ui/input-field";
-
 import Logo from "@/assets/images/logo.png";
 
+import { SearchBox } from "./search-box";
 import { SuggestedGroups } from "./suggested-groups";
 import { SuggestedUsers } from "./suggested-users";
 
@@ -16,10 +14,7 @@ export function SuggestionPanel() {
       </div>
 
       <div className="pb-5 border-b border-nobelBlack-200">
-        <InputField className="h-10">
-          <UserSearch className="text-gray-500" />
-          <Input placeholder="Search" className="placeholder:text-gray-500 text-sm font-medium" />
-        </InputField>
+        <SearchBox />
       </div>
 
       <SuggestedUsers />

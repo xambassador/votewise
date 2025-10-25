@@ -37,5 +37,9 @@ export const routes = {
   },
   notification: {
     root: () => "/notifications"
+  },
+  search: {
+    root: () => "/search",
+    withQuery: (query: string) => `/search?query=${encodeURIComponent(query)}`
   }
 };

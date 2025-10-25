@@ -48,7 +48,8 @@ export class Controller {
       status: group.status,
       logo_url: group.logo_url,
       created_at: group.created_at,
-      updated_at: group.updated_at
+      updated_at: group.updated_at,
+      admin: group.admin
     }));
 
     const result = { results: { users, groups } };

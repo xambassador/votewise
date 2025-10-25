@@ -7,6 +7,7 @@ import { Group } from "@votewise/client/group";
 import { MFA } from "@votewise/client/mfa";
 import { Notification } from "@votewise/client/notification";
 import { Onboard } from "@votewise/client/onboard";
+import { Search } from "@votewise/client/search";
 import { Client } from "@votewise/client/server";
 import { User } from "@votewise/client/user";
 
@@ -68,4 +69,9 @@ export function getGroupClient() {
 export function getNotificationClient() {
   const client = getClient();
   return new Notification({ client });
+}
+
+export function getSearchClient() {
+  const client = getClient();
+  return new Search({ client });
 }

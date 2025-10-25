@@ -50,7 +50,28 @@ export class SearchRepository extends BaseRepository {
         .where(() => sql`name % ${query}`)
         .orderBy("similarity", "desc")
         .execute();
-      return groups;
+
+      const admins = await Promise.all(
+        groups.map(
+          (g) =>
+            new Promise<{ user_name: string } | undefined>((resolve, reject) => {
+              this.dataLayer
+                .selectFrom("GroupMember as gm")
+                .innerJoin("User as u", "gm.user_id", "u.id")
+                .select(["u.user_name"])
+                .where("group_id", "=", g.id)
+                .where("role", "=", "ADMIN")
+                .executeTakeFirst()
+                .then((admin) => resolve(admin))
+                .catch((err) => reject(err));
+            })
+        )
+      );
+
+      return groups.map((group, index) => ({
+        ...group,
+        admin: admins[index]
+      }));
     });
   }
 }

@@ -1,10 +1,12 @@
+import type { PropsWithChildren } from "react";
+
 import { Fragment } from "react";
 
 import { Container } from "@/components/container";
 
 import { FeedTabs } from "@/app/(app)/(feeds)/_components/tabs";
 
-export default function Layout(props: React.PropsWithChildren) {
+export default function Layout(props: PropsWithChildren) {
   return (
     <Fragment>
       <FeedTabs />

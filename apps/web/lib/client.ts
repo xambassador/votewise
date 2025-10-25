@@ -5,6 +5,7 @@ import { Follow } from "@votewise/client/follow";
 import { Group } from "@votewise/client/group";
 import { Notification } from "@votewise/client/notification";
 import { Onboard } from "@votewise/client/onboard";
+import { Search } from "@votewise/client/search";
 import { uploadClientFactory } from "@votewise/client/upload";
 import { User } from "@votewise/client/user";
 
@@ -16,5 +17,6 @@ export const followClient = new Follow({ client });
 export const groupClient = new Group({ client });
 export const userClient = new User({ client });
 export const notificationClient = new Notification({ client });
+export const searchClient = new Search({ client });
 // TODO: Move NEXT_PUBLIC_VOTEWISE_BUCKET_NAME to env package
 export const uploadClient = uploadClientFactory(process.env.NEXT_PUBLIC_VOTEWISE_BUCKET_NAME);
