@@ -55,8 +55,8 @@ export function FeedContent(props: Props) {
 
   return (
     <>
-      <FeedHeader>
-        <Link href={routes.user.profile(feed.author.user_name)} className="focus-visible">
+      <div className="flex items-start gap-3">
+        <Link href={routes.user.profile(feed.author.user_name)} className="focus-visible rounded-full">
           <Avatar className="size-12">
             <AvatarFallback name={feed.author.first_name + " " + feed.author.last_name} />
             <AvatarImage
@@ -66,18 +66,20 @@ export function FeedContent(props: Props) {
             />
           </Avatar>
         </Link>
-        <div className="flex gap-3">
-          <div className="flex flex-col">
+        <div className="w-full">
+          <FeedHeader>
             <Link href={routes.user.profile(feed.author.user_name)} className="focus-visible">
               <FeedUserName>{feed.author.first_name + " " + feed.author.last_name}</FeedUserName>
             </Link>
+            <FeedTimeAgo className="pt-1">{dayjs(feed.created_at).fromNow()}</FeedTimeAgo>
+          </FeedHeader>
+          <FeedHeader>
             <Link href={routes.user.profile(feed.author.user_name)} className="focus-visible">
               <FeedUserHandle>@{feed.author.user_name}</FeedUserHandle>
             </Link>
-          </div>
-          <FeedTimeAgo className="pt-1">{dayjs(feed.created_at).fromNow()}</FeedTimeAgo>
+          </FeedHeader>
         </div>
-      </FeedHeader>
+      </div>
       <FeedTitle className="pb-4 border-b border-nobelBlack-200">{feed.title}</FeedTitle>
       <_FeedContent className="pb-7 border-b border-nobelBlack-200">
         <FeedContentText className="text-base font-normal text-gray-200">{feed.content}</FeedContentText>

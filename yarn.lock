@@ -8218,6 +8218,7 @@ __metadata:
     framer-motion: "npm:^11.3.30"
     jotai: "npm:^2.9.3"
     jsonwebtoken: "npm:^9.0.2"
+    millify: "npm:^6.1.0"
     next: "npm:^14.2.6"
     next-seo: "npm:^6.5.0"
     postcss: "npm:8.4.41"
@@ -18003,6 +18004,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"millify@npm:^6.1.0":
+  version: 6.1.0
+  resolution: "millify@npm:6.1.0"
+  dependencies:
+    yargs: "npm:^17.0.1"
+  bin:
+    millify: bin/millify
+  checksum: a73fc2fdfaf07d5759913427b1f9d2db7fc3cb7cbc085ed9cf94bdd6425d8d4e0feb8a2a2497edfc5d6afe995bbb97237b4f6460c24cb7f4a2785bc1fb99131f
+  languageName: node
+  linkType: hard
+
 "mime-db@npm:1.52.0, mime-db@npm:>= 1.43.0 < 2":
   version: 1.52.0
   resolution: "mime-db@npm:1.52.0"
@@ -26103,7 +26115,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs@npm:17.7.2, yargs@npm:^17.0.0, yargs@npm:^17.5.1, yargs@npm:^17.7.2":
+"yargs@npm:17.7.2, yargs@npm:^17.0.0, yargs@npm:^17.0.1, yargs@npm:^17.5.1, yargs@npm:^17.7.2":
   version: 17.7.2
   resolution: "yargs@npm:17.7.2"
   dependencies:

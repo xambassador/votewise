@@ -167,35 +167,19 @@ export class GroupRepository extends BaseRepository {
 
       const groupIds = groups.map((g) => g.id);
 
-      const members = await this.dataLayer
-        .selectFrom(
-          this.dataLayer
-            .selectFrom("GroupMember as gm")
-            .innerJoin("User as u", "u.id", "gm.user_id")
-            .select([
-              "gm.id",
-              "gm.group_id",
-              "gm.role",
-              "u.id as user_id",
-              "u.user_name",
-              "u.first_name",
-              "u.last_name",
-              "u.avatar_url",
-              sql<number>`row_number() over (partition by gm.group_id order by gm.joined_at asc)`.as("rn")
-            ])
-            .where("gm.group_id", "in", groupIds)
-            .as("ranked_members")
-        )
-        .selectAll()
-        .where("rn", "<=", 5)
+      const admins = await this.dataLayer
+        .selectFrom("GroupMember as gm")
+        .innerJoin("User as u", "u.id", "gm.user_id")
+        .select(["u.id as user_id", "u.user_name", "u.first_name", "u.last_name", "gm.group_id"])
+        .where("gm.group_id", "in", groupIds)
+        .where("gm.role", "=", "ADMIN")
         .execute();
 
-      const membersByGroup = new Map<string, typeof members>();
-      for (const member of members) {
-        if (!membersByGroup.has(member.group_id)) {
-          membersByGroup.set(member.group_id, []);
+      const adminsByGroup = new Map<string, (typeof admins)[0]>();
+      for (const admin of admins) {
+        if (!adminsByGroup.has(admin.group_id)) {
+          adminsByGroup.set(admin.group_id, admin);
         }
-        membersByGroup.get(member.group_id)!.push(member);
       }
 
       return groups.map((group) => ({
@@ -207,17 +191,7 @@ export class GroupRepository extends BaseRepository {
         updated_at: group.updated_at,
         status: group.status,
         type: group.type,
-        members: (membersByGroup.get(group.id) || []).map((m) => ({
-          id: m.id,
-          role: m.role,
-          user: {
-            id: m.user_id,
-            user_name: m.user_name,
-            first_name: m.first_name,
-            last_name: m.last_name,
-            avatar_url: m.avatar_url
-          }
-        })),
+        admin: adminsByGroup.get(group.id),
         _count: { members: group.member_count }
       }));
     });
@@ -276,35 +250,19 @@ export class GroupRepository extends BaseRepository {
       }
 
       const groupIds = groups.map((g) => g.id);
-      const members = await this.dataLayer
-        .selectFrom(
-          this.dataLayer
-            .selectFrom("GroupMember as gm")
-            .innerJoin("User as u", "u.id", "gm.user_id")
-            .select([
-              "gm.id",
-              "gm.group_id",
-              "gm.role",
-              "u.id as user_id",
-              "u.user_name",
-              "u.first_name",
-              "u.last_name",
-              "u.avatar_url",
-              sql<number>`row_number() over (partition by gm.group_id order by gm.joined_at asc)`.as("rn")
-            ])
-            .where("gm.group_id", "in", groupIds)
-            .as("ranked_members")
-        )
-        .selectAll()
-        .where("rn", "<=", 5)
+      const admins = await this.dataLayer
+        .selectFrom("GroupMember as gm")
+        .innerJoin("User as u", "u.id", "gm.user_id")
+        .select(["u.id as user_id", "u.user_name", "u.first_name", "u.last_name", "gm.group_id"])
+        .where("gm.group_id", "in", groupIds)
+        .where("gm.role", "=", "ADMIN")
         .execute();
 
-      const membersByGroup = new Map<string, typeof members>();
-      for (const member of members) {
-        if (!membersByGroup.has(member.group_id)) {
-          membersByGroup.set(member.group_id, []);
+      const adminsByGroup = new Map<string, (typeof admins)[0]>();
+      for (const admin of admins) {
+        if (!adminsByGroup.has(admin.group_id)) {
+          adminsByGroup.set(admin.group_id, admin);
         }
-        membersByGroup.get(member.group_id)!.push(member);
       }
 
       return groups.map((group) => ({
@@ -316,17 +274,7 @@ export class GroupRepository extends BaseRepository {
         updated_at: group.updated_at,
         status: group.status,
         type: group.type,
-        members: (membersByGroup.get(group.id) || []).map((m) => ({
-          id: m.id,
-          role: m.role,
-          user: {
-            id: m.user_id,
-            user_name: m.user_name,
-            first_name: m.first_name,
-            last_name: m.last_name,
-            avatar_url: m.avatar_url
-          }
-        })),
+        admin: adminsByGroup.get(group.id),
         _count: { members: group.member_count }
       }));
     });

@@ -39,22 +39,24 @@ export function FeedSkeleton() {
 export function FeedSkeletonShell() {
   return (
     <>
-      <FeedHeader>
+      <div className="flex items-start gap-3">
         <Skeleton className="size-12 rounded-full" />
-        <div className="flex gap-3">
-          <div className="flex flex-col">
+        <div className="w-full">
+          <FeedHeader>
             <FeedUserName>
               <Skeleton>John doe</Skeleton>
             </FeedUserName>
+            <FeedTimeAgo className="pt-1">
+              <Skeleton>1d ago</Skeleton>
+            </FeedTimeAgo>
+          </FeedHeader>
+          <FeedHeader>
             <FeedUserHandle>
               <Skeleton>@john</Skeleton>
             </FeedUserHandle>
-          </div>
-          <FeedTimeAgo className="pt-1">
-            <Skeleton>1d ago</Skeleton>
-          </FeedTimeAgo>
+          </FeedHeader>
         </div>
-      </FeedHeader>
+      </div>
       <FeedTitle className="pb-4 border-b border-nobelBlack-200">
         <Skeleton>This is a title of the post to represent loading state</Skeleton>
       </FeedTitle>

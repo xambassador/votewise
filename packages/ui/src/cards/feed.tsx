@@ -29,7 +29,7 @@ export type FeedContentProps = React.HTMLAttributes<HTMLDivElement>;
 export function FeedContent(props: FeedContentProps) {
   const { children, className, ...rest } = props;
   return (
-    <div {...rest} className={cn("flex flex-col gap-1", className)}>
+    <div {...rest} className={cn("flex flex-col gap-1 w-full", className)}>
       {children}
     </div>
   );
@@ -39,7 +39,7 @@ export type FeedHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 export function FeedHeader(props: FeedHeaderProps) {
   const { children, className, ...rest } = props;
   return (
-    <div {...rest} className={cn("flex items-center gap-2", className)}>
+    <div {...rest} className={cn("flex items-center justify-between gap-2 w-full", className)}>
       {children}
     </div>
   );
@@ -111,13 +111,19 @@ export function FeedFooter(props: FeedFooterProps) {
 }
 
 export function FeedFooterActions(props: React.HTMLAttributes<HTMLDivElement>) {
-  return <div {...props} className={cn("flex items-center gap-5", props.className)} />;
+  return <div {...props} className={cn("flex items-center", props.className)} />;
 }
 
 export function FeedFooterItem(props: React.HTMLAttributes<HTMLDivElement>) {
   const { children, className, ...rest } = props;
   return (
-    <div {...rest} className={cn("flex items-center gap-1", className)}>
+    <div
+      {...rest}
+      className={cn(
+        "flex items-center gap-1 hover:bg-nobelBlack-200/50 px-2 py-1 rounded transition-colors cursor-pointer",
+        className
+      )}
+    >
       {children}
     </div>
   );
@@ -196,5 +202,5 @@ export function Voters(props: React.HTMLAttributes<HTMLDivElement>) {
 }
 
 export function VotersCount(props: React.HTMLAttributes<HTMLSpanElement>) {
-  return <span {...props} className="text-xs text-gray-400" />;
+  return <span {...props} className={cn("text-xs text-gray-400", props.className)} />;
 }

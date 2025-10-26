@@ -34,15 +34,7 @@ export class Controller {
       type: group.type,
       status: group.status,
       logo_url: group.logo_url,
-      members: group.members.map((member) => ({
-        member_id: member.id,
-        role: member.role,
-        id: member.user.id,
-        first_name: member.user.first_name,
-        user_name: member.user.user_name,
-        last_name: member.user.last_name,
-        avatar_url: this.ctx.services.bucket.generatePublicUrl(member.user.avatar_url || "", "avatar")
-      })),
+      admin: group.admin ? { user_name: group.admin.user_name } : null,
       total_members: group._count.members,
       created_at: group.created_at,
       updated_at: group.updated_at

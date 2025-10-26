@@ -2,7 +2,7 @@ import { cn } from "@/lib/cn";
 
 export function Search(props: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div {...props} className={cn("p-4 rounded-xl border border-nobelBlack-200 bg-nobelBlack-100", props.className)} />
+    <div {...props} className={cn("p-5 rounded-xl border border-nobelBlack-200 bg-nobelBlack-100", props.className)} />
   );
 }
 

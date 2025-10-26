@@ -11,7 +11,6 @@ import {
   Feed,
   FeedContainer,
   FeedContent,
-  FeedContentTags,
   FeedContentText,
   FeedFooter,
   FeedFooterActions,
@@ -31,6 +30,7 @@ import { PaperPlane } from "@votewise/ui/icons/paper-plane";
 import { Separator } from "@votewise/ui/separator";
 
 import { cn } from "@/lib/cn";
+import { humanizeNumber } from "@/lib/humanize";
 import { routes } from "@/lib/routes";
 
 extend(relativeTime);
@@ -42,7 +42,7 @@ export const FeedMolecule = memo(function FeedMolecule(props: Props) {
   return (
     <Feed>
       <VoteContainer>
-        <VoteCount>{feed.votes}</VoteCount>
+        <VoteCount>{humanizeNumber(feed.votes)}</VoteCount>
         <VoteLabel>Votes</VoteLabel>
       </VoteContainer>
       <Separator orientation="vertical" className="h-auto" />
@@ -64,19 +64,13 @@ export const FeedMolecule = memo(function FeedMolecule(props: Props) {
             <Link href={routes.feed.view(feed.id)} className="focus-visible rounded">
               <FeedContentText>{truncateOnWord(feed.title, 128)}</FeedContentText>
             </Link>
-            <FeedContentTags>
-              {feed.hash_tags.map((tag) => (
-                <span key={tag.name}>#{tag.name}</span>
-              ))}
-            </FeedContentTags>
           </FeedContent>
         </div>
-
         <FeedFooter>
           <FeedFooterActions>
             <FeedFooterItem>
               <Comment className="text-gray-400" />
-              <span className="text-gray-400 text-xs">{feed.comments} Discussions</span>
+              <span className="text-gray-400 text-xs">{humanizeNumber(feed.comments)} Discussions</span>
             </FeedFooterItem>
             <FeedFooterItem>
               <PaperPlane className="text-gray-400" />
@@ -89,7 +83,9 @@ export const FeedMolecule = memo(function FeedMolecule(props: Props) {
                 <FeedAvatar key={voter.id} className="size-6" name="Voter" url={voter.avatar_url || ""} />
               ))}
             </Voters>
-            {feed.votes - feed.voters.length > 0 && <VotersCount>+{feed.votes - feed.voters.length}</VotersCount>}
+            {feed.votes - feed.voters.length > 0 && (
+              <VotersCount>+{humanizeNumber(feed.votes - feed.voters.length)}</VotersCount>
+            )}
           </VotersStack>
         </FeedFooter>
       </FeedContainer>

@@ -11,6 +11,7 @@ import {
   Group,
   GroupContent,
   GroupCreatedAt,
+  GroupCreatedBy,
   GroupDescription,
   GroupFooter,
   GroupHeader,
@@ -18,8 +19,8 @@ import {
   GroupName,
   GroupStatusBadge
 } from "@votewise/ui/cards/group";
-import { FloatingCounter } from "@votewise/ui/floating-counter";
 
+import { humanizeNumber } from "@/lib/humanize";
 import { routes } from "@/lib/routes";
 
 extend(relativeTime);
@@ -30,15 +31,17 @@ export function GroupMolecule(props: Props) {
   const { group } = props;
   return (
     <Group>
-      <div className="flex gap-3">
-        <Avatar className="size-20 rounded-xl">
-          <AvatarFallback name={group.name} className="rounded-none" />
-          <AvatarImage
-            src={group.logo_url ?? ""}
-            alt={group.name}
-            className="overflow-clip-margin-unset object-cover"
-          />
-        </Avatar>
+      <div className="flex items-start gap-4">
+        <Link href={routes.group.view(group.id)} className="focus-visible rounded-xl">
+          <Avatar className="size-20 rounded-xl">
+            <AvatarFallback name={group.name} className="rounded-none" />
+            <AvatarImage
+              src={group.logo_url ?? ""}
+              alt={group.name}
+              className="overflow-clip-margin-unset object-cover"
+            />
+          </Avatar>
+        </Link>
         <GroupContent>
           <GroupHeader>
             <GroupName asChild title={group.name}>
@@ -50,25 +53,17 @@ export function GroupMolecule(props: Props) {
           </GroupHeader>
           <GroupDescription>{truncateOnWord(group.about, 120)}</GroupDescription>
           <GroupFooter>
-            <GroupMembers>
-              {group.members.map((member) => (
-                <Avatar className="size-6" key={member.id}>
-                  <AvatarFallback name={member.first_name + " " + member.last_name} />
-                  <AvatarImage
-                    src={member.avatar_url}
-                    alt={member.first_name + " " + member.last_name}
-                    className="overflow-clip-margin-unset object-cover"
-                  />
-                </Avatar>
-              ))}
-              {group.total_members - group.members.length > 0 && (
-                <FloatingCounter className="size-7 text-xs -right-4">
-                  +{group.total_members - group.members.length}
-                </FloatingCounter>
-              )}
-            </GroupMembers>
+            <GroupMembers total={humanizeNumber(group.total_members)} />
             <GroupStatusBadge>{group.type.toLowerCase()}</GroupStatusBadge>
           </GroupFooter>
+          {group.admin && (
+            <GroupCreatedBy>
+              Created by{" "}
+              <Link className="focus-visible font-semibold" href={routes.user.profile(group.admin.user_name)}>
+                {group.admin.user_name}
+              </Link>
+            </GroupCreatedBy>
+          )}
         </GroupContent>
       </div>
     </Group>

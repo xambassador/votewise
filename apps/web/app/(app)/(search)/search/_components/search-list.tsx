@@ -56,7 +56,7 @@ function SearchResults() {
         <Search key={user.id}>
           <SearchContentBox>
             <SearchHeader>
-              <Link href={routes.user.profile(user.user_name)} className="focus-presets focus-primary">
+              <Link href={routes.user.profile(user.user_name)} className="focus-presets focus-primary rounded-full">
                 <Avatar className="size-12">
                   <AvatarFallback name={user.first_name + " " + user.last_name} />
                   <AvatarImage
@@ -77,7 +77,7 @@ function SearchResults() {
                 </Link>
               </div>
             </SearchHeader>
-            <p className="text-gray-300 text-sm">{user.about}</p>
+            <p className="text-gray-400 text-sm">{user.about}</p>
           </SearchContentBox>
         </Search>
       ))}
@@ -86,7 +86,7 @@ function SearchResults() {
         <Search key={group.id}>
           <SearchContentBox>
             <SearchHeader>
-              <Link href={routes.group.view(group.id)} className="focus-presets focus-primary">
+              <Link href={routes.group.view(group.id)} className="rounded focus-presets focus-primary">
                 <Avatar className="size-12 rounded">
                   <AvatarFallback name={group.name} />
                   <AvatarImage
@@ -107,7 +107,7 @@ function SearchResults() {
                 )}
               </div>
             </SearchHeader>
-            <p className="text-gray-300 text-sm">{group.about}</p>
+            <p className="text-gray-400 text-sm">{group.about}</p>
           </SearchContentBox>
         </Search>
       ))}

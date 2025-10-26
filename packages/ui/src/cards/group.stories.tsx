@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { getRandomImage, images } from "../_story-helpers";
+import { getRandomImage } from "../_story-helpers";
 import { Avatar, AvatarFallback, AvatarImage } from "../avatar";
-import { FloatingCounter } from "../floating-counter";
 import {
   Group,
   GroupContent,
   GroupCreatedAt,
+  GroupCreatedBy,
   GroupDescription,
   GroupFooter,
   GroupHeader,
@@ -21,7 +21,7 @@ const meta = {
   tags: ["autodocs", "group"],
   render: (args) => (
     <Group className="min-w-[600px] max-w-[600px]" {...args}>
-      <div className="flex gap-3">
+      <div className="flex items-start gap-4">
         <Avatar className="size-20 rounded-xl">
           <AvatarFallback name="Cincinnati club" />
           <AvatarImage src={getRandomImage().url} className="overflow-clip-margin-unset" />
@@ -38,17 +38,10 @@ const meta = {
             discussions on local culture, events, and more.
           </GroupDescription>
           <GroupFooter>
-            <GroupMembers>
-              {images.slice(0, 5).map((image) => (
-                <Avatar key={image.id} className="size-6">
-                  <AvatarFallback name={image.name} />
-                  <AvatarImage src={image.url} className="overflow-clip-margin-unset" />
-                </Avatar>
-              ))}
-              <FloatingCounter className="size-7 text-xs -right-4">+{images.length}</FloatingCounter>
-            </GroupMembers>
+            <GroupMembers total="1.2K" />
             <GroupStatusBadge>open</GroupStatusBadge>
           </GroupFooter>
+          <GroupCreatedBy>Created by johndoe</GroupCreatedBy>
         </GroupContent>
       </div>
     </Group>
