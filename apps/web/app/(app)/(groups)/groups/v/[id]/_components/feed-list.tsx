@@ -1,8 +1,8 @@
 "use client";
 
-import type { GetAllFeedsResponse } from "@votewise/client/feed";
+import type { GetGroupFeedsResponse } from "@votewise/client/group";
 
-import { useFetchFeeds } from "@/hooks/use-fetch-feeds";
+import { useFetchGroupFeeds } from "@/hooks/use-fetch-group-feeds";
 
 import { Error } from "@votewise/ui/error";
 
@@ -10,9 +10,9 @@ import { FeedMolecule } from "@/components/feed";
 import { FeedListSkeleton, FeedSkeleton } from "@/components/feed-skeleton";
 import { InView } from "@/components/in-view";
 
-export function FeedList(props: { feeds: GetAllFeedsResponse }) {
-  const { feeds } = props;
-  const { data, status, error, fetchNextPage, nextPageStatus } = useFetchFeeds({ initialData: feeds });
+export function GroupFeedList(props: { feeds: GetGroupFeedsResponse; groupId: string }) {
+  const { feeds, groupId } = props;
+  const { data, status, error, fetchNextPage, nextPageStatus } = useFetchGroupFeeds(groupId, { initialData: feeds });
 
   function handleInView(inView: boolean) {
     if (!inView) return;
@@ -24,7 +24,7 @@ export function FeedList(props: { feeds: GetAllFeedsResponse }) {
 
   switch (status) {
     case "pending":
-      return <FeedListSkeleton />;
+      return <FeedListSkeleton className="mt-5" />;
     case "error":
       return <Error error={error.message} errorInfo={{ componentStack: error.stack }} />;
   }
@@ -34,7 +34,7 @@ export function FeedList(props: { feeds: GetAllFeedsResponse }) {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 mt-5">
       {data.feeds.map((feed) => (
         <FeedMolecule data={feed} key={feed.id} />
       ))}

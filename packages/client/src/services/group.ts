@@ -2,6 +2,7 @@ import type {
   AcceptGroupJoinRequestResponse,
   CreateGroupResponse,
   GetAllGroupsResponse,
+  GetGroupFeedsResponse,
   GetGroupJoinRequestsResponse,
   GetGroupMembersResponse,
   GetGroupResponse,
@@ -98,6 +99,12 @@ export class Group {
     const response = await this.client.delete<RejectGroupJoinRequestResponse>(qs(path, query));
     return response;
   }
+
+  public async getFeeds(id: string, query?: TPagination) {
+    const path = groups.runtime.feeds("", id);
+    const response = await this.client.get<GetGroupFeedsResponse>(qs(path, query));
+    return response;
+  }
 }
 
 export type {
@@ -111,5 +118,6 @@ export type {
   SendGroupInviteResponse,
   GetGroupJoinRequestsResponse,
   AcceptGroupJoinRequestResponse,
-  RejectGroupJoinRequestResponse
+  RejectGroupJoinRequestResponse,
+  GetGroupFeedsResponse
 };

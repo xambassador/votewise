@@ -27,6 +27,7 @@ import { deleteFollowControllerFactory } from "./follow/delete";
 import { acceptGroupJoinRequestControllerFactory } from "./group/accept-group-join-request";
 import { acceptGroupInviteControllerFactory } from "./group/accept-invite";
 import { createGroupControllerFactory } from "./group/create";
+import { getGroupFeedsControllerFactory } from "./group/feeds";
 import { getGroupControllerFactory } from "./group/get";
 import { getAllGroupsControllerFactory } from "./group/get-all";
 import { getGroupJoinRequestsControllerFactory } from "./group/get-join-requests";
@@ -93,9 +94,10 @@ export function moduleRouterFactory(basePath: string): Router {
   router.get(groups.paths.myGroups(path), ...getMyGroupsControllerFactory());
   router.get(groups.paths.joinRequests(path), ...getGroupJoinRequestsControllerFactory());
   router.get(groups.paths.get(path), ...getGroupControllerFactory());
+  router.get(groups.paths.members(path), ...getGroupMembersControllerFactory());
+  router.get(groups.paths.feeds(path), ...getGroupFeedsControllerFactory());
   router.get(notifications.paths.all(path), ...getNotificationsControllerFactory());
   router.get(user.paths.profile.getByUsername(path), ...getUserProfileControllerFactory());
-  router.get(groups.paths.members(path), ...getGroupMembersControllerFactory());
   router.get(search.paths.all(path), ...searchControllerFactory());
 
   /* ----------------------------------------------------------------------------------------------- */

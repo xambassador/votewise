@@ -10,6 +10,7 @@ import {
 } from "@/hooks/use-notifications";
 
 import { Error } from "@votewise/ui/error";
+import { Bell } from "@votewise/ui/icons/bell";
 
 import { GroupJoinRequestNotification } from "@/components/notifications/group-join-request";
 import { GroupJoinedNotification } from "@/components/notifications/group-joined";
@@ -37,7 +38,12 @@ export function NotificationList(props: Props) {
   return (
     <div className="flex flex-col gap-4">
       {data.notifications.length === 0 && (
-        <div className="text-center text-sm text-gray-500 dark:text-gray-400">No notifications</div>
+        <div className="content-height center">
+          <div className="flex flex-col gap-3 items-center">
+            <Bell className="size-10 text-black-200" />
+            <h2 className="text-base text-gray-300">No new notifications</h2>
+          </div>
+        </div>
       )}
 
       {data.notifications.map((notification) => {

@@ -28,7 +28,7 @@ export class Controller {
     const cursor = unpack(query.cursor, () => this.ctx.assert.unprocessableEntity(true, "Invalid cursor"));
     const total = await this.ctx.repositories.timeline.countByUserId(locals.payload.sub);
     const timeline = await this.ctx.repositories.timeline.findByUserId(locals.payload.sub, { page, limit, cursor });
-    const timelineFeedPromises = timeline.map((timeline) => ({
+    const feeds = timeline.map((timeline) => ({
       id: timeline.post.id,
       title: timeline.post.title,
       slug: timeline.post.slug,
@@ -49,8 +49,7 @@ export class Controller {
       })),
       comments: timeline.post.postAggregates?.comments ?? 0
     }));
-    const feeds = await Promise.all(timelineFeedPromises);
-    const nextCursor = timeline.at(-1);
+    const nextCursor = feeds.length < limit ? undefined : timeline.at(-1);
     const pagination = new PaginationBuilder({
       total,
       page,

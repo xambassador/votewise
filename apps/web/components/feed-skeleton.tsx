@@ -18,10 +18,13 @@ import {
 import { Separator } from "@votewise/ui/separator";
 import { Skeleton } from "@votewise/ui/skeleton";
 
-export function FeedListSkeleton() {
+import { cn } from "@/lib/cn";
+
+export function FeedListSkeleton(props: React.HTMLAttributes<HTMLDivElement> & { count?: number }) {
+  const count = props.count ?? 10;
   return (
-    <div className="flex flex-col gap-5">
-      {Array.from({ length: 10 }).map((_, i) => (
+    <div {...props} className={cn("flex flex-col gap-5", props.className)}>
+      {Array.from({ length: count }).map((_, i) => (
         <FeedSkeleton key={i} />
       ))}
     </div>

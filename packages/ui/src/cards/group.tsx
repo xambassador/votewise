@@ -17,10 +17,7 @@ export const Group = forwardRef<HTMLDivElement, GroupProps>((props, ref) => {
     <Comp
       ref={ref}
       {...rest}
-      className={cn(
-        "p-5 rounded-xl bg-gradient-to-br from-nobelBlack-100 to-nobelBlack-50 border border-nobelBlack-200 bg-nobelBlack-100",
-        className
-      )}
+      className={cn("p-5 rounded-xl border border-nobelBlack-200 bg-nobelBlack-100", className)}
     >
       {children}
     </Comp>

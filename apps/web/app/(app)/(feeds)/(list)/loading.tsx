@@ -1,4 +1,4 @@
-import { FeedListSkeleton } from "../_components/skeleton";
+import { FeedListSkeleton } from "@/components/feed-skeleton";
 
 export default function Loading() {
   return <FeedListSkeleton />;

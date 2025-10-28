@@ -2,6 +2,7 @@
 
 import type { GetGroupResponse } from "@votewise/client/group";
 
+import { Fragment } from "react";
 import { useFetchGroup } from "@/hooks/use-fetch-group";
 import dayjs, { extend } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -38,7 +39,7 @@ export function GroupView(props: Props) {
   const group = data;
 
   return (
-    <div className="flex flex-col gap-5">
+    <Fragment>
       <div className="flex flex-col gap-4">
         <div className="relative">
           <figure className="relative w-full h-[calc((200/16)*1rem)] max-h-[calc((200/16)*1rem)] rounded-xl overflow-hidden">
@@ -56,7 +57,9 @@ export function GroupView(props: Props) {
         <div className="w-full flex items-center justify-end gap-2">
           <Badge>{group.type.toLowerCase()}</Badge>
           {group.is_invite_sent && <Badge variant="outline">Invite Sent</Badge>}
-          {!group.self_is_member && !group.is_invite_sent && <JoinGroupBtn groupId={group.id} />}
+          {!group.self_is_member && !group.is_invite_sent && group.status === "OPEN" && (
+            <JoinGroupBtn groupId={group.id} />
+          )}
         </div>
       </div>
       <div className="flex flex-col gap-7">
@@ -79,17 +82,8 @@ export function GroupView(props: Props) {
             <div className="pb-3 border-b border-nobelBlack-200 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <User className="size-5 text-black-200" />
-                <span>
+                <span className="text-sm">
                   <b className="text-blue-300 text-lg">{group.aggregate.total_members}</b> members
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="relative size-2">
-                  <div className="rounded-full bg-green-500 animate-ping absolute inset-0" />
-                  <div className="rounded-full bg-green-500 absolute inset-0" />
-                </div>
-                <span>
-                  <b className="text-blue-300 text-lg">{group.aggregate.total_members}</b> online
                 </span>
               </div>
             </div>
@@ -97,19 +91,19 @@ export function GroupView(props: Props) {
             <div className="pb-3 border-b border-nobelBlack-200 flex items-center gap-5">
               <div className="flex items-center gap-2">
                 <Pencil className="size-5 text-black-200" />
-                <span>
+                <span className="text-sm">
                   <b className="text-blue-300 text-lg">{group.aggregate.total_posts}</b> posts
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <Comment className="size-5 text-black-200" />
-                <span>
+                <span className="text-sm">
                   <b className="text-blue-300 text-lg">{group.aggregate.total_comments}</b> comments
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <Heart className="size-5 text-black-200" />
-                <span>
+                <span className="text-sm">
                   <b className="text-blue-300 text-lg">{group.aggregate.total_votes}</b> votes
                 </span>
               </div>
@@ -117,6 +111,6 @@ export function GroupView(props: Props) {
           </div>
         </div>
       </div>
-    </div>
+    </Fragment>
   );
 }

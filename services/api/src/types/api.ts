@@ -39,6 +39,7 @@ export type { AcceptInviteResponse } from "@/core/group/accept-invite/controller
 export type { GetGroupJoinRequestsResponse } from "@/core/group/get-join-requests/controller";
 export type { RejectInviteResponse } from "@/core/group/reject-invite/controller";
 export type { GetGroupMembersResponse } from "@/core/group/get-members/controller";
+export type { GetGroupFeedsResponse } from "@/core/group/feeds/controller";
 export type { GetAllNotificationsResponse } from "@/core/notification/get-all/controller";
 export type { MarkNotificationReadResponse } from "@/core/notification/mark-read/controller";
 export type { LeaveGroupResponse } from "@/core/group/leave/controller";

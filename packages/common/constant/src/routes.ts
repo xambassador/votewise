@@ -267,7 +267,9 @@ export const groups = {
     /** Decline a group join request */
     declineJoinRequest: (base: string) => base + "/groups/join-requests/:id/decline",
     /** Get group members */
-    members: (base: string) => base + "/groups/:groupId/members"
+    members: (base: string) => base + "/groups/:groupId/members",
+    /** Get feeds */
+    feeds: (base: string) => base + "/groups/:groupId/feeds"
   },
   runtime: {
     /** Get all groups */
@@ -298,7 +300,9 @@ export const groups = {
     declineJoinRequest: (base: string, joinRequestId: string) =>
       base + `/groups/join-requests/${joinRequestId}/decline`,
     /** Get group members */
-    members: (base: string, groupId: string) => base + `/groups/${groupId}/members`
+    members: (base: string, groupId: string) => base + `/groups/${groupId}/members`,
+    /** Get feeds */
+    feeds: (base: string, groupId: string) => base + `/groups/${groupId}/feeds`
   }
 };
 
