@@ -110,6 +110,7 @@ export function VoteButton(props: VoteButtonProps) {
         "flex items-center justify-center shadow-vote-button shadow-nobelBlack-200 hover:shadow-vote-button-hover hover:shadow-nobelBlack-200 hover:translate-y-[-2px] active:shadow-vote-button-active active:shadow-nobelBlack-200 active:translate-y-[2px] " +
         cn(
           "px-5 rounded-xl bg-nobelBlack-100 border border-nobelBlack-200 text-sm text-gray-50 h-12 max-w-20 w-full transition-[shadow_transform] outline-none focus:ring-0 focus:border-blue-500",
+          isDisabled && "opacity-50 cursor-not-allowed",
           className
         )
       }

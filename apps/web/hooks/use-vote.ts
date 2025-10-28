@@ -18,6 +18,7 @@ export function useVote(props: Props) {
   const queryKey = getFeedKey(feedId);
   const queryClient = useQueryClient();
   const me = useMe("useVote");
+  const canVote = me.votes_left > 0;
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -57,8 +58,10 @@ export function useVote(props: Props) {
     return {
       showCount: true,
       ...props,
+      children: canVote ? props?.children : "You have no votes left for today",
       onClick: chain(mutation.mutate, props?.onClick),
-      loading: mutation.isPending
+      loading: mutation.isPending,
+      disabled: !canVote || mutation.isPending
     };
   }
 

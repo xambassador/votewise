@@ -28,6 +28,7 @@ export class Controller {
       about: user!.about,
       gender: user!.gender,
       location: user!.location,
+      votes_left: user.vote_bucket,
       aggregation: {
         total_comments: user!.userAggregates?.total_comments ?? 0,
         total_posts: user!.userAggregates?.total_posts ?? 0,

@@ -15,9 +15,13 @@ export function VoteButton(props: Props) {
   const { getButtonProps } = useVote({ feedId });
   return (
     <VoteProvider className="w-full max-w-full" count={upvoteCount}>
-      <Button {...getButtonProps({ className: "w-full max-w-full bg-nobelBlack-50", isVoted })}>
-        <VoteCount variant="minimal" />
-      </Button>
+      <Button
+        {...getButtonProps({
+          className: "w-full max-w-full bg-nobelBlack-50",
+          isVoted,
+          children: <VoteCount variant="minimal" />
+        })}
+      />
     </VoteProvider>
   );
 }

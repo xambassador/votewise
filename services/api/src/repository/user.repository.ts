@@ -169,7 +169,8 @@ export class UserRepository extends BaseRepository {
           "ua.total_followers",
           "ua.total_following",
           "ua.total_posts",
-          "ua.total_groups"
+          "ua.total_groups",
+          "u.vote_bucket"
         ])
         .executeTakeFirst();
 
@@ -188,6 +189,7 @@ export class UserRepository extends BaseRepository {
         location: user.location,
         gender: user.gender,
         created_at: user.created_at,
+        vote_bucket: user.vote_bucket,
         userAggregates: {
           total_comments: user.total_comments,
           total_votes: user.total_votes,
