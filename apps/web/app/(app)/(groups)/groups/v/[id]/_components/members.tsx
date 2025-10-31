@@ -165,7 +165,7 @@ function User(props: { name: string; username: string; avatar: string }) {
     <div className="flex gap-1">
       <Link href={routes.user.profile(username)} className="focus-presets focus-primary rounded">
         <Avatar>
-          <AvatarImage src={avatar} alt={name} className="object-cover overflow-clip-margin-unset" />
+          <AvatarImage src={avatar} alt={name} />
           <AvatarFallback name={name} />
         </Avatar>
       </Link>

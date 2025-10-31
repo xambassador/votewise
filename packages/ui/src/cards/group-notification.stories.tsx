@@ -16,7 +16,7 @@ const meta = {
       <Card.NotificationContent>
         <Avatar>
           <AvatarFallback />
-          <AvatarImage src={getRandomImage().url} alt="User" className="overflow-clip-margin-unset" />
+          <AvatarImage src={getRandomImage().url} alt="User" />
         </Avatar>
         <div className="flex flex-col gap-4">
           <Card.NotificationHeader>

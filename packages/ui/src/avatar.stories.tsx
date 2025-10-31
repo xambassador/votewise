@@ -13,7 +13,7 @@ const meta = {
   args: {},
   render: (args) => (
     <Avatar {...args}>
-      <AvatarImage src={getRandomImage().url} className="overflow-clip-margin-unset" />
+      <AvatarImage src={getRandomImage().url} />
       <AvatarFallback name="John doe" />
     </Avatar>
   )
@@ -28,7 +28,7 @@ export const Default: Story = {};
 export const WithFallback: Story = {
   render: (args) => (
     <Avatar {...args}>
-      <AvatarImage src="https://notfound.com" className="overflow-clip-margin-unset" />
+      <AvatarImage src="https://notfound.com" />
       <AvatarFallback name="John doe" />
     </Avatar>
   )

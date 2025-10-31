@@ -24,7 +24,7 @@ const meta = {
       <div className="flex items-start gap-4">
         <Avatar className="size-20 rounded-xl">
           <AvatarFallback name="Cincinnati club" />
-          <AvatarImage src={getRandomImage().url} className="overflow-clip-margin-unset" />
+          <AvatarImage src={getRandomImage().url} />
         </Avatar>
 
         <GroupContent>

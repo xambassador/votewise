@@ -25,7 +25,11 @@ type AvatarImageRef = React.ElementRef<typeof AvatarPrimitive.Image>;
 export type AvatarImageProps = React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>;
 
 export const AvatarImage = forwardRef<AvatarImageRef, AvatarImageProps>(({ className, ...props }, ref) => (
-  <AvatarPrimitive.Image ref={ref} className={cn("aspect-square h-full w-full", className)} {...props} />
+  <AvatarPrimitive.Image
+    ref={ref}
+    className={cn("aspect-square h-full w-full object-cover overflow-clip-margin-unset", className)}
+    {...props}
+  />
 ));
 AvatarImage.displayName = AvatarPrimitive.Image.displayName;
 

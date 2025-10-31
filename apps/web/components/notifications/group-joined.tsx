@@ -29,7 +29,6 @@ export const GroupJoinedNotification = memo(
             <AvatarImage
               src={notification.content.avatar_url}
               alt={notification.content.first_name + " " + notification.content.last_name}
-              className="object-cover overflow-clip-margin-unset"
             />
             <AvatarFallback name={notification.content.first_name + " " + notification.content.last_name} />
           </Avatar>

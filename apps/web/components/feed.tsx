@@ -97,7 +97,7 @@ const FeedAvatar = memo(function FeedAvatar(props: { name: string; url: string; 
   return (
     <Avatar className={cn("size-12", props.className)}>
       <AvatarFallback name={props.name} />
-      <AvatarImage src={props.url} alt={props.name} className="object-cover overflow-clip-margin-unset" />
+      <AvatarImage src={props.url} alt={props.name} />
     </Avatar>
   );
 });

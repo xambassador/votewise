@@ -15,7 +15,7 @@ export function ProfileImage(props: Props) {
         <Image className="size-full object-cover" src={coverImage} alt={name} />
       </figure>
       <Avatar className="size-20 absolute -bottom-10 left-5">
-        <AvatarImage src={avatarUrl} alt={name} className="object-cover overflow-clip-margin-unset" />
+        <AvatarImage src={avatarUrl} alt={name} />
         <AvatarFallback name={name} />
       </Avatar>
     </div>

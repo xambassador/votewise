@@ -62,7 +62,6 @@ export function FeedContent(props: Props) {
             <AvatarImage
               src={feed.author.avatar_url || ""}
               alt={feed.author.first_name + " " + feed.author.last_name}
-              className="object-cover overflow-clip-margin-unset"
             />
           </Avatar>
         </Link>
@@ -95,11 +94,7 @@ export function FeedContent(props: Props) {
               {feed.voters.map((voter) => (
                 <Avatar className="size-8" key={voter.id}>
                   <AvatarFallback name="Jane Smith" />
-                  <AvatarImage
-                    src={voter.avatar_url || ""}
-                    alt="Voter"
-                    className="object-cover overflow-clip-margin-unset"
-                  />
+                  <AvatarImage src={voter.avatar_url || ""} alt="Voter" />
                 </Avatar>
               ))}
             </Voters>

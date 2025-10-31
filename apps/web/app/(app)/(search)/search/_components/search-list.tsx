@@ -59,11 +59,7 @@ function SearchResults() {
               <Link href={routes.user.profile(user.user_name)} className="focus-presets focus-primary rounded-full">
                 <Avatar className="size-12">
                   <AvatarFallback name={user.first_name + " " + user.last_name} />
-                  <AvatarImage
-                    src={user.avatar}
-                    alt={user.first_name + " " + user.last_name}
-                    className="object-cover overflow-clip-margin-unset"
-                  />
+                  <AvatarImage src={user.avatar} alt={user.first_name + " " + user.last_name} />
                 </Avatar>
               </Link>
               <div className="flex flex-col">
@@ -89,11 +85,7 @@ function SearchResults() {
               <Link href={routes.group.view(group.id)} className="rounded focus-presets focus-primary">
                 <Avatar className="size-12 rounded">
                   <AvatarFallback name={group.name} />
-                  <AvatarImage
-                    src={group.logo_url ?? ""}
-                    alt={group.name}
-                    className="object-cover overflow-clip-margin-unset"
-                  />
+                  <AvatarImage src={group.logo_url ?? ""} alt={group.name} />
                 </Avatar>
               </Link>
               <div className="flex flex-col">

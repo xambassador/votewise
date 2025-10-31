@@ -46,11 +46,7 @@ export function GroupView(props: Props) {
             <Image className="max-w-full size-full object-cover" src={group.cover_url ?? ""} alt={group.name} />
           </figure>
           <Avatar className="size-20 absolute -bottom-10 left-5">
-            <AvatarImage
-              src={group.logo_url ?? ""}
-              alt={group.name}
-              className="object-cover overflow-clip-margin-unset"
-            />
+            <AvatarImage src={group.logo_url ?? ""} alt={group.name} />
             <AvatarFallback name={group.name} />
           </Avatar>
         </div>

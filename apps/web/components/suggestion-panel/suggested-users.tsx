@@ -48,11 +48,7 @@ async function SuggestedUsersList() {
         <SuggestedUserCard.RecommendedUserCard userId={user.id} key={user.id}>
           <Avatar>
             <AvatarFallback name={user.first_name + " " + user.last_name} />
-            <AvatarImage
-              src={user.avatar_url}
-              alt={user.first_name}
-              className="overflow-clip-margin-unset object-cover"
-            />
+            <AvatarImage src={user.avatar_url} alt={user.first_name} />
           </Avatar>
           <div className="flex flex-col gap-1 flex-1">
             <SuggestedUserCard.RecommendedUserCardHeader>

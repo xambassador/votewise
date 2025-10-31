@@ -35,11 +35,7 @@ export function GroupMolecule(props: Props) {
         <Link href={routes.group.view(group.id)} className="focus-visible rounded-xl">
           <Avatar className="size-20 rounded-xl">
             <AvatarFallback name={group.name} className="rounded-none" />
-            <AvatarImage
-              src={group.logo_url ?? ""}
-              alt={group.name}
-              className="overflow-clip-margin-unset object-cover"
-            />
+            <AvatarImage src={group.logo_url ?? ""} alt={group.name} />
           </Avatar>
         </Link>
         <GroupContent>

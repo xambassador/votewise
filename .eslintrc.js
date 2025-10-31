@@ -10,7 +10,7 @@ const config = {
     browser: true
   },
   globals: {
-    // eslint show errors when refrencing NodeJS namespace types because it is global and eslint has no idea about it.
+    // eslint show errors when referencing NodeJS namespace types because it is global and eslint has no idea about it.
     // https://eslint.org/docs/latest/use/configure/language-options#specifying-globals
     NodeJS: "readonly",
     jest: "readonly"

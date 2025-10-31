@@ -25,7 +25,7 @@ const meta = {
       <Notification className="min-w-[600px] max-w-[600px]" {...args}>
         <Avatar>
           <AvatarFallback name="Amelia olla" />
-          <AvatarImage src={getRandomImage().url} className="overflow-clip-margin-unset" />
+          <AvatarImage src={getRandomImage().url} />
         </Avatar>
         <NotificationContent>
           <NotificationHeader>
@@ -47,7 +47,7 @@ const meta = {
       <Notification className="min-w-[600px] max-w-[600px]" {...args}>
         <Avatar>
           <AvatarFallback name="Amelia olla" />
-          <AvatarImage src={getRandomImage().url} className="overflow-clip-margin-unset" />
+          <AvatarImage src={getRandomImage().url} />
         </Avatar>
         <NotificationContent>
           <NotificationHeader>

@@ -50,7 +50,11 @@ export function ImageCard(props: Props) {
         )}
         {isLoaded && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt={alt || "Avatar"} className="size-full object-cover rounded-2xl" />
+          <img
+            src={url}
+            alt={alt || "Avatar"}
+            className="size-full object-cover rounded-2xl overflow-clip-margin-unset"
+          />
         )}
       </figure>
       {children}
