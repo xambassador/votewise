@@ -19,21 +19,22 @@ export function checkStrength(password: string) {
 }
 export type Strength = ReturnType<typeof checkStrength>;
 
+const base = "min-w-10 max-w-10 h-1 rounded-full";
+
 export type PasswordStrengthProps = React.HTMLAttributes<HTMLDivElement> & { password: string };
 export const PasswordStrength = forwardRef<HTMLDivElement, PasswordStrengthProps>((props, ref) => {
   const { password, ...rest } = props;
 
   const strength = checkStrength(password);
   const isValid = (valid: boolean) => (valid ? "bg-green-500" : "bg-nobelBlack-200");
-  const base = "min-w-10 max-w-10 h-1 rounded-full";
 
   return (
     <div {...rest} className={cn("flex items-center gap-1", rest.className)} ref={ref}>
-      <div className={cn(base, isValid(strength.hasLength))} />
+      <div className={cn(base, isValid(strength.hasUpperCase))} />
       <div className={cn(base, isValid(strength.hasLowerCase))} />
       <div className={cn(base, isValid(strength.hasNumber))} />
       <div className={cn(base, isValid(strength.hasSpecial))} />
-      <div className={cn(base, isValid(strength.hasUpperCase))} />
+      <div className={cn(base, isValid(strength.hasLength))} />
     </div>
   );
 });

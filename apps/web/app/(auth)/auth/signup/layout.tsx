@@ -16,7 +16,7 @@ export default function Layout(props: Props) {
         <DotBackground className="flex flex-col justify-center">
           {() => (
             <Banner title="Create Account" subtitle="We're so excited to have you join us!">
-              <Link className="text-blue-400 w-fit" href={routes.auth.signIn()}>
+              <Link className="text-blue-400 w-fit focus-presets focus-presets" href={routes.auth.signIn()}>
                 Log In Here!
               </Link>
             </Banner>

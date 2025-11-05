@@ -51,7 +51,7 @@ export function SignInForm() {
 const usernameLabel = <FormLabel className="sr-only">Username or email address</FormLabel>;
 const passwordLabel = <FormLabel className="sr-only">Password</FormLabel>;
 const forgotLink = (
-  <Link href={routes.auth.forgot()} className="font-medium text-sm text-gray-500 w-fit">
+  <Link href={routes.auth.forgot()} className="font-medium text-sm text-gray-500 w-fit focus-presets">
     Forgot?
   </Link>
 );

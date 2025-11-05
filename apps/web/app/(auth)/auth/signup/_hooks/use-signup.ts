@@ -50,7 +50,7 @@ export function useSignup() {
   }
 
   function getSubmitButtonProps(props?: ButtonProps): ButtonProps {
-    return { children: "Let’s Do This!", ...props, onClick: handleSubmit, disabled: isPending, loading: isPending };
+    return { children: "Let's Do This!", ...props, onClick: handleSubmit, disabled: isPending, loading: isPending };
   }
 
   function getEmailInputProps(props?: EmailInputProps): EmailInputProps {

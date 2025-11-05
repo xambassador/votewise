@@ -30,7 +30,7 @@ export const PasswordInput = forwardRef<InputRef, PasswordInputProps>((props, re
       <Input autoComplete="current-password" {...inputProps} type={type} ref={ref} />
       <button
         type="button"
-        className="absolute top-1/2 right-2 -translate-y-1/2"
+        className="absolute top-1/2 right-2 -translate-y-1/2 focus-presets rounded"
         onClick={onToggle}
         aria-label="Toggle password visibility"
         title="Toggle password visibility"
