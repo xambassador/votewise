@@ -26,7 +26,7 @@ export function SearchList() {
 }
 
 function SearchResults() {
-  const { data, isError, error, isLoading } = useFetchSearchQuery();
+  const { data, isError, error, isLoading, searchQuery } = useFetchSearchQuery();
 
   if (isLoading) {
     return (
@@ -43,9 +43,17 @@ function SearchResults() {
   }
 
   if (!data || (data.results.users.length === 0 && data.results.groups.length === 0)) {
+    if (searchQuery.trim().length === 0) {
+      return (
+        <div className="center h-96">
+          <p className="text-base text-gray-400">Start searching</p>
+        </div>
+      );
+    }
+
     return (
       <div className="center h-96">
-        <p className="text-base text-gray-400">No results found.</p>
+        <p className="text-base text-gray-400">No results found</p>
       </div>
     );
   }

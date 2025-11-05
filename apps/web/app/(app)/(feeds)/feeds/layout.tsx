@@ -1,3 +1,5 @@
+import { Authorized } from "@/components/auth";
+
 export default function Layout(props: React.PropsWithChildren) {
-  return props.children;
+  return <Authorized>{props.children}</Authorized>;
 }

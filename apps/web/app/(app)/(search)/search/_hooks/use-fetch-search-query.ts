@@ -24,5 +24,5 @@ export function useFetchSearchQuery() {
     },
     enabled: !!q
   });
-  return query;
+  return { ...query, searchQuery: q };
 }
