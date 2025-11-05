@@ -23,10 +23,10 @@ import { MembersSheet } from "./members-sheet";
 
 extend(relativeTime);
 
-type Props = { group: GetGroupResponse; id: string };
+type Props = { group: GetGroupResponse; id: string; editSlot?: React.ReactNode };
 
 export function GroupView(props: Props) {
-  const { group: initialData, id } = props;
+  const { group: initialData, id, editSlot } = props;
   const { data, status, error } = useFetchGroup(id, { initialData });
 
   switch (status) {
@@ -51,6 +51,7 @@ export function GroupView(props: Props) {
           </Avatar>
         </div>
         <div className="w-full flex items-center justify-end gap-2">
+          {editSlot}
           <Badge>{group.type.toLowerCase()}</Badge>
           {group.is_invite_sent && <Badge variant="outline">Invite Sent</Badge>}
           {!group.self_is_member && !group.is_invite_sent && group.status === "OPEN" && (

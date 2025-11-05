@@ -56,7 +56,7 @@ export class Controller {
       self_is_member: isMember,
       is_invite_sent: isInviteSent,
       admin: {
-        id: admin.id,
+        id: admin.user.id,
         username: admin.user.user_name,
         first_name: admin.user.first_name,
         last_name: admin.user.last_name,

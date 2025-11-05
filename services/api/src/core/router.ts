@@ -39,6 +39,7 @@ import { leaveGroupControllerFactory } from "./group/leave";
 import { getMyGroupsControllerFactory } from "./group/my-groups";
 import { rejectGroupJoinRequestControllerFactory } from "./group/reject-group-join-request";
 import { rejectGroupInviteControllerFactory } from "./group/reject-invite";
+import { updateGroupControllerFactory } from "./group/update";
 import { getNotificationsControllerFactory } from "./notification/get-all";
 import { markReadNotificationControllerFactory } from "./notification/mark-read";
 import { getGroupRecommendationsControllerFactory } from "./recommendation/group";
@@ -126,6 +127,7 @@ export function moduleRouterFactory(basePath: string): Router {
 
   /* ----------------------------------------------------------------------------------------------- */
   router.put(comments.paths.update(path), ...updateCommentControllerFactory());
+  router.put(groups.paths.update(path), ...updateGroupControllerFactory());
 
   /* ----------------------------------------------------------------------------------------------- */
   router.patch(auth.paths.verify(path), ...verifyControllerFactory(auth.paths.verify(path)));

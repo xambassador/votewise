@@ -9,7 +9,7 @@ import { Input } from "@votewise/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@votewise/ui/select";
 import { Textarea } from "@votewise/ui/textarea";
 
-import { EditImage } from "../edit-image";
+import { EditImage } from "../../edit-image";
 
 export function CreateGroup(props: React.ComponentProps<typeof Dialog>) {
   const form = useCreateGroup(props);

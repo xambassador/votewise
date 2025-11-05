@@ -11,9 +11,10 @@ import type {
   KickMemberResponse,
   LeaveGroupResponse,
   RejectGroupJoinRequestResponse,
-  SendGroupInviteResponse
+  SendGroupInviteResponse,
+  UpdateGroupResponse
 } from "@votewise/api";
-import type { TGroupCreate } from "@votewise/schemas/group";
+import type { TGroupCreate, TGroupUpdate } from "@votewise/schemas/group";
 import type { TPagination } from "@votewise/schemas/pagination";
 import type { BaseOptions, TClient } from "../utils";
 
@@ -49,6 +50,12 @@ export class Group {
   public async create(data: TGroupCreate) {
     const path = groups.runtime.create("");
     const response = await this.client.post<CreateGroupResponse, TGroupCreate>(path, data);
+    return response;
+  }
+
+  public async update(id: string, data: TGroupUpdate) {
+    const path = groups.runtime.update("", id);
+    const response = await this.client.put<UpdateGroupResponse, TGroupUpdate>(path, data);
     return response;
   }
 
@@ -119,5 +126,6 @@ export type {
   GetGroupJoinRequestsResponse,
   AcceptGroupJoinRequestResponse,
   RejectGroupJoinRequestResponse,
-  GetGroupFeedsResponse
+  GetGroupFeedsResponse,
+  UpdateGroupResponse
 };

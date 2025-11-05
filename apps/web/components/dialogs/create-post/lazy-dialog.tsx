@@ -3,7 +3,7 @@
 import { Close, Dialog, DialogContent, DialogDescription, DialogTitle } from "@votewise/ui/dialog";
 import { Dash } from "@votewise/ui/icons/dash";
 
-import { CurrentUserAvatar } from "../current-user-avatar";
+import { CurrentUserAvatar } from "../../current-user-avatar";
 import { AssetPicker, Assets, ContentInput, ProgressTracker, SubmitButton, TitleInput } from "./form-elements";
 import { PickTopics } from "./pick-topics";
 

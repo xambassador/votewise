@@ -23,4 +23,9 @@ export const ZGroupCreate = z.object({
   logo_url: z.string().url().optional()
 });
 
+export const ZGroupUpdate = ZGroupCreate.extend({
+  status: z.enum(["OPEN", "CLOSED", "INACTIVE"]).optional()
+});
+
 export type TGroupCreate = z.infer<typeof ZGroupCreate>;
+export type TGroupUpdate = z.infer<typeof ZGroupUpdate>;

@@ -1,5 +1,11 @@
 import type { GroupMemberRole, GroupStatus } from "@votewise/prisma/client";
-import type { GroupInvitationUpdate, NewGroup, NewGroupInvitation, NewGroupNotification } from "@votewise/prisma/db";
+import type {
+  GroupInvitationUpdate,
+  GroupUpdate,
+  NewGroup,
+  NewGroupInvitation,
+  NewGroupNotification
+} from "@votewise/prisma/db";
 import type { Tx } from "./transaction";
 
 import { sql } from "@votewise/prisma";
@@ -299,6 +305,17 @@ export class GroupRepository extends BaseRepository {
         .returningAll()
         .executeTakeFirstOrThrow();
       return group;
+    });
+  }
+
+  public update(id: string, data: GroupUpdate, tx?: Tx) {
+    const db = tx ?? this.dataLayer;
+    return this.execute(async () => {
+      await db
+        .updateTable("Group")
+        .set({ ...data, updated_at: new Date() })
+        .where("id", "=", id)
+        .execute();
     });
   }
 

@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { Tabs, TabsList, TabsTrigger } from "@votewise/ui/tab";
 
-import { CreateGroup } from "@/components/create-group";
+import { CreateGroup } from "@/components/dialogs/create-group";
 
 const links = [
   { href: "/groups", label: "Groups", id: "groups" },

@@ -6,7 +6,7 @@ import { Search } from "@votewise/ui/icons/search";
 import { User } from "@votewise/ui/icons/user";
 import { Users } from "@votewise/ui/icons/users";
 
-import { CreatePostDialog } from "./create-post";
+import { CreatePostDialog } from "./dialogs/create-post";
 import { Link } from "./link";
 import { Logout } from "./logout";
 import { NotificationButton } from "./notification-button";
