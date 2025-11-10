@@ -23,9 +23,7 @@ export function GroupTabs() {
             {link.label}
           </TabsTrigger>
         ))}
-        <CreateGroup className="ml-auto py-1" size="sm">
-          Create
-        </CreateGroup>
+        <CreateGroup className="ml-auto py-1" size="sm" />
       </TabsList>
     </Tabs>
   );
