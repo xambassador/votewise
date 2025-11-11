@@ -36,7 +36,8 @@ export class Controller {
           content: body.content,
           title: body.title,
           slug,
-          status: body.status!
+          status: body.status!,
+          groupId: body.group_id
         },
         tx
       );

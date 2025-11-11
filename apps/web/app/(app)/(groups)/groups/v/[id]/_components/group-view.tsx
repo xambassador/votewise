@@ -2,7 +2,7 @@
 
 import type { GetGroupResponse } from "@votewise/client/group";
 
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { useFetchGroup } from "@/hooks/use-fetch-group";
 import dayjs, { extend } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -17,6 +17,8 @@ import { Pencil } from "@votewise/ui/icons/pencil";
 import { User } from "@votewise/ui/icons/user";
 import { Image } from "@votewise/ui/image";
 
+import { useSetActiveGroup } from "@/lib/global-store";
+
 import Loading from "../loading";
 import { JoinGroupBtn } from "./join-group-btn";
 import { MembersSheet } from "./members-sheet";
@@ -28,6 +30,16 @@ type Props = { group: GetGroupResponse; id: string; editSlot?: React.ReactNode }
 export function GroupView(props: Props) {
   const { group: initialData, id, editSlot } = props;
   const { data, status, error } = useFetchGroup(id, { initialData });
+  const setActiveGroup = useSetActiveGroup();
+
+  useEffect(() => {
+    if (!data) return;
+    if (!data.self_is_member) return;
+    setActiveGroup({ id: data.id, name: data.name });
+
+    // eslint-disable-next-line consistent-return
+    return () => setActiveGroup(null);
+  }, [data, setActiveGroup]);
 
   switch (status) {
     case "pending":

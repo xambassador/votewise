@@ -13,6 +13,7 @@ type TCreate = {
   title: string;
   type: PostType;
   authorId: string;
+  groupId?: string;
 };
 
 export class FeedRepository extends BaseRepository {
@@ -36,6 +37,7 @@ export class FeedRepository extends BaseRepository {
           title: data.title,
           type: data.type,
           author_id: data.authorId,
+          group_id: data.groupId,
           created_at: new Date(),
           updated_at: new Date()
         })

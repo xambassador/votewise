@@ -10,6 +10,7 @@ import type { Input } from "@votewise/ui/input-basic";
 import type { Textarea } from "@votewise/ui/textarea-autosize";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 
 import { useComboBoxTrigger } from "@votewise/ui/combobox";
@@ -18,6 +19,8 @@ import { makeToast } from "@votewise/ui/toast";
 import { chain } from "@/lib/chain";
 import { feedClient, onboardClient, uploadClient } from "@/lib/client";
 import { cn } from "@/lib/cn";
+import { getGroupFeedsKey } from "@/lib/constants";
+import { useActiveGroup } from "@/lib/global-store";
 
 /* ----------------------------------------------------------------------------------------------- */
 
@@ -189,6 +192,8 @@ export function useSubmit() {
   const [topics, setTopics] = useAtom(selectedTopicsAtom);
   const setCreatePostDialogOpen = useSetAtom(isCreatePostDialogOpenAtom);
   const [files, setFiles] = useAtom(filesAtom);
+  const group = useActiveGroup();
+  const queryClient = useQueryClient();
   const isDisabled = !(title && postContent && topics.length > 0);
 
   async function handleSubmit() {
@@ -213,12 +218,17 @@ export function useSubmit() {
       content: postContent,
       status: "OPEN",
       type: "PUBLIC",
-      assets: urls.map((url) => ({ url, type: "image" }))
+      assets: urls.map((url) => ({ url, type: "image" })),
+      group_id: group?.id
     });
     if (!res.success) {
       makeToast.error("Oops! Failed to create post.", res.error);
       setStatus("error");
       return;
+    }
+
+    if (group) {
+      queryClient.invalidateQueries({ queryKey: getGroupFeedsKey(group.id) });
     }
 
     setStatus("success");
