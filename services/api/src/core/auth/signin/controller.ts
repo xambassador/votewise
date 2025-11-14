@@ -33,7 +33,12 @@ export class Controller {
 
     const { strategy, value, type } = this.getStrategy(email, username);
     const _user = await strategy.handle(value);
-    this.ctx.assert.resourceNotFound(!_user, `User with ${type} ${value} not found`, USER_NOT_FOUND);
+
+    if (!_user) {
+      // To prevent timing attacks
+      await this.ctx.services.crypto.hashPassword(password);
+      this.ctx.assert.resourceNotFound(true, `User with ${type} ${value} not found`, USER_NOT_FOUND);
+    }
 
     const user = _user!;
     const isValid = await this.ctx.services.crypto.comparePassword(password, user.password);

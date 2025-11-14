@@ -110,6 +110,7 @@ describe("Signin Controller", () => {
     mockUserRepository.findByUsername.mockResolvedValue(undefined);
 
     let error = await controller.handle(req, res).catch((e) => e);
+    expect(mockCryptoService.hashPassword).toHaveBeenCalledWith(body.password);
     expect(mockCryptoService.comparePassword).not.toHaveBeenCalled();
     expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(body.email);
     expect(mockUserRepository.findByUsername).not.toHaveBeenCalled();
@@ -117,9 +118,11 @@ describe("Signin Controller", () => {
 
     mockUserRepository.findByEmail.mockClear();
     mockUserRepository.findByUsername.mockClear();
+    mockCryptoService.hashPassword.mockClear();
 
     req = buildReq({ body: userNameBody });
     error = await controller.handle(req, res).catch((e) => e);
+    expect(mockCryptoService.hashPassword).not.toHaveBeenCalled();
     expect(mockCryptoService.comparePassword).not.toHaveBeenCalled();
     expect(mockUserRepository.findByUsername).toHaveBeenCalledWith(userNameBody.username);
     expect(mockUserRepository.findByEmail).not.toHaveBeenCalled();
