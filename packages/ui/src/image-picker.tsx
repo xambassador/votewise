@@ -84,10 +84,18 @@ export type ImagePickerButtonProps = React.HTMLAttributes<HTMLLabelElement> & {
   accept?: string;
   preventDefaultBehavior?: boolean;
   onFileSelect?: (file: File | null) => void;
+  iconProps?: React.SVGAttributes<SVGElement>;
 };
 
 export function ImagePickerButton(props: ImagePickerButtonProps) {
-  const { isMultiple = false, accept = "image/*", preventDefaultBehavior = false, onFileSelect, ...rest } = props;
+  const {
+    isMultiple = false,
+    accept = "image/*",
+    preventDefaultBehavior = false,
+    onFileSelect,
+    iconProps,
+    ...rest
+  } = props;
   const { onPreviewChange } = useProvider("ImagePickerButton");
   const id = useId();
 
@@ -110,7 +118,7 @@ export function ImagePickerButton(props: ImagePickerButtonProps) {
       )}
     >
       <input type="file" id={id} className="sr-only" multiple={isMultiple} accept={accept} onChange={handleChange} />
-      {rest?.children || <ImgIcon className="text-black-200" />}
+      {rest?.children || <ImgIcon {...iconProps} className={cn("text-black-200", iconProps?.className)} />}
     </label>
   );
 }

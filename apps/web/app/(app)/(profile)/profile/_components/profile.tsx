@@ -30,7 +30,14 @@ export function Profile(props: Props) {
 
   return (
     <div className="flex flex-col gap-5">
-      <ProfileImage name={name} avatarUrl={profile.avatar_url ?? ""} coverImage={profile.cover_image_url ?? ""} />
+      <ProfileImage
+        name={name}
+        avatarUrl={profile.avatar_url ?? ""}
+        coverImage={profile.cover_image_url ?? ""}
+        about={profile.about ?? ""}
+        firstName={data.first_name}
+        lastName={data.last_name}
+      />
       <ProfileInfo
         name={name}
         userName={profile.user_name}

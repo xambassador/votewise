@@ -10,7 +10,14 @@ export default function Page() {
         const name = profile.first_name + " " + profile.last_name;
         return (
           <div className="flex flex-col gap-5">
-            <ProfileImage name={name} avatarUrl={profile.avatar_url ?? ""} coverImage={profile.cover_image_url ?? ""} />
+            <ProfileImage
+              name={name}
+              about={profile.about ?? ""}
+              avatarUrl={profile.avatar_url ?? ""}
+              coverImage={profile.cover_image_url ?? ""}
+              firstName={profile.first_name}
+              lastName={profile.last_name}
+            />
             <ProfileInfo
               name={name}
               userName={profile.user_name}
