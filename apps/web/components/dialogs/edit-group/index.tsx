@@ -7,32 +7,26 @@ import dynamic from "next/dynamic";
 import { useLazyLoad } from "@/hooks/use-lazy-load";
 
 import { Button } from "@votewise/ui/button";
-import { Spinner } from "@votewise/ui/ring-spinner";
 
 import { cn } from "@/lib/cn";
 
-const LazyEditGroupDialog = dynamic(() => import("./edit-group").then((m) => m.EditGroup), {
-  ssr: false,
-  loading: () => (
-    <div className="at-max-viewport overlay grid place-items-center fixed inset-0">
-      <Spinner />
-    </div>
-  )
-});
+const load = () => import("./edit-group");
+const LazyEditGroupDialog = dynamic(() => load().then((m) => m.EditGroup), { ssr: false });
 
-type Props = React.ComponentProps<typeof Button> & {
-  group: Group;
-};
+type Props = React.ComponentProps<typeof Button> & { group: Group };
 
 export function EditGroup(props: Props) {
   const { group, ...rest } = props;
   const [open, setOpen] = useState(false);
-  const { isLoaded, trigger } = useLazyLoad();
+  const { isLoaded, trigger } = useLazyLoad({ requiredForceUpdate: true });
+  const loadAndTrigger = () => load().then(trigger);
   return (
     <>
       <Button
         {...rest}
         className={cn("gap-2", props.className)}
+        onMouseEnter={loadAndTrigger}
+        onFocus={loadAndTrigger}
         onClick={(e) => {
           trigger();
           setOpen(true);

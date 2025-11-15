@@ -1,9 +1,13 @@
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
 import { Image } from "@votewise/ui/image";
 
 import { UpdateProfile } from "@/components/dialogs/update-profile";
+import { useMe } from "@/components/user-provider";
 
 type Props = {
+  id: string;
   coverImage: string;
   name: string;
   avatarUrl: string;
@@ -13,7 +17,26 @@ type Props = {
 };
 
 export function ProfileImage(props: Props) {
-  const { coverImage, name, avatarUrl, firstName, lastName, about } = props;
+  const { coverImage, name, avatarUrl, firstName, lastName, about, id: profileId } = props;
+  const { id } = useMe("ProfileImage");
+  const canEdit = id === profileId;
+  const editBtn = canEdit ? (
+    <div className="w-full flex justify-end absolute -bottom-10 right-0">
+      <UpdateProfile
+        size="sm"
+        profile={{
+          avatarUrl,
+          coverImageUrl: coverImage,
+          firstName,
+          lastName,
+          about
+        }}
+      >
+        Edit Profile
+      </UpdateProfile>
+    </div>
+  ) : null;
+
   return (
     <div className="relative mb-10">
       <figure className="relative w-full h-[calc((200/16)*1rem)] max-h-[calc((200/16)*1rem)] rounded-xl overflow-hidden">
@@ -23,20 +46,7 @@ export function ProfileImage(props: Props) {
         <AvatarImage src={avatarUrl} alt={name} />
         <AvatarFallback name={name} />
       </Avatar>
-      <div className="w-full flex justify-end absolute -bottom-10 right-0">
-        <UpdateProfile
-          size="sm"
-          profile={{
-            avatarUrl,
-            coverImageUrl: coverImage,
-            firstName,
-            lastName,
-            about
-          }}
-        >
-          Edit Profile
-        </UpdateProfile>
-      </div>
+      {editBtn}
     </div>
   );
 }

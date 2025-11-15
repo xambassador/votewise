@@ -1,5 +1,5 @@
-import { useUploadAsset } from "@/hooks/use-create-group";
 import { useEditGroup } from "@/hooks/use-edit-group";
+import { useUploadAsset } from "@/hooks/use-upload";
 
 import { Button } from "@votewise/ui/button";
 import { Close, Dialog, DialogContent, DialogDescription, DialogTitle } from "@votewise/ui/dialog";
@@ -125,7 +125,7 @@ function UploadLogo(props: UploadProps) {
   const form = useUploadAsset({ onUploadDone: (url) => props.onUploadDone?.(url, "LOGO") });
   return (
     <>
-      <ImagePickerPill {...form.getImagePickerProps({ children: "Upload logo" })} />
+      <ImagePickerPill {...form.getImagePickerPillProps({ children: "Upload logo" })} />
       <EditImage
         {...form.getEditorProps({ cropperProps: { minWidth: 200, minHeight: 200, maxWidth: 400, maxHeight: 400 } })}
       />
@@ -137,7 +137,7 @@ function UploadCover(props: UploadProps) {
   const form = useUploadAsset({ onUploadDone: (url) => props.onUploadDone?.(url, "COVER") });
   return (
     <>
-      <ImagePickerPill {...form.getImagePickerProps({ children: "Upload cover" })} />
+      <ImagePickerPill {...form.getImagePickerPillProps({ children: "Upload cover" })} />
       <EditImage
         {...form.getEditorProps({ cropperProps: { minWidth: 600, minHeight: 200, maxWidth: 600, maxHeight: 200 } })}
       />

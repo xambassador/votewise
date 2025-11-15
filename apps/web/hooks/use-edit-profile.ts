@@ -64,6 +64,10 @@ export function useEditProfile(props: DialogProps & { profile: Profile }) {
     return form.register(field);
   }
 
+  function updateUrl(field: "avatar" | "cover", url: string) {
+    form.setValue(field, url);
+  }
+
   const onSubmit = form.handleSubmit(() => {});
 
   function getButtonProps(props?: ButtonProps): ButtonProps {
@@ -73,5 +77,13 @@ export function useEditProfile(props: DialogProps & { profile: Profile }) {
     };
   }
 
-  return { getDialogProps, getRootFormProps, getFormFieldProps, getFieldControllerProps, register, getButtonProps };
+  return {
+    getDialogProps,
+    getRootFormProps,
+    getFormFieldProps,
+    getFieldControllerProps,
+    register,
+    getButtonProps,
+    updateUrl
+  };
 }

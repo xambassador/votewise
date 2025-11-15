@@ -31,6 +31,7 @@ export function Profile(props: Props) {
   return (
     <div className="flex flex-col gap-5">
       <ProfileImage
+        id={profile.id}
         name={name}
         avatarUrl={profile.avatar_url ?? ""}
         coverImage={profile.cover_image_url ?? ""}

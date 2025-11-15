@@ -11,6 +11,7 @@ export default function Page() {
         return (
           <div className="flex flex-col gap-5">
             <ProfileImage
+              id={profile.id}
               name={name}
               about={profile.about ?? ""}
               avatarUrl={profile.avatar_url ?? ""}

@@ -85,6 +85,7 @@ export type ImagePickerButtonProps = React.HTMLAttributes<HTMLLabelElement> & {
   preventDefaultBehavior?: boolean;
   onFileSelect?: (file: File | null) => void;
   iconProps?: React.SVGAttributes<SVGElement>;
+  updatePreview?: boolean;
 };
 
 export function ImagePickerButton(props: ImagePickerButtonProps) {
@@ -94,6 +95,7 @@ export function ImagePickerButton(props: ImagePickerButtonProps) {
     preventDefaultBehavior = false,
     onFileSelect,
     iconProps,
+    updatePreview = true,
     ...rest
   } = props;
   const { onPreviewChange } = useProvider("ImagePickerButton");
@@ -103,7 +105,9 @@ export function ImagePickerButton(props: ImagePickerButtonProps) {
     const files = e.target.files;
     if (files && files.length) {
       onFileSelect?.(files[0]);
-      onPreviewChange(URL.createObjectURL(files[0]));
+      if (updatePreview) {
+        onPreviewChange(URL.createObjectURL(files[0]));
+      }
     }
     e.target.value = "";
   }
