@@ -6,9 +6,9 @@ import { useFetchProfile } from "@/hooks/use-fetch-profile";
 
 import { Error } from "@votewise/ui/error";
 
+import { ProfileActivityStats, ProfileRelationStats } from "../../_components/profile-stats";
 import { ProfileImage } from "./profile-image";
 import { ProfileInfo } from "./profile-info";
-import { ProfileActivityStats, ProfileRelationStats } from "./profile-stats";
 
 type Props = {
   profile: GetUserProfileResponse;
@@ -30,22 +30,13 @@ export function Profile(props: Props) {
 
   return (
     <div className="flex flex-col gap-5">
-      <ProfileImage
-        id={profile.id}
-        name={name}
-        avatarUrl={profile.avatar_url ?? ""}
-        coverImage={profile.cover_image_url ?? ""}
-        about={profile.about ?? ""}
-        firstName={data.first_name}
-        lastName={data.last_name}
-      />
+      <ProfileImage avatarUrl={profile.avatar_url ?? ""} coverImage={profile.cover_image_url ?? ""} name={name} />
       <ProfileInfo
         name={name}
         userName={profile.user_name}
         about={profile.about ?? ""}
         joinedAt={profile.joined_at.toString()}
-        location={profile.location}
-        showFollowButton
+        location={profile.location ?? ""}
         selfFollow={profile.self_follow}
       />
       <ProfileRelationStats

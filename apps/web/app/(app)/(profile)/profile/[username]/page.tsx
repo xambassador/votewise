@@ -1,5 +1,5 @@
-import { Profile } from "../_components/profile";
 import { ProfileFetcher } from "../_components/profile-fetcher";
+import { Profile } from "./_components/profile";
 
 type Props = { params: { username: string } };
 

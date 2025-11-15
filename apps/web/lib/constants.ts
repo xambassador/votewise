@@ -11,3 +11,4 @@ export const getGroupNotificationsKey = () => ["group-notifications"];
 export const getGroupKey = (id: string) => ["group", id];
 export const getSearchKey = (q?: string) => ["search", q];
 export const getGroupFeedsKey = (groupId: string) => ["group-feeds", groupId];
+export const getMeKey = () => ["me"];

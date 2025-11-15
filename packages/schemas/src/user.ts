@@ -7,6 +7,7 @@ export const ZRecommendUserQuery = z.object({
 });
 
 export const ZUpdateProfile = z.object({
+  id: z.string({ required_error: "id is required" }).min(1, { message: "id is required" }),
   first_name: ZFirstName,
   last_name: ZLastName,
   about: z

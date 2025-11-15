@@ -1,35 +1,37 @@
 "use client";
 
+import type { GetMeResponse } from "@votewise/client/user";
+
+import { useFetchMe } from "@/hooks/use-fetch-me";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
 import { Image } from "@votewise/ui/image";
 
 import { UpdateProfile } from "@/components/dialogs/update-profile";
 import { useMe } from "@/components/user-provider";
 
-type Props = {
-  id: string;
-  coverImage: string;
-  name: string;
-  avatarUrl: string;
-  firstName: string;
-  lastName: string;
-  about: string;
-};
+type Props = { profile: GetMeResponse };
 
 export function ProfileImage(props: Props) {
-  const { coverImage, name, avatarUrl, firstName, lastName, about, id: profileId } = props;
+  const { profile: initialData } = props;
+  const { data, error } = useFetchMe({ initialData });
   const { id } = useMe("ProfileImage");
-  const canEdit = id === profileId;
+
+  if (error) throw error;
+  if (!data) return null;
+
+  const canEdit = id === data.id;
   const editBtn = canEdit ? (
     <div className="w-full flex justify-end absolute -bottom-10 right-0">
       <UpdateProfile
         size="sm"
         profile={{
-          avatarUrl,
-          coverImageUrl: coverImage,
-          firstName,
-          lastName,
-          about
+          avatarUrl: data.avatar_url,
+          coverImageUrl: data.cover_image_url,
+          firstName: data.first_name,
+          lastName: data.last_name,
+          about: data.about ?? "",
+          id: data.id
         }}
       >
         Edit Profile
@@ -37,13 +39,15 @@ export function ProfileImage(props: Props) {
     </div>
   ) : null;
 
+  const name = data.first_name + " " + data.last_name;
+
   return (
     <div className="relative mb-10">
       <figure className="relative w-full h-[calc((200/16)*1rem)] max-h-[calc((200/16)*1rem)] rounded-xl overflow-hidden">
-        <Image className="size-full object-cover" src={coverImage} alt={name} />
+        <Image className="size-full object-cover" src={data.cover_image_url} alt={name} />
       </figure>
       <Avatar className="size-20 absolute -bottom-10 left-5">
-        <AvatarImage src={avatarUrl} alt={name} />
+        <AvatarImage src={data.avatar_url} alt={name} />
         <AvatarFallback name={name} />
       </Avatar>
       {editBtn}

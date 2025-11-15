@@ -14,15 +14,14 @@ import { makeToast } from "@votewise/ui/toast";
 import { EditImage } from "@/components/edit-image";
 
 export type Profile = {
+  id: string;
   avatarUrl: string | null;
   coverImageUrl: string | null;
   firstName: string;
   lastName: string;
   about: string;
 };
-type Props = React.ComponentProps<typeof Dialog> & {
-  profile: Profile;
-};
+type Props = React.ComponentProps<typeof Dialog> & { profile: Profile };
 
 export function UpdateProfile(props: Props) {
   const form = useEditProfile(props);

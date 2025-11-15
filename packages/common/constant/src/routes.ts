@@ -109,7 +109,9 @@ export const user = {
       /** Get the current user's profile */
       get: (base: string) => base + "/me",
       /** Get all invitations */
-      getInvitations: (base: string) => base + "/me/invitations"
+      getInvitations: (base: string) => base + "/me/invitations",
+      /** Update profile */
+      update: (base: string) => base + "/me"
     },
     invitation: {
       /** Accept group invitation  */

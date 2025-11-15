@@ -10,10 +10,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { ZUpdateProfile } from "@votewise/schemas/user";
 import { useForm } from "@votewise/ui/form";
+import { makeToast } from "@votewise/ui/toast";
 
 import { chain } from "@/lib/chain";
 
+import { useUpdateProfileMutation } from "./use-update-profile-mutation";
+
 type Profile = {
+  id: string;
   avatarUrl: string | null;
   coverImageUrl: string | null;
   firstName: string;
@@ -26,10 +30,13 @@ export function useEditProfile(props: DialogProps & { profile: Profile }) {
   const [_open, _setOpen] = useState(false);
   const open = controlledOpen ?? _open;
   const setOpen = controlledOnOpenChange ?? _setOpen;
+  const mutation = useUpdateProfileMutation();
+  const isPending = mutation.isPending;
 
   const form = useForm<TUpdateProfile>({
     resolver: zodResolver(ZUpdateProfile),
     defaultValues: {
+      id: props.profile.id,
       first_name: props.profile.firstName,
       last_name: props.profile.lastName,
       about: props.profile.about,
@@ -43,6 +50,7 @@ export function useEditProfile(props: DialogProps & { profile: Profile }) {
       ...props,
       open,
       onOpenChange: chain(props?.onOpenChange, (open: boolean) => {
+        if (isPending) return;
         setOpen(open);
       })
     };
@@ -68,12 +76,22 @@ export function useEditProfile(props: DialogProps & { profile: Profile }) {
     form.setValue(field, url);
   }
 
-  const onSubmit = form.handleSubmit(() => {});
+  const onSubmit = form.handleSubmit((data) => {
+    mutation.mutate(data, {
+      onSuccess: () => {
+        setOpen(false);
+      },
+      onError: (err) => {
+        makeToast.error("Update Failed", err.message);
+      }
+    });
+  });
 
   function getButtonProps(props?: ButtonProps): ButtonProps {
     return {
       ...props,
-      onClick: chain(props?.onClick, onSubmit)
+      onClick: chain(props?.onClick, onSubmit),
+      loading: isPending || props?.loading
     };
   }
 

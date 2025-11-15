@@ -1,46 +1,45 @@
-"use client";
-
-import type { GetMeResponse } from "@votewise/client/user";
-
-import { useFetchMe } from "@/hooks/use-fetch-me";
 import dayjs, { extend } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 import { Clock } from "@votewise/ui/icons/clock";
 import { LocationPin } from "@votewise/ui/icons/location-pin";
 
+import { FollowButton } from "./follow-button";
+
 extend(relativeTime);
 
-type Props = { profile: GetMeResponse };
+type Props = {
+  name: string;
+  userName: string;
+  about: string;
+  joinedAt: string;
+  location?: string;
+  selfFollow: boolean;
+};
 
 export function ProfileInfo(props: Props) {
-  const { profile: initialData } = props;
-  const { data, error } = useFetchMe({ initialData });
-
-  if (error) throw error;
-  if (!data) return null;
-
-  const name = data.first_name + " " + data.last_name;
+  const { about, joinedAt, name, userName, location } = props;
 
   return (
     <div className="gap-4 flex flex-col pb-4 border-b border-nobelBlack-200">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl text-gray-200">{name}</h1>
-          <span className="text-base text-gray-400 font-medium">@{data.user_name}</span>
+          <span className="text-base text-gray-400 font-medium">@{userName}</span>
         </div>
+        <FollowButton username={userName} isFollowing={props.selfFollow} />
       </div>
-      <p className="text-base text-gray-300">{data.about}</p>
+      <p className="text-base text-gray-300">{about}</p>
       <div>
-        {data.location && (
+        {location && (
           <div className="flex items-center gap-1 mb-1">
             <LocationPin className="text-black-200" />
-            <span className="text-black-200 text-sm">{data.location}</span>
+            <span className="text-black-200 text-sm">{location}</span>
           </div>
         )}
         <div className="flex items-center gap-1">
           <Clock className="text-black-200" />
-          <span className="text-black-200 text-sm">Joined {dayjs(data.joined_at).fromNow()}</span>
+          <span className="text-black-200 text-sm">Joined {dayjs(joinedAt).fromNow()}</span>
         </div>
       </div>
     </div>

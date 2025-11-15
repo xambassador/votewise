@@ -52,6 +52,7 @@ import { onboardControllerFactory } from "./user/onboard";
 import { getOnboardStatusControllerFactory } from "./user/onboard/get";
 import { getOnboardSessionControllerFactory } from "./user/onboard/get-session";
 import { getUserProfileControllerFactory } from "./user/profile/get";
+import { updateUserProfileControllerFactory } from "./user/profile/update";
 import { listSessionsControllerFactory } from "./user/sessions/list";
 
 /**
@@ -128,6 +129,7 @@ export function moduleRouterFactory(basePath: string): Router {
   /* ----------------------------------------------------------------------------------------------- */
   router.put(comments.paths.update(path), ...updateCommentControllerFactory());
   router.put(groups.paths.update(path), ...updateGroupControllerFactory());
+  router.put(user.paths.me.update(path), ...updateUserProfileControllerFactory());
 
   /* ----------------------------------------------------------------------------------------------- */
   router.patch(auth.paths.verify(path), ...verifyControllerFactory(auth.paths.verify(path)));

@@ -28,8 +28,7 @@ export function useFetchGroups(params: Params) {
         throw new Error(res.error);
       }
       return res.data;
-    },
-    refetchOnWindowFocus: false
+    }
   });
 
   async function fetchNextPage(page: number) {
