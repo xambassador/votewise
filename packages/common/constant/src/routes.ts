@@ -73,7 +73,9 @@ export const user = {
       /** Get all invitations */
       getInvitations: (base: string) => base + "/me/invitations",
       /** Update profile */
-      update: (base: string) => base + "/me"
+      update: (base: string) => base + "/me",
+      /** Get my account */
+      getAccount: (base: string) => base + "/me/account"
     },
     invitations: {
       /** Accept group invitation  */
@@ -111,7 +113,9 @@ export const user = {
       /** Get all invitations */
       getInvitations: (base: string) => base + "/me/invitations",
       /** Update profile */
-      update: (base: string) => base + "/me"
+      update: (base: string) => base + "/me",
+      /** Get my account */
+      getAccount: (base: string) => base + "/me/account"
     },
     invitation: {
       /** Accept group invitation  */

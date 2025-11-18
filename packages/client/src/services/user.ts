@@ -1,6 +1,7 @@
 import type {
   GetGroupRecommendationsResponse,
   GetMeResponse,
+  GetMyAccountResponse,
   GetUserProfileResponse,
   GetUserRecommendationsResponse,
   UpdateUserProfileResponse,
@@ -55,6 +56,12 @@ export class User {
     const res = await this.client.put<UpdateUserProfileResponse, TUpdateProfile>(path, data);
     return res;
   }
+
+  public async getMyAccount() {
+    const path = user.runtime.me.getAccount("");
+    const res = await this.client.get<GetMyAccountResponse>(path);
+    return res;
+  }
 }
 
 export type {
@@ -63,5 +70,6 @@ export type {
   GetUserRecommendationsResponse,
   GetGroupRecommendationsResponse,
   GetUserProfileResponse,
-  UpdateUserProfileResponse
+  UpdateUserProfileResponse,
+  GetMyAccountResponse
 };

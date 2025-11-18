@@ -48,6 +48,7 @@ import { searchControllerFactory } from "./search";
 import { getAllTopicsControllerFactory } from "./topics/get-all";
 import { getUsernameExistsControllerFactory } from "./user/exists";
 import { getMeControllerFactory } from "./user/me";
+import { getMyAccountControllerFactory } from "./user/me/account";
 import { onboardControllerFactory } from "./user/onboard";
 import { getOnboardStatusControllerFactory } from "./user/onboard/get";
 import { getOnboardSessionControllerFactory } from "./user/onboard/get-session";
@@ -100,6 +101,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.get(groups.paths.feeds(path), ...getGroupFeedsControllerFactory());
   router.get(notifications.paths.all(path), ...getNotificationsControllerFactory());
   router.get(user.paths.profile.getByUsername(path), ...getUserProfileControllerFactory());
+  router.get(user.paths.me.getAccount(path), ...getMyAccountControllerFactory());
   router.get(search.paths.all(path), ...searchControllerFactory());
 
   /* ----------------------------------------------------------------------------------------------- */

@@ -201,4 +201,46 @@ export class UserRepository extends BaseRepository {
       };
     });
   }
+
+  public getMyAccount(id: string) {
+    return this.execute(async () => {
+      const user = await this.dataLayer
+        .selectFrom("User as u")
+        .where("id", "=", id)
+        .select([
+          "u.id",
+          "u.first_name",
+          "u.last_name",
+          "u.user_name",
+          "u.avatar_url",
+          "u.cover_image_url",
+          "u.location",
+          "u.gender",
+          "u.about",
+          "u.email",
+          "u.email_confirmed_at",
+          "u.facebook_profile_url",
+          "u.twitter_profile_url",
+          "u.instagram_profile_url",
+          "u.created_at"
+        ])
+        .executeTakeFirst();
+
+      if (!user) {
+        return null;
+      }
+
+      const factors = await this.dataLayer
+        .selectFrom("Factor")
+        .where("user_id", "=", id)
+        .where("status", "=", "VERIFIED")
+        .select(["id", "friendly_name", "factor_type"])
+        .execute();
+
+      return {
+        ...user,
+        factors
+      };
+    });
+  }
 }
