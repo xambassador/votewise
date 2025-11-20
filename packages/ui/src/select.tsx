@@ -26,7 +26,7 @@ export const SelectTrigger = forwardRef<SelectTriggerRef, SelectTriggerProps>((p
       {...rest}
       ref={ref}
       className={cn(
-        "justify-between [&>span]:line-clamp-1 text-gray-500",
+        "justify-between [&>span]:line-clamp-1",
         inputWrapper.base,
         isError && inputWrapper.error,
         className

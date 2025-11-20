@@ -86,7 +86,7 @@ function ProfilePicker(props: ImgPickerProps) {
         <ResetPreviewButton />
         <ImagePickerButton
           {...uploader.getImagePickerButtonProps({
-            className: "size-8 -right-2 bottom-0",
+            className: "size-8 -right-0 bottom-0",
             iconProps: { className: "size-5" },
             updatePreview: false
           })}

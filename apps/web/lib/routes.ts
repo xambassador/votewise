@@ -42,5 +42,10 @@ export const routes = {
   search: {
     root: () => "/search",
     withQuery: (query: string) => `/search?query=${encodeURIComponent(query)}`
+  },
+  settings: {
+    root: () => "/settings",
+    account: () => "/settings/account",
+    notifications: () => "/settings/notifications"
   }
 };

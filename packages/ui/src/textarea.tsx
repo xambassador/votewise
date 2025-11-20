@@ -17,7 +17,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>((props, r
       {...rest}
       ref={ref}
       className={cn(
-        "px-5 pt-4 pb-2 bg-nobelBlack-100 border min-h-32 border-nobelBlack-200 text-gray-500 rounded-lg placeholder:text-gray-500 resize-none text-base",
+        "px-5 pt-4 pb-2 bg-nobelBlack-100 border min-h-32 border-nobelBlack-200 text-gray-300 rounded-lg placeholder:text-gray-500 resize-none text-base",
         inputWrapper.focus,
         isError && inputWrapper.error,
         className

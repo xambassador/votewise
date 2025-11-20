@@ -20,6 +20,7 @@ export type { GetUserOnboardSessionResponse } from "@/core/user/onboard/get-sess
 export type { GetMeResponse } from "@/core/user/me/controller";
 export type { GetMyAccountResponse } from "@/core/user/me/account/controller";
 export type { GetUserProfileResponse } from "@/core/user/profile/get/controller";
+export type { UpdateAccountResponse } from "@/core/user/me/account/update/controller";
 export type { UpdateUserProfileResponse } from "@/core/user/profile/update/controller";
 export type { GetUserRecommendationsResponse } from "@/core/recommendation/user/controller";
 export type { GetGroupRecommendationsResponse } from "@/core/recommendation/group/controller";

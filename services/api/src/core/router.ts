@@ -49,6 +49,7 @@ import { getAllTopicsControllerFactory } from "./topics/get-all";
 import { getUsernameExistsControllerFactory } from "./user/exists";
 import { getMeControllerFactory } from "./user/me";
 import { getMyAccountControllerFactory } from "./user/me/account";
+import { updateAccountControllerFactory } from "./user/me/account/update";
 import { onboardControllerFactory } from "./user/onboard";
 import { getOnboardStatusControllerFactory } from "./user/onboard/get";
 import { getOnboardSessionControllerFactory } from "./user/onboard/get-session";
@@ -132,6 +133,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.put(comments.paths.update(path), ...updateCommentControllerFactory());
   router.put(groups.paths.update(path), ...updateGroupControllerFactory());
   router.put(user.paths.me.update(path), ...updateUserProfileControllerFactory());
+  router.put(user.paths.me.updateAccount(path), ...updateAccountControllerFactory());
 
   /* ----------------------------------------------------------------------------------------------- */
   router.patch(auth.paths.verify(path), ...verifyControllerFactory(auth.paths.verify(path)));

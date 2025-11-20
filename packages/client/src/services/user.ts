@@ -4,10 +4,11 @@ import type {
   GetMyAccountResponse,
   GetUserProfileResponse,
   GetUserRecommendationsResponse,
+  UpdateAccountResponse,
   UpdateUserProfileResponse,
   UsernameExistsResponse
 } from "@votewise/api";
-import type { TRecommendUserQuery, TUpdateProfile } from "@votewise/schemas/user";
+import type { TRecommendUserQuery, TUpdateAccount, TUpdateProfile } from "@votewise/schemas/user";
 import type { BaseOptions, TClient } from "../utils";
 
 import { user } from "@votewise/constant/routes";
@@ -62,6 +63,12 @@ export class User {
     const res = await this.client.get<GetMyAccountResponse>(path);
     return res;
   }
+
+  public async updateAccount(data: TUpdateAccount) {
+    const path = user.runtime.me.updateAccount("");
+    const res = await this.client.put<UpdateAccountResponse, TUpdateAccount>(path, data);
+    return res;
+  }
 }
 
 export type {
@@ -71,5 +78,6 @@ export type {
   GetGroupRecommendationsResponse,
   GetUserProfileResponse,
   UpdateUserProfileResponse,
-  GetMyAccountResponse
+  GetMyAccountResponse,
+  UpdateAccountResponse
 };
