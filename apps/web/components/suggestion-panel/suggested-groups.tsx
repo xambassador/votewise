@@ -47,10 +47,12 @@ async function SuggestedGroupsList() {
         <SuggestedGroupCard.SuggestedGroupCard key={group.id}>
           <SuggestedGroupCard.Header>
             <div className="flex-1 flex gap-2">
-              <Avatar className="rounded size-10">
-                <AvatarFallback name={group.author ? group.author.first_name + group.author.last_name : ""} />
-                <AvatarImage src={group.author?.avatar_url || ""} alt={group.author?.first_name} />
-              </Avatar>
+              <Link href={routes.group.view(group.id)} className="focus-presets focus-primary rounded">
+                <Avatar className="rounded size-10">
+                  <AvatarFallback name={group.author ? group.author.first_name + group.author.last_name : ""} />
+                  <AvatarImage src={group.logo_url || ""} alt={group.author?.first_name} />
+                </Avatar>
+              </Link>
               <div className="flex flex-col">
                 <SuggestedGroupCard.GroupName>
                   <Link href={routes.group.view(group.id)} className="focus-presets focus-primary rounded">
@@ -68,6 +70,7 @@ async function SuggestedGroupsList() {
               </div>
             </div>
             <SuggestedGroupCard.GroupJoinButton
+              className="focus-visible h-fit rounded"
               aria-label={`Join ${group.name} group`}
               title={`Join ${group.name} group`}
             />

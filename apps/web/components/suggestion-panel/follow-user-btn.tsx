@@ -14,6 +14,12 @@ export function FollowUserButton(props: Props) {
   const { isLoading, follow, isFollowing } = useFollowUser(username, false);
   if (isFollowing) return null;
   return (
-    <UserFollowButton aria-label={`Follow ${name}`} title={`Follow ${name}`} loading={isLoading} onClick={follow} />
+    <UserFollowButton
+      className="focus-visible rounded"
+      aria-label={`Follow ${name}`}
+      title={`Follow ${name}`}
+      loading={isLoading}
+      onClick={follow}
+    />
   );
 }

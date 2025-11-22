@@ -32,7 +32,8 @@ export class Controller {
         id: g.id,
         name: g.name,
         about: g.about,
-        author: g.admins[0]
+        author: g.admins[0],
+        logo_url: g.logo_url
       };
       return new Promise<typeof group>((resolve) => {
         this.ctx.services.bucket

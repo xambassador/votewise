@@ -5,7 +5,6 @@ import {
   GroupDescription,
   GroupFooter,
   GroupHeader,
-  GroupMembers,
   GroupName,
   GroupStatusBadge
 } from "@votewise/ui/cards/group";
@@ -24,7 +23,7 @@ export function GroupListSkeleton() {
 function GroupCardSkeleton() {
   return (
     <Group>
-      <div className="flex gap-3">
+      <div className="flex items-start gap-4">
         <Skeleton className="size-20 min-w-20 rounded-xl" />
         <GroupContent>
           <GroupHeader>
@@ -41,11 +40,14 @@ function GroupCardSkeleton() {
             </Skeleton>
           </GroupDescription>
           <GroupFooter>
-            <GroupMembers>
-              {Array.from({ length: 5 }).map((_, index) => (
-                <Skeleton className="size-6 avatar-stack-skeleton" key={index} />
-              ))}
-            </GroupMembers>
+            <div className="flex items-center gap-1">
+              <Skeleton className="h-4 rounded-full">
+                <span>80</span>
+              </Skeleton>
+              <Skeleton className="h-4 rounded-full">
+                <span>80</span>
+              </Skeleton>
+            </div>
             <Skeleton className="h-4 rounded-full">
               <GroupStatusBadge>Public</GroupStatusBadge>
             </Skeleton>

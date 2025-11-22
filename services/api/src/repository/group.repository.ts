@@ -31,7 +31,7 @@ export class GroupRepository extends BaseRepository {
       const groups = await this.dataLayer
         .selectFrom("Group")
         .where("id", "in", ids)
-        .select(["id", "name", "about"])
+        .select(["id", "name", "about", "logo_url"])
         .execute();
 
       if (groups.length === 0) return [];
@@ -58,6 +58,7 @@ export class GroupRepository extends BaseRepository {
         id: group.id,
         name: group.name,
         about: group.about,
+        logo_url: group.logo_url,
         admins: (adminByGroup.get(group.id) || []).map((a) => ({
           id: a.user_id,
           first_name: a.first_name,
@@ -209,8 +210,8 @@ export class GroupRepository extends BaseRepository {
         .selectFrom("UserAggregates")
         .where("user_id", "=", userId)
         .select(["total_groups"])
-        .executeTakeFirstOrThrow();
-      return res.total_groups;
+        .executeTakeFirst();
+      return res ? res.total_groups : 0;
     });
   }
 
