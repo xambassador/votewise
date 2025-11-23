@@ -10,6 +10,9 @@ import { Users as UsersIcon } from "@votewise/ui/icons/users";
 import { Spinner } from "@votewise/ui/ring-spinner";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@votewise/ui/sheet";
 
+import { useMe } from "@/components/user-provider";
+
+import { cn } from "@/lib/cn";
 import { routes } from "@/lib/routes";
 
 type Props = SheetProps & { groupId: string; name: string; about: string };
@@ -84,6 +87,7 @@ function Admins(props: { groupId: string }) {
 function Moderators(props: { groupId: string }) {
   const { groupId } = props;
   const { data, status, error } = useFetchMembers(groupId);
+  const me = useMe("Moderators");
   switch (status) {
     case "pending":
       return loader;
@@ -113,6 +117,7 @@ function Moderators(props: { groupId: string }) {
             name={moderator.user.first_name + " " + moderator.user.last_name}
             avatar={moderator.user.avatar_url}
             username={moderator.user.user_name}
+            isMe={me.id === moderator.user.id}
           />
         </li>
       ))}
@@ -123,6 +128,7 @@ function Moderators(props: { groupId: string }) {
 function Users(props: { groupId: string }) {
   const { groupId } = props;
   const { data, status, error } = useFetchMembers(groupId);
+  const me = useMe("Users");
   switch (status) {
     case "pending":
       return loader;
@@ -152,6 +158,7 @@ function Users(props: { groupId: string }) {
             name={member.user.first_name + " " + member.user.last_name}
             avatar={member.user.avatar_url}
             username={member.user.user_name}
+            isMe={me.id === member.user.id}
           />
         </li>
       ))}
@@ -159,10 +166,10 @@ function Users(props: { groupId: string }) {
   );
 }
 
-function User(props: { name: string; username: string; avatar: string }) {
-  const { name, username, avatar } = props;
+function User(props: { name: string; username: string; avatar: string; isMe?: boolean }) {
+  const { name, username, avatar, isMe } = props;
   return (
-    <div className="flex gap-1">
+    <div className={cn("flex gap-1 w-full", isMe && "border-r-2 border-blue-300")}>
       <Link href={routes.user.profile(username)} className="focus-presets focus-primary rounded">
         <Avatar>
           <AvatarImage src={avatar} alt={name} />
