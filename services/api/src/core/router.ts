@@ -1,6 +1,17 @@
 import { Router } from "express";
 
-import { auth, comments, feeds, follow, groups, notifications, search, topics, user } from "@votewise/constant/routes";
+import {
+  auth,
+  comments,
+  feeds,
+  follow,
+  groups,
+  notifications,
+  search,
+  topics,
+  trending,
+  user
+} from "@votewise/constant/routes";
 
 import { forgotPasswordControllerFactory } from "./auth/forgot-password";
 import { getVerificationSessionControllerFactory } from "./auth/get-verification-session";
@@ -46,6 +57,8 @@ import { getGroupRecommendationsControllerFactory } from "./recommendation/group
 import { getRecommendateUserControllerFactory } from "./recommendation/user";
 import { searchControllerFactory } from "./search";
 import { getAllTopicsControllerFactory } from "./topics/get-all";
+import { getHotFeedsControllerFactory } from "./trending/feed";
+import { getHotUsersControllerFactory } from "./trending/user";
 import { getUsernameExistsControllerFactory } from "./user/exists";
 import { getMeControllerFactory } from "./user/me";
 import { getMyAccountControllerFactory } from "./user/me/account";
@@ -104,6 +117,8 @@ export function moduleRouterFactory(basePath: string): Router {
   router.get(user.paths.profile.getByUsername(path), ...getUserProfileControllerFactory());
   router.get(user.paths.me.getAccount(path), ...getMyAccountControllerFactory());
   router.get(search.paths.all(path), ...searchControllerFactory());
+  router.get(trending.paths.feeds(path), ...getHotFeedsControllerFactory());
+  router.get(trending.paths.users(path), ...getHotUsersControllerFactory());
 
   /* ----------------------------------------------------------------------------------------------- */
   router.post(auth.paths.register(path), ...registerControllerFactory(auth.paths.register(path)));

@@ -1,3 +1,4 @@
+import { PAGINATION } from "@votewise/constant";
 import {
   Feed,
   FeedContainer,
@@ -21,7 +22,7 @@ import { Skeleton } from "@votewise/ui/skeleton";
 import { cn } from "@/lib/cn";
 
 export function FeedListSkeleton(props: React.HTMLAttributes<HTMLDivElement> & { count?: number }) {
-  const count = props.count ?? 10;
+  const count = props.count ?? PAGINATION.feeds.limit;
   return (
     <div {...props} className={cn("flex flex-col gap-5", props.className)}>
       {Array.from({ length: count }).map((_, i) => (

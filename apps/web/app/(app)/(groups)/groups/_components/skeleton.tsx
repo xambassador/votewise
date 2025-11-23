@@ -1,3 +1,4 @@
+import { PAGINATION } from "@votewise/constant";
 import {
   Group,
   GroupContent,
@@ -13,14 +14,14 @@ import { Skeleton } from "@votewise/ui/skeleton";
 export function GroupListSkeleton() {
   return (
     <div className="flex flex-col gap-4">
-      {Array.from({ length: 5 }).map((_, index) => (
+      {Array.from({ length: PAGINATION.groups.limit }).map((_, index) => (
         <GroupCardSkeleton key={index} />
       ))}
     </div>
   );
 }
 
-function GroupCardSkeleton() {
+export function GroupCardSkeleton() {
   return (
     <Group>
       <div className="flex items-start gap-4">

@@ -5,12 +5,11 @@ import { truncateOnWord } from "@votewise/text";
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
 import * as SuggestedUserCard from "@votewise/ui/cards/suggested-user";
 import { ErrorBoundary } from "@votewise/ui/error-boundary";
-import { MoreItemsWithSummary } from "@votewise/ui/more-items";
 
 import { getUserClient } from "@/lib/client.server";
 import { routes } from "@/lib/routes";
 
-import { FollowUserButton } from "./follow-user-btn";
+import { FollowUserButton, MoreItems } from "./follow-user-btn";
 import { ContentWrapper, EmptyState, ErrorMessage, fallbackSpinner, maxListItems, Title } from "./utils";
 
 const maxSuggestedUsers = maxListItems;
@@ -33,7 +32,7 @@ export function SuggestedUsers() {
 
 async function SuggestedUsersList() {
   const user = getUserClient();
-  const result = await user.getRecommendateUsers({ top_n: 20 });
+  const result = await user.getRecommendateUsers({ top_n: 10 });
 
   if (!result.success) return fallbackError;
 
@@ -72,8 +71,7 @@ async function SuggestedUsersList() {
         </SuggestedUserCard.RecommendedUserCard>
       ))}
 
-      <MoreItemsWithSummary
-        count={remainingSuggestedUsers.length}
+      <MoreItems
         avatars={remainingSuggestedUsers.slice(0, 5).map((user) => ({
           name: user.first_name + " " + user.last_name,
           url: user.avatar_url

@@ -1,8 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useFollowUser } from "@/hooks/use-follow-user";
 
 import { UserFollowButton } from "@votewise/ui/cards/suggested-user";
+import { MoreItemsWithSummary } from "@votewise/ui/more-items";
+
+import { routes } from "@/lib/routes";
 
 type Props = {
   name: string;
@@ -22,4 +26,14 @@ export function FollowUserButton(props: Props) {
       onClick={follow}
     />
   );
+}
+
+export function MoreItems(props: React.ComponentProps<typeof MoreItemsWithSummary>) {
+  const router = useRouter();
+
+  function handleClick() {
+    router.push(routes.trending.root());
+  }
+
+  return <MoreItemsWithSummary {...props} onClick={handleClick} />;
 }

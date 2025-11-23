@@ -8,6 +8,7 @@ import { FeedAssetRepository } from "./feed-asset.repository";
 import { FeedRepository } from "./feed.repository";
 import { FollowRepository } from "./follow.repository";
 import { GroupRepository } from "./group.repository";
+import { HotViewsRepository } from "./hot-views.repository";
 import { NotificationRepository } from "./notification.repository";
 import { PostTopicRepository } from "./post-topic.repository";
 import { RefreshTokenRepository } from "./refresh-token.repository";
@@ -42,6 +43,7 @@ export function createRepositories(dataLayer: AppContext["dataLayer"]): Reposito
   const commentRepository = new CommentRepository({ dataLayer });
   const notificationRepository = new NotificationRepository({ dataLayer });
   const searchRepository = new SearchRepository({ dataLayer });
+  const hotViewsRepository = new HotViewsRepository({ dataLayer });
   const transactionManager = new TransactionManager({ dataLayer });
   const aggregator = new Aggregator({ dataLayer });
   return {
@@ -60,6 +62,7 @@ export function createRepositories(dataLayer: AppContext["dataLayer"]): Reposito
     group: groupRepository,
     comment: commentRepository,
     notification: notificationRepository,
+    hotViews: hotViewsRepository,
     transactionManager,
     search: searchRepository,
     aggregator
@@ -86,6 +89,7 @@ declare global {
     transactionManager: TransactionManager;
     aggregator: Aggregator;
     search: SearchRepository;
+    hotViews: HotViewsRepository;
   }
 
   interface RepositoryConfig {

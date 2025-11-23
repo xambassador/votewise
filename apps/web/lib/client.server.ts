@@ -9,6 +9,7 @@ import { Notification } from "@votewise/client/notification";
 import { Onboard } from "@votewise/client/onboard";
 import { Search } from "@votewise/client/search";
 import { Client } from "@votewise/client/server";
+import { Trending } from "@votewise/client/trending";
 import { User } from "@votewise/client/user";
 
 import { clearCookie, getCookie, setCookie } from "./cookie";
@@ -74,4 +75,9 @@ export function getNotificationClient() {
 export function getSearchClient() {
   const client = getClient();
   return new Search({ client });
+}
+
+export function getTrendingClient() {
+  const client = getClient();
+  return new Trending({ client });
 }

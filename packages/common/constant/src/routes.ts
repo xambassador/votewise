@@ -345,3 +345,18 @@ export const search = {
     all: (base: string) => base + "/search"
   }
 };
+
+export const trending = {
+  paths: {
+    /** Get trending feeds */
+    feeds: (base: string) => base + "/trending/feeds",
+    /** Get trending users */
+    users: (base: string) => base + "/trending/users"
+  },
+  runtime: {
+    /** Get trending feeds */
+    feeds: (base: string) => base + "/trending/feeds",
+    /** Get trending users */
+    users: (base: string) => base + "/trending/users"
+  }
+};

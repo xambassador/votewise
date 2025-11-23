@@ -169,6 +169,10 @@ html {
   .avatar-stack-skeleton {
     @apply border-nobelBlack-100 rounded-full border;
   }
+
+  .img-card-base {
+    @apply rotate-[var(--rotate)] rounded-2xl transition-all duration-300 hover:rotate-0 peer-hover:translate-x-10 peer-hover:rotate-0;
+  }
 }
 
 @layer components {

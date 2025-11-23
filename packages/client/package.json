@@ -60,6 +60,10 @@
     "./search": {
       "import": "./dist/services/search.mjs",
       "require": "./dist/services/search.js"
+    },
+    "./trending": {
+      "import": "./dist/services/trending.mjs",
+      "require": "./dist/services/trending.js"
     }
   },
   "scripts": {

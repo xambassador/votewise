@@ -28,6 +28,9 @@ export const routes = {
     root: () => "/feeds",
     view: (id: string) => `/feeds/${id}`
   },
+  trending: {
+    root: () => "/trending"
+  },
   user: {
     profile: (username: string) => `/profile/${username}`,
     me: () => "/profile"

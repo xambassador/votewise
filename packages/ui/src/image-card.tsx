@@ -13,14 +13,37 @@ import { useImageLoadingStatus } from "./use-image-status";
 type Props = React.HTMLProps<HTMLDivElement> & {
   url: string;
   figureProps?: React.ComponentProps<"figure">;
+  isLoading?: boolean;
 };
 
 export function ImageCard(props: Props) {
-  const { url, children, figureProps, alt, ...rest } = props;
+  const { url, children, figureProps, isLoading: _isLoading, alt, ...rest } = props;
   const imageLoadingStatus = useImageLoadingStatus(url);
   const error = imageLoadingStatus === "error";
   const isLoading = imageLoadingStatus === "loading";
   const isLoaded = imageLoadingStatus === "loaded";
+
+  if (_isLoading) {
+    return (
+      <div
+        {...rest}
+        className={cn(
+          "relative max-w-[calc((200/16)*1rem)] flex items-center justify-center group cursor-pointer",
+          rest.className
+        )}
+      >
+        <figure
+          {...figureProps}
+          className={cn(
+            "relative z-[3] w-[calc((100/16)*1rem)] h-[calc((140/16)*1rem)] bg-nobelBlack-200 rounded-2xl border border-black-400 shadow-image-card p-3 group-hover:translate-y-[-5px] transition-transform duration-300",
+            figureProps?.className
+          )}
+        >
+          <div className="size-full bg-nobelBlack-100 rounded-2xl" />
+        </figure>
+      </div>
+    );
+  }
 
   return (
     <div

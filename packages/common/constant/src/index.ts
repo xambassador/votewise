@@ -50,5 +50,6 @@ export const PAGINATION = {
     reply: { limit: 5 }
   },
   feeds: { limit: 20 },
-  groups: { limit: 20 }
+  groups: { limit: 20 },
+  trending: { limit: 5 }
 };

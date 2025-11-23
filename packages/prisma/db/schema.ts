@@ -358,6 +358,21 @@ export type UserSimilarity = Selectable<UserSimilarityTable>;
 export type NewUserSimilarity = Insertable<UserSimilarityTable>;
 export type UserSimilarityUpdate = Updateable<UserSimilarityTable>;
 
+export type AlgoWhatsHotFeedView = {
+  post_id: string;
+  like_count: number;
+  score: number;
+};
+export type AlgoWhatsHotFeed = Selectable<AlgoWhatsHotFeedView>;
+
+export type AlgoHotUserView = {
+  user_id: string;
+  user_name: string;
+  follower_count: number;
+  score: number;
+};
+export type AlgoHotUser = Selectable<AlgoHotUserView>;
+
 export type DB = {
   Challenge: ChallengeTable;
   Comment: CommentTable;
@@ -386,4 +401,6 @@ export type DB = {
   UserAggregates: UserAggregatesTable;
   UserInterests: UserInterestsTable;
   UserSimilarity: UserSimilarityTable;
+  algohotfeedview: AlgoWhatsHotFeedView;
+  algohotuserview: AlgoHotUserView;
 };

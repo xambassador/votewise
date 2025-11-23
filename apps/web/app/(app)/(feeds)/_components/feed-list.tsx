@@ -4,6 +4,7 @@ import type { GetAllFeedsResponse } from "@votewise/client/feed";
 
 import { useFetchFeeds } from "@/hooks/use-fetch-feeds";
 
+import { PAGINATION } from "@votewise/constant";
 import { Error } from "@votewise/ui/error";
 
 import { FeedMolecule } from "@/components/feed";
@@ -38,7 +39,8 @@ export function FeedList(props: { feeds: GetAllFeedsResponse }) {
       {data.feeds.map((feed) => (
         <FeedMolecule data={feed} key={feed.id} />
       ))}
-      {nextPageStatus === "loading" && Array.from({ length: 5 }).map((_, i) => <FeedSkeleton key={i} />)}
+      {nextPageStatus === "loading" &&
+        Array.from({ length: PAGINATION.feeds.limit }).map((_, i) => <FeedSkeleton key={i} />)}
       <InView onInView={handleInView} />
     </div>
   );

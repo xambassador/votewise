@@ -4,11 +4,11 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
 import * as SuggestedGroupCard from "@votewise/ui/cards/suggested-group";
 import { ErrorBoundary } from "@votewise/ui/error-boundary";
-import { MoreItemsWithSummary } from "@votewise/ui/more-items";
 
 import { getUserClient } from "@/lib/client.server";
 import { routes } from "@/lib/routes";
 
+import { MoreItems } from "./follow-user-btn";
 import { ContentWrapper, EmptyState, ErrorMessage, fallbackSpinner, maxListItems, Title, VerticalList } from "./utils";
 
 const maxSuggestedGroups = maxListItems;
@@ -49,7 +49,10 @@ async function SuggestedGroupsList() {
             <div className="flex-1 flex gap-2">
               <Link href={routes.group.view(group.id)} className="focus-presets focus-primary rounded">
                 <Avatar className="rounded size-10">
-                  <AvatarFallback name={group.author ? group.author.first_name + group.author.last_name : ""} />
+                  <AvatarFallback
+                    className="rounded"
+                    name={group.author ? group.author.first_name + group.author.last_name : ""}
+                  />
                   <AvatarImage src={group.logo_url || ""} alt={group.author?.first_name} />
                 </Avatar>
               </Link>
@@ -78,8 +81,7 @@ async function SuggestedGroupsList() {
         </SuggestedGroupCard.SuggestedGroupCard>
       ))}
 
-      <MoreItemsWithSummary
-        count={remainingSuggestedGroups.length}
+      <MoreItems
         avatars={remainingSuggestedGroups.map((group) => ({
           name: group.author?.first_name + " " + group.author?.last_name,
           url: group.author?.avatar_url || ""

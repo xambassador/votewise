@@ -1,8 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { cn } from "./cn";
 
-type UserAvatarsSummaryProps = React.HTMLAttributes<HTMLDivElement> & {
-  count: number;
+type UserAvatarsSummaryProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  count?: number;
   avatars: { name: string; url: string }[];
   avatarProps?: React.ComponentProps<typeof Avatar>;
 };
@@ -10,7 +10,7 @@ type UserAvatarsSummaryProps = React.HTMLAttributes<HTMLDivElement> & {
 export function MoreItemsWithSummary(props: UserAvatarsSummaryProps) {
   const { avatars, count, avatarProps, ...rest } = props;
   return (
-    <div {...rest} className={cn("flex items-center gap-1 w-fit mx-auto", rest.className)}>
+    <button {...rest} className={cn("flex items-center gap-1 w-fit mx-auto focus-visible rounded", rest.className)}>
       <div className="flex -space-x-4">
         {avatars.map((item) => (
           <Avatar {...avatarProps} key={item.url} className={cn("bg-gray-500 size-6", avatarProps?.className)}>
@@ -19,7 +19,11 @@ export function MoreItemsWithSummary(props: UserAvatarsSummaryProps) {
           </Avatar>
         ))}
       </div>
-      <span className="text-xs text-gray-400">+{count} More</span>
-    </div>
+      {count ? (
+        <span className="text-xs text-gray-400">+{count} More</span>
+      ) : (
+        <span className="text-xs text-gray-400">+ More</span>
+      )}
+    </button>
   );
 }

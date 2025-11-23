@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 
+import { PAGINATION } from "@votewise/constant";
 import { Pencil } from "@votewise/ui/icons/pencil";
 
 import { Authorized } from "@/components/auth";
@@ -42,7 +43,7 @@ export default async function Page(props: Props) {
                   ) : null
                 }
               />
-              <Suspense fallback={<FeedListSkeleton className="mt-5" count={5} />}>
+              <Suspense fallback={<FeedListSkeleton className="mt-5" count={PAGINATION.feeds.limit} />}>
                 <GroupFeedFetcher id={id}>
                   {(feedData) => {
                     if (!feedData.hasAccess) {
