@@ -49,7 +49,7 @@ export function Sidebar(props: Props) {
           </Avatar>
         </div>
         <div className="flex flex-col gap-8">
-          <div className="flex flex-col gap-3 pr-1">
+          <div className="flex flex-col pr-1">
             {links.map((link) => {
               if (link.component) {
                 return <link.component key={link.id} />;

@@ -16,7 +16,7 @@ export function Link(props: props) {
       {...rest}
       data-active={isActive}
       className={cn(
-        "py-2 pl-2 pr-1 rounded flex items-center gap-2 hover:bg-nobelBlack-200 transition-colors text-sm font-medium",
+        "py-3 pl-2 pr-1 rounded flex items-center gap-2 hover:bg-nobelBlack-200 transition-colors text-lg font-medium",
         isActive ? "text-blue-200" : "text-black-200",
         className
       )}

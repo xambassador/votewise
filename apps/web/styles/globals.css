@@ -38,6 +38,12 @@ html {
   scrollbar-gutter: stable;
 }
 
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  font-synthesis-weight: none;
+}
+
 @supports (scrollbar-gutter: stable) {
   /* https://github.com/radix-ui/primitives/issues/1496#issuecomment-1962839229 */
   html body[data-scroll-locked] {

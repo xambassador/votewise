@@ -12,6 +12,7 @@ import { ChevronDownTiny } from "@votewise/ui/icons/chevron-down-tiny";
 
 import { humanizeNumber } from "@/lib/humanize";
 import { routes } from "@/lib/routes";
+import { getFullName } from "@/lib/string";
 
 import { HotUserSkeleton } from "./skeleton";
 
@@ -38,7 +39,13 @@ export function HotUsers(props: Props) {
   return (
     <div className="space-y-4">
       {data.users.map((user) => (
-        <Link key={user.id} href={routes.user.profile(user.user_name)} className="focus-visible rounded-xl block">
+        <Link
+          key={user.id}
+          href={routes.user.profile(user.user_name)}
+          className="focus-visible rounded-xl block"
+          role="link"
+          aria-label={"View " + getFullName(user) + "'s profile"}
+        >
           <div className="p-5 rounded-xl bg-nobelBlack-100 border border-nobelBlack-200">
             <div className="flex items-start gap-4">
               <Avatar className="size-12">

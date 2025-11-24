@@ -84,7 +84,7 @@ export type FeedContentTextProps = React.HTMLAttributes<HTMLParagraphElement>;
 export function FeedContentText(props: FeedContentTextProps) {
   const { children, className, ...rest } = props;
   return (
-    <p {...rest} className={cn("text-xl font-medium text-gray-300", className)}>
+    <p {...rest} className={cn("text-xl font-normal text-gray-300", className)}>
       {children}
     </p>
   );

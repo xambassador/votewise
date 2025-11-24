@@ -194,7 +194,13 @@ const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
   return (
     <Comment>
       {parentId && <ReplyConnector />}
-      <Link href={routes.user.profile(userName)} className="focus-visible h-fit rounded-full">
+      <Link
+        href={routes.user.profile(userName)}
+        className="focus-visible h-fit rounded-full"
+        aria-label={name + "'s avatar"}
+        role="link"
+        tabIndex={0}
+      >
         <Avatar className="size-8">
           <AvatarFallback name={name} />
           <AvatarImage src={avatarUrl || ""} alt={name} />
@@ -202,9 +208,16 @@ const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
       </Link>
       <CommentContent>
         <CommentHeader>
-          <Link href={routes.user.profile(userName)} className="hover:underline focus-visible">
-            <CommentAuthor>{userName}</CommentAuthor>
-          </Link>
+          <CommentAuthor>
+            <Link
+              href={routes.user.profile(userName)}
+              className="hover:underline focus-visible rounded"
+              aria-label={"View " + name + "'s profile"}
+              role="link"
+            >
+              {userName}
+            </Link>
+          </CommentAuthor>
           <CommentDate>{dayjs(createdAt).fromNow()}</CommentDate>
           {isEdited && <CommentUpdatedLabel>edited</CommentUpdatedLabel>}
         </CommentHeader>

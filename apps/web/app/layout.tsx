@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-import { Poppins } from "next/font/google";
+import { Inter } from "next/font/google";
 
 import { Toaster } from "@votewise/ui/toast";
 
@@ -11,9 +11,9 @@ import Providers from "@/components/providers";
 
 /* ----------------------------------------------------------------------------------------------- */
 
-const poppins = Poppins({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"]
+  weight: ["300", "400", "500", "600", "700"]
 });
 
 type Props = {
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 export default function RootLayout(props: Props) {
   return (
     <html lang="en">
-      <body className={poppins.className + " bg-nobelBlack-50 text-gray-200"}>
+      <body className={inter.className + " bg-nobelBlack-50 text-gray-200"}>
         <Toaster />
         <Providers>{props.children}</Providers>
       </body>

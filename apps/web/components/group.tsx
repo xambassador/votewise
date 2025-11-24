@@ -29,10 +29,16 @@ type Props = { group: TGroup };
 
 export function GroupMolecule(props: Props) {
   const { group } = props;
+  const viewGroupLabel = "View " + group.name.trim() + " group";
   return (
     <Group>
       <div className="flex items-start gap-4">
-        <Link href={routes.group.view(group.id)} className="focus-visible rounded-xl">
+        <Link
+          href={routes.group.view(group.id)}
+          className="focus-visible rounded-xl"
+          role="link"
+          aria-label={viewGroupLabel}
+        >
           <Avatar className="size-20 rounded-xl">
             <AvatarFallback name={group.name} className="rounded-none" />
             <AvatarImage src={group.logo_url ?? ""} alt={group.name} />
@@ -41,7 +47,12 @@ export function GroupMolecule(props: Props) {
         <GroupContent>
           <GroupHeader>
             <GroupName asChild title={group.name}>
-              <Link className="focus-visible" href={routes.group.view(group.id)}>
+              <Link
+                className="focus-visible"
+                href={routes.group.view(group.id)}
+                role="link"
+                aria-label={viewGroupLabel}
+              >
                 {truncate(group.name, 80)}
               </Link>
             </GroupName>

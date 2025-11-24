@@ -170,7 +170,12 @@ function User(props: { name: string; username: string; avatar: string; isMe?: bo
   const { name, username, avatar, isMe } = props;
   return (
     <div className={cn("flex gap-1 w-full", isMe && "border-r-2 border-blue-300")}>
-      <Link href={routes.user.profile(username)} className="focus-presets focus-primary rounded">
+      <Link
+        href={routes.user.profile(username)}
+        className="focus-presets focus-primary rounded-full"
+        role="link"
+        aria-label={"View " + name + "'s profile"}
+      >
         <Avatar>
           <AvatarImage src={avatar} alt={name} />
           <AvatarFallback name={name} />
@@ -178,12 +183,22 @@ function User(props: { name: string; username: string; avatar: string; isMe?: bo
       </Link>
       <div className="flex flex-col gap-1">
         <span className="text-xs text-gray-300">
-          <Link href={routes.user.profile(username)} className="focus-presets focus-primary rounded">
+          <Link
+            href={routes.user.profile(username)}
+            className="focus-presets focus-primary rounded"
+            role="link"
+            aria-label={"View " + name + "'s profile"}
+          >
             {name}
           </Link>
         </span>
         <span className="text-xs text-gray-400">
-          <Link href={routes.user.profile(username)} className="focus-presets focus-primary rounded">
+          <Link
+            href={routes.user.profile(username)}
+            className="focus-presets focus-primary rounded"
+            role="link"
+            aria-label={"View " + name + "'s profile"}
+          >
             @{username}
           </Link>
         </span>

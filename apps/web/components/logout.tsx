@@ -10,7 +10,7 @@ import { cn } from "@/lib/cn";
 import { logoutAction } from "./logout-action";
 
 const className =
-  "py-2 pl-2 pr-1 rounded flex items-center gap-2 hover:bg-nobelBlack-200 transition-colors text-black-200 text-sm font-medium focus-visible";
+  "py-2 pl-2 pr-1 rounded flex items-center gap-2 hover:bg-nobelBlack-200 transition-colors text-black-200 text-lg font-medium focus-visible";
 
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement>;
 
@@ -27,7 +27,7 @@ export function Logout(props: Props) {
 
   return (
     <button {...props} className={cn(className, props.className)} onClick={logout} disabled={isPending}>
-      <LogoutIcon />
+      <LogoutIcon className="ml-1" />
       <span>Logout</span>
       {spinner}
     </button>

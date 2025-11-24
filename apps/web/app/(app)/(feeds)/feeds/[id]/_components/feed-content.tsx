@@ -23,6 +23,7 @@ import {
 import { Error } from "@votewise/ui/error";
 
 import { routes } from "@/lib/routes";
+import { getFullName } from "@/lib/string";
 
 import { FeedAssets } from "./feed-assets";
 import { FeedSkeletonShell } from "./skeleton";
@@ -56,24 +57,37 @@ export function FeedContent(props: Props) {
   return (
     <>
       <div className="flex items-start gap-3">
-        <Link href={routes.user.profile(feed.author.user_name)} className="focus-visible rounded-full">
+        <Link
+          href={routes.user.profile(feed.author.user_name)}
+          className="focus-visible rounded-full"
+          aria-label={getFullName(feed.author) + "'s avatar"}
+          role="link"
+          tabIndex={0}
+        >
           <Avatar className="size-12">
-            <AvatarFallback name={feed.author.first_name + " " + feed.author.last_name} />
-            <AvatarImage
-              src={feed.author.avatar_url || ""}
-              alt={feed.author.first_name + " " + feed.author.last_name}
-            />
+            <AvatarFallback name={getFullName(feed.author)} />
+            <AvatarImage src={feed.author.avatar_url || ""} alt={getFullName(feed.author)} />
           </Avatar>
         </Link>
         <div className="w-full">
           <FeedHeader>
-            <Link href={routes.user.profile(feed.author.user_name)} className="focus-visible">
-              <FeedUserName>{feed.author.first_name + " " + feed.author.last_name}</FeedUserName>
+            <Link
+              href={routes.user.profile(feed.author.user_name)}
+              className="focus-visible rounded"
+              role="link"
+              aria-label={"View " + getFullName(feed.author) + "'s profile"}
+            >
+              <FeedUserName>{getFullName(feed.author)}</FeedUserName>
             </Link>
             <FeedTimeAgo className="pt-1">{dayjs(feed.created_at).fromNow()}</FeedTimeAgo>
           </FeedHeader>
           <FeedHeader>
-            <Link href={routes.user.profile(feed.author.user_name)} className="focus-visible">
+            <Link
+              href={routes.user.profile(feed.author.user_name)}
+              className="focus-visible rounded"
+              role="link"
+              aria-label={"View " + getFullName(feed.author) + "'s profile"}
+            >
               <FeedUserHandle>@{feed.author.user_name}</FeedUserHandle>
             </Link>
           </FeedHeader>
