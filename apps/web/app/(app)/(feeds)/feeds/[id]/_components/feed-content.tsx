@@ -71,25 +71,29 @@ export function FeedContent(props: Props) {
         </Link>
         <div className="w-full">
           <FeedHeader>
-            <Link
-              href={routes.user.profile(feed.author.user_name)}
-              className="focus-visible rounded"
-              role="link"
-              aria-label={"View " + getFullName(feed.author) + "'s profile"}
-            >
-              <FeedUserName>{getFullName(feed.author)}</FeedUserName>
-            </Link>
-            <FeedTimeAgo className="pt-1">{dayjs(feed.created_at).fromNow()}</FeedTimeAgo>
+            <FeedUserName asChild>
+              <Link
+                href={routes.user.profile(feed.author.user_name)}
+                className="focus-visible rounded hover:underline"
+                role="link"
+                aria-label={"View " + getFullName(feed.author) + "'s profile"}
+              >
+                {getFullName(feed.author)}
+              </Link>
+            </FeedUserName>
+            <FeedTimeAgo>{dayjs(feed.created_at).fromNow()}</FeedTimeAgo>
           </FeedHeader>
           <FeedHeader>
-            <Link
-              href={routes.user.profile(feed.author.user_name)}
-              className="focus-visible rounded"
-              role="link"
-              aria-label={"View " + getFullName(feed.author) + "'s profile"}
-            >
-              <FeedUserHandle>@{feed.author.user_name}</FeedUserHandle>
-            </Link>
+            <FeedUserHandle asChild>
+              <Link
+                href={routes.user.profile(feed.author.user_name)}
+                className="focus-visible rounded"
+                role="link"
+                aria-label={"View " + getFullName(feed.author) + "'s profile"}
+              >
+                @{feed.author.user_name}
+              </Link>
+            </FeedUserHandle>
           </FeedHeader>
         </div>
       </div>

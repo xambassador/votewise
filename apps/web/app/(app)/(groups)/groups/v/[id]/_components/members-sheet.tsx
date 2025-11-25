@@ -34,7 +34,7 @@ export function MembersSheet(props: { groupId: string; name: string; about: stri
         onMouseEnter={load}
       >
         <InforCircleSolid className="text-blue-300 size-5" />
-        <span className="font-medium text-blue-300 text-sm">About</span>
+        <span className="font-medium text-blue-300 text-base">About</span>
       </button>
     </div>
   );

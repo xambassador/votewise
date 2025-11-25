@@ -28,7 +28,7 @@ export default async function Page() {
         <ChevronRight className="rotate-180 size-4" />
         <span>Back to Settings</span>
       </Link>
-      <h1 className="text-xl text-gray-300">Account</h1>
+      <h1 className="text-xl text-gray-300 font-semibold">Account</h1>
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-4">
           <Avatar className="size-20">
@@ -43,7 +43,7 @@ export default async function Page() {
         <ProfileForm account={res.data} />
       </div>
       <Separator className="w-full h-px" />
-      <h1 className="text-xl text-gray-300">Security</h1>
+      <h1 className="text-xl text-gray-300 font-semibold">Security</h1>
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <span className="text-gray-400">Two-Factor Authentication</span>
@@ -53,7 +53,7 @@ export default async function Page() {
         </div>
       </div>
       <Separator className="w-full h-px" />
-      <h1 className="text-xl text-gray-300">Danger Zone</h1>
+      <h1 className="text-xl text-gray-300 font-semibold">Danger Zone</h1>
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <span className="text-gray-400">Delete Account</span>

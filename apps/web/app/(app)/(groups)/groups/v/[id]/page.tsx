@@ -49,7 +49,7 @@ export default async function Page(props: Props) {
                     if (!feedData.hasAccess) {
                       return (
                         <div className="pt-10 flex justify-center">
-                          <p className="text-gray-400">
+                          <p className="text-gray-400 text-base">
                             You are not a member of this group. To view posts, please join the group.
                           </p>
                         </div>
@@ -59,7 +59,7 @@ export default async function Page(props: Props) {
                     if (feedData.feeds.feeds.length === 0) {
                       return (
                         <div className="pt-10 flex justify-center">
-                          <span className="text-gray-400">No posts yet. Be the first to post!</span>
+                          <p className="text-gray-400 text-base">No posts yet. Be the first to post!</p>
                         </div>
                       );
                     }

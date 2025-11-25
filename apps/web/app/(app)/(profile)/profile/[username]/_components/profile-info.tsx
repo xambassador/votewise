@@ -24,8 +24,8 @@ export function ProfileInfo(props: Props) {
     <div className="gap-4 flex flex-col pb-4 border-b border-nobelBlack-200">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl text-gray-200">{name}</h1>
-          <span className="text-base text-gray-400 font-medium">@{userName}</span>
+          <h1 className="text-xl text-gray-200 font-semibold">{name}</h1>
+          <span className="text-base text-gray-400">@{userName}</span>
         </div>
         <FollowButton username={userName} isFollowing={props.selfFollow} />
       </div>
@@ -34,12 +34,12 @@ export function ProfileInfo(props: Props) {
         {location && (
           <div className="flex items-center gap-1 mb-1">
             <LocationPin className="text-black-200" />
-            <span className="text-black-200 text-sm">{location}</span>
+            <span className="text-black-200 text-base">{location}</span>
           </div>
         )}
         <div className="flex items-center gap-1">
           <Clock className="text-black-200" />
-          <span className="text-black-200 text-sm">Joined {dayjs(joinedAt).fromNow()}</span>
+          <span className="text-black-200 text-base">Joined {dayjs(joinedAt).fromNow()}</span>
         </div>
       </div>
     </div>

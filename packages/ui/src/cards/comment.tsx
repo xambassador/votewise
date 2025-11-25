@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef, memo, useState } from "react";
+import { Slot } from "@radix-ui/react-slot";
 
 import { cn } from "../cn";
 import { createContext } from "../context";
@@ -107,21 +108,23 @@ export const CommentHeader = forwardRef<HTMLDivElement, CommentHeaderProps>((pro
 ));
 CommentHeader.displayName = "CommentHeader";
 
-export type CommentAuthorProps = React.HTMLAttributes<HTMLSpanElement>;
-export const CommentAuthor = forwardRef<HTMLSpanElement, CommentAuthorProps>((props, ref) => (
-  <span {...props} ref={ref} className={cn("text-sm text-gray-200", props.className)} />
-));
+export type CommentAuthorProps = React.HTMLAttributes<HTMLSpanElement> & { asChild?: boolean };
+export const CommentAuthor = forwardRef<HTMLSpanElement, CommentAuthorProps>((props, ref) => {
+  const { asChild, className, ...rest } = props;
+  const Component = asChild ? Slot : "span";
+  return <Component {...rest} ref={ref} className={cn("text-base text-gray-200", className)} />;
+});
 CommentAuthor.displayName = "CommentAuthor";
 
 export type CommentDateProps = React.HTMLAttributes<HTMLSpanElement>;
 export const CommentDate = forwardRef<HTMLSpanElement, CommentDateProps>((props, ref) => (
-  <span {...props} ref={ref} className={cn("text-xs text-gray-400", props.className)} />
+  <span {...props} ref={ref} className={cn("text-base text-gray-400", props.className)} />
 ));
 CommentDate.displayName = "CommentDate";
 
 export type CommentUpdatedLabelProps = React.HTMLAttributes<HTMLSpanElement>;
 export const CommentUpdatedLabel = forwardRef<HTMLSpanElement, CommentUpdatedLabelProps>((props, ref) => (
-  <span {...props} ref={ref} className={cn("text-xs text-gray-400", props.className)} />
+  <span {...props} ref={ref} className={cn("text-sm text-gray-400", props.className)} />
 ));
 CommentUpdatedLabel.displayName = "CommentUpdatedLabel";
 

@@ -7,6 +7,7 @@ import { useFetchProfile } from "@/hooks/use-fetch-profile";
 import { Error } from "@votewise/ui/error";
 
 import { ProfileActivityStats, ProfileRelationStats } from "../../_components/profile-stats";
+import { ProfileImageSkeleton, ProfileInfoSkeleton } from "../../_components/skeleton";
 import { ProfileImage } from "./profile-image";
 import { ProfileInfo } from "./profile-info";
 
@@ -21,7 +22,12 @@ export function Profile(props: Props) {
 
   switch (status) {
     case "pending":
-      return <div>Loading...</div>;
+      return (
+        <div className="flex flex-col gap-5">
+          <ProfileImageSkeleton />
+          <ProfileInfoSkeleton />
+        </div>
+      );
     case "error":
       return <Error error={error.message} />;
   }

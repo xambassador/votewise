@@ -1,3 +1,5 @@
+import { Slot } from "@radix-ui/react-slot";
+
 import { AvatarCard } from "../avatar-card";
 import { cn } from "../cn";
 import { FloatingCounter } from "../floating-counter";
@@ -45,46 +47,51 @@ export function FeedHeader(props: FeedHeaderProps) {
   );
 }
 
-export type FeedUserNameProps = React.HTMLAttributes<HTMLSpanElement>;
+export type FeedUserNameProps = React.HTMLAttributes<HTMLSpanElement> & { asChild?: boolean };
 export function FeedUserName(props: FeedUserNameProps) {
-  const { children, className, ...rest } = props;
+  const { children, className, asChild, ...rest } = props;
+  const Component = asChild ? Slot : "span";
   return (
-    <span {...rest} className={cn("font-medium text-lg text-gray-300", className)}>
+    <Component {...rest} className={cn("text-gray-300 text-base font-semibold", className)}>
       {children}
-    </span>
+    </Component>
   );
 }
 
-export type FeedUserHandleProps = React.HTMLAttributes<HTMLSpanElement>;
+export type FeedUserHandleProps = React.HTMLAttributes<HTMLSpanElement> & { asChild?: boolean };
 export function FeedUserHandle(props: FeedUserHandleProps) {
-  const { children, className, ...rest } = props;
+  const { children, className, asChild, ...rest } = props;
+  const Component = asChild ? Slot : "span";
   return (
-    <span {...rest} className={cn("text-gray-400 text-sm", className)}>
+    <Component {...rest} className={cn("text-gray-400 text-base", className)}>
       {children}
-    </span>
+    </Component>
   );
 }
 
-export type FeedTimeAgoProps = React.HTMLAttributes<HTMLSpanElement>;
+export type FeedTimeAgoProps = React.HTMLAttributes<HTMLSpanElement> & { asChild?: boolean };
 export function FeedTimeAgo(props: FeedTimeAgoProps) {
-  const { children, className, ...rest } = props;
+  const { children, className, asChild, ...rest } = props;
+  const Component = asChild ? Slot : "span";
   return (
-    <span {...rest} className={cn("text-gray-400 text-xs", className)}>
+    <Component {...rest} className={cn("text-gray-400 text-base", className)}>
       {children}
-    </span>
+    </Component>
   );
 }
 
-export type FeedTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
+export type FeedTitleProps = React.HTMLAttributes<HTMLHeadingElement> & { asChild?: boolean };
 export function FeedTitle(props: FeedTitleProps) {
-  return <h1 {...props} className={cn("text-lg font-medium text-gray-200", props.className)} />;
+  const { asChild, className, ...rest } = props;
+  const Component = asChild ? Slot : "h1";
+  return <Component {...rest} className={cn("text-lg font-medium text-gray-200", className)} />;
 }
 
 export type FeedContentTextProps = React.HTMLAttributes<HTMLParagraphElement>;
 export function FeedContentText(props: FeedContentTextProps) {
   const { children, className, ...rest } = props;
   return (
-    <p {...rest} className={cn("text-xl font-normal text-gray-300", className)}>
+    <p {...rest} className={cn("font-normal text-gray-300 text-base", className)}>
       {children}
     </p>
   );

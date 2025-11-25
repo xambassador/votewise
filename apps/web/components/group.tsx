@@ -48,7 +48,7 @@ export function GroupMolecule(props: Props) {
           <GroupHeader>
             <GroupName asChild title={group.name}>
               <Link
-                className="focus-visible"
+                className="focus-visible hover:underline"
                 href={routes.group.view(group.id)}
                 role="link"
                 aria-label={viewGroupLabel}
@@ -66,7 +66,12 @@ export function GroupMolecule(props: Props) {
           {group.admin && (
             <GroupCreatedBy>
               Created by{" "}
-              <Link className="focus-visible font-semibold" href={routes.user.profile(group.admin.user_name)}>
+              <Link
+                className="focus-visible font-semibold hover:underline"
+                href={routes.user.profile(group.admin.user_name)}
+                role="link"
+                aria-label={`View ${group.admin.user_name} profile`}
+              >
                 {group.admin.user_name}
               </Link>
             </GroupCreatedBy>

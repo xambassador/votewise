@@ -75,7 +75,7 @@ export const FeedMolecule = memo(function FeedMolecule(props: Props) {
           </Link>
           <FeedContent>
             <FeedHeader>
-              <FeedUserName>
+              <FeedUserName asChild>
                 <Link
                   href={routes.user.profile(feed.author.user_name)}
                   className="focus-visible rounded hover:underline"
@@ -95,11 +95,11 @@ export const FeedMolecule = memo(function FeedMolecule(props: Props) {
           <FeedFooterActions>
             <FeedFooterItem>
               <Comment className="text-gray-400" />
-              <span className="text-gray-400 text-xs">{humanizeNumber(feed.comments)} Discussions</span>
+              <span className="text-gray-400 text-sm">{humanizeNumber(feed.comments)} Discussions</span>
             </FeedFooterItem>
             <FeedFooterItem>
               <PaperPlane className="text-gray-400" />
-              <span className="text-gray-400 text-xs">Share</span>
+              <span className="text-gray-400 text-sm">Share</span>
             </FeedFooterItem>
           </FeedFooterActions>
           <VotersStack>

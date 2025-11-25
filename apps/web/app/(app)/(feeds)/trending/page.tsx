@@ -24,7 +24,7 @@ export default function TrendingPage() {
 async function TrendingPosts() {
   return (
     <section className="pb-5">
-      <h2 className="text-xl font-medium text-gray-300 mb-6">Trending Posts</h2>
+      <h2 className="text-lg font-semibold text-gray-300 mb-6">Trending Posts</h2>
       <Suspense fallback={<HotFeedsSkeleton />}>
         <HotFeedFetcher>{(data) => <HotFeeds data={data} />}</HotFeedFetcher>
       </Suspense>
@@ -35,7 +35,7 @@ async function TrendingPosts() {
 async function TrendingUsers() {
   return (
     <section>
-      <h2 className="text-xl font-medium text-gray-200 mb-6">Trending Users</h2>
+      <h2 className="text-lg font-semibold text-gray-200 mb-6">Trending Users</h2>
       <Suspense fallback={<HotUserSkeleton />}>
         <HotUsersFetcher>{(data) => <HotUsers data={data} />}</HotUsersFetcher>
       </Suspense>
@@ -47,7 +47,7 @@ async function SuggestedUsers() {
   return (
     <section>
       <div className="mb-6">
-        <h2 className="text-xl font-medium text-gray-200 mb-2">People to Follow</h2>
+        <h2 className="text-lg font-semibold text-gray-200 mb-2">People to Follow</h2>
         <p className="text-sm text-gray-400">Discover interesting people in the community</p>
       </div>
       <Suspense fallback={<SuggestedUsersSkeleton />}>

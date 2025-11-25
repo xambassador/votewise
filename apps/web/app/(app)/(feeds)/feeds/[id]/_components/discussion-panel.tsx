@@ -208,7 +208,7 @@ const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
       </Link>
       <CommentContent>
         <CommentHeader>
-          <CommentAuthor>
+          <CommentAuthor asChild>
             <Link
               href={routes.user.profile(userName)}
               className="hover:underline focus-visible rounded"

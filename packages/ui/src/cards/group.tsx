@@ -51,13 +51,13 @@ export type GroupNameProps = React.HTMLAttributes<HTMLSpanElement> & {
 export const GroupName = forwardRef<HTMLSpanElement, GroupNameProps>((props, ref) => {
   const { className, asChild = false, ...rest } = props;
   const Comp = asChild ? Slot : "span";
-  return <Comp ref={ref} {...rest} className={cn("text-gray-200 font-semibold text-lg break-words", className)} />;
+  return <Comp ref={ref} {...rest} className={cn("text-gray-200 font-semibold text-base break-words", className)} />;
 });
 GroupName.displayName = "GroupName";
 
 export type GroupDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
 export const GroupDescription = forwardRef<HTMLParagraphElement, GroupDescriptionProps>((props, ref) => (
-  <p ref={ref} {...props} className={cn("text-gray-400 text-sm mb-4 leading-relaxed", props.className)} />
+  <p ref={ref} {...props} className={cn("text-gray-400 text-base mb-4", props.className)} />
 ));
 GroupDescription.displayName = "GroupDescription";
 
@@ -91,7 +91,7 @@ GroupMembers.displayName = "GroupMembers";
 
 export type GroupCreatedAtProps = React.HTMLAttributes<HTMLSpanElement>;
 export const GroupCreatedAt = forwardRef<HTMLSpanElement, GroupCreatedAtProps>((props, ref) => (
-  <span ref={ref} {...props} className={cn("text-xs text-gray-500", props.className)} />
+  <span ref={ref} {...props} className={cn("text-base text-gray-500", props.className)} />
 ));
 GroupCreatedAt.displayName = "GroupCreatedAt";
 
@@ -103,6 +103,6 @@ GroupFooter.displayName = "GroupFooter";
 
 export type GroupCreatedByProps = React.HTMLAttributes<HTMLSpanElement>;
 export const GroupCreatedBy = forwardRef<HTMLSpanElement, GroupCreatedByProps>((props, ref) => (
-  <span ref={ref} {...props} className={cn("text-xs block text-gray-500 mt-2", props.className)} />
+  <span ref={ref} {...props} className={cn("text-sm block text-gray-500 mt-2", props.className)} />
 ));
 GroupCreatedBy.displayName = "GroupCreatedBy";

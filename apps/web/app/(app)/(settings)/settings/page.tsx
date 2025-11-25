@@ -23,7 +23,7 @@ export default function Page() {
           <Setting />
           <h1 className="text-xl text-gray-300">Settings</h1>
         </div>
-        <p className="text-gray-400">Manage your account settings and preferences</p>
+        <p className="text-gray-400 text-base">Manage your account settings and preferences</p>
       </div>
 
       <div className="flex flex-col p-4 rounded-xl bg-nobelBlack-200">
@@ -31,7 +31,7 @@ export default function Page() {
           <Link
             href={tab.href}
             key={tab.id}
-            className="py-4 rounded-xl flex items-center justify-between hover:bg-nobelBlack-100 px-3"
+            className="py-4 rounded-xl flex items-center justify-between hover:bg-nobelBlack-100 px-3 text-base"
           >
             <div className="flex items-center gap-2 text-gray-300">
               {tab.icon}

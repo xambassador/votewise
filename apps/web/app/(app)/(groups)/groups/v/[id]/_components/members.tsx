@@ -24,22 +24,22 @@ export function Members(props: Props) {
     <Sheet {...rest}>
       <SheetContent>
         <SheetHeader className="pb-5 border-b border-nobelBlack-200 mb-5">
-          <SheetTitle>{name}</SheetTitle>
-          <SheetDescription>{about}</SheetDescription>
+          <SheetTitle className="text-xl">{name}</SheetTitle>
+          <SheetDescription className="text-base">{about}</SheetDescription>
         </SheetHeader>
         <div className="flex flex-col gap-5 max-h-[calc(100vh-64px-145px-)] overflow-y-auto scroller">
           <div className="flex flex-col gap-5 border-b border-nobelBlack-200 pb-5">
-            <h2 className="text-xl font-medium">Admins</h2>
+            <h2 className="text-lg font-semibold">Admins</h2>
             <Admins groupId={groupId} />
           </div>
 
           <div className="flex flex-col gap-5 border-b border-nobelBlack-200 pb-5">
-            <h2 className="text-xl font-medium">Moderators</h2>
+            <h2 className="text-lg font-semibold">Moderators</h2>
             <Moderators groupId={groupId} />
           </div>
 
           <div className="flex flex-col gap-5 border-b border-nobelBlack-200 pb-5">
-            <h2 className="text-xl font-medium">Members</h2>
+            <h2 className="text-lg font-semibold">Members</h2>
             <Users groupId={groupId} />
           </div>
         </div>
@@ -145,7 +145,7 @@ function Users(props: { groupId: string }) {
     return (
       <div>
         <UsersIcon className="text-gray-400 size-8 mx-auto" />
-        <p className="text-center text-gray-400 mt-2">No members</p>
+        <p className="text-center text-gray-400 mt-2 text-base">No members</p>
       </div>
     );
   }
@@ -176,32 +176,28 @@ function User(props: { name: string; username: string; avatar: string; isMe?: bo
         role="link"
         aria-label={"View " + name + "'s profile"}
       >
-        <Avatar>
+        <Avatar className="size-11">
           <AvatarImage src={avatar} alt={name} />
           <AvatarFallback name={name} />
         </Avatar>
       </Link>
-      <div className="flex flex-col gap-1">
-        <span className="text-xs text-gray-300">
-          <Link
-            href={routes.user.profile(username)}
-            className="focus-presets focus-primary rounded"
-            role="link"
-            aria-label={"View " + name + "'s profile"}
-          >
-            {name}
-          </Link>
-        </span>
-        <span className="text-xs text-gray-400">
-          <Link
-            href={routes.user.profile(username)}
-            className="focus-presets focus-primary rounded"
-            role="link"
-            aria-label={"View " + name + "'s profile"}
-          >
-            @{username}
-          </Link>
-        </span>
+      <div>
+        <Link
+          href={routes.user.profile(username)}
+          className="focus-presets focus-primary rounded text-base text-gray-300 block"
+          role="link"
+          aria-label={"View " + name + "'s profile"}
+        >
+          {name}
+        </Link>
+        <Link
+          href={routes.user.profile(username)}
+          className="focus-presets focus-primary rounded text-base text-gray-400 block -mt-px"
+          role="link"
+          aria-label={"View " + name + "'s profile"}
+        >
+          @{username}
+        </Link>
       </div>
     </div>
   );

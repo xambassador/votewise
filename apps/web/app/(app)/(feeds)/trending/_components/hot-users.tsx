@@ -49,17 +49,15 @@ export function HotUsers(props: Props) {
           <div className="p-5 rounded-xl bg-nobelBlack-100 border border-nobelBlack-200">
             <div className="flex items-start gap-4">
               <Avatar className="size-12">
-                <AvatarImage src={user.avatar_url} alt={user.first_name + " " + user.last_name} />
-                <AvatarFallback name={user.first_name + " " + user.last_name} />
+                <AvatarImage src={user.avatar_url} alt={getFullName(user)} />
+                <AvatarFallback name={getFullName(user)} />
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium text-lg text-gray-300">{user.first_name + " " + user.last_name}</span>
-                  <span className="text-gray-400 text-xs">@{user.user_name}</span>
+                  <span className="text-base font-semibold text-gray-300">{getFullName(user)}</span>
+                  <span className="text-gray-400 text-base">@{user.user_name}</span>
                 </div>
-
-                <p className="text-gray-400 text-sm mb-4 leading-relaxed">{user.about}</p>
-
+                <p className="text-gray-300 text-base mb-4">{user.about}</p>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4 text-sm">
                     <div>

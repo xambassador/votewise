@@ -74,16 +74,16 @@ export function GroupView(props: Props) {
       <div className="flex flex-col gap-7">
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-2">
-            <h2 className="text-2xl font-semibold text-gray-200">{group.name}</h2>
+            <h2 className="text-xl font-semibold text-gray-200">{group.name}</h2>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1">
                 <Clock className="text-black-200 size-5" />
-                <span className="text-sm text-black-200">Created {dayjs(group.created_at).fromNow()}</span>
+                <span className="text-base text-black-200">Created {dayjs(group.created_at).fromNow()}</span>
               </div>
               <MembersSheet groupId={group.id} about={group.about} name={group.name} />
             </div>
           </div>
-          <p className="text-sm text-gray-300">{group.about}</p>
+          <p className="text-base text-gray-300">{group.about}</p>
         </div>
 
         <div className="flex flex-col gap-7">
