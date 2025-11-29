@@ -2,6 +2,8 @@ import type { AppContext } from "@/context";
 
 import chalk from "chalk";
 
+import { sql } from "@votewise/prisma";
+
 type Options = { ctx: AppContext };
 
 export class HealthChecker {
@@ -13,8 +15,8 @@ export class HealthChecker {
 
   public async connectDB() {
     return new Promise((resolve, reject) => {
-      this.ctx.db
-        .$connect()
+      sql`SELECT 1`
+        .execute(this.ctx.dataLayer)
         .then(resolve)
         .catch((err) => {
           this.ctx.logger.errorSync(
@@ -41,8 +43,8 @@ export class HealthChecker {
 
   public async disconnectDB() {
     return new Promise((resolve, reject) => {
-      this.ctx.db
-        .$disconnect()
+      this.ctx.dataLayer
+        .destroy()
         .then(resolve)
         .catch((err) => {
           this.ctx.logger.errorSync(chalk.red(`❌ Failed to disconnect from Postgres`));

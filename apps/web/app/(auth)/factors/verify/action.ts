@@ -6,12 +6,12 @@ import type { ActionResponse } from "@votewise/types";
 import { redirect } from "next/navigation";
 
 import { isAuthorized } from "@/lib/auth";
-import { getAuthClient } from "@/lib/client.server";
+import { getMFAClient } from "@/lib/client.server";
 import { clearCookie, COOKIE_KEYS, forwardCookie, getCookie } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
 export async function verifyFactor(code: string): Promise<ActionResponse<VerifyMFAResponse>> {
-  isAuthorized<true>({ redirect: true });
+  await isAuthorized<true>({ redirect: true });
   const factorId = getCookie(COOKIE_KEYS.factorId);
   const challengeId = getCookie(COOKIE_KEYS.challengeId);
 
@@ -20,8 +20,8 @@ export async function verifyFactor(code: string): Promise<ActionResponse<VerifyM
     return redirect(routes.auth.logout());
   }
 
-  const authClient = getAuthClient();
-  const res = await authClient.verifyFactor({ code, challenge_id: challengeId, factorId });
+  const mfaClient = getMFAClient();
+  const res = await mfaClient.verify(factorId, { code, challenge_id: challengeId });
   if (!res.success) return { success: false, error: res.error, errorData: res.errorData };
 
   clearCookie(COOKIE_KEYS.factorId);

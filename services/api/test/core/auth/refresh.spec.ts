@@ -30,7 +30,8 @@ const accessToken = jwtService.signAccessToken({
   sub: user.id,
   user_metadata: {},
   app_metadata: appMetaData,
-  user_aal_level: "aal1"
+  user_aal_level: "aal1",
+  is_onboarded: false
 });
 const refreshToken = faker.string.alphanumeric(64);
 
@@ -139,7 +140,8 @@ describe("Refresh Controller", () => {
         app_metadata: appMetaData,
         user_metadata: {},
         session_id: newSessionId,
-        user_aal_level: "aal1"
+        user_aal_level: "aal1",
+        is_onboarded: false
       },
       { expiresIn: 30 * Minute }
     );

@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 
 import { ERROR_CODES } from "@votewise/constant";
 
-import { getAuthClient } from "@/lib/client.server";
+import { getAuthClient, getMFAClient } from "@/lib/client.server";
 import { COOKIE_KEYS, forwardCookie, setCookie, setFlashMessage } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
@@ -31,7 +31,6 @@ export async function signin(data: TSinginForm, redirectTo?: string | null): Pro
   }
 
   const expiresIn = new Date(Date.now() + res.data.expires_in);
-  setCookie(COOKIE_KEYS.user, JSON.stringify(res.data.user), { expires: expiresIn });
   setCookie(COOKIE_KEYS.isOnboarded, res.data.user.is_onboarded ? "true" : "false", { expires: expiresIn });
   forwardCookie(res.headers);
 
@@ -39,9 +38,10 @@ export async function signin(data: TSinginForm, redirectTo?: string | null): Pro
   const hasTotp = res.data.user.factors.find((f) => f.type === "TOTP");
 
   if (hasFactors && hasTotp) {
+    const mfaClient = getMFAClient();
     // Need to pass access token explicitly because cookies are not set yet on the client and we are
     // making a server side request to challenge the factor.
-    const challengeRes = await auth.challengeFactor(hasTotp.id, res.data.access_token);
+    const challengeRes = await mfaClient.challenge(hasTotp.id, res.data.access_token);
     if (!challengeRes.success) {
       setFlashMessage("MFA challenge failed", challengeRes.error, "error");
       return challengeRes;

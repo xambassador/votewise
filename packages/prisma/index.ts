@@ -16,14 +16,9 @@ const dialect = new PostgresDialect({
   pool: new Pool({ connectionString: process.env.DATABASE_URL })
 });
 
-export const dataLayer = new Kysely<VotewiseSchema>({
-  dialect,
-  log: (e) => {
-    if (process.env.DEBUG !== "true") return;
-    // eslint-disable-next-line no-console
-    console.log(e.query.sql, " ", e.query.parameters);
-  }
-}) as Kysely<VotewiseSchema> & { createId: typeof createId };
+export const dataLayer = new Kysely<VotewiseSchema>({ dialect }) as Kysely<VotewiseSchema> & {
+  createId: typeof createId;
+};
 
 dataLayer.createId = createId;
 

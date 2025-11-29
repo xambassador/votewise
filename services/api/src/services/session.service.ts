@@ -20,6 +20,7 @@ type CreateOptions = {
   aal: "aal1" | "aal2";
   sessionId?: string; // If need to create a session for existing session ID
   user_aal_level: "aal1" | "aal2";
+  isOnboarded?: boolean;
 };
 
 export class SessionManager {
@@ -48,7 +49,8 @@ export class SessionManager {
       appMetaData = {},
       userMetaData = {},
       sessionId: existingSessionId,
-      user_aal_level
+      user_aal_level,
+      isOnboarded = false
     } = opts;
     const sessionId = existingSessionId || this.ctx.cryptoService.generateUUID();
     const refreshToken = this.ctx.cryptoService.generateUUID().replace(/-/g, "");
@@ -64,7 +66,8 @@ export class SessionManager {
         app_metadata: appMetaData,
         user_metadata: userMetaData,
         session_id: sessionId,
-        user_aal_level
+        user_aal_level,
+        is_onboarded: isOnboarded
       },
       { expiresIn }
     );
@@ -85,11 +88,6 @@ export class SessionManager {
    */
   public async save(sessionId: string, session: InMemorySession & { userId: string }) {
     const key = this.getSessionKey(sessionId);
-    await this.ctx.cache.setWithExpiry(
-      key,
-      JSON.stringify({ ip: session.ip, userAgent: session.userAgent, aal: session.aal }),
-      20 * Minute
-    );
     await this.ctx.sessionRepository.create({
       id: sessionId,
       aal: session.aal,
@@ -97,6 +95,11 @@ export class SessionManager {
       userAgent: session.userAgent,
       userId: session.userId
     });
+    await this.ctx.cache.setWithExpiry(
+      key,
+      JSON.stringify({ ip: session.ip, userAgent: session.userAgent, aal: session.aal }),
+      20 * Minute
+    );
   }
 
   /**
@@ -229,34 +232,5 @@ export class SessionManager {
     const keys = sessionIds.map((sessionId) => this.getSessionKey(sessionId));
     await Promise.all(keys.map((key) => this.ctx.cache.del(key)));
     await this.ctx.sessionRepository.clearByUserId(userId);
-  }
-
-  /**
-   * Save the onboard status of a user
-   */
-  public async saveOnboardStatus(userId: string, status: "ONBOARDED" | "NOT_ONBOARDED") {
-    const key = `onboard-status:${userId}`;
-    await this.ctx.cache.setWithExpiry(key, status, 60 * Minute);
-  }
-
-  /**
-   * Get the onboard status of a user
-   */
-  public async getOnboardStatus(userId: string) {
-    const key = `onboard-status:${userId}`;
-    const status = await this.ctx.cache.get(key);
-    if (!status) return null;
-    return status as "ONBOARDED" | "NOT_ONBOARDED";
-  }
-
-  /**
-   * Update the onboard status of a user
-   */
-  public async updateOnboardStatus(userId: string, status: "ONBOARDED" | "NOT_ONBOARDED") {
-    const key = `onboard-status:${userId}`;
-    const onboardStatus = await this.ctx.cache.get(key);
-    if (!onboardStatus) return null;
-    await this.ctx.cache.setWithExpiry(key, status, 60 * Minute);
-    return status;
   }
 }

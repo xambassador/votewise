@@ -4,9 +4,11 @@ import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
-import { ERROR_CODES } from "@votewise/constant";
+import { COOKIE_KEYS, ERROR_CODES } from "@votewise/constant";
 import { ZOnboard } from "@votewise/schemas/onboard";
+import { Day } from "@votewise/times";
 
+import { getCookieOptions } from "@/utils/cookie";
 import { getAuthenticateLocals } from "@/utils/locals";
 
 const { USERNAME_ALREADY_EXISTS } = ERROR_CODES.USER;
@@ -173,9 +175,44 @@ export class Controller {
 
       case 7: {
         await this.ctx.repositories.user.update(userId, { is_onboarded: true });
-        await this.ctx.services.session.updateOnboardStatus(userId, "ONBOARDED");
         await this.ctx.services.onboard.clearUserOnboardCache(userId);
-        const result = { is_onboarded: true };
+
+        const session = this.ctx.services.session.create({
+          subject: locals.payload.sub,
+          aal: locals.payload.aal,
+          amr: locals.payload.amr,
+          email: locals.payload.email,
+          role: locals.payload.role,
+          user_aal_level: locals.payload.user_aal_level,
+          appMetaData: locals.payload.app_metadata,
+          isOnboarded: true
+        });
+        await this.ctx.services.session.delete(locals.payload.session_id);
+        await this.ctx.services.session.save(session.sessionId, {
+          ip: locals.session.ip,
+          userAgent: locals.session.userAgent,
+          aal: locals.payload.aal,
+          userId: locals.payload.sub
+        });
+        await this.ctx.repositories.refreshToken.create({ token: session.refreshToken, userId });
+        const result = {
+          is_onboarded: true,
+          access_token: session.accessToken,
+          refresh_token: session.refreshToken,
+          token_type: "Bearer",
+          expires_in: session.expiresInMs,
+          expires_at: session.expiresAt
+        };
+        res.cookie(
+          COOKIE_KEYS.accessToken,
+          session.accessToken,
+          getCookieOptions({ expires: new Date(Date.now() + session.expiresInMs) })
+        );
+        res.cookie(
+          COOKIE_KEYS.refreshToken,
+          session.refreshToken,
+          getCookieOptions({ expires: new Date(Date.now() + 30 * Day) })
+        );
         return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
       }
 

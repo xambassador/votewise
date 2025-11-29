@@ -8,14 +8,7 @@ import type {
   VerifyEmailResponse,
   VerifyMFAResponse
 } from "@votewise/api";
-import type {
-  TRegister,
-  TResetPassword,
-  TResetPasswordQuery,
-  TSignin,
-  TVerifyChallenge,
-  TVerifyEmail
-} from "@votewise/schemas/auth";
+import type { TRegister, TResetPassword, TResetPasswordQuery, TSignin, TVerifyEmail } from "@votewise/schemas/auth";
 import type { AccessTokenPayload } from "@votewise/types";
 import type { BaseOptions, TClient } from "../utils";
 
@@ -52,33 +45,6 @@ export class Auth {
 
   public async verifyEmail(data: TVerifyEmail) {
     const res = await this.client.patch<VerifyEmailResponse, TVerifyEmail>(auth.runtime.verify(""), data);
-    return res;
-  }
-
-  /**
-   * @deprecated - use `challenge` from the MFA module instead.
-   */
-  public async challengeFactor(factorId: string, token?: string) {
-    const res = await this.client.post<ChallengeFactorResponse, object>(
-      auth.runtime.factors.challengeFactor("", factorId),
-      {},
-      {
-        headers: {
-          ...(token ? { Authorization: `Votewise ${token}` } : {})
-        }
-      }
-    );
-    return res;
-  }
-
-  /**
-   * @deprecated - use `verify` from the MFA module instead.
-   */
-  public async verifyFactor(data: TVerifyChallenge & { factorId: string }) {
-    const res = await this.client.post<VerifyMFAResponse, TVerifyChallenge>(
-      auth.runtime.factors.verifyFactor("", data.factorId),
-      data
-    );
     return res;
   }
 

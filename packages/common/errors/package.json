@@ -11,11 +11,6 @@
     ".": {
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
-    },
-    "./codes": {
-      "types": "./dist/codes.d.ts",
-      "import": "./dist/codes.mjs",
-      "require": "./dist/codes.js"
     }
   },
   "scripts": {

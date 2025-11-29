@@ -122,7 +122,7 @@ describe("Signin Controller", () => {
 
     req = buildReq({ body: userNameBody });
     error = await controller.handle(req, res).catch((e) => e);
-    expect(mockCryptoService.hashPassword).not.toHaveBeenCalled();
+    expect(mockCryptoService.hashPassword).toHaveBeenCalledWith(body.password);
     expect(mockCryptoService.comparePassword).not.toHaveBeenCalled();
     expect(mockUserRepository.findByUsername).toHaveBeenCalledWith(userNameBody.username);
     expect(mockUserRepository.findByEmail).not.toHaveBeenCalled();
@@ -183,7 +183,8 @@ describe("Signin Controller", () => {
         app_metadata: { provider: "email", providers: ["email"] },
         user_metadata: {},
         session_id: sessionId,
-        user_aal_level: "aal1"
+        user_aal_level: "aal1",
+        is_onboarded: user.is_onboarded
       },
       { expiresIn: 30 * Minute }
     );

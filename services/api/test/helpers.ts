@@ -112,6 +112,7 @@ export function buildAccessToken(data: Partial<AccessTokenPayload>): AccessToken
     role: "user",
     email: faker.internet.email(),
     user_aal_level: "aal1",
+    is_onboarded: false,
     ...data
   };
 }

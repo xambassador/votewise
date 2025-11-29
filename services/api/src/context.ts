@@ -5,7 +5,7 @@ import * as Minio from "minio";
 
 import { Assertions } from "@votewise/errors";
 import logger from "@votewise/log";
-import { dataLayer, prisma } from "@votewise/prisma";
+import { dataLayer } from "@votewise/prisma";
 
 import { Mailer } from "@/emails/mailer";
 import { EventBus } from "@/lib/event-bus";
@@ -23,10 +23,6 @@ type ServerSecrets = ApplicationConfigs["secrets"];
 export type AppContextOptions = {
   config: ServerConfig;
   secrets: ServerSecrets;
-  /**
-   * @deprecated Use `dataLayer` instead.
-   */
-  db: typeof prisma;
   dataLayer: DataLayer;
   logger: typeof logger;
   environment: Environment;
@@ -51,7 +47,6 @@ export class AppContext {
 
   public config: ServerConfig;
   public secrets: ServerSecrets;
-  public db: typeof prisma;
   public dataLayer: DataLayer;
   public logger: typeof logger;
   public environment: Environment;
@@ -78,7 +73,6 @@ export class AppContext {
     this.config = opts.config;
     this.cache = opts.cache;
     this.secrets = opts.secrets;
-    this.db = opts.db;
     this.logger = opts.logger;
     this.environment = opts.environment;
     this.repositories = opts.repositories;
@@ -114,7 +108,6 @@ export class AppContext {
     const environment = checkEnv(process.env);
     const assert = new Assertions();
     const cache = new Cache();
-    const db = prisma;
     const mailer = new Mailer({ env: environment });
     const repositories = createRepositories(dataLayer);
     const { tasksQueue, uploadCompletedEventQueue, uploadQueue } = createQueues({ env: environment });
@@ -158,7 +151,6 @@ export class AppContext {
     const ctx = new AppContext({
       config: cfg,
       secrets,
-      db,
       dataLayer,
       logger,
       environment,

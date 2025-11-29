@@ -1,9 +1,4 @@
-import type {
-  GetAllTopicsResponse,
-  GetUserOnboardSessionResponse,
-  GetUserOnboardStatusResponse,
-  OnboardUserResponse
-} from "@votewise/api";
+import type { GetAllTopicsResponse, GetUserOnboardSessionResponse, OnboardUserResponse } from "@votewise/api";
 import type { TOnboard } from "@votewise/schemas/onboard";
 import type { BaseOptions, TClient } from "../utils";
 
@@ -14,12 +9,6 @@ export class Onboard {
 
   constructor(opts: BaseOptions) {
     this.client = opts.client;
-  }
-
-  public async isOnboarded() {
-    const path = user.runtime.onboard.getStatus("");
-    const res = await this.client.get<GetUserOnboardStatusResponse>(path);
-    return res;
   }
 
   public async getOnboardSession() {
@@ -41,4 +30,4 @@ export class Onboard {
   }
 }
 
-export type { GetAllTopicsResponse, GetUserOnboardStatusResponse, OnboardUserResponse, GetUserOnboardSessionResponse };
+export type { GetAllTopicsResponse, OnboardUserResponse, GetUserOnboardSessionResponse };

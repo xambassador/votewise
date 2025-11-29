@@ -12,7 +12,7 @@ import { routes } from "@/lib/routes";
 type OnboardResponse = { is_onboarded: boolean } & TOnboard;
 
 export async function onboard(props: TOnboard & { isDirty: boolean }): Promise<ActionResponse<OnboardResponse>> {
-  isAuthorized<true>({ redirect: true });
+  await isAuthorized<true>({ redirect: true });
   const onboardClient = getOnboardClient();
   const { isDirty } = props;
 

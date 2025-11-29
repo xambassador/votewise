@@ -64,7 +64,6 @@ import { getMeControllerFactory } from "./user/me";
 import { getMyAccountControllerFactory } from "./user/me/account";
 import { updateAccountControllerFactory } from "./user/me/account/update";
 import { onboardControllerFactory } from "./user/onboard";
-import { getOnboardStatusControllerFactory } from "./user/onboard/get";
 import { getOnboardSessionControllerFactory } from "./user/onboard/get-session";
 import { getUserProfileControllerFactory } from "./user/profile/get";
 import { updateUserProfileControllerFactory } from "./user/profile/update";
@@ -84,10 +83,6 @@ export function moduleRouterFactory(basePath: string): Router {
   /* ----------------------------------------------------------------------------------------------- */
   router.get(auth.paths.emailVerificationSession(path), ...getVerificationSessionControllerFactory());
   router.get(user.paths.sessions(path), ...listSessionsControllerFactory());
-  router.get(
-    user.paths.onboard.getStatus(path),
-    ...getOnboardStatusControllerFactory(user.paths.onboard.getStatus(path))
-  );
   router.get(
     user.paths.onboard.getOnboardSession(path),
     ...getOnboardSessionControllerFactory(user.paths.onboard.getOnboardSession(path))

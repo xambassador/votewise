@@ -7,8 +7,8 @@ import { Banner } from "@/app/(auth)/_components/banner";
 import { isAuthorized } from "@/lib/auth";
 import { routes } from "@/lib/routes";
 
-export default function Layout(props: { children: React.ReactNode }) {
-  const user = isAuthorized<true>({ redirect: true });
+export default async function Layout(props: { children: React.ReactNode }) {
+  const user = await isAuthorized<true>({ redirect: true });
   if (user.aal === user.user_aal_level) {
     return redirect(routes.app.root());
   }

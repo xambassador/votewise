@@ -77,13 +77,13 @@ export class Controller {
       email: user.email,
       role: "user",
       user_aal_level: aal,
-      appMetaData: { provider: "email", providers: ["email"] }
+      appMetaData: { provider: "email", providers: ["email"] },
+      isOnboarded: user.is_onboarded
     });
 
     await Promise.all([
       this.ctx.services.session.save(session.sessionId, { ip, userAgent, aal, userId: user.id }),
-      this.ctx.repositories.refreshToken.create({ token: session.refreshToken, userId: user.id }),
-      this.ctx.services.session.saveOnboardStatus(user.id, user.is_onboarded ? "ONBOARDED" : "NOT_ONBOARDED")
+      this.ctx.repositories.refreshToken.create({ token: session.refreshToken, userId: user.id })
     ]);
 
     const lastLogin = new Date();

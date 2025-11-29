@@ -58,8 +58,6 @@ export const user = {
     /** List user sessions */
     sessions: (base: string) => base + "/users/sessions",
     onboard: {
-      /** Get the onboarding status of the user */
-      getStatus: (base: string) => base + "/me/onboard",
       /** Update the onboarding data of the user */
       update: (base: string) => base + "/me/onboard",
       /** Get the current onboarding session */

@@ -15,11 +15,16 @@ type AuthReturn<T extends boolean = false> = T extends true ? AccessTokenPayload
  * @param {AuthParam} param
  * @returns {AuthReturn<T>}
  */
-export function isAuthorized<T extends boolean = false>(param: AuthParam = { redirect: false }): AuthReturn<T> {
-  const user = getAuthClient().getUser();
-  if (user) return user as AuthReturn<T>;
-  if (param.redirect) {
-    return redirect(routes.auth.signIn()) as AuthReturn<T>;
+export async function isAuthorized<T extends boolean = false>(
+  param: AuthParam = { redirect: false }
+): Promise<AuthReturn<T>> {
+  const authClient = getAuthClient();
+  const user = await authClient.isAuthorized();
+  if (!user) {
+    if (param.redirect) {
+      return redirect(routes.auth.signIn()) as AuthReturn<T>;
+    }
+    return null as AuthReturn<T>;
   }
-  return null as AuthReturn<T>;
+  return user.user as AuthReturn<T>;
 }

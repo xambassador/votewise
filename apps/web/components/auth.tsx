@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { Error } from "@votewise/ui/error";
 
 import { isAuthorized } from "@/lib/auth";
-import { getOnboardClient, getUserClient } from "@/lib/client.server";
+import { getUserClient } from "@/lib/client.server";
 import { routes } from "@/lib/routes";
 
 import { UserProvider } from "./user-provider";
@@ -15,17 +15,11 @@ export type AuthorizedProps = {
 };
 
 export async function Authorized(props: AuthorizedProps) {
-  const user = isAuthorized<true>({ redirect: true });
+  const user = await isAuthorized<true>({ redirect: true });
   if (user.aal !== user.user_aal_level) {
     return redirect(routes.auth.verify2FA());
   }
-
-  const onboard = getOnboardClient();
-  const onboardedResult = await onboard.isOnboarded();
-  if (!onboardedResult.success) {
-    return <Error error={onboardedResult.error} />;
-  }
-  if (!onboardedResult.data.is_onboarded) {
+  if (!user.is_onboarded) {
     return redirect(routes.onboard.root());
   }
 
@@ -42,8 +36,8 @@ export async function Authorized(props: AuthorizedProps) {
   return <UserProvider user={me}>{props.children}</UserProvider>;
 }
 
-export function Unauthorized(props: React.PropsWithChildren) {
-  const user = isAuthorized();
+export async function Unauthorized(props: React.PropsWithChildren) {
+  const user = await isAuthorized();
   if (user) return redirect(routes.app.root());
   return <>{props.children}</>;
 }

@@ -10,6 +10,7 @@ import { requestParserPluginFactory } from "@/plugins";
 import { mockTaskQueue, mockUploadQueue } from "../__mock__/queue";
 import {
   mockPostTopicRepository,
+  mockRefreshTokenRepository,
   mockTimelineRepository,
   mockUserInterestRepository,
   mockUserRepository
@@ -25,7 +26,8 @@ const controller = new Controller({
     user: mockUserRepository,
     postTopic: mockPostTopicRepository,
     timeline: mockTimelineRepository,
-    userInterest: mockUserInterestRepository
+    userInterest: mockUserInterestRepository,
+    refreshToken: mockRefreshTokenRepository
   },
   services: {
     onboard: mockOnboardService,
@@ -231,7 +233,7 @@ describe("Onboard Controller", () => {
     expect(mockOnboardService.updateUserOnboardCache).toHaveBeenCalledWith(user.id, data);
   });
 
-  it("should successfully update user information for step 6 and schedual welcome email", async () => {
+  it("should successfully update user information for step 6 and schedule welcome email", async () => {
     const body = getOnboardBody(6);
     const req = buildReq({ body });
     const res = buildRes({ locals });
@@ -259,16 +261,39 @@ describe("Onboard Controller", () => {
     expect(mockTimelineRepository.createMany).toHaveBeenCalledWith([{ post_id: "post1", user_id: user.id }]);
   });
 
-  it("should successfully update onboard status", async () => {
+  it("should successfully update onboard status and create new session with updated claims", async () => {
     const body = getOnboardBody(7);
     const req = buildReq({ body });
     const res = buildRes({ locals });
     mockUserRepository.findById.mockResolvedValue(user);
     mockUserRepository.findByUsername.mockResolvedValue(undefined);
+    mockSessionManagerWithoutCtx.create.mockReturnValue({
+      accessToken: "new_access_token",
+      refreshToken: "new_refresh_token",
+      expiresAt: Date.now() + 3600,
+      expiresInMs: 3600000,
+      sessionId: "new_session_id"
+    });
 
     await controller.handle(req, res);
     expect(mockUserRepository.update).toHaveBeenCalledWith(user.id, { is_onboarded: true });
-    expect(mockSessionManagerWithoutCtx.updateOnboardStatus).toHaveBeenCalledWith(user.id, "ONBOARDED");
     expect(mockOnboardService.clearUserOnboardCache).toHaveBeenCalledWith(user.id);
+    expect(mockSessionManagerWithoutCtx.create).toHaveBeenCalledWith({
+      subject: locals.payload.sub,
+      aal: locals.payload.aal,
+      amr: locals.payload.amr,
+      email: locals.payload.email,
+      role: locals.payload.role,
+      user_aal_level: locals.payload.user_aal_level,
+      appMetaData: locals.payload.app_metadata,
+      isOnboarded: true
+    });
+    expect(mockSessionManagerWithoutCtx.delete).toHaveBeenCalledWith(locals.payload.session_id);
+    expect(mockSessionManagerWithoutCtx.save).toHaveBeenCalledWith("new_session_id", {
+      ip: locals.session.ip,
+      userAgent: locals.session.userAgent,
+      aal: locals.payload.aal,
+      userId: user.id
+    });
   });
 });

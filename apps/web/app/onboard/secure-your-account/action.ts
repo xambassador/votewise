@@ -6,7 +6,7 @@ import type { ActionResponse } from "@votewise/types";
 import { redirect } from "next/navigation";
 
 import { getMFAClient, getOnboardClient } from "@/lib/client.server";
-import { clearAllCookies, setFlashMessage } from "@/lib/cookie";
+import { clearAllCookies, forwardCookie, setFlashMessage } from "@/lib/cookie";
 import { routes } from "@/lib/routes";
 
 export async function enrollMultiFactorAction(): Promise<ActionResponse<EnrollMFAResponse>> {
@@ -49,6 +49,7 @@ export async function skipMultiFactorAction(): Promise<ActionResponse<{ is_onboa
   if (!res.success) {
     return { success: false, error: res.error, errorData: res.errorData };
   }
+  forwardCookie(res.headers);
   setFlashMessage("Onboard complete!", "Welcome to Votewise!", "success");
   return redirect(routes.app.root());
 }

@@ -1,6 +1,5 @@
 import "server-only";
 
-import type { SigninResponse } from "@votewise/client/auth";
 import type { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
 import { cookies } from "next/headers";
@@ -17,7 +16,6 @@ export const COOKIE_KEYS = {
   flash: "__votewise_flash_message",
   accessToken: "__votewise_access_token",
   refreshToken: "__votewise_refresh_token",
-  user: "__votewise_user",
   onboard: "__votewise_onboard",
   isOnboarded: "__votewise_is_onboarded",
   challengeId: "__votewise_challenge_id",
@@ -83,17 +81,6 @@ export function getFlashMessage() {
 
 export function setFlashMessage(title: string, message: string, type: "success" | "error") {
   setCookie(COOKIE_KEYS.flash, JSON.stringify({ title, message, type }));
-}
-
-export function getUser() {
-  const user = getCookie(COOKIE_KEYS.user);
-  if (!user) return null;
-  try {
-    const data = JSON.parse(user) as SigninResponse["user"];
-    return data;
-  } catch (err) {
-    return null;
-  }
 }
 
 const knownCookies = Object.values(COOKIE_KEYS);
