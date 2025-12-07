@@ -26,7 +26,7 @@ export const SelectTrigger = forwardRef<SelectTriggerRef, SelectTriggerProps>((p
       {...rest}
       ref={ref}
       className={cn(
-        "justify-between [&>span]:line-clamp-1",
+        "justify-between [&>span]:line-clamp-1 text-sm sm:text-base",
         inputWrapper.base,
         isError && inputWrapper.error,
         className
@@ -121,14 +121,14 @@ export const SelectItem = forwardRef<SelectItemRef, SelectItemProps>(({ classNam
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex p-2 rounded w-full select-none items-center text-gray-500 focus:bg-nobelBlack-200 transition-colors duration-300 cursor-pointer outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex p-2 text-sm sm:text-base rounded w-full select-none items-center text-gray-500 focus:bg-nobelBlack-200 transition-colors duration-300 cursor-pointer outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     {...props}
   >
     <span className="absolute right-2 flex size-3.5 items-center justify-center">
       <SelectPrimitive.ItemIndicator>
-        <Check />
+        <Check className="size-5" />
       </SelectPrimitive.ItemIndicator>
     </span>
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>

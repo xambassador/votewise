@@ -16,10 +16,10 @@ export function SignInForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={onSubmit} className="flex flex-col gap-7 min-w-[calc((450/16)*1rem)]">
+      <form onSubmit={onSubmit} className="flex flex-col gap-7 w-full max-w-md lg:min-w-[calc((450/16)*1rem)]">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-3">
-            <h1 className="text-lg">Account</h1>
+            <h1 className="hidden lg:block lg:text-lg text-base font-semibold">Account</h1>
             <FormField name="username">
               {usernameLabel}
               <FormControl>
@@ -51,7 +51,7 @@ export function SignInForm() {
 const usernameLabel = <FormLabel className="sr-only">Username or email address</FormLabel>;
 const passwordLabel = <FormLabel className="sr-only">Password</FormLabel>;
 const forgotLink = (
-  <Link href={routes.auth.forgot()} className="font-medium text-sm text-gray-500 w-fit focus-presets">
+  <Link href={routes.auth.forgot()} className="font-semibold text-sm text-gray-500 w-fit focus-presets">
     Forgot?
   </Link>
 );

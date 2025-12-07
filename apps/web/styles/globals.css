@@ -187,7 +187,7 @@ body {
   }
 
   .spinner-text {
-    @apply text-black-200 text-lg;
+    @apply text-black-200 max-w-xs text-center text-base md:max-w-full md:text-lg;
   }
 
   .spinner-with-text-wrapper {

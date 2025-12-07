@@ -1,5 +1,7 @@
 "use client";
 
+import { useMediaQuery } from "react-responsive";
+
 import { Button } from "@votewise/ui/button";
 import { Close, Dialog, DialogContent, DialogDescription, DialogTitle } from "@votewise/ui/dialog";
 import { SeparatorWithLabel } from "@votewise/ui/separator";
@@ -14,7 +16,7 @@ export function BackgroundPickerDialog() {
   const props = useGetDialogProps();
   return (
     <Dialog {...props}>
-      <DialogContent className="p-12">
+      <DialogContent className="sm:p-12 p-5">
         <DialogTitle className="sr-only">Choose a Background</DialogTitle>
         <DialogDescription className="sr-only">
           Showcase your best background and make your profile stand out!
@@ -27,19 +29,21 @@ export function BackgroundPickerDialog() {
             <SaveButton />
           </div>
         </div>
-        <Close />
+        <Close className="sm:top-5 sm:right-5 top-2 right-2" />
       </DialogContent>
     </Dialog>
   );
 }
 
 function ChooseBgButton() {
+  const isMobile = useMediaQuery({ query: "(max-width: 640px)" });
   const setOpen = useSetChooseBgDialogOpen();
+  const label = isMobile ? "Choose Background" : "Choose from our stunning backgrounds to make your profile pop!";
   return (
     <>
       <ChooseBackgroundDialog />
       <Button onClick={() => setOpen(true)} variant="secondary">
-        Choose from our stunning backgrounds to make your profile pop!
+        {label}
       </Button>
     </>
   );

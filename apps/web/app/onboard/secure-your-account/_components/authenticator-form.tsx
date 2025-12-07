@@ -54,7 +54,7 @@ export function AuthenticatorForm(props: { factorId: string; qrCode: string; sec
     <>
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-3">
-          <h2 className="text-xl text-gray-300">Set up Authenticator App</h2>
+          <h2 className="sm:text-xl text-lg text-gray-300">Set up Authenticator App</h2>
           <p className="text-sm text-gray-400">
             Use an authenticator app like Google Authenticator, Authy, or 1Password to generate verification codes.
           </p>
@@ -90,11 +90,17 @@ export function AuthenticatorForm(props: { factorId: string; qrCode: string; sec
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-between">
-        <Button variant="outline" onClick={onSkip} disabled={isPending} loading={skipIsPending}>
+      <div className="flex items-center justify-between sm:flex-row flex-col gap-2 sm:gap-0">
+        <Button
+          className="w-full sm:w-fit"
+          variant="outline"
+          onClick={onSkip}
+          disabled={isPending}
+          loading={skipIsPending}
+        >
           Skip for now
         </Button>
-        <Button onClick={onVerify} loading={isPending} disabled={skipIsPending}>
+        <Button className="w-full sm:w-fit" onClick={onVerify} loading={isPending} disabled={skipIsPending}>
           Verify and continue
         </Button>
       </div>

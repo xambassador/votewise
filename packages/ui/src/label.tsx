@@ -11,7 +11,7 @@ const Label = forwardRef<
 >(({ className, ...props }, ref) => (
   <LabelPrimitive.Root
     ref={ref}
-    className={cn("text-lg w-fit text-gray-300 font-normal peer-disabled:cursor-not-allowed", className)}
+    className={cn("text-sm md:text-base w-fit text-gray-300 font-normal peer-disabled:cursor-not-allowed", className)}
     {...props}
   />
 ));

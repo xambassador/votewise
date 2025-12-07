@@ -73,7 +73,7 @@ function StepOne(props: {
   return (
     <>
       <div>
-        <h2 className="text-xl text-gray-300 mb-3">Multi-Factor Authentication</h2>
+        <h2 className="sm:text-xl text-lg text-gray-300 mb-3">Multi-Factor Authentication</h2>
         <p className="text-gray-400 text-sm">
           Protect your account by requiring a second verification method in addition to your password.
         </p>

@@ -58,7 +58,7 @@ function getCroppedImage(image: HTMLImageElement, crop: Crop, originalFile?: Fil
 export function EditImage(props: EditImageProps) {
   return (
     <Dialog {...props}>
-      <DialogContent className="w-fit min-w-[calc((768/16)*1rem)]">
+      <DialogContent className="lg:min-w-[calc((768/16)*1rem)]">
         <DialogHeader>
           <DialogTitle className="sr-only">Edit Image</DialogTitle>
           <DialogDescription className="sr-only">Crop and adjust your image</DialogDescription>

@@ -28,9 +28,9 @@ export default async function Page() {
   }
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-10 w-full max-w-[calc((450/16)*1rem)] sm:w-fit px-6 sm:px-0">
       <div>
-        <h1 className="text-3xl leading-10 text-gray-300 font-semibold mb-2">Verify your email</h1>
+        <h1 className="md:text-3xl text-xl md:leading-10 text-gray-300 font-semibold mb-2">Verify your email</h1>
         <p className="text-sm text-gray-300">
           We have send an OTP to {obfuscateEmail(verificationResponse.data.email)}
         </p>

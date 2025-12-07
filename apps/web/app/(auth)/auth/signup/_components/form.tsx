@@ -24,9 +24,9 @@ export function SignupForm() {
 
   return (
     <Fragment>
-      <div className="flex flex-col gap-7">
-        <h4 className="text-3xl font-semibold">Your account</h4>
-        <div className="flex flex-col gap-7 min-w-[calc((450/16)*1rem)] max-w-[calc((450/16)*1rem)]">
+      <div className="flex flex-col gap-7 w-full">
+        <h4 className="hidden lg:block lg:text-lg text-base font-semibold">Your account</h4>
+        <div className="flex flex-col gap-7 w-full sm:min-w-[calc((450/16)*1rem)] sm:max-w-[calc((450/16)*1rem)]">
           <Form {...form}>
             <FormField {...getFormFieldProps("email")}>
               <FormLabel>Email</FormLabel>

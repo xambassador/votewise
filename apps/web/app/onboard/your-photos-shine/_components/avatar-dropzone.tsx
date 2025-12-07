@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useMediaQuery } from "react-responsive";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
 import { AvatarBackCards, AvatarCard, AvatarClearButton } from "@votewise/ui/avatar-card";
+import { Cross } from "@votewise/ui/icons/cross";
 
 import { ImageDropZone, Placeholder } from "@/components/image-dropzone";
 
@@ -32,8 +35,23 @@ export function AvatarDropZone() {
 function ImageDropZonePlaceholder() {
   const selectedAvatar = useGetSelectedAvatar();
   const reset = useResetSelection();
+  const isMobile = useMediaQuery({ query: "(max-width: 640px)" });
 
   if (!selectedAvatar) return <Placeholder />;
+
+  if (isMobile) {
+    return (
+      <div className="flex flex-col items-center gap-2">
+        <Avatar className="size-28">
+          <AvatarImage src={selectedAvatar} alt="Selected Avatar" />
+          <AvatarFallback name="U" />
+        </Avatar>
+        <button onClick={reset}>
+          <Cross className="size-5 text-gray-500" />
+        </button>
+      </div>
+    );
+  }
 
   return (
     <AvatarCard url={selectedAvatar}>

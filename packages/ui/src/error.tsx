@@ -19,11 +19,11 @@ const isDevMode = process.env.NODE_ENV === "development";
 export function Error(props: Props) {
   const { error, errorInfo, resetErrorBoundary, shellProps, iconProps, iconWrapperProps, ...rest } = props;
   return (
-    <div {...rest} className={cn("flex items-center justify-center size-full p-6", rest.className)}>
+    <div {...rest} className={cn("flex items-center justify-center size-full", rest.className)}>
       <div
         {...shellProps}
         className={cn(
-          "w-full max-w-md bg-nobelBlack-100 rounded-lg shadow-xl overflow-hidden border border-black-400",
+          "w-full bg-nobelBlack-100 rounded-lg shadow-xl overflow-hidden border border-black-400",
           shellProps?.className
         )}
       >
@@ -31,17 +31,17 @@ export function Error(props: Props) {
           <div
             {...iconWrapperProps}
             className={cn(
-              "flex items-center justify-center size-16 mx-auto mb-4 rounded-full bg-black-500 text-orange-50",
+              "flex items-center justify-center size-16 mx-auto mb-4 rounded-full bg-black-400/50 text-orange-50",
               iconWrapperProps?.className
             )}
           >
             <AlertCircleSolid {...iconProps} className={cn("size-8", iconProps?.className)} />
           </div>
 
-          <h2 className="mb-2 text-2xl font-bold text-center text-gray-100">Well, This Is Embarrassing...</h2>
+          <h2 className="mb-2 text-lg font-bold text-center text-gray-200">Well, This Is Embarrassing...</h2>
 
           <div className="mb-6 text-center text-gray-300">
-            <p className="mb-4">
+            <p className="mb-4 text-base">
               The hamsters powering this section have gone on strike. Union negotiations in progress.
             </p>
             {isDevMode && (

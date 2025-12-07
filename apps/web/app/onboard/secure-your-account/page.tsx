@@ -8,11 +8,11 @@ export default async function Page() {
   const onboardData = await shouldNotOnboarded();
   verifyStep(6, onboardData);
   return (
-    <OnboardContainer className="max-w-[calc((530/16)*1rem)] min-w-[calc((530/16)*1rem)]">
-      <OnboardHeader className="items-center">
+    <OnboardContainer className="sm:max-w-[calc((530/16)*1rem)] sm:min-w-[calc((530/16)*1rem)] py-5 sm:py-0">
+      <OnboardHeader className="items-center w-full">
         <OnboardSubtitle>Hello 👋, {onboardData.first_name + " " + onboardData.last_name}</OnboardSubtitle>
         <OnboardTitle>Secure Your Account</OnboardTitle>
-        <OnboardSubtitle className="text-base text-gray-400">
+        <OnboardSubtitle className="text-base text-gray-400 text-center">
           Your password is like underwear. Two layers are better than one.
         </OnboardSubtitle>
       </OnboardHeader>

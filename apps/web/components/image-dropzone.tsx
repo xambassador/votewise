@@ -56,7 +56,7 @@ export function ImageDropZone(props: Props) {
       {...rest}
       {...rootProps}
       className={cn(
-        "bg-nobelBlack-200 cursor-pointer h-[calc((250/16)*1rem)] rounded-3xl border-2 border-dashed border-black-400 grid place-items-center p-5",
+        "bg-nobelBlack-200 cursor-pointer sm:h-[calc((250/16)*1rem)] h-[calc((200/16)*1rem)] rounded-3xl border-2 border-dashed border-black-400 grid place-items-center p-5",
         "focus:border-blue-500 focus:ring-blue-500/20 focus:outline-none focus:shadow-input-ring focus:ring-offset-1 focus:ring-offset-nobelBlack-200 transition-shadow",
         isDragActive && "border-blue-200",
         isDragAccept && "border-green-400",
@@ -76,10 +76,10 @@ export function ImageDropZone(props: Props) {
 export function Placeholder() {
   return (
     <div className="flex flex-col items-center">
-      <ImageIcon className="text-black-300 size-12" />
+      <ImageIcon className="text-black-300 sm:size-12 size-8" />
       <div className="flex flex-col gap-2 items-center mt-5">
-        <h2 className="text-lg text-gray-300">Drop your image here</h2>
-        <p className="text-sm font-medium text-gray-400">We support JPG, JPEG and PNG</p>
+        <h2 className="sm:text-lg text-base text-gray-300">Drop your image here</h2>
+        <p className="sm:text-sm text-xs font-medium text-gray-400">We support JPG, JPEG and PNG</p>
       </div>
     </div>
   );

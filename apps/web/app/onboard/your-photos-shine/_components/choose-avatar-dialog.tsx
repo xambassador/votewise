@@ -12,7 +12,7 @@ export function ChooseAvatarDialog() {
   return (
     <Dialog {...props}>
       <DialogContent className="p-12">
-        <DialogTitle className="text-2xl text-gray-400 font-medium">Pick Your Perfect Avatar!</DialogTitle>
+        <DialogTitle className="sm:text-xl text-lg text-gray-400 font-medium">Pick Your Perfect Avatar!</DialogTitle>
         <DialogDescription className="sr-only">Choose an avatar to express your style!</DialogDescription>
         <AvatarList onSelect={(url) => selectAvatar(url)} />
         <Close />

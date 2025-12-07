@@ -23,7 +23,7 @@ export function PasswordHintTooltip(props: PasswordHintTooltipProps) {
         <InforCircleSolid className="text-gray-400" />
       </TooltipTrigger>
       <TooltipContent className="bg-nobelBlack-200 border border-nobelBlack-100 rounded p-4 shadow-lg">
-        <h5 className="text-gray-400 mb-2">Password must have</h5>
+        <h5 className="text-gray-400 mb-2 text-base">Password must have</h5>
         <ul className="text-gray-400 text-sm pl-3 flex flex-col gap-1">
           <li>{strength.hasLength ? success : fail} At least 8 characters</li>
           <li>{strength.hasLowerCase ? success : fail} At least 1 lowercase letter</li>

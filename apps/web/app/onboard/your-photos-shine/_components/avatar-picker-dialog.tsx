@@ -1,5 +1,7 @@
 "use client";
 
+import { useMediaQuery } from "react-responsive";
+
 import { Button } from "@votewise/ui/button";
 import { Close, Dialog, DialogContent, DialogDescription, DialogTitle } from "@votewise/ui/dialog";
 import { SeparatorWithLabel } from "@votewise/ui/separator";
@@ -27,10 +29,10 @@ export function AvatarPickerDialog(props: Props) {
 
   return (
     <Dialog {...dialogProps}>
-      <DialogContent className="p-12">
+      <DialogContent className="sm:p-12 p-5">
         <DialogTitle className="sr-only">Choose an Avatar</DialogTitle>
         <DialogDescription className="sr-only">Choose an avatar to express your style!</DialogDescription>
-        <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-10 w-full">
           <AvatarDropZone />
           <AvatarEditor />
           <SeparatorWithLabel>Or</SeparatorWithLabel>
@@ -39,7 +41,7 @@ export function AvatarPickerDialog(props: Props) {
             <SaveButton />
           </div>
         </div>
-        <Close />
+        <Close className="sm:top-5 sm:right-5 top-2 right-2" />
       </DialogContent>
     </Dialog>
   );
@@ -47,9 +49,11 @@ export function AvatarPickerDialog(props: Props) {
 
 function ChooseAvatarButton() {
   const setDialogOpen = useSetChooseAvatarDialogOpen();
+  const isMobile = useMediaQuery({ query: "(max-width: 640px)" });
+  const label = isMobile ? "Choose Avatar" : "Or choose from our awesome avatars to express your style!";
   return (
     <Button variant="secondary" onClick={() => setDialogOpen(true)}>
-      Or choose from our awesome avatars to express your style!
+      {label}
     </Button>
   );
 }

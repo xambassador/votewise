@@ -33,7 +33,7 @@ export const InputOTPSlot = forwardRef<
     <div
       ref={ref}
       className={cn(
-        "relative w-15 h-15 rounded-lg bg-nobelBlack-100 border border-nobelBlack-200 text-gray-500 flex flex-col items-center justify-center",
+        "relative sm:w-15 sm:h-15 w-10 h-10 rounded-lg bg-nobelBlack-100 border border-nobelBlack-200 text-gray-500 flex flex-col items-center justify-center",
         isActive &&
           "z-10 border-blue-500 ring-blue-500/20 outline-none shadow-input-ring ring-offset-1 ring-offset-nobelBlack-200",
         className
