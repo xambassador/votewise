@@ -23,6 +23,7 @@ const cfg = new ServerConfig({
 async function bootstrap() {
   const server = await Server.create({ cfg });
   await server.start();
+  server.ctx.logger.logSync(`Votewise upload server is running on port ${cfg.port}`);
 }
 
 bootstrap().catch((err) => {

@@ -1,14 +1,13 @@
 import "@/types";
 
+import type http from "http";
 import type { HttpTerminator } from "http-terminator";
 
-import http from "http";
-import https from "https";
+import events from "events";
 import chalk from "chalk";
 import express from "express";
 import { createHttpTerminator } from "http-terminator";
 
-import { getSSL } from "@/utils";
 import { banner } from "@/utils/banner";
 
 import { AppContext } from "../context";
@@ -58,14 +57,8 @@ export class Server {
 
   public async start(): Promise<http.Server> {
     banner();
-    const { port, ssl } = this.ctx.config;
-    const sslConfig = getSSL(ssl);
-    const useHTTPs = !!sslConfig.key && !!sslConfig.cert;
-    useHTTPs ? https.createServer(sslConfig, this.app) : http.createServer(this.app);
-    const server = this.app.listen(port, () => {
-      this.ctx.logger.logSync(chalk.blue("Press Ctrl+C to shutdown Votewise API\n\n"));
-      this.ctx.logger.logSync(`Votewise API is running on port ${port}`);
-    });
+    const { port } = this.ctx.config;
+    const server = this.app.listen(port);
     this.ctx.services.realtime.init(server);
     this.terminator = createHttpTerminator({ server });
     this.server = server;
@@ -75,6 +68,7 @@ export class Server {
     this.server.timeout = this.serverConfig.serverTimeout ?? 60 * 1000;
     this.healthCheck();
     this.registerShutdownHandlers();
+    await events.once(server, "listening");
     server.on("error", (err) => {
       const error = err as NodeJS.ErrnoException;
       if (error.syscall !== "listen") {

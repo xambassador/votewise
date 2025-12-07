@@ -1,7 +1,8 @@
 import type { ServerConfig } from "@/config";
+import type http from "http";
 import type { HttpTerminator } from "http-terminator";
 
-import http from "http";
+import events from "events";
 import express from "express";
 import { createHttpTerminator } from "http-terminator";
 
@@ -38,13 +39,11 @@ export class Server {
 
   public async start(): Promise<http.Server> {
     const { port } = this.ctx.config;
-    http.createServer(this.app);
-    const server = this.app.listen(port, () => {
-      this.ctx.logger.logSync(`Votewise upload server is running on port ${port}`);
-    });
+    const server = this.app.listen(port);
     this.terminator = createHttpTerminator({ server });
     this.server = server;
     this.server.keepAliveTimeout = 61 * 1000;
+    events.once(server, "listening");
     server.on("error", (err) => {
       const error = err as NodeJS.ErrnoException;
       if (error.syscall !== "listen") {

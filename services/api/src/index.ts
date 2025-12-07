@@ -1,5 +1,7 @@
 import "dotenv/config";
 
+import chalk from "chalk";
+
 import { environment } from "@votewise/env";
 import { Day, Minute } from "@votewise/times";
 
@@ -33,6 +35,8 @@ const secrets = new ServerSecrets({
 async function bootstrap() {
   const server = await Server.create({ cfg, secrets });
   await server.start();
+  server.ctx.logger.logSync(chalk.blue("Press Ctrl+C to shutdown Votewise API\n\n"));
+  server.ctx.logger.logSync(`Votewise API is running on port ${cfg.port}`);
 }
 
 bootstrap().catch((err) => {

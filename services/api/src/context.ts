@@ -15,7 +15,7 @@ import { createQueues } from "@/queues";
 import { createRepositories } from "@/repository";
 import * as Services from "@/services";
 import { Cache } from "@/storage/redis";
-import { checkEnv } from "@/utils";
+import { checkEnv } from "@/utils/env";
 
 type ServerConfig = ApplicationConfigs["server"];
 type ServerSecrets = ApplicationConfigs["secrets"];
