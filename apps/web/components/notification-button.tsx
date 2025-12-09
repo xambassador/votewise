@@ -19,7 +19,7 @@ export function NotificationButton() {
   return (
     <Link href={routes.notification.root()} className="focus-visible rounded">
       <Bell className="text-inherit" />
-      Notifications
+      <span className="hidden xl:inline-block">Notifications</span>
       <UnreadBadge />
     </Link>
   );

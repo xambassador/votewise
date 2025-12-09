@@ -21,7 +21,7 @@ export type FeedContainerProps = React.HTMLAttributes<HTMLDivElement>;
 export function FeedContainer(props: FeedContainerProps) {
   const { children, className, ...rest } = props;
   return (
-    <div {...rest} className={cn("flex flex-col gap-6 w-full", className)}>
+    <div {...rest} className={cn("flex flex-col md:gap-6 gap-4 w-full", className)}>
       {children}
     </div>
   );

@@ -56,11 +56,11 @@ export const FeedMolecule = memo(function FeedMolecule(props: Props) {
         }
       }}
     >
-      <VoteContainer>
+      <VoteContainer className="hidden md:flex">
         <VoteCount>{humanizeNumber(feed.votes)}</VoteCount>
         <VoteLabel>Votes</VoteLabel>
       </VoteContainer>
-      <Separator orientation="vertical" className="h-auto" />
+      <Separator orientation="vertical" className="h-auto hidden md:block" />
       <FeedContainer>
         <div className="flex gap-2">
           <Link
@@ -102,7 +102,7 @@ export const FeedMolecule = memo(function FeedMolecule(props: Props) {
               <span className="text-gray-400 text-sm">Share</span>
             </FeedFooterItem>
           </FeedFooterActions>
-          <VotersStack>
+          <VotersStack className="hidden sm:flex">
             <Voters>
               {feed.voters.map((voter) => (
                 <FeedAvatar key={voter.id} className="size-6" name="Voter" url={voter.avatar_url || ""} />

@@ -86,12 +86,19 @@ body {
 
     --sidebar-max-width: calc((200 / 16) * 1rem);
     --suggestions-panel-width: calc((270 / 16) * 1rem);
-    --container-max-width: calc((664 / 16) * 1rem);
+    --container-max-width: 100%;
     --tab-container-height: calc((70 / 16) * 1rem);
     --tab-container-bottom-margin: 1rem;
-    --feed-card-width: calc((600 / 16) * 1rem);
+    --feed-card-width: 100%;
     --content-height: calc(100vh - var(--tab-container-height) - var(--tab-container-bottom-margin));
     --create-post-modal-width: calc((600 / 16) * 1rem);
+  }
+
+  @media screen and (min-width: 768px) {
+    :root {
+      --feed-card-width: calc((600 / 16) * 1rem);
+      --container-max-width: calc((664 / 16) * 1rem);
+    }
   }
 }
 
@@ -183,7 +190,7 @@ body {
 
 @layer components {
   .tab-container {
-    @apply bg-nobelBlack-50/70 tab-container-height sticky top-0 z-10 mb-[var(--tab-container-bottom-margin)] flex w-full flex-col justify-center backdrop-blur-lg;
+    @apply bg-nobelBlack-50/70 tab-container-height sticky top-0 z-10 mb-[var(--tab-container-bottom-margin)] flex w-full flex-col justify-center px-8 backdrop-blur-lg md:px-0;
   }
 
   .spinner-text {

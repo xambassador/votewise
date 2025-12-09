@@ -35,7 +35,7 @@ export function FeedListSkeleton(props: React.HTMLAttributes<HTMLDivElement> & {
 export function FeedSkeleton() {
   return (
     <Feed>
-      <VoteContainer>
+      <VoteContainer className="hidden md:flex">
         <VoteCount>
           <Skeleton>0</Skeleton>
         </VoteCount>
@@ -43,7 +43,7 @@ export function FeedSkeleton() {
           <Skeleton>Votes</Skeleton>
         </VoteLabel>
       </VoteContainer>
-      <Separator orientation="vertical" className="h-auto" />
+      <Separator orientation="vertical" className="h-auto hidden md:block" />
       <FeedContainer>
         <div className="flex gap-2">
           <Skeleton className="size-12 rounded-full min-w-12" />

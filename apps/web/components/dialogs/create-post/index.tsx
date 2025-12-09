@@ -19,7 +19,7 @@ export function CreatePostDialog() {
     <>
       <Button
         {...getButtonProps({
-          className: "w-fit gap-1",
+          className: "w-fit gap-1 hidden xl:flex",
           onMouseEnter: loadAndTrigger,
           onFocus: loadAndTrigger,
           onClick: trigger

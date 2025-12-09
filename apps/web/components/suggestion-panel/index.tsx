@@ -8,7 +8,7 @@ import { SuggestedUsers } from "./suggested-users";
 
 export function SuggestionPanel() {
   return (
-    <aside className="flex-1 suggestions-panel-max-width border-l border-nobelBlack-200 pl-4 pt-7 flex flex-col gap-4 max-h-screen sticky top-0">
+    <aside className="hidden flex-1 suggestions-panel-max-width border-l border-nobelBlack-200 pl-4 pt-7 xl:flex flex-col gap-4 max-h-screen sticky top-0">
       <div className="pb-2 border-b border-nobelBlack-200 flex items-center justify-end">
         <Image src={Logo} alt="Votewise" />
       </div>

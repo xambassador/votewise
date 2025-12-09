@@ -16,11 +16,6 @@ const nextConfig = bundleAnalyzer({
   eslint: { dirs: ["."] },
   poweredByHeader: false,
   transpilePackages: ["@votewise/ui"],
-  logging: {
-    fetches: {
-      fullUrl: true
-    }
-  },
   webpack: (config) => {
     config.externals.push({
       bufferutil: "bufferutil",

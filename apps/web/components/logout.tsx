@@ -28,7 +28,7 @@ export function Logout(props: Props) {
   return (
     <button {...props} className={cn(className, props.className)} onClick={logout} disabled={isPending}>
       <LogoutIcon className="ml-1" />
-      <span>Logout</span>
+      <span className="hidden xl:inline-block">Logout</span>
       {spinner}
     </button>
   );
