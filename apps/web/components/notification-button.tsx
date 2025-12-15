@@ -3,6 +3,7 @@
 import type { EventData } from "@votewise/types";
 
 import { useEffect, useState } from "react";
+import { useMediaQuery } from "react-responsive";
 import { useSound } from "use-sound";
 
 import { Badge } from "@votewise/ui/badge";
@@ -15,11 +16,12 @@ import boop from "@/assets/sounds/boop.mp3";
 import { Link } from "./link";
 import { useRealtime } from "./realtime";
 
-export function NotificationButton() {
+export function NotificationButton(props: Omit<React.ComponentProps<typeof Link>, "href">) {
+  const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
   return (
-    <Link href={routes.notification.root()} className="focus-visible rounded">
+    <Link {...props} href={routes.notification.root()} className="focus-visible rounded">
       <Bell className="text-inherit" />
-      <span className="hidden xl:inline-block">Notifications</span>
+      {isMobile ? "Notifications" : <span className="hidden xl:inline-block">Notifications</span>}
       <UnreadBadge />
     </Link>
   );

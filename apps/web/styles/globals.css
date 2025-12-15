@@ -190,7 +190,7 @@ body {
 
 @layer components {
   .tab-container {
-    @apply bg-nobelBlack-50/70 tab-container-height sticky top-0 z-10 mb-[var(--tab-container-bottom-margin)] flex w-full flex-col justify-center px-8 backdrop-blur-lg md:px-0;
+    @apply bg-nobelBlack-50 xl:bg-nobelBlack-50/70 tab-container-height sticky top-[var(--tab-container-height)] z-10 mb-[var(--tab-container-bottom-margin)] flex w-full flex-col justify-center px-8 backdrop-blur-lg md:px-0 xl:top-0;
   }
 
   .spinner-text {

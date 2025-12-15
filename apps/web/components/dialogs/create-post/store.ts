@@ -12,6 +12,7 @@ import type { Textarea } from "@votewise/ui/textarea-autosize";
 import { useEffect, useId, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useMediaQuery } from "react-responsive";
 
 import { useComboBoxTrigger } from "@votewise/ui/combobox";
 import { makeToast } from "@votewise/ui/toast";
@@ -31,7 +32,6 @@ type LabelProps = React.ComponentProps<"label">;
 type ZigZagListProps = React.ComponentProps<typeof ZigZagList>;
 
 const maxLength = 300;
-const maxFilesToShow = 8;
 const topicsPromise = onboardClient.getTopics();
 
 /* -----------------------------------------------------------------------------------------------
@@ -170,8 +170,10 @@ export function useAssetPicker() {
 export function useAssets() {
   const files = useAtomValue(filesAtom);
   const setFilesToAtom = useSetAtom(filesAtom);
-  const remainingFiles = files.length - maxFilesToShow;
   const isFilesEmpty = files.length === 0;
+  const isMobile = useMediaQuery({ query: "(max-width: 640px)" });
+  const maxFilesToShow = isMobile ? 4 : 8;
+  const remainingFiles = files.length - maxFilesToShow;
 
   function removeFile(fileId: string | number) {
     const newFiles = files.filter((f) => f.id !== fileId);

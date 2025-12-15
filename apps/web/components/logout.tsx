@@ -10,11 +10,12 @@ import { cn } from "@/lib/cn";
 import { logoutAction } from "./logout-action";
 
 const className =
-  "py-2 pl-2 pr-1 rounded flex items-center gap-2 hover:bg-nobelBlack-200 transition-colors text-black-200 text-lg font-medium focus-visible";
+  "py-3 pl-2 pr-1 rounded flex items-center gap-2 hover:bg-nobelBlack-200 transition-colors text-black-200 text-lg font-medium focus-visible";
 
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 export function Logout(props: Props) {
+  const { children, ...rest } = props;
   const [isPending, startTransition] = useTransition();
 
   function logout() {
@@ -26,9 +27,9 @@ export function Logout(props: Props) {
   const spinner = isPending ? <Spinner className="size-5 ml-2" /> : null;
 
   return (
-    <button {...props} className={cn(className, props.className)} onClick={logout} disabled={isPending}>
+    <button {...rest} className={cn(className, rest.className)} onClick={logout} disabled={isPending}>
       <LogoutIcon className="ml-1" />
-      <span className="hidden xl:inline-block">Logout</span>
+      {children ?? "Logout"}
       {spinner}
     </button>
   );

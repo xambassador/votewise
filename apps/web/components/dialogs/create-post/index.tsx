@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useLazyLoad } from "@/hooks/use-lazy-load";
+import { useMediaQuery } from "react-responsive";
 
 import { Button } from "@votewise/ui/button";
 import { Pencil } from "@votewise/ui/icons/pencil";
@@ -27,6 +28,29 @@ export function CreatePostDialog() {
       >
         <Pencil className="text-gray-200" />
         <span>Share Idea</span>
+      </Button>
+      {isLoaded() && <LazyCreatePostDialog {...getDialogProps()} />}
+    </>
+  );
+}
+
+export function CreatePostMobile() {
+  const isMobile = useMediaQuery({ query: "(max-width: 1280px)" });
+  const { getDialogProps, getButtonProps } = useCreatePostDialog();
+  const { isLoaded, trigger } = useLazyLoad({ requiredForceUpdate: true });
+  const loadAndTrigger = () => load().then(trigger);
+  if (!isMobile) return null;
+  return (
+    <>
+      <Button
+        {...getButtonProps({
+          className: "fixed bottom-6 right-6 z-50 rounded-full px-0 size-16 shadow-lg",
+          onMouseEnter: loadAndTrigger,
+          onFocus: loadAndTrigger,
+          onClick: trigger
+        })}
+      >
+        <Pencil className="text-gray-200" />
       </Button>
       {isLoaded() && <LazyCreatePostDialog {...getDialogProps()} />}
     </>

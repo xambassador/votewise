@@ -65,7 +65,7 @@ function PickTopicsModal() {
 
   return (
     <Dialog {...getDialogProps()}>
-      <DialogContent className="p-12 max-w-[var(--create-post-modal-width)] flex flex-col gap-8">
+      <DialogContent className="sm:p-12 px-5 py-8 max-w-[var(--create-post-modal-width)] flex flex-col gap-8">
         <DialogTitle className="sr-only">Pick Topics</DialogTitle>
         <DialogDescription className="sr-only">Select topics relevant to your post</DialogDescription>
         <Close className="absolute top-4 right-5 outline-none focus:ring-2" />
