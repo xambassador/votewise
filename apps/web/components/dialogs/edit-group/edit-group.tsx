@@ -28,7 +28,7 @@ export function EditGroup(props: Props) {
   const form = useEditGroup(props);
   return (
     <Dialog {...form.getDialogProps()}>
-      <DialogContent className="p-12 max-w-[var(--create-post-modal-width)] flex flex-col gap-8">
+      <DialogContent className="sm:p-12 px-5 py-8 max-w-[var(--create-post-modal-width)] flex flex-col gap-8">
         <DialogTitle className="text-2xl text-gray-300 font-normal">Update details</DialogTitle>
         <DialogDescription className="sr-only">Update group details</DialogDescription>
         <Close className="absolute top-4 right-5 outline-none focus:ring-2 rounded-full" />

@@ -27,7 +27,7 @@ export function UpdateProfile(props: Props) {
   const form = useEditProfile(props);
   return (
     <Dialog {...form.getDialogProps()}>
-      <DialogContent className="p-12 flex flex-col gap-8">
+      <DialogContent className="sm:p-12 px-5 py-8 flex flex-col gap-8">
         <DialogTitle className="sr-only">Update your profile</DialogTitle>
         <DialogDescription className="sr-only">Update your profile details</DialogDescription>
         <Close className="absolute top-4 right-5 outline-none focus:ring-2 rounded-full" />

@@ -74,7 +74,8 @@ async function SuggestedUsersList() {
       <MoreItems
         avatars={remainingSuggestedUsers.slice(0, 5).map((user) => ({
           name: user.first_name + " " + user.last_name,
-          url: user.avatar_url
+          url: user.avatar_url,
+          username: user.user_name
         }))}
       />
     </Fragment>

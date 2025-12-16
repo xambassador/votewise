@@ -17,7 +17,7 @@ import { Link } from "./link";
 import { useRealtime } from "./realtime";
 
 export function NotificationButton(props: Omit<React.ComponentProps<typeof Link>, "href">) {
-  const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
+  const isMobile = useMediaQuery({ query: "(max-width: 767px)" });
   return (
     <Link {...props} href={routes.notification.root()} className="focus-visible rounded">
       <Bell className="text-inherit" />

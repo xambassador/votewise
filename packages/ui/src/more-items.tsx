@@ -3,7 +3,7 @@ import { cn } from "./cn";
 
 type UserAvatarsSummaryProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   count?: number;
-  avatars: { name: string; url: string }[];
+  avatars: { name: string; url: string; username?: string }[];
   avatarProps?: React.ComponentProps<typeof Avatar>;
 };
 
@@ -12,8 +12,12 @@ export function MoreItemsWithSummary(props: UserAvatarsSummaryProps) {
   return (
     <button {...rest} className={cn("flex items-center gap-1 w-fit mx-auto focus-visible rounded", rest.className)}>
       <div className="flex -space-x-4">
-        {avatars.map((item) => (
-          <Avatar {...avatarProps} key={item.url} className={cn("bg-gray-500 size-6", avatarProps?.className)}>
+        {avatars.map((item, index) => (
+          <Avatar
+            {...avatarProps}
+            key={item.username ?? index}
+            className={cn("bg-gray-500 size-6", avatarProps?.className)}
+          >
             <AvatarFallback name={item.name} />
             <AvatarImage src={item.url} alt={item.name} />
           </Avatar>

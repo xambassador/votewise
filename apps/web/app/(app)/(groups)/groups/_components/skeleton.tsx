@@ -25,7 +25,7 @@ export function GroupCardSkeleton() {
   return (
     <Group>
       <div className="flex items-start gap-4">
-        <Skeleton className="size-20 min-w-20 rounded-xl" />
+        <Skeleton className="size-20 hidden sm:block min-w-20 rounded-xl" />
         <GroupContent>
           <GroupHeader>
             <GroupName>

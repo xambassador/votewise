@@ -81,8 +81,8 @@ export function Sidebar(props: Props) {
 export function MobileSidebar(props: Props) {
   const { name, avatarUrl } = props;
   const [open, setOpen] = useState(false);
-  const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
-  if (!isMobile) return null;
+  const isDesktop = useMediaQuery({ query: "(min-width: 768px)" });
+  if (isDesktop) return null;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>

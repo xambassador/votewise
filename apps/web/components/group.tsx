@@ -35,7 +35,7 @@ export function GroupMolecule(props: Props) {
       <div className="flex items-start gap-4">
         <Link
           href={routes.group.view(group.id)}
-          className="focus-visible rounded-xl"
+          className="focus-visible rounded-xl sm:block hidden"
           role="link"
           aria-label={viewGroupLabel}
         >
