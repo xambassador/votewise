@@ -20,7 +20,7 @@ export function CreatePostDialog() {
     <>
       <Button
         {...getButtonProps({
-          className: "w-fit gap-1 hidden xl:flex",
+          className: "w-fit gap-1 hidden xl:flex min-w-36",
           onMouseEnter: loadAndTrigger,
           onFocus: loadAndTrigger,
           onClick: trigger
@@ -51,6 +51,7 @@ export function CreatePostMobile() {
         })}
       >
         <Pencil className="text-gray-200" />
+        <span className="sr-only">Share Idea</span>
       </Button>
       {isLoaded() && <LazyCreatePostDialog {...getDialogProps()} />}
     </>

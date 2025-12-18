@@ -24,7 +24,7 @@ export function EditGroup(props: Props) {
     <>
       <Button
         {...rest}
-        className={cn("gap-2", props.className)}
+        className={cn("gap-2 rounded-full size-8", props.className)}
         onMouseEnter={loadAndTrigger}
         onFocus={loadAndTrigger}
         onClick={(e) => {

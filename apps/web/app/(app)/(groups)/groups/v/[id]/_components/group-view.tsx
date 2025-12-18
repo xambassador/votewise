@@ -90,7 +90,7 @@ export function GroupView(props: Props) {
           <div className="flex flex-col gap-5">
             <div className="pb-3 border-b border-nobelBlack-200 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <User className="size-5 text-black-200" />
+                <User className="size-5 text-black-200 hidden sm:inline-block" />
                 <span className="text-sm">
                   <b className="text-blue-300 text-lg">{group.aggregate.total_members}</b> members
                 </span>
@@ -99,19 +99,19 @@ export function GroupView(props: Props) {
 
             <div className="pb-3 border-b border-nobelBlack-200 flex items-center gap-5">
               <div className="flex items-center gap-2">
-                <Pencil className="size-5 text-black-200" />
+                <Pencil className="size-5 text-black-200 hidden sm:inline-block" />
                 <span className="text-sm">
                   <b className="text-blue-300 text-lg">{group.aggregate.total_posts}</b> posts
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Comment className="size-5 text-black-200" />
+                <Comment className="size-5 text-black-200 hidden sm:inline-block" />
                 <span className="text-sm">
                   <b className="text-blue-300 text-lg">{group.aggregate.total_comments}</b> comments
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Heart className="size-5 text-black-200" />
+                <Heart className="size-5 text-black-200 hidden sm:inline-block" />
                 <span className="text-sm">
                   <b className="text-blue-300 text-lg">{group.aggregate.total_votes}</b> votes
                 </span>

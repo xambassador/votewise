@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 import { useLazyLoad } from "@/hooks/use-lazy-load";
 
 import { Button } from "@votewise/ui/button";
+import { Pencil } from "@votewise/ui/icons/pencil";
 
 import { cn } from "@/lib/cn";
 
@@ -21,7 +22,10 @@ export function UpdateProfile(props: Props) {
   const { getButtonProps, getDialogProps, isLoaded } = useUpdateProfile();
   return (
     <>
-      <Button {...getButtonProps(rest)} />
+      <Button {...getButtonProps(rest)}>
+        <Pencil className="size-4" />
+        <span className="sr-only">{rest.children}</span>
+      </Button>
       {isLoaded() && <LazyUpdateProfileDialog {...getDialogProps(profile)} />}
     </>
   );
@@ -42,7 +46,7 @@ function useUpdateProfile() {
         setOpen(true);
         props?.onClick?.(e);
       },
-      className: cn("gap-1", props?.className)
+      className: cn("gap-1 px-1 rounded-full size-8", props?.className)
     };
   }
 

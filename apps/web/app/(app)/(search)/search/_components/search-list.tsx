@@ -92,7 +92,7 @@ function SearchResults() {
             <SearchHeader>
               <Link href={routes.group.view(group.id)} className="rounded focus-presets focus-primary">
                 <Avatar className="size-12 rounded">
-                  <AvatarFallback name={group.name} />
+                  <AvatarFallback className="rounded" name={group.name} />
                   <AvatarImage src={group.logo_url ?? ""} alt={group.name} />
                 </Avatar>
               </Link>

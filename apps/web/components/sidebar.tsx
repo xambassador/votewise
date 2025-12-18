@@ -12,6 +12,7 @@ import { User } from "@votewise/ui/icons/user";
 import { Users } from "@votewise/ui/icons/users";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@votewise/ui/sheet";
 
+import { CreateGroup } from "./dialogs/create-group";
 import { CreatePostDialog } from "./dialogs/create-post";
 import { Link } from "./link";
 import { Logout } from "./logout";
@@ -71,7 +72,10 @@ export function Sidebar(props: Props) {
               <span className="hidden xl:inline-block">Logout</span>
             </Logout>
           </div>
-          <CreatePostDialog />
+          <div className="flex flex-col gap-y-4">
+            <CreatePostDialog />
+            <CreateGroup />
+          </div>
         </div>
       </div>
     </aside>
@@ -87,7 +91,7 @@ export function MobileSidebar(props: Props) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <button>
+        <button className="block md:hidden">
           <Avatar>
             <AvatarFallback name={props.name} />
             <AvatarImage src={props.avatarUrl} alt={props.name} />

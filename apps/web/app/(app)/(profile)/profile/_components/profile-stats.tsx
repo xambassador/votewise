@@ -38,20 +38,20 @@ export function ProfileActivityStats(props: ProfileActivityStatsProps) {
   const { totalComments, totalVotes, totalGroups } = props;
   return (
     <div className="flex items-center gap-5 pb-4 border-b border-nobelBlack-200">
-      <div className="flex items-center gap-2">
-        <Comment className="text-black-200" />
+      <div className="flex items-center gap-x-2">
+        <Comment className="text-black-200 sm:inline-block hidden" />
         <p className="text-sm text-gray-300">
           <span className="font-semibold text-blue-300 text-lg">{totalComments}</span> comments
         </p>
       </div>
-      <div className="flex items-center gap-2">
-        <Heart className="text-black-200" />
+      <div className="flex items-center gap-x-2">
+        <Heart className="text-black-200 sm:inline-block hidden" />
         <p className="text-sm text-gray-300">
           <span className="font-semibold text-blue-300 text-lg">{totalVotes}</span> votes
         </p>
       </div>
-      <div className="flex items-center gap-2">
-        <Users2 className="text-black-200" />
+      <div className="flex items-center gap-x-2">
+        <Users2 className="text-black-200 sm:inline-block hidden" />
         <p className="text-sm text-gray-300">
           <span className="font-semibold text-blue-300 text-lg">{totalGroups}</span> groups
         </p>

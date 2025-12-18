@@ -22,7 +22,7 @@ export function Members(props: Props) {
 
   return (
     <Sheet {...rest}>
-      <SheetContent>
+      <SheetContent className="w-full sm:w-3/4">
         <SheetHeader className="pb-5 border-b border-nobelBlack-200 mb-5">
           <SheetTitle className="text-xl">{name}</SheetTitle>
           <SheetDescription className="text-base">{about}</SheetDescription>

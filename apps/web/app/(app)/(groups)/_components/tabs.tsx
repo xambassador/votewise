@@ -4,8 +4,6 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { Tabs, TabsList, TabsTrigger } from "@votewise/ui/tab";
 
-import { CreateGroup } from "@/components/dialogs/create-group";
-
 const links = [
   { href: "/groups", label: "Groups", id: "groups" },
   { href: "/groups/my", label: "My Groups", id: "my-groups" },
@@ -23,7 +21,6 @@ export function GroupTabs() {
             {link.label}
           </TabsTrigger>
         ))}
-        <CreateGroup className="ml-auto py-1" size="sm" />
       </TabsList>
     </Tabs>
   );

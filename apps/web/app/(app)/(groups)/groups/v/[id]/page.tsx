@@ -37,8 +37,8 @@ export default async function Page(props: Props) {
                         status: data.status
                       }}
                     >
-                      <Pencil />
-                      Edit
+                      <Pencil className="size-4" />
+                      <span className="sr-only">Edit</span>
                     </EditGroup>
                   ) : null
                 }
@@ -48,7 +48,7 @@ export default async function Page(props: Props) {
                   {(feedData) => {
                     if (!feedData.hasAccess) {
                       return (
-                        <div className="pt-10 flex justify-center">
+                        <div className="flex justify-center min-h-40 pt-10">
                           <p className="text-gray-400 text-base">
                             You are not a member of this group. To view posts, please join the group.
                           </p>
@@ -58,7 +58,7 @@ export default async function Page(props: Props) {
 
                     if (feedData.feeds.feeds.length === 0) {
                       return (
-                        <div className="pt-10 flex justify-center">
+                        <div className="min-h-40 pt-10 flex justify-center">
                           <p className="text-gray-400 text-base">No posts yet. Be the first to post!</p>
                         </div>
                       );

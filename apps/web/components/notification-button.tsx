@@ -19,7 +19,7 @@ import { useRealtime } from "./realtime";
 export function NotificationButton(props: Omit<React.ComponentProps<typeof Link>, "href">) {
   const isMobile = useMediaQuery({ query: "(max-width: 767px)" });
   return (
-    <Link {...props} href={routes.notification.root()} className="focus-visible rounded">
+    <Link {...props} href={routes.notification.root()} className="focus-visible rounded relative">
       <Bell className="text-inherit" />
       {isMobile ? "Notifications" : <span className="hidden xl:inline-block">Notifications</span>}
       <UnreadBadge />
@@ -51,7 +51,10 @@ function UnreadBadge() {
 
   if (count === 0) return null;
   return (
-    <Badge className="rounded-full size-6" variant="secondary">
+    <Badge
+      className="rounded-full size-6 md:absolute md:top-0 md:right-0 xl:relative xl:top-[unset] xl:right-[unset]"
+      variant="secondary"
+    >
       {count}
     </Badge>
   );

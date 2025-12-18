@@ -19,17 +19,17 @@ export function FollowButton(props: { username: string; isFollowing: boolean }) 
 
   if (isFollowing) {
     return (
-      <Button onClick={unFollow} loading={isLoading} variant="secondary">
+      <Button onClick={unFollow} loading={isLoading} variant="secondary" className="sm:h-10 h-8 px-2 sm:px-5">
         <UserMinus />
-        Unfollow
+        <span className="hidden sm:inline-block">Unfollow</span>
       </Button>
     );
   }
 
   return (
-    <Button onClick={follow} loading={isLoading}>
+    <Button onClick={follow} loading={isLoading} className="sm:h-10 h-8 px-2 sm:px-5">
       <UserPlus />
-      Follow
+      <span className="hidden sm:inline-block">Follow</span>
     </Button>
   );
 }

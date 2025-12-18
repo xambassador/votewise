@@ -17,7 +17,9 @@ export function Notification(props: NotificationProps) {
 export type NotificationHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function NotificationHeader(props: NotificationHeaderProps) {
-  return <div {...props} className={cn("flex items-center justify-between", props.className)} />;
+  return (
+    <div {...props} className={cn("flex md:flex-row flex-col md:items-center justify-between", props.className)} />
+  );
 }
 
 export type NotificationActorProps = React.HTMLAttributes<HTMLSpanElement>;
@@ -41,7 +43,7 @@ export function NotificationMessage(props: NotificationMessageProps) {
 export type NotificationTimeagoProps = React.HTMLAttributes<HTMLSpanElement>;
 
 export function NotificationTimeago(props: NotificationTimeagoProps) {
-  return <span {...props} className={cn("text-xs text-gray-400", props.className)} />;
+  return <span {...props} className={cn("text-xs text-gray-400 mt-1 md:mt-0", props.className)} />;
 }
 
 export type NotificationContentProps = React.HTMLAttributes<HTMLDivElement>;

@@ -53,7 +53,7 @@ export function HotUsers(props: Props) {
                 <AvatarFallback name={getFullName(user)} />
               </Avatar>
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-x-2 mb-1 flex-wrap">
                   <span className="text-base font-semibold text-gray-300">{getFullName(user)}</span>
                   <span className="text-gray-400 text-base">@{user.user_name}</span>
                 </div>

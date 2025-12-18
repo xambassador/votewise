@@ -23,7 +23,7 @@ export function MobileLogo(props: React.HTMLAttributes<HTMLDivElement> & { avata
     <div
       {...rest}
       className={cn(
-        "xl:hidden tab-container-height bg-nobelBlack-50 flex items-center sticky top-0 w-full px-8 pt-7",
+        "xl:hidden tab-container-height bg-nobelBlack-50 flex items-center sticky top-0 w-full px-8 pt-7 z-10",
         rest.className
       )}
     >

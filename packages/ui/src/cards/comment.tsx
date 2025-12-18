@@ -104,7 +104,7 @@ CommentContent.displayName = "CommentContent";
 
 export type CommentHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 export const CommentHeader = forwardRef<HTMLDivElement, CommentHeaderProps>((props, ref) => (
-  <div {...props} ref={ref} className={cn("flex items-center gap-2", props.className)} />
+  <div {...props} ref={ref} className={cn("flex items-center gap-x-2 flex-wrap", props.className)} />
 ));
 CommentHeader.displayName = "CommentHeader";
 
@@ -193,7 +193,7 @@ export const CommentEditButton = forwardRef<HTMLButtonElement, CommentEditButton
       }}
     >
       {leftSlot || icon}
-      {children || label}
+      {children || <span className="hidden sm:inline-block">{label}</span>}
       {rightSlot}
     </button>
   );

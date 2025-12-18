@@ -41,7 +41,7 @@ export type FeedHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 export function FeedHeader(props: FeedHeaderProps) {
   const { children, className, ...rest } = props;
   return (
-    <div {...rest} className={cn("flex items-center justify-between gap-2 w-full", className)}>
+    <div {...rest} className={cn("flex items-center justify-between gap-x-2 w-full flex-wrap", className)}>
       {children}
     </div>
   );
@@ -205,7 +205,7 @@ export function VotersStack(props: React.HTMLAttributes<HTMLDivElement>) {
 }
 
 export function Voters(props: React.HTMLAttributes<HTMLDivElement>) {
-  return <div {...props} className={cn("flex items-center -space-x-3", props.className)} />;
+  return <div {...props} className={cn("flex items-center sm:-space-x-3 -space-x-5", props.className)} />;
 }
 
 export function VotersCount(props: React.HTMLAttributes<HTMLSpanElement>) {
