@@ -26,3 +26,15 @@ export type PasswordResetSuccessTemplate = BaseData & {
   templateName: "password-reset-success";
   locals: { name: string; loginUrl: string } & BaseLocals;
 };
+export type PasswordChangedTemplate = BaseData & {
+  templateName: "password-changed";
+  locals: {
+    firstName: string;
+    logo: string;
+    changedAt: string;
+    device?: string;
+    location?: string;
+    ipAddress?: string;
+    resetLink: string;
+  };
+};

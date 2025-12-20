@@ -13,6 +13,7 @@ import {
   user
 } from "@votewise/constant/routes";
 
+import { changePasswordControllerFactory } from "./auth/change-password";
 import { forgotPasswordControllerFactory } from "./auth/forgot-password";
 import { getVerificationSessionControllerFactory } from "./auth/get-verification-session";
 import { logoutControllerFactory } from "./auth/logout";
@@ -150,6 +151,7 @@ export function moduleRouterFactory(basePath: string): Router {
   router.patch(auth.paths.resetPassword(path), ...resetPasswordControllerFactory(auth.paths.resetPassword(path)));
   router.patch(user.paths.onboard.update(path), ...onboardControllerFactory(user.paths.onboard.update(path)));
   router.patch(notifications.paths.markAsRead(path), ...markReadNotificationControllerFactory());
+  router.patch(auth.paths.changePassword(path), ...changePasswordControllerFactory(auth.paths.changePassword(path)));
 
   /* ----------------------------------------------------------------------------------------------- */
   router.delete(auth.paths.logout(path), ...logoutControllerFactory());

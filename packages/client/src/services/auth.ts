@@ -1,5 +1,6 @@
 import type {
   ChallengeFactorResponse,
+  ChangePasswordResponse,
   ForgotPasswordResponse,
   GetVerificationSessionResponse,
   ResetPasswordResponse,
@@ -8,7 +9,14 @@ import type {
   VerifyEmailResponse,
   VerifyMFAResponse
 } from "@votewise/api";
-import type { TRegister, TResetPassword, TResetPasswordQuery, TSignin, TVerifyEmail } from "@votewise/schemas/auth";
+import type {
+  TChangePassword,
+  TRegister,
+  TResetPassword,
+  TResetPasswordQuery,
+  TSignin,
+  TVerifyEmail
+} from "@votewise/schemas/auth";
 import type { AccessTokenPayload } from "@votewise/types";
 import type { BaseOptions, TClient } from "../utils";
 
@@ -97,6 +105,11 @@ export class Auth {
     storage?.remove(COOKIE_KEYS.refreshToken);
     storage?.remove(COOKIE_KEYS.user);
     const res = await this.client.delete(auth.runtime.logout(""));
+    return res;
+  }
+
+  public async changePassword(data: TChangePassword) {
+    const res = await this.client.patch<ChangePasswordResponse, TChangePassword>(auth.runtime.changePassword(""), data);
     return res;
   }
 }

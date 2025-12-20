@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { checkStrength } from "@votewise/ui/password-strength";
+import { isPasswordStrong } from "@/lib/password";
 
 export const ZSignUpForm = z
   .object({
@@ -18,10 +18,8 @@ export const ZSignUpForm = z
       return z.NEVER;
     }
 
-    const strength = checkStrength(data.password);
-    const isValid =
-      strength.hasLength && strength.hasLowerCase && strength.hasUpperCase && strength.hasNumber && strength.hasSpecial;
-    if (!isValid) {
+    const isStrong = isPasswordStrong(data.password);
+    if (!isStrong) {
       ctx.addIssue({
         message: "Password is too weak",
         code: z.ZodIssueCode.custom,

@@ -2,13 +2,13 @@ import dynamic from "next/dynamic";
 
 import { Authorized } from "@/components/auth";
 import { FlashProvider } from "@/components/flash-provider";
-import { MobileLogo } from "@/components/logo";
 import { Sidebar } from "@/components/sidebar";
 import { SuggestionPanel } from "@/components/suggestion-panel";
 
 const CreatePostMobile = dynamic(() => import("@/components/dialogs/create-post").then((m) => m.CreatePostMobile), {
   ssr: false
 });
+const MobileLogo = dynamic(() => import("@/components/logo").then((m) => m.MobileLogo), { ssr: false });
 
 type Props = { children: React.ReactNode };
 

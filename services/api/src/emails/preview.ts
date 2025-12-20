@@ -1,5 +1,11 @@
 import type { Request, Response } from "express";
-import type { ForgotPasswordTemplate, PasswordResetSuccessTemplate, SignupTemplate, WelcomeTemplate } from "./types";
+import type {
+  ForgotPasswordTemplate,
+  PasswordChangedTemplate,
+  PasswordResetSuccessTemplate,
+  SignupTemplate,
+  WelcomeTemplate
+} from "./types";
 
 import path from "node:path";
 import pug from "pug";
@@ -46,6 +52,18 @@ const templates = [
         }
       ]
     } as WelcomeTemplate["locals"]
+  },
+  {
+    name: "password-changed.pug",
+    data: {
+      firstName: "John",
+      logo,
+      device: "Chrome on Windows 10",
+      location: "New York, USA",
+      ipAddress: "192.168.1.10",
+      changedAt: new Date().toLocaleString(),
+      resetLink: "https://example.com/reset-password?token=abc123"
+    } as PasswordChangedTemplate["locals"]
   }
 ];
 

@@ -46,5 +46,22 @@ type PasswordResetSuccessTemplate = BaseData & {
   templateName: "password-reset-success";
   locals: { name: string; loginUrl: string } & BaseLocals;
 };
-export type EmailJob = SignupTemplate | WelcomeTemplate | ForgotPasswordTemplate | PasswordResetSuccessTemplate;
+type PasswordChangedTemplate = BaseData & {
+  templateName: "password-changed";
+  locals: {
+    firstName: string;
+    logo: string;
+    changedAt: string;
+    device?: string;
+    location?: string;
+    ipAddress?: string;
+    resetLink: string;
+  };
+};
+export type EmailJob =
+  | SignupTemplate
+  | WelcomeTemplate
+  | ForgotPasswordTemplate
+  | PasswordResetSuccessTemplate
+  | PasswordChangedTemplate;
 export type Tasks = { name: "email"; payload: EmailJob };

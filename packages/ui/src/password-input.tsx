@@ -12,9 +12,9 @@ import { Input, InputField } from "./input-field";
 /* -----------------------------------------------------------------------------------------------
  * PasswordInput
  * -----------------------------------------------------------------------------------------------*/
-export type PasswordInputProps = InputProps & { wrapperProps?: InputFieldProps };
+export type PasswordInputProps = InputProps & { wrapperProps?: InputFieldProps; showPadLock?: boolean };
 export const PasswordInput = forwardRef<InputRef, PasswordInputProps>((props, ref) => {
-  const { wrapperProps, ...inputProps } = props;
+  const { wrapperProps, showPadLock = true, ...inputProps } = props;
   const hasError = !!inputProps["data-has-error"];
 
   const [showPassword, setShowPassword] = useState(false);
@@ -26,7 +26,7 @@ export const PasswordInput = forwardRef<InputRef, PasswordInputProps>((props, re
 
   return (
     <InputField {...wrapperProps} hasError={hasError}>
-      <Padlock className="text-gray-600" />
+      {showPadLock && <Padlock className="text-gray-600" />}
       <Input autoComplete="current-password" {...inputProps} type={type} ref={ref} />
       <button
         type="button"

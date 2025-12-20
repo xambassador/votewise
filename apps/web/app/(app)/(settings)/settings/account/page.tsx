@@ -7,6 +7,8 @@ import { Error } from "@votewise/ui/error";
 import { ChevronRight } from "@votewise/ui/icons/chevron-right";
 import { Separator } from "@votewise/ui/separator";
 
+import { ChangePassword } from "@/components/dialogs/change-password";
+
 import { getUserClient } from "@/lib/client.server";
 import { routes } from "@/lib/routes";
 
@@ -50,6 +52,10 @@ export default async function Page() {
           <Button variant={isTotpEnabled ? "danger" : "primary"} size="md">
             {isTotpEnabled ? "Disable 2FA" : "Enable 2FA"}
           </Button>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-gray-400">Change Password</span>
+          <ChangePassword variant="secondary" size="md" />
         </div>
       </div>
       <Separator className="w-full h-px" />

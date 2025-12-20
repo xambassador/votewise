@@ -14,6 +14,8 @@ export const auth = {
     resetPassword: (base: string) => base + "/auth/reset-password",
     /** Log out the user */
     logout: (base: string) => base + "/auth/logout",
+    /** Change password */
+    changePassword: (base: string) => base + "/auth/change-password",
     factors: {
       /** Enroll a new factor for multi-factor authentication */
       enroll: (base: string) => base + "/auth/factors/enroll",
@@ -40,6 +42,8 @@ export const auth = {
     resetPassword: (base: string) => base + "/auth/reset-password",
     /** Log out the user */
     logout: (base: string) => base + "/auth/logout",
+    /** Change password */
+    changePassword: (base: string) => base + "/auth/change-password",
     factors: {
       /** Enroll a new factor for multi-factor authentication */
       enroll: (base: string) => base + "/auth/factors/enroll",
