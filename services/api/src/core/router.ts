@@ -19,6 +19,7 @@ import { getVerificationSessionControllerFactory } from "./auth/get-verification
 import { logoutControllerFactory } from "./auth/logout";
 import { challengeMFAControllerFactory } from "./auth/mfa/challenge";
 import { enrollMFAControllerFactory } from "./auth/mfa/enroll";
+import { unEnrollMFAControllerFactory } from "./auth/mfa/unenroll";
 import { verifyChallengeControllerFactory } from "./auth/mfa/verify";
 import { refreshControllerFactory } from "./auth/refresh";
 import { registerControllerFactory } from "./auth/register";
@@ -149,18 +150,22 @@ export function moduleRouterFactory(basePath: string): Router {
   /* ----------------------------------------------------------------------------------------------- */
   router.patch(auth.paths.verify(path), ...verifyControllerFactory(auth.paths.verify(path)));
   router.patch(auth.paths.resetPassword(path), ...resetPasswordControllerFactory(auth.paths.resetPassword(path)));
+  router.patch(auth.paths.changePassword(path), ...changePasswordControllerFactory(auth.paths.changePassword(path)));
   router.patch(user.paths.onboard.update(path), ...onboardControllerFactory(user.paths.onboard.update(path)));
   router.patch(notifications.paths.markAsRead(path), ...markReadNotificationControllerFactory());
-  router.patch(auth.paths.changePassword(path), ...changePasswordControllerFactory(auth.paths.changePassword(path)));
 
   /* ----------------------------------------------------------------------------------------------- */
   router.delete(auth.paths.logout(path), ...logoutControllerFactory());
+  router.delete(
+    auth.paths.factors.disableFactor(path),
+    ...unEnrollMFAControllerFactory(auth.paths.factors.disableFactor(path))
+  );
   router.delete(follow.paths.unfollowUser(path), ...deleteFollowControllerFactory());
   router.delete(groups.paths.leave(path), ...leaveGroupControllerFactory());
   router.delete(groups.paths.kick(path), ...kickMemberControllerFactory());
+  router.delete(groups.paths.declineJoinRequest(path), ...rejectGroupJoinRequestControllerFactory());
   router.delete(comments.paths.delete(path), ...deleteCommentControllerFactory());
   router.delete(user.paths.invitations.declineGroupInvite(path), ...rejectGroupInviteControllerFactory());
-  router.delete(groups.paths.declineJoinRequest(path), ...rejectGroupJoinRequestControllerFactory());
 
   return router;
 }

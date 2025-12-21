@@ -1,5 +1,5 @@
-import type { ChallengeFactorResponse, EnrollMFAResponse, VerifyMFAResponse } from "@votewise/api";
-import type { TVerifyChallenge } from "@votewise/schemas/auth";
+import type { ChallengeFactorResponse, EnrollMFAResponse, UnEnrollMFAResponse, VerifyMFAResponse } from "@votewise/api";
+import type { TDisableMFA, TVerifyChallenge } from "@votewise/schemas/auth";
 import type { BaseOptions, TClient } from "../utils";
 
 import { auth } from "@votewise/constant/routes";
@@ -36,6 +36,14 @@ export class MFA {
     );
     return res;
   }
+
+  public async disable(factorId: string, data: TDisableMFA) {
+    const res = await this.client.deleteWithBody<UnEnrollMFAResponse, TDisableMFA>(
+      auth.runtime.factors.disableFactor("", factorId),
+      data
+    );
+    return res;
+  }
 }
 
-export type { EnrollMFAResponse, ChallengeFactorResponse, VerifyMFAResponse };
+export type { EnrollMFAResponse, ChallengeFactorResponse, VerifyMFAResponse, UnEnrollMFAResponse };

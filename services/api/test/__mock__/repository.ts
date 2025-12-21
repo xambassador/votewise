@@ -18,7 +18,8 @@ export const mockFactorRepository = {
   verifyFactor: jest.fn().mockName("factorRepository.verifyFactor"),
   findByUserIdAndType: jest.fn().mockName("factorRepository.findByUserIdAndType"),
   findByUserId: jest.fn().mockName("factorRepository.findByUserId").mockResolvedValue([]),
-  findById: jest.fn().mockName("factorRepository.findById")
+  findById: jest.fn().mockName("factorRepository.findById"),
+  findFirstUnverifiedByUserIdAndType: jest.fn().mockName("factorRepository.findFirstUnverifiedByUserIdAndType")
 } as unknown as jest.Mocked<FactorRepository>;
 
 export const mockPostTopicRepository = {

@@ -103,6 +103,16 @@ export const ZChangePassword = z.object({
   new_password: ZPassword
 });
 
+export const ZVerifyPassword = z.object({ password: ZPassword });
+
+export const ZDisableMFA = z.object({
+  password: ZPassword,
+  otp: ZOtp,
+  challenge_id: z
+    .string({ required_error: "challenge_id is missing", invalid_type_error: "challenge_id must be a string" })
+    .min(1, { message: "challenge_id is missing" })
+});
+
 export type TRegister = z.infer<typeof ZRegister>;
 export type TEmail = z.infer<typeof ZEmail>;
 export type TPassword = z.infer<typeof ZPassword>;
@@ -114,3 +124,5 @@ export type TResetPassword = z.infer<typeof ZResetPassword>;
 export type TResetPasswordQuery = z.infer<typeof ZResetPasswordQuery>;
 export type TVerifyChallenge = z.infer<typeof ZVerifyChallenge>;
 export type TChangePassword = z.infer<typeof ZChangePassword>;
+export type TVerifyPassword = z.infer<typeof ZVerifyPassword>;
+export type TDisableMFA = z.infer<typeof ZDisableMFA>;

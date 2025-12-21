@@ -9,6 +9,7 @@ export type { ResetPasswordResponse } from "@/core/auth/reset-password/controlle
 export type { SigninResponse } from "@/core/auth/signin/controller";
 export type { VerifyEmailResponse } from "@/core/auth/verify/controller";
 export type { ChangePasswordResponse } from "@/core/auth/change-password/controller";
+export type { UnEnrollMFAResponse } from "@/core/auth/mfa/unenroll/controller";
 export type { CreateFeedResponse } from "@/core/feed/create/controller";
 export type { GetAllFeedsResponse } from "@/core/feed/get-all/controller";
 export type { GetFeedResponse } from "@/core/feed/get/controller";

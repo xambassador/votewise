@@ -22,7 +22,9 @@ export const auth = {
       /** Challenge an existing factor for multi-factor authentication */
       challengeFactor: (base: string) => base + "/auth/factors/:factor_id/challenge",
       /** Verify an existing factor for multi-factor authentication */
-      verifyFactor: (base: string) => base + "/auth/factors/:factor_id/verify"
+      verifyFactor: (base: string) => base + "/auth/factors/:factor_id/verify",
+      /** Disable an existing factor for multi-factor authentication */
+      disableFactor: (base: string) => base + "/auth/factors/:factor_id/disable"
     },
     /** Get an active email verification session */
     emailVerificationSession: (base: string) => base + "/auth/verify/:email"
@@ -50,7 +52,9 @@ export const auth = {
       /** Challenge an existing factor for multi-factor authentication */
       challengeFactor: (base: string, factorId: string) => base + `/auth/factors/${factorId}/challenge`,
       /** Verify an existing factor for multi-factor authentication */
-      verifyFactor: (base: string, factorId: string) => base + `/auth/factors/${factorId}/verify`
+      verifyFactor: (base: string, factorId: string) => base + `/auth/factors/${factorId}/verify`,
+      /** Disable an existing factor for multi-factor authentication */
+      disableFactor: (base: string, factorId: string) => base + `/auth/factors/${factorId}/disable`
     },
     /** Get an active email verification session */
     emailVerificationSession: (base: string, email: string) => base + `/auth/verify/${email}`

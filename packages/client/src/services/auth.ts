@@ -116,6 +116,7 @@ export class Auth {
 
 export type {
   ChallengeFactorResponse,
+  ChangePasswordResponse,
   ForgotPasswordResponse,
   GetVerificationSessionResponse,
   ResetPasswordResponse,

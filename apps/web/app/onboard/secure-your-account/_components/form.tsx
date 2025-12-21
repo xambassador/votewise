@@ -7,7 +7,7 @@ import { Button } from "@votewise/ui/button";
 import { Spinner } from "@votewise/ui/ring-spinner";
 import { makeToast } from "@votewise/ui/toast";
 
-import { enrollMultiFactorAction, skipMultiFactorAction } from "../action";
+import { enrollMultiFactorAction, skipMultiFactorAction } from "@/app/action";
 
 const AuthenticatorForm = dynamic(() => import("./authenticator-form").then((m) => m.AuthenticatorForm), {
   ssr: false,

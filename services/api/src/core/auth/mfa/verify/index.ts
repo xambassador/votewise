@@ -7,10 +7,12 @@ import { ExceptionLayer } from "@/lib/exception-layer";
 import { rateLimitStrategies } from "@/lib/rate-limiter";
 
 import { Controller } from "./controller";
+import { VerifyFactorSevice } from "./service";
 
 export function verifyChallengeControllerFactory(path: string) {
   const ctx = AppContext.instance;
-  const controller = new Controller(ctx);
+  const verifyFactorService = new VerifyFactorSevice(ctx);
+  const controller = new Controller({ ...ctx, verifyFactorService });
   const auth = authMiddlewareFactory();
   const limiter = rateLimitMiddlewareFactory(path, {
     ...rateLimitStrategies.THREE_PER_MINUTE,

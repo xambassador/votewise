@@ -31,9 +31,29 @@ export class Controller {
     const userHasTOTPFactor = await this.ctx.repositories.factor.findByUserIdAndType(user.id, "TOTP");
     this.ctx.assert.unprocessableEntity(!!userHasTOTPFactor, CONFLICTING_FACTOR_MSG, CONFLICTING_FACTOR);
 
+    const hasAnyUnverifiedTOTPFactor = await this.ctx.repositories.factor.findFirstUnverifiedByUserIdAndType(
+      user.id,
+      "TOTP"
+    );
+    const issuer = this.ctx.config.appName || "Votewise";
+
+    if (hasAnyUnverifiedTOTPFactor) {
+      const decryptedSecret = this.ctx.services.crypto.symmetricDecrypt(
+        hasAnyUnverifiedTOTPFactor.secret,
+        this.ctx.environment.APP_SECRET
+      );
+      const keyUri = this.ctx.services.crypto.generateKeyUri(decryptedSecret, user.email, issuer);
+      const qrCode = await this.ctx.services.crypto.generate2FAQRCode(decryptedSecret, user.email, issuer);
+      const result = {
+        id: hasAnyUnverifiedTOTPFactor.id,
+        type: hasAnyUnverifiedTOTPFactor.factor_type,
+        totp: { qr_code: qrCode, uri: keyUri, secret: decryptedSecret }
+      };
+      return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
+    }
+
     const totpSecret = this.ctx.services.crypto.generate2FASecret();
     const encryptedSecret = this.ctx.services.crypto.symmetricEncrypt(totpSecret, this.ctx.environment.APP_SECRET);
-    const issuer = this.ctx.config.appName || "Votewise";
     const keyUri = this.ctx.services.crypto.generateKeyUri(totpSecret, user.email, issuer);
     const qrCode = await this.ctx.services.crypto.generate2FAQRCode(totpSecret, user.email, issuer);
     const factor = await this.ctx.repositories.factor.create({

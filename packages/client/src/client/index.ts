@@ -120,6 +120,14 @@ export class Client {
     return this._fetch<T>(url, { method: "DELETE", ...options });
   }
 
+  public async deleteWithBody<T, B extends object>(
+    url: string,
+    body: B,
+    options?: RequestInit
+  ): Promise<FetchResult<T>> {
+    return this._fetch<T>(url, { method: "DELETE", body: JSON.stringify(body), ...options });
+  }
+
   public async patch<T, B extends object>(url: string, body: B, options?: RequestInit): Promise<FetchResult<T>> {
     return this._fetch<T>(url, { method: "PATCH", body: JSON.stringify(body), ...options });
   }

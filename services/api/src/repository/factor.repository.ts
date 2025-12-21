@@ -80,4 +80,24 @@ export class FactorRepository extends BaseRepository {
       return factor;
     });
   }
+
+  public findFirstUnverifiedByUserIdAndType(userId: string, type: TFactorCreate["factor_type"]) {
+    return this.execute(async () => {
+      const factor = await this.dataLayer
+        .selectFrom("Factor")
+        .where("user_id", "=", userId)
+        .where("factor_type", "=", type)
+        .where("status", "=", "UNVERIFIED")
+        .selectAll()
+        .executeTakeFirst();
+      return factor;
+    });
+  }
+
+  public deleteById(id: string, tx?: Tx) {
+    const db = (tx ?? this.dataLayer) as Tx;
+    return this.execute(async () => {
+      await db.deleteFrom("Factor").where("id", "=", id).execute();
+    });
+  }
 }

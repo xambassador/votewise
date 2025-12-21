@@ -6,13 +6,14 @@ import { Assertions } from "@votewise/errors";
 import { Minute } from "@votewise/times";
 
 import { Controller } from "@/core/auth/mfa/verify/controller";
+import { VerifyFactorSevice } from "@/core/auth/mfa/verify/service";
 import { requestParserPluginFactory } from "@/plugins";
 
 import { mockChallengeRepository, mockFactorRepository } from "../../__mock__/repository";
 import { mockCryptoService, mockSessionManagerWithoutCtx } from "../../__mock__/services";
 import { buildChallenge, buildFactor, buildReq, buildRes, getLocals } from "../../helpers";
 
-const controller = new Controller({
+const ctx = {
   assert: new Assertions(),
   plugins: { requestParser: requestParserPluginFactory() },
   repositories: {
@@ -21,7 +22,9 @@ const controller = new Controller({
   },
   services: { crypto: mockCryptoService, session: mockSessionManagerWithoutCtx },
   environment: { APP_SECRET: "app_secret" } as AppContext["environment"]
-} as unknown as AppContext);
+} as unknown as AppContext;
+
+const controller = new Controller({ ...ctx, verifyFactorService: new VerifyFactorSevice(ctx) });
 
 beforeEach(() => {
   jest.clearAllMocks();

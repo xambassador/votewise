@@ -14,3 +14,4 @@ export const getGroupFeedsKey = (groupId: string) => ["group-feeds", groupId];
 export const getMeKey = () => ["me"];
 export const getHotUsersKey = () => ["hot-users"];
 export const getHotFeedsKey = () => ["hot-feeds"];
+export const getMyAccountKey = () => ["my-account"];

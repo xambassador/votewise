@@ -1,6 +1,7 @@
 "use server";
 
 import type { EnrollMFAResponse } from "@votewise/client/mfa";
+import type { TDisableMFA } from "@votewise/schemas/auth";
 import type { ActionResponse } from "@votewise/types";
 
 import { redirect } from "next/navigation";
@@ -18,9 +19,12 @@ export async function enrollMultiFactorAction(): Promise<ActionResponse<EnrollMF
   return { success: true, data: res.data };
 }
 
+const defaultMsg = "Welcome to Votewise! Your account is now secure. Please login again to continue.";
+
 export async function verifyMultiFactorAction(
   factorId: string,
-  otp: string
+  otp: string,
+  msg = defaultMsg
 ): Promise<ActionResponse<{ is_onboarded: boolean }>> {
   const mfa = getMFAClient();
   const challengeRes = await mfa.challenge(factorId);
@@ -37,7 +41,6 @@ export async function verifyMultiFactorAction(
   if (!res.success) {
     return { success: false, error: res.error, errorData: res.errorData };
   }
-  const msg = "Welcome to Votewise! Your account is now secure. Please login again to continue.";
   setFlashMessage("Onboard complete!", msg, "success");
   clearAllCookies();
   return redirect(routes.auth.signIn());
@@ -52,4 +55,18 @@ export async function skipMultiFactorAction(): Promise<ActionResponse<{ is_onboa
   forwardCookie(res.headers);
   setFlashMessage("Onboard complete!", "Welcome to Votewise!", "success");
   return redirect(routes.app.root());
+}
+
+export async function disableMFAAction(factorId: string, data: TDisableMFA) {
+  const mfa = getMFAClient();
+  const challengeRes = await mfa.challenge(factorId);
+  if (!challengeRes.success) {
+    return { success: false, error: challengeRes.error, errorData: challengeRes.errorData };
+  }
+  data.challenge_id = challengeRes.data.id;
+  const res = await mfa.disable(factorId, data);
+  if (!res.success) {
+    return { success: false, error: res.error, errorData: res.errorData };
+  }
+  return { success: true, data: res.data };
 }
