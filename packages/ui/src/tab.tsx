@@ -29,7 +29,7 @@ export const TabsTrigger = forwardRef<TabsTriggerRef, TabsTriggerProps>((props, 
     <TabsPrimitive.Trigger
       {...rest}
       className={cn(
-        "h-7 text-black-200 text-base font-medium focus-primary focus-presets whitespace-nowrap rounded-sm",
+        "h-7 text-black-200 text-base font-medium focus-primary focus-presets whitespace-nowrap",
         "data-[state=active]:border-b data-[state=active]:border-blue-600 data-[state=active]:text-blue-200 shadow-none",
         "disabled:pointer-events-none disabled:opacity-50",
         className

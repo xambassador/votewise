@@ -1,6 +1,8 @@
 import type { NewUser, UserUpdate } from "@votewise/prisma/db";
 import type { Tx } from "./transaction";
 
+import { sql } from "@votewise/prisma";
+
 import { BaseRepository } from "./base.repository";
 
 export class UserRepository extends BaseRepository {
@@ -241,6 +243,541 @@ export class UserRepository extends BaseRepository {
         ...user,
         factors
       };
+    });
+  }
+
+  public getUserPosts(username: string, opts: { page: number; limit: number }) {
+    const { page, limit } = opts;
+    const offset = (page - 1) * limit;
+    return this.execute(async () => {
+      const user = await this.dataLayer
+        .selectFrom("User")
+        .where("user_name", "=", username)
+        .select("id")
+        .executeTakeFirst();
+
+      if (!user) return [];
+
+      const posts = await this.dataLayer
+        .selectFrom("Post as p")
+        .innerJoin("User as author", "author.id", "p.author_id")
+        .leftJoin("PostAggregates as pa", "pa.post_id", "p.id")
+        .select([
+          "p.id",
+          "p.slug",
+          "p.title",
+          "p.created_at",
+          "p.updated_at",
+          "author.id as author_id",
+          "author.user_name",
+          "author.first_name",
+          "author.last_name",
+          "author.avatar_url",
+          "pa.comments",
+          "pa.votes"
+        ])
+        .where("p.author_id", "=", user.id)
+        .orderBy("p.created_at", "desc")
+        .limit(limit)
+        .offset(offset)
+        .execute();
+
+      if (posts.length === 0) return [];
+
+      const postIds = posts.map((p) => p.id);
+      const votes = await this.dataLayer
+        .selectFrom("Upvote as u")
+        .innerJoin("User as upvote_user", "upvote_user.id", "u.user_id")
+        .select([
+          "u.post_id",
+          "upvote_user.id as user_id",
+          "upvote_user.avatar_url",
+          sql<number>`row_number() over (partition by u.post_id order by u.created_at asc)`.as("rn")
+        ])
+        .where("u.post_id", "in", postIds)
+        .execute();
+
+      const upvotes = votes.filter((r) => r.rn <= 5);
+      const upvotesByPost = new Map<string, Array<{ user_id: string; avatar_url: string | null }>>();
+      for (const uv of upvotes) {
+        if (!upvotesByPost.has(uv.post_id)) {
+          upvotesByPost.set(uv.post_id, []);
+        }
+        upvotesByPost.get(uv.post_id)!.push({ user_id: uv.user_id, avatar_url: uv.avatar_url });
+      }
+
+      return posts.map((post) => ({
+        id: post.id,
+        slug: post.slug,
+        title: post.title,
+        created_at: post.created_at,
+        updated_at: post.updated_at,
+        author: {
+          id: post.author_id,
+          user_name: post.user_name,
+          first_name: post.first_name,
+          last_name: post.last_name,
+          avatar_url: post.avatar_url
+        },
+        voters: (upvotesByPost.get(post.id) || []).map((uv) => ({
+          id: uv.user_id,
+          avatar_url: uv.avatar_url
+        })),
+        votes: post.votes ?? 0,
+        comments: post.comments ?? 0
+      }));
+    });
+  }
+
+  public countUserPosts(username: string) {
+    return this.execute(async () => {
+      const user = await this.dataLayer
+        .selectFrom("User")
+        .where("user_name", "=", username)
+        .select("id")
+        .executeTakeFirst();
+
+      if (!user) return 0;
+
+      const res = await this.dataLayer
+        .selectFrom("UserAggregates")
+        .where("user_id", "=", user.id)
+        .select("total_posts")
+        .executeTakeFirst();
+
+      return res?.total_posts ?? 0;
+    });
+  }
+
+  public getUserVotedPosts(username: string, opts: { page: number; limit: number }) {
+    const { page, limit } = opts;
+    const offset = (page - 1) * limit;
+    return this.execute(async () => {
+      const user = await this.dataLayer
+        .selectFrom("User")
+        .where("user_name", "=", username)
+        .select("id")
+        .executeTakeFirst();
+
+      if (!user) return [];
+
+      const votedPostIds = await this.dataLayer
+        .selectFrom("Upvote")
+        .where("user_id", "=", user.id)
+        .select("post_id")
+        .orderBy("created_at", "desc")
+        .limit(limit)
+        .offset(offset)
+        .execute();
+
+      if (votedPostIds.length === 0) return [];
+
+      const postIds = votedPostIds.map((v) => v.post_id);
+
+      const posts = await this.dataLayer
+        .selectFrom("Post as p")
+        .innerJoin("User as author", "author.id", "p.author_id")
+        .leftJoin("PostAggregates as pa", "pa.post_id", "p.id")
+        .select([
+          "p.id",
+          "p.slug",
+          "p.title",
+          "p.created_at",
+          "p.updated_at",
+          "author.id as author_id",
+          "author.user_name",
+          "author.first_name",
+          "author.last_name",
+          "author.avatar_url",
+          "pa.comments",
+          "pa.votes"
+        ])
+        .where("p.id", "in", postIds)
+        .execute();
+
+      const votes = await this.dataLayer
+        .selectFrom("Upvote as u")
+        .innerJoin("User as upvote_user", "upvote_user.id", "u.user_id")
+        .select([
+          "u.post_id",
+          "upvote_user.id as user_id",
+          "upvote_user.avatar_url",
+          sql<number>`row_number() over (partition by u.post_id order by u.created_at asc)`.as("rn")
+        ])
+        .where("u.post_id", "in", postIds)
+        .execute();
+
+      const upvotes = votes.filter((r) => r.rn <= 5);
+      const upvotesByPost = new Map<string, Array<{ user_id: string; avatar_url: string | null }>>();
+      for (const uv of upvotes) {
+        if (!upvotesByPost.has(uv.post_id)) {
+          upvotesByPost.set(uv.post_id, []);
+        }
+        upvotesByPost.get(uv.post_id)!.push({ user_id: uv.user_id, avatar_url: uv.avatar_url });
+      }
+
+      const postMap = new Map(posts.map((p) => [p.id, p]));
+      return postIds
+        .map((id) => postMap.get(id))
+        .filter(Boolean)
+        .map((post) => ({
+          id: post!.id,
+          slug: post!.slug,
+          title: post!.title,
+          created_at: post!.created_at,
+          updated_at: post!.updated_at,
+          author: {
+            id: post!.author_id,
+            user_name: post!.user_name,
+            first_name: post!.first_name,
+            last_name: post!.last_name,
+            avatar_url: post!.avatar_url
+          },
+          voters: (upvotesByPost.get(post!.id) || []).map((uv) => ({
+            id: uv.user_id,
+            avatar_url: uv.avatar_url
+          })),
+          votes: post!.votes ?? 0,
+          comments: post!.comments ?? 0
+        }));
+    });
+  }
+
+  public countUserVotedPosts(username: string) {
+    return this.execute(async () => {
+      const user = await this.dataLayer
+        .selectFrom("User")
+        .where("user_name", "=", username)
+        .select("id")
+        .executeTakeFirst();
+
+      if (!user) return 0;
+
+      const res = await this.dataLayer
+        .selectFrom("UserAggregates")
+        .where("user_id", "=", user.id)
+        .select("total_votes")
+        .executeTakeFirst();
+
+      return res?.total_votes ?? 0;
+    });
+  }
+
+  public getUserComments(username: string, opts: { page: number; limit: number }) {
+    const { page, limit } = opts;
+    const offset = (page - 1) * limit;
+    return this.execute(async () => {
+      const user = await this.dataLayer
+        .selectFrom("User")
+        .where("user_name", "=", username)
+        .select("id")
+        .executeTakeFirst();
+
+      if (!user) return [];
+
+      const comments = await this.dataLayer
+        .selectFrom("Comment as c")
+        .innerJoin("User as u", "u.id", "c.user_id")
+        .innerJoin("Post as p", "p.id", "c.post_id")
+        .select([
+          "c.id",
+          "c.text",
+          "c.created_at",
+          "c.updated_at",
+          "u.id as user_id",
+          "u.user_name",
+          "u.first_name",
+          "u.last_name",
+          "u.avatar_url",
+          "p.id as post_id",
+          "p.title as post_title",
+          "p.slug as post_slug"
+        ])
+        .where("c.user_id", "=", user.id)
+        .orderBy("c.created_at", "desc")
+        .limit(limit)
+        .offset(offset)
+        .execute();
+
+      return comments.map((comment) => ({
+        id: comment.id,
+        text: comment.text,
+        created_at: comment.created_at,
+        updated_at: comment.updated_at,
+        user: {
+          id: comment.user_id,
+          user_name: comment.user_name,
+          first_name: comment.first_name,
+          last_name: comment.last_name,
+          avatar_url: comment.avatar_url
+        },
+        post: {
+          id: comment.post_id,
+          title: comment.post_title,
+          slug: comment.post_slug
+        }
+      }));
+    });
+  }
+
+  public countUserComments(username: string) {
+    return this.execute(async () => {
+      const user = await this.dataLayer
+        .selectFrom("User")
+        .where("user_name", "=", username)
+        .select("id")
+        .executeTakeFirst();
+
+      if (!user) return 0;
+
+      const res = await this.dataLayer
+        .selectFrom("UserAggregates")
+        .where("user_id", "=", user.id)
+        .select("total_comments")
+        .executeTakeFirst();
+
+      return res?.total_comments ?? 0;
+    });
+  }
+
+  public getUserFollowers(username: string, opts: { page: number; limit: number }) {
+    const { page, limit } = opts;
+    const offset = (page - 1) * limit;
+    return this.execute(async () => {
+      const user = await this.dataLayer
+        .selectFrom("User")
+        .where("user_name", "=", username)
+        .select("id")
+        .executeTakeFirst();
+
+      if (!user) return [];
+
+      const followers = await this.dataLayer
+        .selectFrom("Follow as f")
+        .innerJoin("User as u", "u.id", "f.follower_id")
+        .leftJoin("UserAggregates as ua", "ua.user_id", "u.id")
+        .select([
+          "u.id",
+          "u.user_name",
+          "u.first_name",
+          "u.last_name",
+          "u.avatar_url",
+          "u.about",
+          "ua.total_followers",
+          "ua.total_posts"
+        ])
+        .where("f.following_id", "=", user.id)
+        .orderBy("f.created_at", "desc")
+        .limit(limit)
+        .offset(offset)
+        .execute();
+
+      return followers.map((follower) => ({
+        id: follower.id,
+        user_name: follower.user_name,
+        first_name: follower.first_name,
+        last_name: follower.last_name,
+        avatar_url: follower.avatar_url,
+        about: follower.about,
+        aggregates: {
+          total_followers: follower.total_followers ?? 0,
+          total_posts: follower.total_posts ?? 0
+        }
+      }));
+    });
+  }
+
+  public countUserFollowers(username: string) {
+    return this.execute(async () => {
+      const user = await this.dataLayer
+        .selectFrom("User")
+        .where("user_name", "=", username)
+        .select("id")
+        .executeTakeFirst();
+
+      if (!user) return 0;
+
+      const res = await this.dataLayer
+        .selectFrom("UserAggregates")
+        .where("user_id", "=", user.id)
+        .select("total_followers")
+        .executeTakeFirst();
+
+      return res?.total_followers ?? 0;
+    });
+  }
+
+  public getUserFollowing(username: string, opts: { page: number; limit: number }) {
+    const { page, limit } = opts;
+    const offset = (page - 1) * limit;
+    return this.execute(async () => {
+      const user = await this.dataLayer
+        .selectFrom("User")
+        .where("user_name", "=", username)
+        .select("id")
+        .executeTakeFirst();
+
+      if (!user) return [];
+
+      const following = await this.dataLayer
+        .selectFrom("Follow as f")
+        .innerJoin("User as u", "u.id", "f.following_id")
+        .leftJoin("UserAggregates as ua", "ua.user_id", "u.id")
+        .select([
+          "u.id",
+          "u.user_name",
+          "u.first_name",
+          "u.last_name",
+          "u.avatar_url",
+          "u.about",
+          "ua.total_followers",
+          "ua.total_posts"
+        ])
+        .where("f.follower_id", "=", user.id)
+        .orderBy("f.created_at", "desc")
+        .limit(limit)
+        .offset(offset)
+        .execute();
+
+      return following.map((user) => ({
+        id: user.id,
+        user_name: user.user_name,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        avatar_url: user.avatar_url,
+        about: user.about,
+        aggregates: {
+          total_followers: user.total_followers ?? 0,
+          total_posts: user.total_posts ?? 0
+        }
+      }));
+    });
+  }
+
+  public countUserFollowing(username: string) {
+    return this.execute(async () => {
+      const user = await this.dataLayer
+        .selectFrom("User")
+        .where("user_name", "=", username)
+        .select("id")
+        .executeTakeFirst();
+
+      if (!user) return 0;
+
+      const res = await this.dataLayer
+        .selectFrom("UserAggregates")
+        .where("user_id", "=", user.id)
+        .select("total_following")
+        .executeTakeFirst();
+
+      return res?.total_following ?? 0;
+    });
+  }
+
+  public getUserGroups(username: string, opts: { page: number; limit: number }) {
+    const { page, limit } = opts;
+    const offset = (page - 1) * limit;
+    return this.execute(async () => {
+      const user = await this.dataLayer
+        .selectFrom("User")
+        .where("user_name", "=", username)
+        .select("id")
+        .executeTakeFirst();
+
+      if (!user) return [];
+
+      const memberGroups = await this.dataLayer
+        .selectFrom("GroupMember")
+        .where("user_id", "=", user.id)
+        .where("is_removed", "=", false)
+        .select(["group_id", "role"])
+        .execute();
+
+      if (memberGroups.length === 0) return [];
+
+      const groupIds = memberGroups.map((m) => m.group_id);
+      const roleByGroup = new Map(memberGroups.map((m) => [m.group_id, m.role]));
+
+      const groups = await this.dataLayer
+        .selectFrom("Group as g")
+        .leftJoin("GroupAggregates as ga", "ga.group_id", "g.id")
+        .select([
+          "g.id",
+          "g.name",
+          "g.about",
+          "g.logo_url",
+          "g.type",
+          "g.status",
+          "g.created_at",
+          "g.updated_at",
+          "ga.total_members"
+        ])
+        .where("g.id", "in", groupIds)
+        .orderBy("g.created_at", "desc")
+        .limit(limit)
+        .offset(offset)
+        .execute();
+
+      if (groups.length === 0) return [];
+
+      const admins = await this.dataLayer
+        .selectFrom("GroupMember as gm")
+        .innerJoin("User as u", "u.id", "gm.user_id")
+        .select(["gm.group_id", "u.id as user_id", "u.user_name", "u.first_name", "u.last_name"])
+        .where("gm.group_id", "in", groupIds)
+        .where("gm.role", "=", "ADMIN")
+        .execute();
+
+      const adminByGroup = new Map<string, (typeof admins)[0]>();
+      for (const admin of admins) {
+        if (!adminByGroup.has(admin.group_id)) {
+          adminByGroup.set(admin.group_id, admin);
+        }
+      }
+
+      return groups.map((group) => {
+        const admin = adminByGroup.get(group.id);
+        return {
+          id: group.id,
+          name: group.name,
+          about: group.about,
+          logo_url: group.logo_url,
+          type: group.type,
+          status: group.status,
+          created_at: group.created_at,
+          updated_at: group.updated_at,
+          total_members: group.total_members ?? 0,
+          role: roleByGroup.get(group.id),
+          admin: admin
+            ? {
+                id: admin.user_id,
+                user_name: admin.user_name,
+                first_name: admin.first_name,
+                last_name: admin.last_name
+              }
+            : null
+        };
+      });
+    });
+  }
+
+  public countUserGroups(username: string) {
+    return this.execute(async () => {
+      const user = await this.dataLayer
+        .selectFrom("User")
+        .where("user_name", "=", username)
+        .select("id")
+        .executeTakeFirst();
+
+      if (!user) return 0;
+
+      const res = await this.dataLayer
+        .selectFrom("UserAggregates")
+        .where("user_id", "=", user.id)
+        .select("total_groups")
+        .executeTakeFirst();
+
+      return res?.total_groups ?? 0;
     });
   }
 }

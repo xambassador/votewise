@@ -144,7 +144,7 @@ body {
   }
 
   .focus-presets {
-    @apply focus:shadow-input-ring focus:ring-offset-nobelBlack-50 outline-none focus:outline-none focus:outline-0 focus:ring-offset-2 focus-visible:outline-0;
+    @apply focus-visible:shadow-input-ring focus-visible:ring-offset-nobelBlack-50 outline-none focus:outline-none focus:outline-0 focus-visible:outline-0 focus-visible:ring-offset-2;
   }
 
   .focus-within-presets {
@@ -152,7 +152,7 @@ body {
   }
 
   .focus-primary {
-    @apply focus:border-blue-500 focus:ring-blue-500/30;
+    @apply focus-visible:border-blue-500 focus-visible:ring-blue-500/30;
   }
 
   .focus-within-primary {
@@ -160,15 +160,15 @@ body {
   }
 
   .focus-visible {
-    @apply focus-visible:shadow-input-ring focus-visible:ring-offset-nobelBlack-50 outline-none transition-all duration-100 focus:ring-offset-2 focus-visible:border-blue-500 focus-visible:outline-none focus-visible:outline-0 focus-visible:ring-blue-500/30;
+    @apply focus-visible:shadow-input-ring focus-visible:ring-offset-nobelBlack-50 outline-none transition-all duration-100 focus-visible:border-blue-500 focus-visible:outline-none focus-visible:outline-0 focus-visible:ring-blue-500/30 focus-visible:ring-offset-2;
   }
 
   .focus-secondary {
-    @apply focus:border-nobelBlack-200 focus:ring-gray-700;
+    @apply focus-visible:border-nobelBlack-200 focus-visible:ring-gray-700;
   }
 
   .focus-danger {
-    @apply focus:border-red-500 focus:ring-red-500/30;
+    @apply focus-visible:border-red-500 focus-visible:ring-red-500/30;
   }
 
   .overlay {

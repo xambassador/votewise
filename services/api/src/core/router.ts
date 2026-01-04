@@ -67,7 +67,12 @@ import { getMyAccountControllerFactory } from "./user/me/account";
 import { updateAccountControllerFactory } from "./user/me/account/update";
 import { onboardControllerFactory } from "./user/onboard";
 import { getOnboardSessionControllerFactory } from "./user/onboard/get-session";
+import { getUserCommentsControllerFactory } from "./user/profile/comments";
+import { getUserFollowersControllerFactory } from "./user/profile/followers";
+import { getUserFollowingsControllerFactory } from "./user/profile/following";
 import { getUserProfileControllerFactory } from "./user/profile/get";
+import { getUserGroupsControllerFactory } from "./user/profile/groups";
+import { getUserPostsControllerFactory } from "./user/profile/posts";
 import { updateUserProfileControllerFactory } from "./user/profile/update";
 import { listSessionsControllerFactory } from "./user/sessions/list";
 
@@ -116,6 +121,11 @@ export function moduleRouterFactory(basePath: string): Router {
   router.get(search.paths.all(path), ...searchControllerFactory());
   router.get(trending.paths.feeds(path), ...getHotFeedsControllerFactory());
   router.get(trending.paths.users(path), ...getHotUsersControllerFactory());
+  router.get(user.paths.profile.getComments(path), ...getUserCommentsControllerFactory());
+  router.get(user.paths.profile.getPosts(path), ...getUserPostsControllerFactory());
+  router.get(user.paths.profile.getFollowers(path), ...getUserFollowersControllerFactory());
+  router.get(user.paths.profile.getFollowings(path), ...getUserFollowingsControllerFactory());
+  router.get(user.paths.profile.getGroups(path), ...getUserGroupsControllerFactory());
 
   /* ----------------------------------------------------------------------------------------------- */
   router.post(auth.paths.register(path), ...registerControllerFactory(auth.paths.register(path)));

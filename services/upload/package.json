@@ -4,7 +4,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "lint": "eslint ./src --ext .ts",
-    "build": "rimraf dist && tsc && tsc-alias",
+    "build": "rimraf dist && tsc && tsc-alias && rm tsconfig.tsbuildinfo",
     "dev": "nodemon",
     "clean": "rimraf dist node_modules",
     "clean:build": "rimraf dist"

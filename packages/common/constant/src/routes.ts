@@ -99,7 +99,17 @@ export const user = {
     },
     profile: {
       /** Get a user's profile by username */
-      getByUsername: (base: string) => base + "/users/:username/profile"
+      getByUsername: (base: string) => base + "/users/:username/profile",
+      /** Get user's posts */
+      getPosts: (base: string) => base + "/users/:username/posts",
+      /** Get user's comments */
+      getComments: (base: string) => base + "/users/:username/comments",
+      /** Get user's followers */
+      getFollowers: (base: string) => base + "/users/:username/followers",
+      /** Get user's followings */
+      getFollowings: (base: string) => base + "/users/:username/following",
+      /** Get user's groups */
+      getGroups: (base: string) => base + "/users/:username/groups"
     }
   },
   runtime: {
@@ -141,7 +151,17 @@ export const user = {
     },
     profile: {
       /** Get a user's profile by username */
-      getByUsername: (base: string, username: string) => base + `/users/${username}/profile`
+      getByUsername: (base: string, username: string) => base + `/users/${username}/profile`,
+      /** Get user's posts */
+      getPosts: (base: string, username: string) => base + `/users/${username}/posts`,
+      /** Get user's comments */
+      getComments: (base: string, username: string) => base + `/users/${username}/comments`,
+      /** Get user's followers */
+      getFollowers: (base: string, username: string) => base + `/users/${username}/followers`,
+      /** Get user's followings */
+      getFollowings: (base: string, username: string) => base + `/users/${username}/following`,
+      /** Get user's groups */
+      getGroups: (base: string, username: string) => base + `/users/${username}/groups`
     }
   }
 };

@@ -15,3 +15,8 @@ export const getMeKey = () => ["me"];
 export const getHotUsersKey = () => ["hot-users"];
 export const getHotFeedsKey = () => ["hot-feeds"];
 export const getMyAccountKey = () => ["my-account"];
+export const getUserPostsKey = (username: string, type?: string) => ["user-posts", username, type];
+export const getUserGroupsKey = (username: string) => ["user-groups", username];
+export const getUserFollowersKey = (username: string) => ["user-followers", username];
+export const getUserFollowingKey = (username: string) => ["user-following", username];
+export const getUserCommentsKey = (username: string) => ["user-comments", username];

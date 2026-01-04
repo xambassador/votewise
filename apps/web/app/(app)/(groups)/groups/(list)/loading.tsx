@@ -1,4 +1,4 @@
-import { GroupListSkeleton } from "../_components/skeleton";
+import { GroupListSkeleton } from "@/components/group-skeleton";
 
 export default function Loading() {
   return <GroupListSkeleton />;

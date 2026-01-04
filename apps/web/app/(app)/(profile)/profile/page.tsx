@@ -2,6 +2,7 @@ import { MyProfileFetcher } from "./_components/profile-fetcher";
 import { ProfileImage } from "./_components/profile-image";
 import { ProfileInfo } from "./_components/profile-info";
 import { ProfileActivityStats, ProfileRelationStats } from "./_components/profile-stats";
+import { ProfileTabs } from "./_components/profile-tabs";
 
 export default function Page() {
   return (
@@ -20,6 +21,7 @@ export default function Page() {
             totalGroups={profile.aggregation.total_groups}
             totalVotes={profile.aggregation.total_votes}
           />
+          <ProfileTabs username={profile.user_name} isItMe />
         </div>
       )}
     </MyProfileFetcher>

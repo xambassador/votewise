@@ -7,10 +7,9 @@ import { useFetchGroups } from "@/hooks/use-fetch-groups";
 import { Error } from "@votewise/ui/error";
 
 import { GroupMolecule } from "@/components/group";
+import { GroupListSkeleton } from "@/components/group-skeleton";
 import { InView } from "@/components/in-view";
 import { LoadMoreSpinner } from "@/components/load-more-spinner";
-
-import { GroupListSkeleton } from "./skeleton";
 
 type Props = {
   groups: GetAllGroupsResponse;

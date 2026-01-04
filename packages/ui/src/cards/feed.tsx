@@ -178,7 +178,7 @@ export function VoteCount(props: VoteCountProps) {
     <span
       {...rest}
       className={cn(
-        "size-8 rounded-lg bg-nobelBlack-100 border border-nobelBlack-200 text-sm text-blue-100 flex items-center justify-center",
+        "h-8 min-w-8 w-fit px-1 rounded-lg bg-nobelBlack-100 border border-nobelBlack-200 text-sm text-blue-100 flex items-center justify-center",
         isVoted && "border-green-600 text-green-100",
         rest.className
       )}

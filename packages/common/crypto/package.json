@@ -25,11 +25,7 @@
     "clean:build": "rm -rf dist",
     "clean": "rm -rf dist node_modules"
   },
-  "dependencies": {
-    "debug": "^4.3.7"
-  },
   "devDependencies": {
-    "@types/debug": "^4",
     "@types/node": "^20.16.1",
     "tsup": "^8.2.4",
     "typescript": "^5.5.4"

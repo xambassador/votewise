@@ -2,12 +2,18 @@ import type {
   GetGroupRecommendationsResponse,
   GetMeResponse,
   GetMyAccountResponse,
+  GetUserCommentsResponse,
+  GetUserFollowersResponse,
+  GetUserFollowingsResponse,
+  GetUserGroupsResponse,
+  GetUserPostsResponse,
   GetUserProfileResponse,
   GetUserRecommendationsResponse,
   UpdateAccountResponse,
   UpdateUserProfileResponse,
   UsernameExistsResponse
 } from "@votewise/api";
+import type { TPagination } from "@votewise/schemas/pagination";
 import type { TRecommendUserQuery, TUpdateAccount, TUpdateProfile } from "@votewise/schemas/user";
 import type { BaseOptions, TClient } from "../utils";
 
@@ -69,6 +75,36 @@ export class User {
     const res = await this.client.put<UpdateAccountResponse, TUpdateAccount>(path, data);
     return res;
   }
+
+  public async getUserComments(username: string, query?: TPagination) {
+    const path = user.runtime.profile.getComments("", username);
+    const res = await this.client.get<GetUserCommentsResponse>(qs(path, query));
+    return res;
+  }
+
+  public async getUserPosts(username: string, query?: TPagination & { type?: "posts" | "voted" }) {
+    const path = user.runtime.profile.getPosts("", username);
+    const res = await this.client.get<GetUserPostsResponse>(qs(path, query));
+    return res;
+  }
+
+  public async getUserFollowers(username: string, query?: TPagination) {
+    const path = user.runtime.profile.getFollowers("", username);
+    const res = await this.client.get<GetUserFollowersResponse>(qs(path, query));
+    return res;
+  }
+
+  public async getUserFollowings(username: string, query?: TPagination) {
+    const path = user.runtime.profile.getFollowings("", username);
+    const res = await this.client.get<GetUserFollowingsResponse>(qs(path, query));
+    return res;
+  }
+
+  public async getUserGroups(username: string, query?: TPagination) {
+    const path = user.runtime.profile.getGroups("", username);
+    const res = await this.client.get<GetUserGroupsResponse>(qs(path, query));
+    return res;
+  }
 }
 
 export type {
@@ -79,5 +115,10 @@ export type {
   GetUserProfileResponse,
   UpdateUserProfileResponse,
   GetMyAccountResponse,
-  UpdateAccountResponse
+  UpdateAccountResponse,
+  GetUserCommentsResponse,
+  GetUserFollowersResponse,
+  GetUserFollowingsResponse,
+  GetUserGroupsResponse,
+  GetUserPostsResponse
 };

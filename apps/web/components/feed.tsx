@@ -102,16 +102,18 @@ export const FeedMolecule = memo(function FeedMolecule(props: Props) {
               <span className="text-gray-400 text-sm">Share</span>
             </FeedFooterItem>
           </FeedFooterActions>
-          <VotersStack className="hidden sm:flex">
-            <Voters>
-              {feed.voters.map((voter) => (
-                <FeedAvatar key={voter.id} className="size-6" name="Voter" url={voter.avatar_url || ""} />
-              ))}
-            </Voters>
-            {feed.votes - feed.voters.length > 0 && (
-              <VotersCount>+{humanizeNumber(feed.votes - feed.voters.length)}</VotersCount>
-            )}
-          </VotersStack>
+          {feed.voters.length > 0 && (
+            <VotersStack className="hidden sm:flex">
+              <Voters>
+                {feed.voters.map((voter) => (
+                  <FeedAvatar key={voter.id} className="size-6" name="Voter" url={voter.avatar_url || ""} />
+                ))}
+              </Voters>
+              {feed.votes - feed.voters.length > 0 && (
+                <VotersCount>+{humanizeNumber(feed.votes - feed.voters.length)}</VotersCount>
+              )}
+            </VotersStack>
+          )}
         </FeedFooter>
       </FeedContainer>
     </Feed>

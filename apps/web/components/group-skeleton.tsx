@@ -11,9 +11,11 @@ import {
 } from "@votewise/ui/cards/group";
 import { Skeleton } from "@votewise/ui/skeleton";
 
-export function GroupListSkeleton() {
+import { cn } from "@/lib/cn";
+
+export function GroupListSkeleton(props: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className="flex flex-col gap-4">
+    <div {...props} className={cn("flex flex-col gap-4", props.className)}>
       {Array.from({ length: PAGINATION.groups.limit }).map((_, index) => (
         <GroupCardSkeleton key={index} />
       ))}

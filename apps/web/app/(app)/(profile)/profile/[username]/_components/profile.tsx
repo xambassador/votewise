@@ -7,6 +7,7 @@ import { useFetchProfile } from "@/hooks/use-fetch-profile";
 import { Error } from "@votewise/ui/error";
 
 import { ProfileActivityStats, ProfileRelationStats } from "../../_components/profile-stats";
+import { ProfileTabs } from "../../_components/profile-tabs";
 import { ProfileImageSkeleton, ProfileInfoSkeleton } from "../../_components/skeleton";
 import { ProfileImage } from "./profile-image";
 import { ProfileInfo } from "./profile-info";
@@ -55,6 +56,7 @@ export function Profile(props: Props) {
         totalGroups={profile.aggregation.total_groups}
         totalVotes={profile.aggregation.total_votes}
       />
+      <ProfileTabs username={props.username} />
     </div>
   );
 }

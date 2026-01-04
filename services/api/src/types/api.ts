@@ -53,3 +53,8 @@ export type { RejectGroupJoinRequestResponse } from "@/core/group/reject-group-j
 export type { SearchResponse } from "@/core/search/controller";
 export type { GetHotFeedsResponse } from "@/core/trending/feed/controller";
 export type { GetHotUsersResponse } from "@/core/trending/user/controller";
+export type { GetUserCommentsResponse } from "@/core/user/profile/comments/controller";
+export type { GetUserFollowersResponse } from "@/core/user/profile/followers/controller";
+export type { GetUserFollowingsResponse } from "@/core/user/profile/following/controller";
+export type { GetUserGroupsResponse } from "@/core/user/profile/groups/controller";
+export type { GetUserPostsResponse } from "@/core/user/profile/posts/controller";
