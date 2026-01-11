@@ -33,20 +33,9 @@ export function useJoinGroupRequestNotification() {
         return {
           notifications: [
             {
-              id: data.notificationId,
-              event_type: "GROUP_JOIN_REQUEST",
-              created_at: data.createdAt,
-              content: {
-                type: "GROUP_JOIN_REQUEST",
-                avatar_url: data.avatarUrl,
-                first_name: data.firstName,
-                group_id: data.groupId,
-                group_name: data.groupName,
-                invitation_id: data.invitationId,
-                last_name: data.lastName,
-                user_id: data.userId,
-                username: data.userName
-              }
+              ...data,
+              id: data.notification_id,
+              event_type: "group_join_request"
             },
             ...old.notifications
           ]
@@ -58,19 +47,21 @@ export function useJoinGroupRequestNotification() {
         return {
           requests: [
             {
+              id: data.invitation_id,
+              sent_at: data.created_at,
+              status: data.status,
+              type: "JOIN",
               created_at: new Date().toISOString(),
               group: {
-                id: data.groupId,
-                name: data.groupName
+                id: data.group_id,
+                name: data.group_name
               },
-              id: data.invitationId,
-              sent_at: data.createdAt,
               user: {
-                id: data.userId,
-                first_name: data.firstName,
-                last_name: data.lastName,
-                username: data.userName,
-                avatar_url: data.avatarUrl ?? null
+                id: data.user_id,
+                first_name: data.first_name,
+                last_name: data.last_name,
+                username: data.user_name,
+                avatar_url: data.avatar_url ?? null
               }
             },
             ...old.requests
@@ -100,18 +91,9 @@ export function useGroupJoinNotification() {
           return {
             notifications: [
               {
+                ...data,
                 id: notificationCounter++,
-                event_type: "GROUP_JOINED",
-                created_at: data.createdAt,
-                content: {
-                  type: "GROUP_JOINED",
-                  group_id: data.groupId,
-                  avatar_url: data.avatarUrl,
-                  first_name: data.firstName,
-                  last_name: data.lastName,
-                  group_name: data.groupName,
-                  username: data.userName
-                }
+                event_type: "group_joined"
               },
               ...old.notifications
             ]
@@ -142,15 +124,31 @@ export function useGroupInviteNotification() {
               {
                 id: notificationCounter++,
                 event_type: "GROUP_INVITATION",
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error @todo - Update once event is added
                 created_at: data.createdAt,
                 content: {
                   type: "GROUP_INVITATION",
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-expect-error @todo - Update once event is added
                   group_id: data.groupId,
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-expect-error @todo - Update once event is added
                   avatar_url: data.avatarUrl,
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-expect-error @todo - Update once event is added
                   first_name: data.firstName,
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-expect-error @todo - Update once event is added
                   last_name: data.lastName,
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-expect-error @todo - Update once event is added
                   group_name: data.groupName,
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-expect-error @todo - Update once event is added
                   username: data.userName,
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-expect-error @todo - Update once event is added
                   invitation_id: data.invitationId
                 }
               },

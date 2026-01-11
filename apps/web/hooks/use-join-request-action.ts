@@ -41,13 +41,29 @@ export function useGroupJoinRequestAction(action: "accept" | "reject") {
       queryClient.setQueryData<GetAllNotificationsResponse>(notificationQueryKey, (old) => {
         if (!old) return old;
         return {
-          notifications: old.notifications.filter((n) => n.id !== variables.notificationId)
+          notifications: old.notifications.map((n) => {
+            if (n.event_type === "group_join_request") {
+              return {
+                ...n,
+                status: action === "accept" ? "ACCEPTED" : "REJECTED"
+              };
+            }
+            return n;
+          })
         } as GetAllNotificationsResponse;
       });
       queryClient.setQueryData<GetGroupJoinRequestsResponse>(groupNotificationsKey, (old) => {
         if (!old) return old;
         return {
-          requests: old.requests.filter((r) => r.id !== variables.id)
+          requests: old.requests.map((r) => {
+            if (r.id === variables.id) {
+              return {
+                ...r,
+                status: action === "accept" ? "ACCEPTED" : "REJECTED"
+              };
+            }
+            return r;
+          })
         } as GetGroupJoinRequestsResponse;
       });
 

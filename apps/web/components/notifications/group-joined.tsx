@@ -21,30 +21,24 @@ export const GroupJoinedNotification = memo(
     const { notification } = props;
     return (
       <NotificationPremitives.Notification className="items-center">
-        <Link
-          href={routes.user.profile(notification.content.username)}
-          className="focus-presets focus-primary rounded-full"
-        >
+        <Link href={routes.user.profile(notification.user_name)} className="focus-presets focus-primary rounded-full">
           <Avatar>
-            <AvatarImage
-              src={notification.content.avatar_url}
-              alt={notification.content.first_name + " " + notification.content.last_name}
-            />
-            <AvatarFallback name={notification.content.first_name + " " + notification.content.last_name} />
+            <AvatarImage src={notification.avatar_url} alt={notification.first_name + " " + notification.last_name} />
+            <AvatarFallback name={notification.first_name + " " + notification.last_name} />
           </Avatar>
         </Link>
         <NotificationPremitives.NotificationContent>
           <NotificationPremitives.NotificationHeader>
             <NotificationPremitives.NotificationMessage>
-              <Link href={routes.user.profile(notification.content.username)} className="focus-presets focus-primary">
+              <Link href={routes.user.profile(notification.user_name)} className="focus-presets focus-primary">
                 <NotificationPremitives.NotificationActor>
-                  {notification.content.first_name} {notification.content.last_name}
+                  {notification.first_name} {notification.last_name}
                 </NotificationPremitives.NotificationActor>{" "}
               </Link>
               joined{" "}
-              <Link href={routes.group.view(notification.content.group_id)} className="focus-presets focus-primary">
+              <Link href={routes.group.view(notification.group_id)} className="focus-presets focus-primary">
                 <NotificationPremitives.NotificationResource>
-                  {notification.content.group_name}!
+                  {notification.group_name}!
                 </NotificationPremitives.NotificationResource>
               </Link>
             </NotificationPremitives.NotificationMessage>

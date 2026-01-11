@@ -43,21 +43,19 @@ export function GroupJoinRequestsList(props: Props) {
         <GroupJoinRequestNotification
           key={req.id}
           notification={{
-            id: req.notification_id ?? "",
-            content: {
-              avatar_url: req.user.avatar_url ?? "",
-              user_id: req.user.id,
-              first_name: req.user.first_name,
-              last_name: req.user.last_name,
-              group_id: req.group.id,
-              group_name: req.group.name,
-              invitation_id: req.id,
-              type: "GROUP_JOIN_REQUEST",
-              username: req.user.username
-            },
+            admin_id: "",
+            group_id: req.group.id,
+            group_name: req.group.name,
+            avatar_url: req.user.avatar_url ?? "",
+            user_id: req.user.id,
+            user_name: req.user.username,
+            first_name: req.user.first_name,
+            last_name: req.user.last_name,
+            invitation_id: req.id,
+            notification_id: "",
+            status: req.status,
             created_at: req.sent_at,
-            event_type: "GROUP_JOIN_REQUEST",
-            is_read: false
+            event_type: "group_join_request"
           }}
         />
       ))}

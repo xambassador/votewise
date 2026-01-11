@@ -52,10 +52,7 @@ export class Controller {
             total_members: (data?.total_members ?? 0) + 1
           }),
           tx
-        ),
-        joinRequest?.notification_id
-          ? this.ctx.repositories.notification.deleteById(joinRequest.notification_id)
-          : Promise.resolve()
+        )
       ]);
     });
 

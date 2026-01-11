@@ -1,11 +1,5 @@
 import type { GroupMemberRole, GroupStatus } from "@votewise/prisma/client";
-import type {
-  GroupInvitationUpdate,
-  GroupUpdate,
-  NewGroup,
-  NewGroupInvitation,
-  NewGroupNotification
-} from "@votewise/prisma/db";
+import type { GroupInvitationUpdate, GroupUpdate, NewGroup, NewGroupInvitation } from "@votewise/prisma/db";
 import type { Tx } from "./transaction";
 
 import { sql } from "@votewise/prisma";
@@ -16,14 +10,12 @@ export class GroupRepository extends BaseRepository {
   private readonly dataLayer: RepositoryConfig["dataLayer"];
   public readonly groupMember: GroupMemberRepository;
   public readonly groupInvitation: GroupInvitationRepository;
-  public readonly groupNotifications: GroupNotificationsRepository;
 
   constructor(cfg: RepositoryConfig) {
     super();
     this.dataLayer = cfg.dataLayer;
     this.groupMember = new GroupMemberRepository(cfg);
     this.groupInvitation = new GroupInvitationRepository(cfg);
-    this.groupNotifications = new GroupNotificationsRepository(cfg);
   }
 
   public getGroupsById(ids: string[]) {
@@ -651,7 +643,6 @@ export class GroupInvitationRepository extends BaseRepository {
     return this.execute(async () => {
       const req = await this.dataLayer
         .selectFrom("GroupInvitation as invitation")
-        .leftJoin("GroupNotification as notification", "notification.group_invitation_id", "invitation.id")
         .where((eb) =>
           eb.and([
             eb("invitation.id", "=", id),
@@ -659,7 +650,7 @@ export class GroupInvitationRepository extends BaseRepository {
             eb("invitation.type", "=", "JOIN")
           ])
         )
-        .selectAll(["invitation", "notification"])
+        .selectAll()
         .executeTakeFirst();
       return req;
     });
@@ -682,37 +673,43 @@ export class GroupInvitationRepository extends BaseRepository {
       const groupIds = groups.map((g) => g.group_id);
 
       const invitations = await this.dataLayer
-        .selectFrom("GroupInvitation as invitation")
-        .innerJoin("User as u", "invitation.user_id", "u.id")
-        .innerJoin("Group as g", "invitation.group_id", "g.id")
-        .innerJoin("GroupNotification as gn", "gn.group_invitation_id", "invitation.id")
+        .selectFrom("Notification as n")
+        .innerJoin("GroupInvitation as gi", "n.source_id", "gi.id")
+        .innerJoin("User as u", "n.creator_id", "u.id")
+        .innerJoin("Group as g", "gi.group_id", "g.id")
         .where((eb) =>
           eb.and([
-            eb("invitation.group_id", "in", groupIds),
-            eb("invitation.status", "=", "PENDING"),
-            eb("invitation.type", "=", "JOIN")
+            eb("n.user_id", "=", userId),
+            eb("n.read_at", "is", null),
+            eb("n.source_type", "=", "GroupJoinRequest"),
+            eb("g.id", "in", groupIds)
           ])
         )
         .select([
-          "invitation.id",
-          "invitation.created_at",
-          "invitation.sent_at",
+          "n.id",
+          "n.created_at",
+          "gi.id as invitation_id",
+          "gi.type",
+          "gi.status",
+          "gi.sent_at",
           "u.id as user_id",
           "u.user_name",
           "u.first_name",
           "u.last_name",
           "u.avatar_url",
           "g.id as group_id",
-          "g.name",
-          "gn.notification_id"
+          "g.name"
         ])
-        .orderBy("created_at", "desc")
+        .orderBy("n.created_at", "desc")
+        .limit(10)
         .execute();
 
       return invitations.map((invitation) => ({
-        id: invitation.id,
+        id: invitation.invitation_id,
         created_at: invitation.created_at,
         sent_at: invitation.sent_at,
+        status: invitation.status,
+        type: invitation.type,
         user: {
           id: invitation.user_id,
           user_name: invitation.user_name,
@@ -723,30 +720,8 @@ export class GroupInvitationRepository extends BaseRepository {
         group: {
           id: invitation.group_id,
           name: invitation.name
-        },
-        groupNotification: { notification_id: invitation.notification_id }
+        }
       }));
-    });
-  }
-}
-
-export class GroupNotificationsRepository extends BaseRepository {
-  private readonly dataLayer: RepositoryConfig["dataLayer"];
-
-  constructor(cfg: RepositoryConfig) {
-    super();
-    this.dataLayer = cfg.dataLayer;
-  }
-
-  public create(data: NewGroupNotification, tx?: Tx) {
-    const db = tx ?? this.dataLayer;
-    return this.execute(async () => {
-      const notification = await db
-        .insertInto("GroupNotification")
-        .values(data)
-        .returningAll()
-        .executeTakeFirstOrThrow();
-      return notification;
     });
   }
 }

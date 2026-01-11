@@ -9,7 +9,6 @@ import type {
   GroupMemberRole,
   GroupStatus,
   GroupType,
-  NotificationType,
   PostStatus,
   PostType
 } from "./enums";
@@ -148,14 +147,6 @@ export type GroupMember = Selectable<GroupMemberTable>;
 export type NewGroupMember = Insertable<GroupMemberTable>;
 export type GroupMemberUpdate = Updateable<GroupMemberTable>;
 
-export type GroupNotificationTable = {
-  group_invitation_id: string;
-  notification_id: string;
-};
-export type GroupNotification = Selectable<GroupNotificationTable>;
-export type NewGroupNotification = Insertable<GroupNotificationTable>;
-export type GroupNotificationUpdate = Updateable<GroupNotificationTable>;
-
 export type HashTagTable = {
   id: Generated<string>;
   count: Generated<number>;
@@ -169,10 +160,11 @@ export type HashTagUpdate = Updateable<HashTagTable>;
 
 export type NotificationTable = {
   id: Generated<string>;
-  event_type: NotificationType;
-  is_read: Generated<boolean>;
-  content: unknown | null;
+  source_type: string;
+  source_id: string;
   user_id: string;
+  creator_id: string | null;
+  read_at: Timestamp | null;
   created_at: Timestamp;
   updated_at: Timestamp;
 };
@@ -384,7 +376,6 @@ export type DB = {
   GroupAggregates: GroupAggregatesTable;
   GroupInvitation: GroupInvitationTable;
   GroupMember: GroupMemberTable;
-  GroupNotification: GroupNotificationTable;
   HashTag: HashTagTable;
   Notification: NotificationTable;
   Post: PostTable;

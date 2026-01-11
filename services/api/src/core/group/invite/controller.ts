@@ -42,16 +42,16 @@ export class Controller {
     const { invitation } = await this.sendInvitation(groupId, member.id, currentUserDetails.id);
 
     const event = new EventBuilder("groupInviteNotification").setData({
-      groupId,
-      invitationId: invitation.id,
-      groupName: group.name,
-      type: "INVITE",
-      avatarUrl: this.ctx.services.bucket.generatePublicUrl(currentUserDetails.avatar_url || "", "avatar"),
-      createdAt: new Date(),
-      firstName: currentUserDetails.first_name,
-      lastName: currentUserDetails.last_name,
-      invitedUserId: member.id,
-      userName: currentUserDetails.user_name
+      group_id: groupId,
+      invitation_id: invitation.id,
+      group_name: group.name,
+      event_type: "group_invite",
+      avatar_url: this.ctx.services.bucket.generatePublicUrl(currentUserDetails.avatar_url || "", "avatar"),
+      created_at: new Date(),
+      first_name: currentUserDetails.first_name,
+      last_name: currentUserDetails.last_name,
+      invited_user_id: member.id,
+      user_name: currentUserDetails.user_name
     });
     this.ctx.eventBus.emit(event.name, event.data);
 
@@ -122,14 +122,10 @@ export class Controller {
       sent_at: new Date()
     });
     const notification = await this.ctx.repositories.notification.create({
-      event_type: "GROUP_INVITATION",
+      source_id: invitation.id,
+      source_type: "GroupJoinInvitation",
       user_id: userId,
-      content: {
-        type: "GROUP_INVITATION",
-        groupId,
-        invitationId: invitation.id,
-        userId: currentUserId
-      }
+      creator_id: currentUserId
     });
     return { invitation, notification };
   }

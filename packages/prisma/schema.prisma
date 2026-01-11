@@ -11,20 +11,6 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-generator zod {
-    provider      = "zod-prisma"
-    output        = "./zod"
-    relationModel = "default"
-}
-
-generator kysely {
-    provider           = "prisma-kysely"
-    output             = "./db"
-    fileName           = "schema.ts"
-    enumFileName       = "enums.ts"
-    exportWrappedTypes = true
-}
-
 enum Gender {
     MALE
     FEMALE
@@ -71,24 +57,7 @@ enum GroupInvitationType {
     INVITE
 }
 
-enum NotificationType {
-    PUBLIC_POST_UPVOTE
-    PUBLIC_POST_COMMENT_UPVOTE
-    PUBLIC_POST_COMMENT
-    START_FOLLOWING
-    FRIEND_REQUEST
-    FRIEND_REQUEST_ACCEPTED
-    GROUP_POST_UPVOTE
-    GROUP_POST_COMMENT_UPVOTE
-    GROUP_POST_COMMENT
-    GROUP_INVITATION
-    GROUP_INVITATION_ACCEPTED
-    GROUP_INVITATION_REJECTED
-    GROUP_JOINED
-    GROUP_JOIN_REQUEST
-    GROUP_JOIN_REQUEST_ACCEPTED
-    GROUP_JOIN_REQUEST_REJECTED
-}
+// Removed NotificationType enum - notification type is now derived from source_type
 
 enum FactorType {
     TOTP
@@ -131,23 +100,24 @@ model User {
     created_at DateTime @default(now()) @db.Timestamptz
     updated_at DateTime @updatedAt @db.Timestamptz
 
-    posts            Post[]
-    upvotes          Upvote[]
-    comments         Comment[]
-    commentUpvotes   CommentUpvote[]
-    followers        Follow[]          @relation("followers")
-    following        Follow[]          @relation("following")
-    friend1          Friend[]          @relation("user")
-    friend2          Friend[]          @relation("friend")
-    groupMembers     GroupMember[]
-    groupInvitations GroupInvitation[]
-    notification     Notification[]
-    factors          Factor[]
-    sessions         Session[]
-    refreshTokens    RefreshToken[]
-    interests        UserInterests[]
-    timelines        Timeline[]
-    userAggregates   UserAggregates?
+    posts                Post[]
+    upvotes              Upvote[]
+    comments             Comment[]
+    commentUpvotes       CommentUpvote[]
+    followers            Follow[]          @relation("followers")
+    following            Follow[]          @relation("following")
+    friend1              Friend[]          @relation("user")
+    friend2              Friend[]          @relation("friend")
+    groupMembers         GroupMember[]
+    groupInvitations     GroupInvitation[]
+    notifications        Notification[]
+    createdNotifications Notification[]    @relation("notification_creator")
+    factors              Factor[]
+    sessions             Session[]
+    refreshTokens        RefreshToken[]
+    interests            UserInterests[]
+    timelines            Timeline[]
+    userAggregates       UserAggregates?
 }
 
 model Factor {
@@ -410,34 +380,27 @@ model GroupInvitation {
     created_at DateTime @default(now()) @db.Timestamptz
     updated_at DateTime @updatedAt @db.Timestamptz
 
-    groupNotification GroupNotification?
-
     @@unique([user_id, group_id])
 }
 
-model GroupNotification {
-    group_invitation_id String          @unique
-    group_invitation    GroupInvitation @relation(fields: [group_invitation_id], references: [id], onDelete: Cascade)
-
-    notification_id String       @unique
-    notification    Notification @relation(fields: [notification_id], references: [id], onDelete: Cascade)
-}
-
 model Notification {
-    id         String           @id @default(cuid())
-    event_type NotificationType
-    is_read    Boolean          @default(false)
-    content    Json?
+    id          String @id @default(cuid())
+    source_type String
+    source_id   String
 
     user_id String
     user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-    created_at DateTime @default(now()) @db.Timestamptz
-    updated_at DateTime @updatedAt @db.Timestamptz
+    creator_id String?
+    creator    User?   @relation("notification_creator", fields: [creator_id], references: [id], onDelete: Cascade)
 
-    groupNotification GroupNotification?
+    read_at    DateTime?
+    created_at DateTime  @default(now()) @db.Timestamptz
+    updated_at DateTime  @updatedAt @db.Timestamptz
 
-    @@index([user_id], name: "user_notification_index")
+    @@index([user_id, read_at, created_at(sort: Desc)], name: "user_notifications_index")
+    @@index([source_type, source_id], name: "notification_source_index")
+    @@index([creator_id], name: "notification_creator_index")
 }
 
 model RefreshToken {

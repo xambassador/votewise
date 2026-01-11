@@ -1,25 +1,12 @@
 import type { AppContext } from "@/context";
 import type { ExtractControllerResponse } from "@/types";
-import type { NotificationType } from "@votewise/prisma/client";
-import type { NotificationContentSerialized } from "@votewise/types";
+import type { Group, GroupInvitation } from "@votewise/prisma/db";
+import type { GroupJoinPayload, GroupJoinRequestPayload } from "@votewise/types";
 import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
-import { notificationBuilder, ZNotification } from "@/lib/notification-builder";
 import { getAuthenticateLocals } from "@/utils/locals";
-
-// The same type is declared in notification-builder.ts
-// but we cannot import it here or create a new type from notificationBuilder
-// because if we do then in @votewise/client/notification, the getAll method
-// start complaining about `cannot be named without a reference to notificationBuilder`
-type Notification = {
-  id: string;
-  content: NotificationContentSerialized;
-  is_read: boolean;
-  event_type: NotificationType;
-  created_at: Date;
-};
 
 export class Controller {
   private readonly ctx: AppContext;
@@ -31,36 +18,65 @@ export class Controller {
   public async handle(_: Request, res: Response) {
     const locals = getAuthenticateLocals(res);
     const currentUserId = locals.payload.sub;
-    const unknownNotifications = await this.ctx.repositories.notification.findByUserId(currentUserId);
-    const notificationsResult = unknownNotifications
-      .map((notification) => {
-        const content = ZNotification.safeParse(notification.content);
-        if (!content.success) return null;
+    const skeleton = await this.ctx.repositories.notification.findByUserId(currentUserId);
+    const notificationPromises = skeleton.map(async (s) => {
+      if (s.source_type === "GroupJoin") {
+        const groups = await this.ctx.repositories.notification.buildNotificationFromSource<Group>(
+          "Group",
+          s.source_id!
+        );
+        const group = groups[0];
+        if (!group) return null;
         return {
-          id: notification.id,
-          is_read: notification.is_read,
-          event_type: notification.event_type,
-          content: content.data,
-          created_at: notification.created_at
-        };
-      })
-      .filter((notification) => notification !== null);
+          admin_id: group.id, // @todo
+          group_id: group.id,
+          group_name: group.name,
+          created_at: s.created_at,
+          event_type: "group_joined",
+          user_name: s.user_name,
+          first_name: s.first_name,
+          last_name: s.last_name,
+          avatar_url: this.ctx.services.bucket.generatePublicUrl(s.avatar_url || "", "avatar"),
+          notification_id: s.id
+        } as GroupJoinPayload;
+      }
 
-    const notifications: Notification[] = [];
+      if (s.source_type === "GroupJoinRequest") {
+        const groupInvitations = await this.ctx.repositories.notification.buildNotificationFromSource<GroupInvitation>(
+          "GroupInvitation",
+          s.source_id!
+        );
+        const groupInvitation = groupInvitations[0];
+        if (!groupInvitation) return null;
+        const groups = await this.ctx.repositories.notification.buildNotificationFromSource<Group>(
+          "Group",
+          groupInvitation.group_id
+        );
+        const group = groups[0];
+        if (!group) return null;
+        return {
+          admin_id: groupInvitation.user_id, // @todo
+          group_id: group.id,
+          group_name: group.name,
+          avatar_url: this.ctx.services.bucket.generatePublicUrl(s.avatar_url || "", "avatar"),
+          first_name: s.first_name,
+          last_name: s.last_name,
+          user_name: s.user_name,
+          event_type: "group_join_request",
+          created_at: s.created_at,
+          notification_id: s.id,
+          invitation_id: groupInvitation.id,
+          user_id: groupInvitation.user_id,
+          status: groupInvitation.status
+        } as GroupJoinRequestPayload;
+      }
 
-    const builder = notificationBuilder({
-      bucketService: this.ctx.services.bucket,
-      groupRepository: this.ctx.repositories.group,
-      userRepository: this.ctx.repositories.user
+      return null;
     });
 
-    for (const unHydratedNotification of notificationsResult) {
-      const notification = await builder.getNotification(unHydratedNotification);
-      if (!notification) continue;
-      notifications.push(notification);
-    }
+    const notifications = await Promise.all(notificationPromises);
 
-    const result = { notifications };
+    const result = { notifications: notifications.filter((n) => n !== null) };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 }

@@ -1,12 +1,9 @@
-import type { NotificationContent } from "@/lib/notification-builder";
 import type { NewNotification } from "@votewise/prisma/db";
 import type { Tx } from "./transaction";
 
-import { BaseRepository } from "./base.repository";
+import { sql } from "@votewise/prisma";
 
-type TCreate = Omit<NewNotification, "content"> & {
-  content: NotificationContent;
-};
+import { BaseRepository } from "./base.repository";
 
 export class NotificationRepository extends BaseRepository {
   private readonly dataLayer: RepositoryConfig["dataLayer"];
@@ -16,7 +13,7 @@ export class NotificationRepository extends BaseRepository {
     this.dataLayer = cfg.dataLayer;
   }
 
-  public create(data: TCreate, tx?: Tx) {
+  public create(data: NewNotification, tx?: Tx) {
     const db = tx ?? this.dataLayer;
     return this.execute(async () => {
       const notification = await db
@@ -32,8 +29,20 @@ export class NotificationRepository extends BaseRepository {
     return this.execute(async () => {
       const notifications = await this.dataLayer
         .selectFrom("Notification")
-        .where((eb) => eb.and([eb("user_id", "=", userId), eb("is_read", "=", false)]))
-        .selectAll()
+        .rightJoin("User", "Notification.creator_id", "User.id")
+        .where((eb) => eb.and([eb("user_id", "=", userId)]))
+        .select([
+          "Notification.id",
+          "Notification.created_at",
+          "Notification.read_at",
+          "Notification.source_type",
+          "Notification.source_id",
+          "Notification.creator_id",
+          "User.first_name",
+          "User.last_name",
+          "User.user_name",
+          "User.avatar_url"
+        ])
         .orderBy("created_at", "desc")
         .limit(10)
         .execute();
@@ -57,7 +66,7 @@ export class NotificationRepository extends BaseRepository {
     return this.execute(async () => {
       const notification = await db
         .updateTable("Notification")
-        .set({ is_read: true })
+        .set({ read_at: new Date(), updated_at: new Date() })
         .where("id", "=", id)
         .returningAll()
         .executeTakeFirstOrThrow();
@@ -69,6 +78,14 @@ export class NotificationRepository extends BaseRepository {
     const db = (tx ?? this.dataLayer) as Tx;
     return this.execute(async () => {
       db.deleteFrom("Notification").where("id", "=", id).execute();
+    });
+  }
+
+  public async buildNotificationFromSource<T>(tableName: string, sourceId: string) {
+    const db = this.dataLayer;
+    return this.execute(async () => {
+      const res = await sql<T>`SELECT * FROM ${sql.table(tableName)} WHERE id = ${sourceId}`.execute(db);
+      return res.rows;
     });
   }
 }

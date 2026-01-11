@@ -2,48 +2,50 @@
 // They represent the data that will be sent over WebSocket events
 
 export type GroupJoinRequestPayload = {
-  adminId: string;
-  groupName: string;
-  groupId: string;
-  createdAt: Date;
-  type: "JOIN";
-  userName: string;
-  firstName: string;
-  lastName: string;
-  avatarUrl: string;
-  invitationId: string;
-  userId: string;
-  notificationId: string;
+  admin_id: string;
+  group_name: string;
+  group_id: string;
+  created_at: Date;
+  event_type: "group_join_request";
+  user_name: string;
+  first_name: string;
+  last_name: string;
+  avatar_url: string;
+  invitation_id: string;
+  user_id: string;
+  notification_id: string;
+  status: "PENDING" | "ACCEPTED" | "REJECTED";
 };
 
 export type GroupJoinPayload = {
-  adminId: string;
-  groupName: string;
-  groupId: string;
-  createdAt: Date;
-  type: "JOIN";
-  userName: string;
-  firstName: string;
-  lastName: string;
-  avatarUrl: string;
+  admin_id: string;
+  group_name: string;
+  group_id: string;
+  created_at: Date;
+  event_type: "group_joined";
+  user_name: string;
+  first_name: string;
+  last_name: string;
+  avatar_url: string;
+  notification_id: string;
 };
 
 export type GroupInviteNotificationPayload = {
-  invitedUserId: string;
-  groupName: string;
-  groupId: string;
-  createdAt: Date;
-  type: "INVITE";
-  userName: string;
-  firstName: string;
-  lastName: string;
-  avatarUrl: string;
-  invitationId: string;
+  invited_user_id: string;
+  group_name: string;
+  group_id: string;
+  created_at: Date;
+  event_type: "group_invite";
+  user_name: string;
+  first_name: string;
+  last_name: string;
+  avatar_url: string;
+  invitation_id: string;
 };
 
 export type NotificationCountPayload = {
   count: number;
-  userId: string;
+  user_id: string;
 };
 
 export type Events = {

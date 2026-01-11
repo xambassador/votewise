@@ -47,12 +47,12 @@ export function NotificationList(props: Props) {
       )}
 
       {data.notifications.map((notification) => {
-        if (notification.event_type === "GROUP_JOIN_REQUEST") {
-          return <GroupJoinRequestNotification key={notification.id} notification={notification} />;
+        if (notification.event_type === "group_join_request") {
+          return <GroupJoinRequestNotification key={notification.notification_id} notification={notification} />;
         }
 
-        if (notification.event_type === "GROUP_JOINED") {
-          return <GroupJoinedNotification key={notification.id} notification={notification} />;
+        if (notification.event_type === "group_joined") {
+          return <GroupJoinedNotification key={notification.notification_id} notification={notification} />;
         }
 
         return null;

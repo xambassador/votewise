@@ -35,46 +35,46 @@ export class PublicGroupStrategy extends Strategy {
   public override async handle(data: { group: Group; groupId: string; currentUserId: string }): Promise<Result> {
     const admin = await this.getAdmin(data.groupId);
     const user = await this.getUser(data.currentUserId);
-    const { member } = await this.ctx.repositories.transactionManager.withDataLayerTransaction(async (tx) => {
-      const memberPromise = this.ctx.repositories.group.groupMember.addMember(
-        data.groupId,
-        data.currentUserId,
-        "MEMBER",
-        tx
-      );
-      const notificationPromise = this.ctx.repositories.notification.create(
-        {
-          event_type: "GROUP_JOINED",
-          user_id: admin.user_id,
-          content: {
-            type: "GROUP_JOINED",
-            joinedUserId: user.id,
-            groupId: data.groupId
-          }
-        },
-        tx
-      );
-      const aggregatePromise = this.ctx.repositories.aggregator.groupAggregator.aggregate(
-        data.groupId,
-        (data) => ({
-          ...data,
-          total_members: (data?.total_members ?? 0) + 1
-        }),
-        tx
-      );
-      const [member] = await Promise.all([memberPromise, notificationPromise, aggregatePromise]);
-      return { member };
-    });
+    const { member, notification } = await this.ctx.repositories.transactionManager.withDataLayerTransaction(
+      async (tx) => {
+        const memberPromise = this.ctx.repositories.group.groupMember.addMember(
+          data.groupId,
+          data.currentUserId,
+          "MEMBER",
+          tx
+        );
+        const notificationPromise = this.ctx.repositories.notification.create(
+          {
+            source_id: data.groupId,
+            source_type: "GroupJoin",
+            user_id: admin.user_id,
+            creator_id: data.currentUserId
+          },
+          tx
+        );
+        const aggregatePromise = this.ctx.repositories.aggregator.groupAggregator.aggregate(
+          data.groupId,
+          (data) => ({
+            ...data,
+            total_members: (data?.total_members ?? 0) + 1
+          }),
+          tx
+        );
+        const [member, notification] = await Promise.all([memberPromise, notificationPromise, aggregatePromise]);
+        return { member, notification };
+      }
+    );
     const event = new EventBuilder("groupJoinNotification").setData({
-      adminId: admin.user_id,
-      avatarUrl: this.ctx.services.bucket.generatePublicUrl(user.avatar_url ?? "", "avatar"),
-      firstName: user.first_name,
-      lastName: user.last_name,
-      groupName: data.group.name,
-      type: "JOIN",
-      userName: user.user_name,
-      createdAt: new Date(),
-      groupId: data.groupId
+      admin_id: admin.user_id,
+      avatar_url: this.ctx.services.bucket.generatePublicUrl(user.avatar_url ?? "", "avatar"),
+      first_name: user.first_name,
+      last_name: user.last_name,
+      group_name: data.group.name,
+      event_type: "group_joined",
+      user_name: user.user_name,
+      created_at: new Date(),
+      group_id: data.groupId,
+      notification_id: notification.id
     });
     this.ctx.eventBus.emit(event.name, event.data);
     return { id: member.id };
@@ -109,37 +109,30 @@ export class PrivateGroupStrategy extends Strategy {
         );
         const notification = await this.ctx.repositories.notification.create(
           {
-            event_type: "GROUP_JOIN_REQUEST",
+            source_id: invitation.id,
+            source_type: "GroupJoinRequest",
             user_id: admin.user_id,
-            content: {
-              type: "GROUP_JOIN_REQUEST",
-              groupId: data.groupId,
-              invitationId: invitation.id,
-              userId: user.id
-            }
+            creator_id: data.currentUserId
           },
-          tx
-        );
-        await this.ctx.repositories.group.groupNotifications.create(
-          { group_invitation_id: invitation.id, notification_id: notification.id },
           tx
         );
         return { invitation, notification };
       }
     );
     const event = new EventBuilder("groupJoinRequestNotification").setData({
-      adminId: admin.user_id,
-      avatarUrl: this.ctx.services.bucket.generatePublicUrl(user.avatar_url ?? "", "avatar"),
-      createdAt: sentAt,
-      firstName: user.first_name,
-      lastName: user.last_name,
-      groupName: data.group.name,
-      type: "JOIN",
-      userName: user.user_name,
-      groupId: data.groupId,
-      invitationId: invitation.id,
-      userId: user.id,
-      notificationId: notification.id
+      admin_id: admin.user_id,
+      avatar_url: this.ctx.services.bucket.generatePublicUrl(user.avatar_url ?? "", "avatar"),
+      created_at: sentAt,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      group_name: data.group.name,
+      event_type: "group_join_request",
+      user_name: user.user_name,
+      group_id: data.groupId,
+      invitation_id: invitation.id,
+      user_id: user.id,
+      notification_id: notification.id,
+      status: invitation.status
     });
     this.ctx.eventBus.emit(event.name, event.data);
     return { id: "PENDING" };

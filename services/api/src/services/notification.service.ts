@@ -23,23 +23,23 @@ export class NotificationService {
 
   private listenForGroupEvents() {
     this.eventBus.on("groupJoinRequestNotification", (data) => {
-      const event = new EventBuilder("groupJoinRequestNotification").setData(data).serialize(["adminId"]);
-      this.sendNotificationToClient(data.adminId, event);
+      const event = new EventBuilder("groupJoinRequestNotification").setData(data).serialize(["admin_id"]);
+      this.sendNotificationToClient(data.admin_id, event);
     });
 
     this.eventBus.on("groupJoinNotification", (data) => {
-      const event = new EventBuilder("groupJoinNotification").setData(data).serialize(["adminId"]);
-      this.sendNotificationToClient(data.adminId, event);
+      const event = new EventBuilder("groupJoinNotification").setData(data).serialize(["admin_id"]);
+      this.sendNotificationToClient(data.admin_id, event);
     });
 
     this.eventBus.on("groupInviteNotification", (data) => {
       const event = new EventBuilder("groupInviteNotification").setData(data).serialize();
-      this.sendNotificationToClient(data.invitedUserId, event);
+      this.sendNotificationToClient(data.invited_user_id, event);
     });
 
     this.eventBus.on("notificationCount", (data) => {
       const event = new EventBuilder("notificationCount").setData(data).serialize();
-      this.sendNotificationToClient(data.userId, event);
+      this.sendNotificationToClient(data.user_id, event);
     });
   }
 
@@ -48,7 +48,7 @@ export class NotificationService {
     if (!sockets) return;
     const totalNotifications = sockets.notifications + 1;
     const countEvent = new EventBuilder("notificationCount")
-      .setData({ userId: clientId, count: totalNotifications })
+      .setData({ user_id: clientId, count: totalNotifications })
       .serialize();
     sockets.sessions.forEach((client) => {
       if (client.ws.readyState === Websocket.OPEN) {
