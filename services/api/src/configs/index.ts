@@ -73,6 +73,7 @@ export class ServerConfig {
   public headersTimeout?: number = 61 * Millisecond;
   public requestTimeout?: number = 30 * Millisecond;
   public serverTimeout?: number = 30 * Millisecond;
+  public isSandboxMode: boolean = false;
 
   constructor(cfg: ServerConfig) {
     this.port = cfg.port;
@@ -97,6 +98,7 @@ export class ServerConfig {
     this.headersTimeout = cfg.headersTimeout ?? this.headersTimeout;
     this.requestTimeout = cfg.requestTimeout ?? this.requestTimeout;
     this.serverTimeout = cfg.serverTimeout ?? this.serverTimeout;
+    this.isSandboxMode = cfg.isSandboxMode ?? this.isSandboxMode;
   }
 }
 

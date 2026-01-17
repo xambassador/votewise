@@ -24,7 +24,8 @@ const cfg = new ServerConfig({
   appName: environment.APP_NAME,
   avatarsBucket: environment.AVATAR_BUCKET_NAME,
   backgroundsBucket: environment.BACKGROUND_BUCKET_NAME,
-  uploadBucket: environment.UPLOAD_BUCKET_NAME
+  uploadBucket: environment.UPLOAD_BUCKET_NAME,
+  isSandboxMode: environment.IS_SANDBOX
 });
 const secrets = new ServerSecrets({
   cronSecret: environment.CRON_SECRET,
