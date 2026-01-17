@@ -34,6 +34,10 @@ export class HotViewsRepository extends BaseRepository {
         .execute();
 
       const feedIds = hotFeeds.map((feed) => feed.post_id);
+      if (!feedIds.length) {
+        return [];
+      }
+
       const feedsQuery = this.dataLayer
         .selectFrom("Post as p")
         .innerJoin("User as author", "author.id", "p.author_id")
@@ -133,6 +137,10 @@ export class HotViewsRepository extends BaseRepository {
         .execute();
 
       const userIds = hotUsers.map((user) => user.user_id);
+      if (!userIds.length) {
+        return [];
+      }
+
       const usersQuery = this.dataLayer.selectFrom("User").selectAll().where("id", "in", userIds);
       const aggregatesQuery = this.dataLayer.selectFrom("UserAggregates").selectAll().where("user_id", "in", userIds);
       const userInterestsQuery = this.dataLayer

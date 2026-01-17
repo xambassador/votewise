@@ -494,6 +494,7 @@ export class UserRepository extends BaseRepository {
           "p.slug as post_slug"
         ])
         .where("c.user_id", "=", user.id)
+        .where("c.parent_id", "is", null)
         .orderBy("c.created_at", "desc")
         .limit(limit)
         .offset(offset)
