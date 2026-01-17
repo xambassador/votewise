@@ -3,6 +3,7 @@
 import { isServer, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { domAnimation, LazyMotion } from "framer-motion";
+import { Provider } from "jotai";
 
 import { Realtime } from "./realtime";
 
@@ -27,9 +28,11 @@ export default function Providers(props: Props) {
   const queryClient = getQueryClient();
   return (
     <QueryClientProvider client={queryClient}>
-      <LazyMotion strict features={domAnimation}>
-        <Realtime>{children}</Realtime>
-      </LazyMotion>
+      <Provider>
+        <LazyMotion strict features={domAnimation}>
+          <Realtime>{children}</Realtime>
+        </LazyMotion>
+      </Provider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
