@@ -7,9 +7,10 @@ type Storage = {
   remove: (key: string) => void;
 };
 type ClientOptions = {
-  url: string;
+  url?: string;
   headers?: Record<string, string>;
   storage?: Storage;
+  isSandbox?: boolean;
 };
 
 const DEFAULT_OPTIONS: ClientOptions = {
@@ -21,11 +22,14 @@ const DEFAULT_OPTIONS: ClientOptions = {
   }
 };
 
+const SANDBOX_MSG = "This action is not allowed in sandbox mode.";
+
 export class Client {
   public readonly url: string;
   public readonly headers?: Record<string, string>;
   public readonly fetch: Fetch = fetch;
   private storage?: Storage;
+  private readonly isSandbox: boolean = false;
 
   constructor(opts?: ClientOptions) {
     const settings = { ...DEFAULT_OPTIONS, ...opts };
@@ -40,6 +44,7 @@ export class Client {
     if (typeof window !== "undefined") {
       this.fetch = window.fetch.bind(window);
     }
+    this.isSandbox = opts?.isSandbox ?? false;
   }
 
   private async _fetch<T>(url: string, options: RequestInit): Promise<FetchResult<T>> {
@@ -109,15 +114,15 @@ export class Client {
   }
 
   public async post<T, B extends object>(url: string, body: B, options?: RequestInit): Promise<FetchResult<T>> {
-    return this._fetch<T>(url, { method: "POST", body: JSON.stringify(body), ...options });
+    return this.withSandboxCheck(() => this._fetch<T>(url, { method: "POST", body: JSON.stringify(body), ...options }));
   }
 
   public async put<T, B extends object>(url: string, body: B, options?: RequestInit): Promise<FetchResult<T>> {
-    return this._fetch<T>(url, { method: "PUT", body: JSON.stringify(body), ...options });
+    return this.withSandboxCheck(() => this._fetch<T>(url, { method: "PUT", body: JSON.stringify(body), ...options }));
   }
 
   public async delete<T>(url: string, options?: RequestInit): Promise<FetchResult<T>> {
-    return this._fetch<T>(url, { method: "DELETE", ...options });
+    return this.withSandboxCheck(() => this._fetch<T>(url, { method: "DELETE", ...options }));
   }
 
   public async deleteWithBody<T, B extends object>(
@@ -125,11 +130,15 @@ export class Client {
     body: B,
     options?: RequestInit
   ): Promise<FetchResult<T>> {
-    return this._fetch<T>(url, { method: "DELETE", body: JSON.stringify(body), ...options });
+    return this.withSandboxCheck(() =>
+      this._fetch<T>(url, { method: "DELETE", body: JSON.stringify(body), ...options })
+    );
   }
 
   public async patch<T, B extends object>(url: string, body: B, options?: RequestInit): Promise<FetchResult<T>> {
-    return this._fetch<T>(url, { method: "PATCH", body: JSON.stringify(body), ...options });
+    return this.withSandboxCheck(() =>
+      this._fetch<T>(url, { method: "PATCH", body: JSON.stringify(body), ...options })
+    );
   }
 
   public async head<T>(url: string, options?: RequestInit): Promise<FetchResult<T>> {
@@ -184,5 +193,24 @@ export class Client {
 
   public setStorage(storage: Storage) {
     this.storage = storage;
+  }
+
+  private async withSandboxCheck<T>(fn: () => Promise<FetchResult<T>>): Promise<FetchResult<T>> {
+    if (this.isSandbox) {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 500);
+      });
+      return {
+        success: false,
+        error: SANDBOX_MSG,
+        errorData: {
+          status_code: 403,
+          message: SANDBOX_MSG,
+          name: "SandboxError"
+        },
+        status: 403
+      } as unknown as Promise<FetchResult<T>>;
+    }
+    return fn();
   }
 }
