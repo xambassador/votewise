@@ -7,6 +7,8 @@ import { Toaster } from "@votewise/ui/toast";
 
 import "@/styles/globals.css";
 
+import { environment } from "@votewise/env";
+
 import Providers from "@/components/providers";
 
 /* ----------------------------------------------------------------------------------------------- */
@@ -31,6 +33,15 @@ export default function RootLayout(props: Props) {
       <body className={inter.className + " bg-nobelBlack-50 text-gray-200"}>
         <Toaster />
         <Providers>{props.children}</Providers>
+        {environment.IS_SANDBOX && (
+          <div
+            className="p-4 w-full text-sm text-gray-400 rounded-lg bg-nobelBlack-100 border border-nobelBlack-200 fixed bottom-0 inset-x-0 text-center"
+            role="alert"
+          >
+            This is a sandbox environment. Data may be periodically reset and any actions performed here will not affect
+            the system.
+          </div>
+        )}
       </body>
     </html>
   );

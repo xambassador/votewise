@@ -10,6 +10,7 @@ import { PAGINATION } from "@votewise/constant";
 
 import { commentClient } from "@/lib/client";
 import { getRepliesKey } from "@/lib/constants";
+import { assertResponse } from "@/lib/error";
 
 // TODO:
 // We have button component, so we can remove all
@@ -31,13 +32,7 @@ export function useFetchReplies(options: Opts) {
   const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: getRepliesKey(feedId, parentId),
-    queryFn: async () => {
-      const replies = await commentClient.getReplies(feedId, parentId);
-      if (!replies.success) {
-        throw new Error(replies.error);
-      }
-      return replies.data;
-    },
+    queryFn: async () => assertResponse(await commentClient.getReplies(feedId, parentId)),
     initialData,
     refetchOnWindowFocus: false
   });

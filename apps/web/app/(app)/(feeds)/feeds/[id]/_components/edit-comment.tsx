@@ -5,7 +5,6 @@ import { useEditComment } from "@/hooks/use-edit-comment";
 
 import { CommentEditButton, CommentEditInput, useComment } from "@votewise/ui/cards/comment";
 import { Spinner } from "@votewise/ui/ring-spinner";
-import { makeToast } from "@votewise/ui/toast";
 
 import { useMe } from "@/components/user-provider";
 
@@ -27,11 +26,11 @@ export function EditComment(props: Props) {
   return <CommentEditInput {...getInputProps({ disableFocusIndicator: true })} />;
 }
 
-export function EditCommentButton(props: { authorId: string }) {
-  const { authorId } = props;
+export function EditCommentButton(props: React.ComponentProps<typeof CommentEditButton> & { authorId: string }) {
+  const { authorId, ...rest } = props;
   const { id } = useMe("EditButton");
   if (id !== authorId) return null;
-  return <CommentEditButton />;
+  return <CommentEditButton {...rest} />;
 }
 
 function useUpdateComment(props: Props) {
@@ -57,10 +56,7 @@ function useUpdateComment(props: Props) {
       return;
     }
 
-    mutation.mutate(
-      { text: value },
-      { onError: (err) => makeToast.error("Oops! Failed to create comment.", err.message) }
-    );
+    mutation.mutate({ text: value });
     toggle?.(true);
   }
 

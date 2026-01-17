@@ -8,6 +8,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { trendingClient } from "@/lib/client";
 import { getHotFeedsKey } from "@/lib/constants";
+import { assertResponse } from "@/lib/error";
 
 type Props = {
   initialData?: GetHotFeedsResponse;
@@ -19,13 +20,7 @@ export function useFetchHotFeeds(props?: Props) {
   const queryKey = getHotFeedsKey();
   const query = useQuery({
     queryKey,
-    queryFn: async () => {
-      const res = await trendingClient.getFeeds();
-      if (!res.success) {
-        throw new Error(res.error);
-      }
-      return res.data;
-    },
+    queryFn: async () => assertResponse(await trendingClient.getFeeds()),
     initialData: props?.initialData
   });
 

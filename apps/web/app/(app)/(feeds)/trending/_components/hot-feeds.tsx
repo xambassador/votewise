@@ -34,13 +34,16 @@ export function HotFeeds(props: Props) {
 
   return (
     <div className="space-y-4">
+      {data.feeds.length === 0 && <p className="text-center text-sm text-gray-500">No trending posts found.</p>}
       {data.feeds.map((feed) => (
         <FeedMolecule key={feed.id} data={feed} />
       ))}
-      <Button variant="secondary" className="w-full" onClick={onLoadMore} loading={nextPageStatus === "loading"}>
-        Load more trending posts
-        <ChevronDownTiny />
-      </Button>
+      {data.pagination.cursor && (
+        <Button variant="secondary" className="w-full" onClick={onLoadMore} loading={nextPageStatus === "loading"}>
+          Load more trending posts
+          <ChevronDownTiny />
+        </Button>
+      )}
     </div>
   );
 }

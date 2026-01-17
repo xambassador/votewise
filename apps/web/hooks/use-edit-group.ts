@@ -10,7 +10,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { ZGroupUpdate } from "@votewise/schemas/group";
 import { useForm } from "@votewise/ui/form";
-import { makeToast } from "@votewise/ui/toast";
 
 import { chain } from "@/lib/chain";
 
@@ -64,15 +63,7 @@ export function useEditGroup(props: DialogProps & { group: TGroupUpdate & { id: 
   }
 
   const onSubmit = form.handleSubmit((data) => {
-    mutation.mutate(
-      { ...data, id: props.group.id },
-      {
-        onSuccess: () => setOpen(false),
-        onError: (error) => {
-          makeToast.error("Oops!", error.message);
-        }
-      }
-    );
+    mutation.mutate({ ...data, id: props.group.id }, { onSuccess: () => setOpen(false) });
   });
 
   function getButtonProps(props?: ButtonProps): ButtonProps {

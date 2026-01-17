@@ -15,12 +15,12 @@ import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useMediaQuery } from "react-responsive";
 
 import { useComboBoxTrigger } from "@votewise/ui/combobox";
-import { makeToast } from "@votewise/ui/toast";
 
 import { chain } from "@/lib/chain";
 import { feedClient, onboardClient, uploadClient } from "@/lib/client";
 import { cn } from "@/lib/cn";
 import { getGroupFeedsKey } from "@/lib/constants";
+import { renderErrorToast } from "@/lib/error";
 import { useActiveGroup } from "@/lib/global-store";
 
 /* ----------------------------------------------------------------------------------------------- */
@@ -223,8 +223,18 @@ export function useSubmit() {
       assets: urls.map((url) => ({ url, type: "image" })),
       group_id: group?.id
     });
+
+    const reset = () => {
+      setPostContent("");
+      setTitle("");
+      setTopics([]);
+      setFiles([]);
+      setStatus("idle");
+      setCreatePostDialogOpen(false);
+    };
+
     if (!res.success) {
-      makeToast.error("Oops! Failed to create post.", res.error);
+      renderErrorToast(res, { onSandboxError: reset });
       setStatus("error");
       return;
     }
@@ -234,10 +244,7 @@ export function useSubmit() {
     }
 
     setStatus("success");
-    setPostContent("");
-    setTitle("");
-    setTopics([]);
-    setFiles([]);
+    reset();
     setCreatePostDialogOpen(false);
   }
 

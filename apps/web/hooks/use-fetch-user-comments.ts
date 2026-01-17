@@ -8,6 +8,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { userClient } from "@/lib/client";
 import { getUserCommentsKey } from "@/lib/constants";
+import { assertResponse } from "@/lib/error";
 
 export function useFetchUserComments(props: { username: string }) {
   const [nextPageStatus, setNextPageStatus] = useState<AsyncState>("idle");
@@ -15,13 +16,7 @@ export function useFetchUserComments(props: { username: string }) {
   const queryKey = getUserCommentsKey(props.username);
   const query = useQuery({
     queryKey,
-    queryFn: async () => {
-      const res = await userClient.getUserComments(props.username);
-      if (!res.success) {
-        throw new Error(res.error);
-      }
-      return res.data;
-    },
+    queryFn: async () => assertResponse(await userClient.getUserComments(props.username)),
     refetchOnWindowFocus: false
   });
 

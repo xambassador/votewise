@@ -8,6 +8,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { feedClient } from "@/lib/client";
 import { getFeedsKey } from "@/lib/constants";
+import { assertResponse } from "@/lib/error";
 
 type Params = {
   initialData?: GetAllFeedsResponse;
@@ -20,13 +21,7 @@ export function useFetchFeeds(params: Params) {
   const query = useQuery({
     initialData: params.initialData,
     queryKey,
-    queryFn: async () => {
-      const res = await feedClient.getAll();
-      if (!res.success) {
-        throw new Error(res.error);
-      }
-      return res.data;
-    },
+    queryFn: async () => assertResponse(await feedClient.getAll()),
     refetchOnWindowFocus: false
   });
 

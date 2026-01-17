@@ -10,6 +10,7 @@ import { PAGINATION } from "@votewise/constant";
 
 import { groupClient } from "@/lib/client";
 import { getGroupsKey } from "@/lib/constants";
+import { assertResponse } from "@/lib/error";
 
 type Params = {
   initialData?: GetAllGroupsResponse;
@@ -22,13 +23,7 @@ export function useFetchGroups(params: Params) {
   const query = useQuery({
     initialData: params.initialData,
     queryKey,
-    queryFn: async () => {
-      const res = await groupClient.getAll();
-      if (!res.success) {
-        throw new Error(res.error);
-      }
-      return res.data;
-    }
+    queryFn: async () => assertResponse(await groupClient.getAll())
   });
 
   async function fetchNextPage(page: number) {

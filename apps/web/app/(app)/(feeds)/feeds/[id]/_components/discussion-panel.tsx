@@ -1,5 +1,6 @@
 "use client";
 
+import type { Comments as TComments } from "@/types";
 import type { GetCommentsResponse } from "@votewise/client/comment";
 
 import { memo, useMemo, useState } from "react";
@@ -69,7 +70,7 @@ export function DiscussionPanel(props: Props) {
 
   if (!data) return noDataElement;
 
-  const comments = data.comments;
+  const comments = data.comments as TComments; // So I can use is_optimistic happily
 
   return (
     <Comments>
@@ -90,6 +91,7 @@ export function DiscussionPanel(props: Props) {
             userName={comment.user.user_name}
             isEdited={comment.is_edited}
             shouldReply
+            isOptimistic={comment.is_optimistic}
           >
             <Replies
               pagination={comment.pagination}
@@ -170,6 +172,7 @@ type MemoizedCommentProps = {
   children?: React.ReactNode;
   isEdited?: boolean;
   parentId?: string;
+  isOptimistic?: boolean;
 };
 
 const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
@@ -186,13 +189,14 @@ const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
     userName,
     isEdited,
     shouldReply,
-    parentId
+    parentId,
+    isOptimistic = false
   } = props;
   const { id } = useMe("MemoizedComment");
   const [showReplies, setShowReplies] = useState(true);
 
   return (
-    <Comment>
+    <Comment className={cn(isOptimistic ? "opacity-60" : "")}>
       {parentId && <ReplyConnector />}
       <Link
         href={routes.user.profile(userName)}
@@ -229,9 +233,15 @@ const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
             reply to a comment 😛
          */}
         <CommentActions className={cn(id !== userId && !shouldReply ? "hidden" : "")}>
-          {shouldReply && <CommentReplyButton />}
-          <EditCommentButton authorId={userId} />
-          <DeleteCommentButton authorId={userId} commentId={commentId} feedId={postId} parentId={parentId} />
+          {shouldReply && <CommentReplyButton disabled={isOptimistic} />}
+          <EditCommentButton authorId={userId} disabled={isOptimistic} />
+          <DeleteCommentButton
+            authorId={userId}
+            commentId={commentId}
+            feedId={postId}
+            parentId={parentId}
+            disabled={isOptimistic}
+          />
         </CommentActions>
 
         {commentId && <ReplyToComment parentId={commentId} postId={postId} username={userName} />}

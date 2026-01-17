@@ -8,6 +8,7 @@ import { useMe } from "@/components/user-provider";
 
 import { commentClient } from "@/lib/client";
 import { getCommentsKey, getRepliesKey } from "@/lib/constants";
+import { assertResponse, kindOfError, renderErrorToast } from "@/lib/error";
 
 type CreateCommentParams = Parameters<typeof commentClient.createComment>[1];
 
@@ -26,13 +27,7 @@ export function useCreateComment(feedId: string) {
   const mutationKey = ["createComment", feedId];
   const mutation = useMutation({
     mutationKey,
-    mutationFn: async (data: CreateCommentParams) => {
-      const res = await commentClient.createComment(feedId, data);
-      if (!res.success) {
-        throw new Error(res.error);
-      }
-      return res.data;
-    },
+    mutationFn: async (data: CreateCommentParams) => assertResponse(await commentClient.createComment(feedId, data)),
     onMutate: async (variables) => {
       const newCommentId = `temp-${++idCounter}`;
       const repliesKey = getRepliesKey(feedId, variables.parent_id || "");
@@ -51,6 +46,7 @@ export function useCreateComment(feedId: string) {
             text: variables.text,
             created_at: new Date(),
             updated_at: new Date(),
+            is_optimistic: true,
             user: {
               avatar_url: currentUser.avatar_url,
               first_name: currentUser.first_name,
@@ -99,6 +95,7 @@ export function useCreateComment(feedId: string) {
               text: variables.text,
               created_at: new Date(),
               updated_at: new Date(),
+              is_optimistic: true,
               user: {
                 avatar_url: currentUser.avatar_url,
                 first_name: currentUser.first_name,
@@ -135,7 +132,9 @@ export function useCreateComment(feedId: string) {
       });
       return { previousComments, newCommentId };
     },
-    onError: (_, variables, context) => {
+    onError: (err, variables, context) => {
+      renderErrorToast(err, { showOnSandboxError: false });
+      if (kindOfError(err).isSandbox) return;
       if (variables.parent_id) {
         queryClient.setQueryData<GetRepliesResponse>(
           getRepliesKey(feedId, variables.parent_id || ""),
@@ -145,7 +144,8 @@ export function useCreateComment(feedId: string) {
         queryClient.setQueryData<GetCommentsResponse>(commentsKey, context?.previousComments as GetCommentsResponse);
       }
     },
-    onSettled: (data, _, variables, ctx) => {
+    onSettled: (data, err, variables, ctx) => {
+      if (kindOfError(err).isSandbox) return;
       const isReply = !!variables.parent_id;
       const optimisticId = ctx?.newCommentId;
       const repliesKey = getRepliesKey(feedId, variables.parent_id || "");
@@ -165,7 +165,7 @@ export function useCreateComment(feedId: string) {
               ...oldReplies,
               replies: oldReplies.replies.map((reply) => {
                 if (reply.id === optimisticId) {
-                  return { ...reply, id: data.id };
+                  return { ...reply, id: data.id, is_optimistic: false };
                 }
                 return reply;
               })
@@ -180,7 +180,7 @@ export function useCreateComment(feedId: string) {
             ...oldComments,
             comments: oldComments.comments.map((comment) => {
               if (comment.id === optimisticId) {
-                return { ...comment, id: data.id };
+                return { ...comment, id: data.id, is_optimistic: false };
               }
               return comment;
             }),

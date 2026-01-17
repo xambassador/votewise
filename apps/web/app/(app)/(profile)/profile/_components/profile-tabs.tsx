@@ -39,7 +39,7 @@ export function ProfileTabs(props: TabPanelProps) {
     <Tabs defaultValue="posts" className="w-full">
       <TabsList className="overflow-x-auto">
         {tabs.map((tab) => (
-          <TabsTrigger value={tab.value} key={tab.value}>
+          <TabsTrigger value={tab.value} key={tab.value} className="pb-4 h-fit">
             {tab.label}
           </TabsTrigger>
         ))}

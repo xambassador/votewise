@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { commentClient } from "@/lib/client";
 import { getCommentsKey, getRepliesKey } from "@/lib/constants";
+import { assertResponse, renderErrorToast } from "@/lib/error";
 
 type UpdateParams = Parameters<typeof commentClient.update>[2];
 
@@ -15,13 +16,7 @@ export function useEditComment(feedId: string, commentId: string, parentId?: str
   const repliesKey = getRepliesKey(feedId, parentId ?? "");
   const mutation = useMutation({
     mutationKey: ["editComment", feedId, commentId],
-    mutationFn: async (data: UpdateParams) => {
-      const res = await commentClient.update(feedId, commentId, data);
-      if (!res.success) {
-        throw new Error(res.error);
-      }
-      return res.data;
-    },
+    mutationFn: async (data: UpdateParams) => assertResponse(await commentClient.update(feedId, commentId, data)),
     onMutate: async (variables) => {
       if (parentId) {
         await queryClient.cancelQueries({ queryKey: repliesKey });
@@ -62,7 +57,8 @@ export function useEditComment(feedId: string, commentId: string, parentId?: str
       });
       return { previousComments };
     },
-    onError: (_, __, ctx) => {
+    onError: (err, __, ctx) => {
+      renderErrorToast(err, { showOnSandboxError: false });
       if (parentId) {
         queryClient.setQueryData<GetRepliesResponse>(repliesKey, ctx?.previousComments as GetRepliesResponse);
       } else {

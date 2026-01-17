@@ -34,13 +34,16 @@ export function HotUsers(props: Props) {
 
   return (
     <div className="space-y-4">
+      {data.users.length === 0 && <p className="text-center text-sm text-gray-500">No trending users found.</p>}
       {data.users.map((user) => (
         <UserCard key={user.id} user={user} />
       ))}
-      <Button variant="secondary" className="w-full" onClick={onLoadMore} loading={nextPageStatus === "loading"}>
-        Load more trending users
-        <ChevronDownTiny />
-      </Button>
+      {data.pagination.cursor && (
+        <Button variant="secondary" className="w-full" onClick={onLoadMore} loading={nextPageStatus === "loading"}>
+          Load more trending users
+          <ChevronDownTiny />
+        </Button>
+      )}
     </div>
   );
 }

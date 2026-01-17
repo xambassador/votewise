@@ -8,6 +8,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { groupClient } from "@/lib/client";
 import { getGroupFeedsKey } from "@/lib/constants";
+import { assertResponse } from "@/lib/error";
 
 export function useFetchGroupFeeds(id: string, options?: { initialData?: GetGroupFeedsResponse }) {
   const [nextPageStatus, setNextPageStatus] = useState<AsyncState>("idle");
@@ -15,13 +16,7 @@ export function useFetchGroupFeeds(id: string, options?: { initialData?: GetGrou
   const queryClient = useQueryClient();
   const query = useQuery({
     queryKey,
-    queryFn: async () => {
-      const res = await groupClient.getFeeds(id);
-      if (!res.success) {
-        throw new Error(res.error);
-      }
-      return res.data;
-    },
+    queryFn: async () => assertResponse(await groupClient.getFeeds(id)),
     initialData: options?.initialData
   });
 

@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { commentClient } from "@/lib/client";
 import { getCommentsKey, getRepliesKey } from "@/lib/constants";
+import { assertResponse, renderErrorToast } from "@/lib/error";
 
 export function useDeleteComment(feedId: string, commentId: string, parentId?: string) {
   const commentsKey = getCommentsKey(feedId);
@@ -39,13 +40,7 @@ export function useDeleteComment(feedId: string, commentId: string, parentId?: s
   }
 
   const mutation = useMutation({
-    mutationFn: async () => {
-      const res = await commentClient.delete(feedId, commentId);
-      if (!res.success) {
-        throw new Error(res.error);
-      }
-      return res.data;
-    },
+    mutationFn: async () => assertResponse(await commentClient.delete(feedId, commentId)),
     onMutate: async () => {
       if (parentId) {
         const { previousData } = await deleteReply();
@@ -54,14 +49,14 @@ export function useDeleteComment(feedId: string, commentId: string, parentId?: s
       const { previousData } = await deleteComment();
       return { previousData };
     },
-    onError: (_, __, ctx) => {
+    onError: (err, __, ctx) => {
+      renderErrorToast(err, { showOnSandboxError: false });
       if (parentId) {
         queryClient.setQueryData<GetRepliesResponse>(repliesKey, ctx?.previousData as GetRepliesResponse);
       } else {
         queryClient.setQueryData<GetCommentsResponse>(commentsKey, ctx?.previousData as GetCommentsResponse);
       }
-    },
-    onSettled: async () => {}
+    }
   });
   return mutation;
 }

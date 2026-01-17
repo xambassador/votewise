@@ -154,7 +154,7 @@ export const CommentReplyButton = forwardRef<HTMLButtonElement, CommentReplyButt
       {...rest}
       ref={ref}
       className={cn(
-        "flex items-center justify-center gap-1 text-gray-400 text-sm focus-primary focus-presets rounded",
+        "flex items-center justify-center gap-1 text-gray-400 text-sm focus-primary focus-presets rounded disabled:cursor-not-allowed",
         className
       )}
       onClick={(e) => {
@@ -184,7 +184,7 @@ export const CommentEditButton = forwardRef<HTMLButtonElement, CommentEditButton
       {...rest}
       ref={ref}
       className={cn(
-        "flex items-center justify-center gap-1 text-gray-400 text-sm focus-primary focus-presets rounded",
+        "flex items-center justify-center gap-1 text-gray-400 text-sm focus-primary focus-presets rounded disabled:cursor-not-allowed",
         className
       )}
       onClick={(e) => {
@@ -298,7 +298,7 @@ export const CommentDeleteButton = forwardRef<HTMLButtonElement, CommentDeleteBu
       {...rest}
       ref={ref}
       className={cn(
-        "flex items-center justify-center gap-1 text-gray-400 text-sm focus-primary focus-presets rounded",
+        "flex items-center justify-center gap-1 text-gray-400 text-sm focus-primary focus-presets rounded disabled:cursor-not-allowed",
         className
       )}
     >

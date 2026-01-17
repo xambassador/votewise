@@ -14,6 +14,7 @@ import { useForm } from "@votewise/ui/form";
 import { makeToast } from "@votewise/ui/toast";
 
 import { chain } from "@/lib/chain";
+import { assertResponse, renderErrorToast } from "@/lib/error";
 import { isPasswordStrong } from "@/lib/password";
 
 import { changePasswordAction } from "../action";
@@ -32,20 +33,12 @@ export function useChangePassword(props?: DialogProps) {
     }
   });
   const mutation = useMutation({
-    mutationFn: async (data: TChangePassword) => {
-      const res = await changePasswordAction(data);
-      if (!res.success) {
-        throw new Error(res.error);
-      }
-      return res.data;
-    },
+    mutationFn: async (data: TChangePassword) => assertResponse(await changePasswordAction(data)),
     onSuccess: () => {
       makeToast.success("Success!", "Your password has been changed.");
       setOpen(false);
     },
-    onError: (error) => {
-      makeToast.error("Oops!", error.message);
-    }
+    onError: (error) => renderErrorToast(error)
   });
   const isPending = mutation.isPending;
   const password = form.watch("new_password");

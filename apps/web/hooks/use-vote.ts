@@ -10,6 +10,7 @@ import { useMe } from "@/components/user-provider";
 import { chain } from "@/lib/chain";
 import { feedClient } from "@/lib/client";
 import { getFeedKey } from "@/lib/constants";
+import { assertResponse, kindOfError } from "@/lib/error";
 
 type Props = { feedId: string };
 
@@ -21,13 +22,7 @@ export function useVote(props: Props) {
   const canVote = me.votes_left > 0;
 
   const mutation = useMutation({
-    mutationFn: async () => {
-      const res = await feedClient.vote(feedId);
-      if (!res.success) {
-        throw new Error(res.error);
-      }
-      return res.data;
-    },
+    mutationFn: async () => assertResponse(await feedClient.vote(feedId)),
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey });
       const previousFeed = queryClient.getQueryData<GetFeedResponse>(queryKey);
@@ -49,7 +44,8 @@ export function useVote(props: Props) {
       });
       return { previousFeed };
     },
-    onError: (_, __, ctx) => {
+    onError: (err, __, ctx) => {
+      if (kindOfError(err).isSandbox) return;
       queryClient.setQueryData<GetFeedResponse>(queryKey, ctx?.previousFeed);
     }
   });

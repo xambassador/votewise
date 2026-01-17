@@ -38,7 +38,6 @@ export function useProfileForm(props: Props) {
 
   const handleSubmit = form.handleSubmit((data) => {
     mutation.mutate(data, {
-      onError: (err) => makeToast.error("Failed to update profile", err.message),
       onSuccess: () => makeToast.success("Success!", "Profile updated successfully")
     });
   });

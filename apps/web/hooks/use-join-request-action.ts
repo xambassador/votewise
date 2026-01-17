@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { groupClient } from "@/lib/client";
 import { getGroupKey, getGroupNotificationsKey, getMembersKey, getNotificationsKey } from "@/lib/constants";
+import { assertResponse, kindOfError, renderErrorToast } from "@/lib/error";
 
 const notificationQueryKey = getNotificationsKey();
 const groupNotificationsKey = getGroupNotificationsKey();
@@ -18,17 +19,11 @@ export function useGroupJoinRequestAction(action: "accept" | "reject") {
     mutationFn: async (props: { id: string; groupId: string; notificationId?: string }) => {
       if (action === "reject") {
         const res = await groupClient.rejectJoinRequest(props.id, { notification_id: props.notificationId });
-        if (!res.success) {
-          throw new Error(res.error);
-        }
-        return res.data;
+        return assertResponse(res);
       }
 
       const res = await groupClient.acceptJoinRequest(props.id);
-      if (!res.success) {
-        throw new Error(res.error);
-      }
-      return res.data;
+      return assertResponse(res);
     },
     onMutate: async (variables) => {
       await Promise.all([
@@ -69,11 +64,13 @@ export function useGroupJoinRequestAction(action: "accept" | "reject") {
 
       return { previousNotifications, previousGroupNotifications };
     },
-    onError: (_, __, context) => {
+    onError: (err, __, context) => {
+      renderErrorToast(err, { showOnSandboxError: false });
       queryClient.setQueryData(notificationQueryKey, context?.previousNotifications);
       queryClient.setQueryData(groupNotificationsKey, context?.previousGroupNotifications);
     },
-    onSettled: (_, __, variables) => {
+    onSettled: (_, err, variables) => {
+      if (kindOfError(err).isSandbox) return;
       queryClient.invalidateQueries({ queryKey: getGroupKey(variables.groupId) });
       queryClient.invalidateQueries({ queryKey: getMembersKey(variables.groupId) });
     }

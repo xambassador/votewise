@@ -7,18 +7,13 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { userClient } from "@/lib/client";
 import { getMeKey } from "@/lib/constants";
+import { assertResponse, renderErrorToast } from "@/lib/error";
 
 export function useUpdateProfileMutation() {
   const qc = useQueryClient();
   const queryKey = getMeKey();
   const mutation = useMutation({
-    mutationFn: async (data: TUpdateProfile) => {
-      const res = await userClient.update(data);
-      if (!res.success) {
-        throw new Error(res.error);
-      }
-      return res.data;
-    },
+    mutationFn: async (data: TUpdateProfile) => assertResponse(await userClient.update(data)),
     onMutate: async (variables) => {
       await qc.cancelQueries({ queryKey });
       const previousProfile = qc.getQueryData<GetMeResponse>(queryKey);
@@ -35,7 +30,8 @@ export function useUpdateProfileMutation() {
       });
       return { previousProfile };
     },
-    onError: (_, __, context) => {
+    onError: (err, __, context) => {
+      renderErrorToast(err);
       qc.setQueryData<GetMeResponse>(queryKey, context?.previousProfile);
     }
   });

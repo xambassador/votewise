@@ -10,7 +10,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { ZUpdateProfile } from "@votewise/schemas/user";
 import { useForm } from "@votewise/ui/form";
-import { makeToast } from "@votewise/ui/toast";
 
 import { chain } from "@/lib/chain";
 
@@ -77,14 +76,7 @@ export function useEditProfile(props: DialogProps & { profile: Profile }) {
   }
 
   const onSubmit = form.handleSubmit((data) => {
-    mutation.mutate(data, {
-      onSuccess: () => {
-        setOpen(false);
-      },
-      onError: (err) => {
-        makeToast.error("Update Failed", err.message);
-      }
-    });
+    mutation.mutate(data, { onSuccess: () => setOpen(false) });
   });
 
   function getButtonProps(props?: ButtonProps): ButtonProps {

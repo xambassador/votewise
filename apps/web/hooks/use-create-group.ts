@@ -10,7 +10,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { ZGroupCreate } from "@votewise/schemas/group";
 import { useForm } from "@votewise/ui/form";
-import { makeToast } from "@votewise/ui/toast";
 
 import { chain } from "@/lib/chain";
 
@@ -54,12 +53,7 @@ export function useCreateGroup(props?: DialogProps) {
   }
 
   const onSubmit = form.handleSubmit((data) => {
-    mutation.mutate(data, {
-      onSuccess: () => setOpen(false),
-      onError: (error) => {
-        makeToast.error("Oops!", error.message);
-      }
-    });
+    mutation.mutate(data, { onSuccess: () => setOpen(false) });
   });
 
   function getButtonProps(props?: ButtonProps): ButtonProps {

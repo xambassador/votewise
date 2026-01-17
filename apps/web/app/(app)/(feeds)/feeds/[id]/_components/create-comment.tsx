@@ -5,7 +5,6 @@ import { useCreateComment } from "@/hooks/use-create-comment";
 
 import { CommentInput, CommentReplyInput } from "@votewise/ui/cards/comment";
 import { Spinner } from "@votewise/ui/ring-spinner";
-import { makeToast } from "@votewise/ui/toast";
 
 const spinner = <Spinner className="size-5" />;
 
@@ -45,10 +44,7 @@ function useCommentCreation(props: Props) {
       setError("Comment cannot be empty.");
       return;
     }
-    mutation.mutate(
-      { text: value, parent_id: parentId },
-      { onError: (err) => makeToast.error("Oops! Failed to create comment.", err.message) }
-    );
+    mutation.mutate({ text: value, parent_id: parentId });
     inputRef.current!.value = "";
   }
 

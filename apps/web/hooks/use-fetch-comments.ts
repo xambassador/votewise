@@ -10,6 +10,7 @@ import { PAGINATION } from "@votewise/constant";
 
 import { commentClient } from "@/lib/client";
 import { getCommentsKey } from "@/lib/constants";
+import { assertResponse } from "@/lib/error";
 
 type Options = { initialData?: GetCommentsResponse };
 
@@ -24,13 +25,7 @@ export function useFetchComments(feedId: string, options?: Options) {
   const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: getCommentsKey(feedId),
-    queryFn: async () => {
-      const comments = await commentClient.getComments(feedId);
-      if (!comments.success) {
-        throw new Error(comments.error);
-      }
-      return comments.data;
-    },
+    queryFn: async () => assertResponse(await commentClient.getComments(feedId)),
     refetchOnWindowFocus: false,
     initialData: options?.initialData
   });

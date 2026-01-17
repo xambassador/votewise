@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { groupClient } from "@/lib/client";
 import { getGroupKey, getGroupsKey, getMyGroupsKey } from "@/lib/constants";
+import { assertResponse, kindOfError, renderErrorToast } from "@/lib/error";
 
 const myGroupsKey = getMyGroupsKey();
 const groupsKey = getGroupsKey();
@@ -17,10 +18,7 @@ export function useUpdateGroupMutation() {
     mutationFn: async (data: TGroupUpdate & { id: string }) => {
       const { id, ...rest } = data;
       const res = await groupClient.update(id, rest);
-      if (!res.success) {
-        throw new Error(res.error);
-      }
-      return res.data;
+      return assertResponse(res);
     },
     onMutate: async (variables) => {
       const queryKey = getGroupKey(variables.id);
@@ -40,11 +38,13 @@ export function useUpdateGroupMutation() {
       });
       return { previousGroup };
     },
-    onError: (_, variables, context) => {
+    onError: (err, variables, context) => {
+      renderErrorToast(err);
       const queryKey = getGroupKey(variables.id);
       queryClient.setQueryData<GetGroupResponse>(queryKey, context?.previousGroup);
     },
-    onSettled: () => {
+    onSettled: (_, err) => {
+      if (kindOfError(err).isSandbox) return;
       queryClient.invalidateQueries({ queryKey: myGroupsKey });
       queryClient.invalidateQueries({ queryKey: groupsKey });
     }

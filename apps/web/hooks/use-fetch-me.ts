@@ -6,17 +6,12 @@ import { useQuery } from "@tanstack/react-query";
 
 import { userClient } from "@/lib/client";
 import { getMeKey } from "@/lib/constants";
+import { assertResponse } from "@/lib/error";
 
 export function useFetchMe(props?: { initialData?: GetMeResponse }) {
   const query = useQuery({
     queryKey: getMeKey(),
-    queryFn: async () => {
-      const res = await userClient.getMe();
-      if (!res.success) {
-        throw new Error(res.error);
-      }
-      return res.data;
-    },
+    queryFn: async () => assertResponse(await userClient.getMe()),
     initialData: props?.initialData
   });
   return query;

@@ -117,6 +117,7 @@ const VOTEWISE_ML_API_URL = z
   .url({
     message: "VOTEWISE_ML_API_URL should be a valid URL"
   });
+const IS_SANDBOX = z.string().default("false").transform(parseBooleanValue);
 
 export const envBaseSchema = z.object({
   ACCESS_TOKEN_SECRET,
@@ -158,7 +159,8 @@ export const envBaseSchema = z.object({
   BACKGROUND_BUCKET_NAME,
   UPLOAD_BUCKET_NAME,
   USE_SSL,
-  VOTEWISE_ML_API_URL
+  VOTEWISE_ML_API_URL,
+  IS_SANDBOX
 });
 
 export const envSchema = z.object({
@@ -204,7 +206,8 @@ export const envSchema = z.object({
   BACKGROUND_BUCKET_NAME,
   UPLOAD_BUCKET_NAME,
   USE_SSL,
-  VOTEWISE_ML_API_URL
+  VOTEWISE_ML_API_URL,
+  IS_SANDBOX
 });
 
 envSchema.superRefine((data) => {

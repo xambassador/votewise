@@ -6,19 +6,14 @@ import { useQuery } from "@tanstack/react-query";
 
 import { notificationClient } from "@/lib/client";
 import { getNotificationsKey } from "@/lib/constants";
+import { assertResponse } from "@/lib/error";
 
 type Props = { initialData?: GetAllNotificationsResponse };
 
 export function useFetchNotifications(props?: Props) {
   const query = useQuery({
     queryKey: getNotificationsKey(),
-    queryFn: async () => {
-      const res = await notificationClient.getAll();
-      if (!res.success) {
-        throw new Error(res.error);
-      }
-      return res.data;
-    },
+    queryFn: async () => assertResponse(await notificationClient.getAll()),
     initialData: props?.initialData
   });
   return query;
