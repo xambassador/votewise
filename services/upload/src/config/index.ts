@@ -52,6 +52,7 @@ export class ServerConfig {
   public uploadBucket: string;
   public avatarBucket: string;
   public backgroundsBucket: string;
+  public imageCacheTTL: number;
 
   constructor(cfg: ServerConfig) {
     this.port = cfg.port;
@@ -69,5 +70,6 @@ export class ServerConfig {
     this.uploadBucket = cfg.uploadBucket;
     this.avatarBucket = cfg.avatarBucket;
     this.backgroundsBucket = cfg.backgroundsBucket;
+    this.imageCacheTTL = cfg.imageCacheTTL;
   }
 }

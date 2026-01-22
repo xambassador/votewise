@@ -1,1 +1,3 @@
 public/uploads
+public/votewise/assets/avatars/*
+!public/votewise/assets/avatars/default_avatar.png

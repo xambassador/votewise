@@ -66,10 +66,8 @@ export class Controller {
     });
 
     bb.on("finish", () => {
-      const publicUrl = this.ctx.environment.VOTEWISE_BUCKET_URL;
-      const url = new URL(
-        `${publicUrl}/uploads/${this.ctx.getFileName(fileName, fileToken)}?file_name=${fileName}&file_token=${fileToken}`
-      ).toString();
+      const bucketName = "votewise-bucket"; // @todo: Move to env and remove VOTEWISE_BUCKET_URL
+      const url = `/${bucketName}/uploads/${this.ctx.getFileName(fileName, fileToken)}`;
       res.status(StatusCodes.OK).json({ url });
     });
 

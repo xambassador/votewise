@@ -16,6 +16,7 @@ const DEFAULT_AVATAR_BUCKET_NAME = "avatars";
 const DEFAULT_BACKGROUND_BUCKET_NAME = "backgrounds";
 const DEFAULT_UPLOAD_BUCKET_NAME = "uploads";
 const DEFAULT_USE_SSL = false;
+const DEFAULT_IMAGE_CACHE_TTL = 31536000; // 1 year in seconds
 
 const ACCESS_TOKEN_SECRET = z
   .string({ required_error: "ACCESS_TOKEN is required" })
@@ -118,6 +119,10 @@ const VOTEWISE_ML_API_URL = z
     message: "VOTEWISE_ML_API_URL should be a valid URL"
   });
 const IS_SANDBOX = z.string().default("false").transform(parseBooleanValue);
+const IMAGE_CACHE_TTL = z
+  .string()
+  .default(DEFAULT_IMAGE_CACHE_TTL.toString())
+  .transform((val) => parseInt(val, 10));
 
 export const envBaseSchema = z.object({
   ACCESS_TOKEN_SECRET,
@@ -160,7 +165,8 @@ export const envBaseSchema = z.object({
   UPLOAD_BUCKET_NAME,
   USE_SSL,
   VOTEWISE_ML_API_URL,
-  IS_SANDBOX
+  IS_SANDBOX,
+  IMAGE_CACHE_TTL
 });
 
 export const envSchema = z.object({
@@ -207,7 +213,8 @@ export const envSchema = z.object({
   UPLOAD_BUCKET_NAME,
   USE_SSL,
   VOTEWISE_ML_API_URL,
-  IS_SANDBOX
+  IS_SANDBOX,
+  IMAGE_CACHE_TTL
 });
 
 envSchema.superRefine((data) => {

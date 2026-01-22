@@ -1,4 +1,5 @@
 import type { ServerConfig } from "@/config";
+import type { ImageConfigComplete } from "./core/image-optimizer";
 import type { RequestParserPlugin } from "./plugins/request-parser";
 
 import _fs from "node:fs/promises";
@@ -12,15 +13,14 @@ import { JWT } from "@votewise/jwt";
 import logger from "@votewise/log";
 
 import { checkEnv } from "@/env";
-import { UploadCompletedEventQueue, UploadQueue } from "@/queues";
 import { RedisAdapter } from "@/storage/redis";
 
+import { createImageConfigDefault, ImageOptimizerCache } from "./core/image-optimizer";
 import { requestParserPluginFactory } from "./plugins/request-parser";
 
 type Plugins = {
   requestParser: RequestParserPlugin;
 };
-type Queue = { uploadQueue: UploadQueue; uploadCompletedEventQueue: UploadCompletedEventQueue };
 export type AppContextOptions = {
   config: ServerConfig;
   logger: typeof logger;
@@ -29,23 +29,24 @@ export type AppContextOptions = {
   plugins: Plugins;
   minio: Minio.Client;
   jwtService: JWT;
-  queues: Queue;
   cache: RedisAdapter;
+  imageConfig: ImageConfigComplete;
+  imageOptimizerCache: ImageOptimizerCache;
 };
 
-const basUploadPath = path.join(__dirname, "../public/uploads");
+const baseUploadPath = path.join(__dirname, "../public/uploads");
 
 function getFileName(fileName: string, fileToken: string) {
   return `votewise-assets-${fileToken}-${fileName}`;
 }
 
 function getBlobPath(fileName: string, fileToken: string) {
-  const filePath = path.join(basUploadPath, getFileName(fileName, fileToken));
+  const filePath = path.join(baseUploadPath, getFileName(fileName, fileToken));
   return filePath;
 }
 
 function createUploadPath() {
-  ensureDirSync(basUploadPath);
+  ensureDirSync(baseUploadPath);
 }
 
 function getFileInfo(filePath: string) {
@@ -64,8 +65,9 @@ export class AppContext {
   public plugins: Plugins;
   public minio: Minio.Client;
   public jwtService: JWT;
-  public queues: Queue;
   public cache: RedisAdapter;
+  public imageConfig: ImageConfigComplete;
+  public imageOptimizerCache: ImageOptimizerCache;
 
   constructor(opts: AppContextOptions) {
     this.config = opts.config;
@@ -75,8 +77,9 @@ export class AppContext {
     this.plugins = opts.plugins;
     this.minio = opts.minio;
     this.jwtService = opts.jwtService;
-    this.queues = opts.queues;
     this.cache = opts.cache;
+    this.imageConfig = opts.imageConfig;
+    this.imageOptimizerCache = opts.imageOptimizerCache;
     createUploadPath();
 
     this.logger.info(`[${yellow("AppContext")}] dependencies initialized`);
@@ -97,26 +100,25 @@ export class AppContext {
       secretKey: environment.MINIO_SECRET_KEY
     });
     const jwtService = new JWT({ accessTokenSecret: environment.ACCESS_TOKEN_SECRET });
-    const uploadQueue = new UploadQueue();
-    const uploadCompletedEventQueue = new UploadCompletedEventQueue();
+    const imageConfig = createImageConfigDefault(cfg.imageCacheTTL);
+    const imageOptimizerCache = new ImageOptimizerCache({
+      uploadsDir: baseUploadPath,
+      config: imageConfig
+    });
     const context = new AppContext({
       config: cfg,
       logger,
       environment,
       assert,
+      imageConfig,
+      imageOptimizerCache,
       plugins: { requestParser },
       minio,
       jwtService,
-      queues: { uploadQueue, uploadCompletedEventQueue },
       cache,
       ...overrides
     });
     this._instance = context;
-    cache.onConnect(() => {
-      uploadCompletedEventQueue.init();
-      uploadQueue.init();
-      uploadQueue.initWorker(context);
-    });
     return context;
   }
 

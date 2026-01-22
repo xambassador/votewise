@@ -39,14 +39,6 @@ export class UploadQueue {
     );
     this.worker.on("completed", (job) => {
       ctx.logger.info(`[${uploadQueueName} worker] Job ${job.id} completed`);
-      ctx.queues.uploadCompletedEventQueue.add({
-        name: "uploadCompletedEvent",
-        payload: {
-          path: job.data.payload.path,
-          userId: job.data.payload.userId,
-          assetType: job.data.payload.assetType
-        }
-      });
       job.remove();
     });
     this.worker.on("failed", (job, err) => {

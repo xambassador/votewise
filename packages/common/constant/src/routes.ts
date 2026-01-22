@@ -213,7 +213,9 @@ export const upload = {
     /** Get avatars */
     getAvatars: (base: string) => base + "/upload/assets/avatars",
     /** Get backgrounds */
-    getBackgrounds: (base: string) => base + "/upload/assets/backgrounds"
+    getBackgrounds: (base: string) => base + "/upload/assets/backgrounds",
+    /** Optimize and serve image */
+    optimize: (base: string) => base + "/optimize"
   },
   runtime: {
     /** Create handshake for file upload */
@@ -227,7 +229,10 @@ export const upload = {
     /** Get avatars */
     getAvatars: (base: string) => base + "/upload/assets/avatars",
     /** Get backgrounds */
-    getBackgrounds: (base: string) => base + "/upload/assets/backgrounds"
+    getBackgrounds: (base: string) => base + "/upload/assets/backgrounds",
+    /** Optimize and serve image */
+    optimize: (base: string, params: { url: string; w: number; q: number }) =>
+      base + `/optimize?url=${encodeURIComponent(params.url)}&w=${params.w}&q=${params.q}`
   }
 };
 

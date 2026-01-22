@@ -17,7 +17,8 @@ const cfg = new ServerConfig({
   publicUrl: environment.VOTEWISE_BUCKET_URL,
   port: environment.VOTEWISE_BUCKET_PORT,
   devMode: environment.NODE_ENV === "development",
-  blobUploadLimit: 100 * 1024 * 1024 // 100 MB
+  blobUploadLimit: 100 * 1024 * 1024, // 100 MB
+  imageCacheTTL: environment.IMAGE_CACHE_TTL
 });
 
 async function bootstrap() {
