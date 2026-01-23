@@ -52,7 +52,7 @@ export function Sidebar(props: Props) {
         <div className="xl:pl-2 xl:pr-1">
           <Avatar>
             <AvatarFallback name={name} />
-            <AvatarImage src={avatarUrl} alt={name} />
+            <AvatarImage src={avatarUrl} alt={name} sizes="48px" />
           </Avatar>
         </div>
         <div className="flex flex-col gap-8">
@@ -94,7 +94,7 @@ export function MobileSidebar(props: Props) {
         <button className="block md:hidden">
           <Avatar>
             <AvatarFallback name={props.name} />
-            <AvatarImage src={props.avatarUrl} alt={props.name} />
+            <AvatarImage src={props.avatarUrl} alt={props.name} sizes="48px" />
           </Avatar>
         </button>
       </SheetTrigger>
@@ -107,7 +107,7 @@ export function MobileSidebar(props: Props) {
           <div className="xl:pl-2 xl:pr-1">
             <Avatar>
               <AvatarFallback name={name} />
-              <AvatarImage src={avatarUrl} alt={name} />
+              <AvatarImage src={avatarUrl} alt={name} sizes="48px" />
             </Avatar>
           </div>
           <div className="flex flex-col gap-8">

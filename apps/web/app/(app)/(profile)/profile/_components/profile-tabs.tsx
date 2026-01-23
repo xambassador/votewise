@@ -183,7 +183,7 @@ function CommentsPanel(props: TabPanelProps) {
             >
               <Avatar className="size-12">
                 <AvatarFallback name={getFullName(comment.user)} />
-                <AvatarImage src={comment.user.avatar_url || ""} alt={getFullName(comment.user)} />
+                <AvatarImage src={comment.user.avatar_url || ""} alt={getFullName(comment.user)} sizes="48px" />
               </Avatar>
             </Link>
             <div className="flex-1 min-w-0">
@@ -292,7 +292,7 @@ function UserCard({ user }: UserCardProps) {
       <div className="p-5 rounded-xl bg-nobelBlack-100 border border-nobelBlack-200 hover:border-nobelBlack-300 transition-colors">
         <div className="flex items-start gap-4">
           <Avatar className="size-12">
-            <AvatarImage src={user.avatar_url || ""} alt={getFullName(user)} />
+            <AvatarImage src={user.avatar_url || ""} alt={getFullName(user)} sizes="48px" />
             <AvatarFallback name={getFullName(user)} />
           </Avatar>
           <div className="flex-1 min-w-0">

@@ -29,7 +29,7 @@ export function UserCard(props: Props) {
       <div className="p-5 rounded-xl bg-nobelBlack-100 border border-nobelBlack-200">
         <div className="flex items-start gap-4">
           <Avatar className="size-12">
-            <AvatarImage src={user.avatar_url || ""} alt={getFullName(user)} />
+            <AvatarImage src={user.avatar_url || ""} alt={getFullName(user)} sizes="48px" />
             <AvatarFallback name={getFullName(user)} />
           </Avatar>
           <div className="flex-1">

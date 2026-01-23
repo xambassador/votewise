@@ -114,20 +114,7 @@ describe("Onboard Controller", () => {
     expect(mockOnboardService.updateUserOnboardCache).toHaveBeenCalledWith(user.id, data);
   });
 
-  it("should throw an error if the avatar URL is invalid", async () => {
-    const body = getOnboardBody(3);
-    body.avatar = "http://example.com/avatar.jpg";
-    const req = buildReq({ body });
-    const res = buildRes({ locals });
-    mockUserRepository.findById.mockResolvedValue(user);
-    mockUserRepository.findByUsername.mockResolvedValue(undefined);
-
-    const error = await controller.handle(req, res).catch((err) => err);
-    expect(mockUserRepository.update).not.toHaveBeenCalled();
-    expect(error.message).toBe("Invalid avatar url");
-  });
-
-  it("should successfully update user information for step 3 and schedule avatar upload", async () => {
+  it("should successfully update user information for step 3", async () => {
     const body = getOnboardBody(3);
     const fileName = "avatar.jpg";
     const fileToken = "some_random_token";
@@ -141,46 +128,9 @@ describe("Onboard Controller", () => {
     await controller.handle(req, res);
     expect(mockUserRepository.update).toHaveBeenCalledWith(user.id, data);
     expect(mockOnboardService.updateUserOnboardCache).toHaveBeenCalledWith(user.id, data);
-    expect(mockUploadQueue.add).toHaveBeenCalledWith({
-      name: "uploadToS3",
-      payload: {
-        fileName,
-        fileToken,
-        assetType: "avatar",
-        userId: user.id,
-        path: user.id + "/" + fileName
-      }
-    });
   });
 
-  it("should successfully update user information for step 3 without schedule avatar upload", async () => {
-    const body = getOnboardBody(3);
-    const req = buildReq({ body });
-    const res = buildRes({ locals });
-    mockUserRepository.findById.mockResolvedValue(user);
-    mockUserRepository.findByUsername.mockResolvedValue(undefined);
-
-    const data = { avatar_url: body.avatar };
-    await controller.handle(req, res);
-    expect(mockUploadQueue.add).not.toHaveBeenCalled();
-    expect(mockUserRepository.update).toHaveBeenCalledWith(user.id, data);
-    expect(mockOnboardService.updateUserOnboardCache).toHaveBeenCalledWith(user.id, data);
-  });
-
-  it("should throw an error if the cover URL is invalid", async () => {
-    const body = getOnboardBody(4);
-    body.cover = "http://example.com/background.jpg";
-    const req = buildReq({ body });
-    const res = buildRes({ locals });
-    mockUserRepository.findById.mockResolvedValue(user);
-    mockUserRepository.findByUsername.mockResolvedValue(undefined);
-
-    const error = await controller.handle(req, res).catch((err) => err);
-    expect(mockUserRepository.update).not.toHaveBeenCalled();
-    expect(error.message).toBe("Invalid cover url");
-  });
-
-  it("should successfully update user information for step 4 and schedule cover upload", async () => {
+  it("should successfully update user information for step 4", async () => {
     const body = getOnboardBody(4);
     const fileName = "background.jpg";
     const fileToken = "some_random_token";
@@ -192,30 +142,6 @@ describe("Onboard Controller", () => {
 
     const data = { cover_image_url: body.cover };
     await controller.handle(req, res);
-    expect(mockUserRepository.update).toHaveBeenCalledWith(user.id, data);
-    expect(mockOnboardService.updateUserOnboardCache).toHaveBeenCalledWith(user.id, data);
-    expect(mockUploadQueue.add).toHaveBeenCalledWith({
-      name: "uploadToS3",
-      payload: {
-        fileName,
-        fileToken,
-        assetType: "cover_image",
-        userId: user.id,
-        path: user.id + "/" + fileName
-      }
-    });
-  });
-
-  it("should successfully update user information for step 4 without schedual cover upload", async () => {
-    const body = getOnboardBody(4);
-    const req = buildReq({ body });
-    const res = buildRes({ locals });
-    mockUserRepository.findById.mockResolvedValue(user);
-    mockUserRepository.findByUsername.mockResolvedValue(undefined);
-
-    const data = { cover_image_url: body.cover };
-    await controller.handle(req, res);
-    expect(mockUploadQueue.add).not.toHaveBeenCalled();
     expect(mockUserRepository.update).toHaveBeenCalledWith(user.id, data);
     expect(mockOnboardService.updateUserOnboardCache).toHaveBeenCalledWith(user.id, data);
   });

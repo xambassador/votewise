@@ -6,12 +6,13 @@ import { cn } from "./cn";
 import { createContext } from "./context";
 import { Cross } from "./icons/cross";
 import { Image as ImgIcon } from "./icons/image";
+import { getSrcSet } from "./image-utils";
 import { Spinner } from "./ring-spinner";
 
 /* ----------------------------------------------------------------------------------------------- */
 
-export const defaultAvatarUrl = "/votewise-bucket/votewise/assets/avatars/default_avatar.png";
-export const defaultBgUrl = "/votewise-bucket/votewise/assets/backgrounds/default_bg.jpeg";
+export const defaultAvatarUrl = "/votewise-bucket/votewise/assets/avatars/default_avatar.png?q=75&w=256";
+export const defaultBgUrl = "/votewise-bucket/votewise/assets/backgrounds/default_bg.jpeg?q=75&w=256";
 
 const theme = {
   imagePicker: "relative size-[calc((200/16)*1rem)] overflow-hidden",
@@ -164,8 +165,18 @@ export function ResetPreviewButton(props: ResetPreviewButtonProps) {
 }
 
 function Img(props: React.ImgHTMLAttributes<HTMLImageElement>) {
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img {...props} src={props.src} alt={props.alt} className={cn(theme.img, props.className)} />;
+  const srcSet = getSrcSet(props.src || "", { width: props.width ? Number(props.width) : undefined });
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      {...props}
+      alt={props.alt}
+      className={cn(theme.img, props.className)}
+      sizes={srcSet.sizes}
+      srcSet={srcSet.srcSet}
+      src={srcSet.url}
+    />
+  );
 }
 
 export type ImagePickerPillProps = React.HTMLAttributes<HTMLLabelElement> & {

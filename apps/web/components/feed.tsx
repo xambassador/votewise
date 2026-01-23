@@ -106,7 +106,7 @@ export const FeedMolecule = memo(function FeedMolecule(props: Props) {
             <VotersStack className="hidden sm:flex">
               <Voters>
                 {feed.voters.map((voter) => (
-                  <FeedAvatar key={voter.id} className="size-6" name="Voter" url={voter.avatar_url || ""} />
+                  <FeedAvatar key={voter.id} className="size-6" name="Voter" url={voter.avatar_url || ""} width={24} />
                 ))}
               </Voters>
               {feed.votes - feed.voters.length > 0 && (
@@ -120,11 +120,11 @@ export const FeedMolecule = memo(function FeedMolecule(props: Props) {
   );
 });
 
-const FeedAvatar = memo(function FeedAvatar(props: { name: string; url: string; className?: string }) {
+const FeedAvatar = memo(function FeedAvatar(props: { name: string; url: string; className?: string; width?: number }) {
   return (
     <Avatar className={cn("size-12", props.className)}>
       <AvatarFallback name={props.name} />
-      <AvatarImage src={props.url} alt={props.name} />
+      <AvatarImage src={props.url} alt={props.name} width={props.width || 48} />
     </Avatar>
   );
 });

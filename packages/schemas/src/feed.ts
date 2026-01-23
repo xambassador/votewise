@@ -1,7 +1,15 @@
 import { z } from "zod";
 
 export const ZAsset = z.object({
-  url: z.string({ required_error: "url is required" }).url({ message: "url is not a valid url" }),
+  url: z
+    .string({ required_error: "url is required" })
+    .refine((val) => val.length > 0, { message: "url is required" })
+    .refine(
+      (val) =>
+        // Value must start with /votewise-bucket/uploads
+        val.startsWith("/votewise-bucket/uploads"),
+      { message: "invalid url" }
+    ),
   type: z.enum(["image", "video", "document"], {
     errorMap: (issue, ctx) => {
       if (issue.code === "invalid_enum_value") {

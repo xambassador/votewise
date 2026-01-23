@@ -44,10 +44,15 @@ export function ProfileImage(props: Props) {
   return (
     <div className="relative mb-10">
       <figure className="relative w-full h-[calc((200/16)*1rem)] max-h-[calc((200/16)*1rem)] rounded-xl overflow-hidden">
-        <Image className="size-full object-cover" src={data.cover_image_url} alt={name} />
+        <Image
+          className="size-full object-cover overflow-clip-margin-unset"
+          src={data.cover_image_url}
+          alt={name}
+          width={600}
+        />
       </figure>
       <Avatar className="size-20 absolute -bottom-10 left-5">
-        <AvatarImage src={data.avatar_url} alt={name} />
+        <AvatarImage src={data.avatar_url} alt={name} sizes="80px" />
         <AvatarFallback name={name} />
       </Avatar>
       {editBtn}

@@ -13,7 +13,7 @@ export function CurrentUserAvatar(props: Props) {
   return (
     <Avatar {...props} className={cn("size-12", props.className)}>
       <AvatarFallback name={first_name + " " + last_name} />
-      <AvatarImage src={avatar_url} alt={first_name + " " + last_name} />
+      <AvatarImage src={avatar_url} alt={first_name + " " + last_name} sizes="48px" />
     </Avatar>
   );
 }

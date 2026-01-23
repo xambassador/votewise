@@ -46,11 +46,8 @@ export class OnboardService {
     if (onboardDataFromDb.first_name !== "INVALID_FIRST_NAME" && onboardDataFromDb.user_name !== "INVALID_USER_NAME") {
       hasValidFirstStep = true;
     }
-    const [avatarUrl, backgroundUrl] = await Promise.all([
-      this.ctx.bucketService.getUrlForType(onboardDataFromDb.avatar_url ?? "", "avatar"),
-      this.ctx.bucketService.getUrlForType(onboardDataFromDb.cover_image_url ?? "", "background")
-    ]);
-
+    const avatarUrl = onboardDataFromDb.avatar_url;
+    const backgroundUrl = onboardDataFromDb.cover_image_url;
     const data: OnboardData = {
       user_name: hasValidFirstStep ? onboardDataFromDb.user_name : "",
       first_name: hasValidFirstStep ? onboardDataFromDb.first_name : "",

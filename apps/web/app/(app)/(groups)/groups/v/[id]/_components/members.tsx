@@ -177,7 +177,7 @@ function User(props: { name: string; username: string; avatar: string; isMe?: bo
         aria-label={"View " + name + "'s profile"}
       >
         <Avatar className="size-11">
-          <AvatarImage src={avatar} alt={name} />
+          <AvatarImage src={avatar} alt={name} sizes="48px" />
           <AvatarFallback name={name} />
         </Avatar>
       </Link>

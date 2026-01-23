@@ -7,6 +7,7 @@ import { cva } from "class-variance-authority";
 import { cn } from "./cn";
 import { Cross } from "./icons/cross";
 import { Image as ImageIcon } from "./icons/image";
+import { getSrcSet } from "./image-utils";
 import { Spinner } from "./ring-spinner";
 import { useImageLoadingStatus } from "./use-image-status";
 
@@ -14,11 +15,12 @@ type Props = React.HTMLProps<HTMLDivElement> & {
   url: string;
   figureProps?: React.ComponentProps<"figure">;
   isLoading?: boolean;
+  width?: number | string;
 };
 
 export function ImageCard(props: Props) {
-  const { url, children, figureProps, isLoading: _isLoading, alt, ...rest } = props;
-  const imageLoadingStatus = useImageLoadingStatus(url);
+  const { url, children, figureProps, isLoading: _isLoading, alt, width, ...rest } = props;
+  const imageLoadingStatus = useImageLoadingStatus(url, Number(width) || 100);
   const error = imageLoadingStatus === "error";
   const isLoading = imageLoadingStatus === "loading";
   const isLoaded = imageLoadingStatus === "loaded";
@@ -44,6 +46,8 @@ export function ImageCard(props: Props) {
       </div>
     );
   }
+
+  const srcSets = getSrcSet(url, { width: Number(width) || 100 });
 
   return (
     <div
@@ -74,9 +78,11 @@ export function ImageCard(props: Props) {
         {isLoaded && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={url}
-            alt={alt || "Avatar"}
             className="size-full object-cover rounded-2xl overflow-clip-margin-unset"
+            alt={alt || "Avatar"}
+            sizes={srcSets.sizes}
+            srcSet={srcSets.srcSet}
+            src={srcSets.url}
           />
         )}
       </figure>

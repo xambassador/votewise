@@ -4,6 +4,7 @@ import { forwardRef } from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 
 import { cn } from "./cn";
+import { getSrcSet } from "./image-utils";
 
 type AvatarRef = React.ElementRef<typeof AvatarPrimitive.Root>;
 export type AvatarProps = React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root> & { isOnline?: boolean };
@@ -24,13 +25,20 @@ Avatar.displayName = AvatarPrimitive.Root.displayName;
 type AvatarImageRef = React.ElementRef<typeof AvatarPrimitive.Image>;
 export type AvatarImageProps = React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>;
 
-export const AvatarImage = forwardRef<AvatarImageRef, AvatarImageProps>(({ className, ...props }, ref) => (
-  <AvatarPrimitive.Image
-    ref={ref}
-    className={cn("aspect-square h-full w-full object-cover overflow-clip-margin-unset", className)}
-    {...props}
-  />
-));
+export const AvatarImage = forwardRef<AvatarImageRef, AvatarImageProps>((props, ref) => {
+  const { className, src, width, sizes, ...rest } = props;
+  const srcSets = getSrcSet(src || "", { width, sizes });
+  return (
+    <AvatarPrimitive.Image
+      {...rest}
+      ref={ref}
+      className={cn("aspect-square h-full w-full object-cover overflow-clip-margin-unset", className)}
+      sizes={srcSets.sizes}
+      srcSet={srcSets.srcSet}
+      src={srcSets.url}
+    />
+  );
+});
 AvatarImage.displayName = AvatarPrimitive.Image.displayName;
 
 type AvatarFallbackRef = React.ElementRef<typeof AvatarPrimitive.Fallback>;

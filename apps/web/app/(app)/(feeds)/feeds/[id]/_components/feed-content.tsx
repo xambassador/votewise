@@ -66,7 +66,7 @@ export function FeedContent(props: Props) {
         >
           <Avatar className="size-12">
             <AvatarFallback name={getFullName(feed.author)} />
-            <AvatarImage src={feed.author.avatar_url || ""} alt={getFullName(feed.author)} />
+            <AvatarImage src={feed.author.avatar_url || ""} alt={getFullName(feed.author)} sizes="48px" />
           </Avatar>
         </Link>
         <div className="w-full">
@@ -112,7 +112,7 @@ export function FeedContent(props: Props) {
               {feed.voters.map((voter) => (
                 <Avatar className="size-8" key={voter.id}>
                   <AvatarFallback name="Jane Smith" />
-                  <AvatarImage src={voter.avatar_url || ""} alt="Voter" />
+                  <AvatarImage src={voter.avatar_url || ""} alt="Voter" sizes="32px" />
                 </Avatar>
               ))}
             </Voters>

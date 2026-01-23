@@ -53,7 +53,7 @@ async function SuggestedGroupsList() {
                     className="rounded"
                     name={group.author ? group.author.first_name + group.author.last_name : ""}
                   />
-                  <AvatarImage src={group.logo_url || ""} alt={group.author?.first_name} />
+                  <AvatarImage src={group.logo_url || ""} alt={group.author?.first_name} sizes="48px" />
                 </Avatar>
               </Link>
               <div className="flex flex-col">

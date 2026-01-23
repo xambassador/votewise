@@ -10,81 +10,19 @@ type ServiceOptions = {
 };
 
 export class BucketService {
-  private readonly ctx: ServiceOptions;
+  constructor(_opts: ServiceOptions) {}
 
-  constructor(opts: ServiceOptions) {
-    this.ctx = opts;
+  /**
+   * @deprecated
+   */
+  public async getUrlForType(url: string, _type: "avatar" | "background") {
+    return url;
   }
 
-  public async getUrlForType(url: string, type: "avatar" | "background") {
-    const avatarBucket = this.ctx.avatarBucket;
-    const backgroundBucket = this.ctx.backgroundBucket;
-    const uploadBucket = this.ctx.uploadBucket;
-    let signedUrl = url;
-    if (type === "avatar") {
-      if (!url.startsWith("https://") && !url.startsWith("http://")) {
-        if (url.startsWith(avatarBucket)) {
-          // TODO: Protocol and port should be configurable for different environments
-          signedUrl = `http://${this.ctx.minioEndpoint}:${this.ctx.minioPort}/${url}`;
-        }
-
-        if (!url.startsWith(avatarBucket)) {
-          try {
-            signedUrl = await this.ctx.minio.presignedGetObject(uploadBucket, url);
-          } catch (err) {
-            // --
-          }
-        }
-      }
-    }
-
-    if (type === "background") {
-      if (!url.startsWith("https://") && !url.startsWith("http://")) {
-        if (url.startsWith(backgroundBucket)) {
-          // TODO: Protocol and port should be configurable for different environments
-          signedUrl = `http://${this.ctx.minioEndpoint}:${this.ctx.minioPort}/${url}`;
-        }
-
-        if (!url.startsWith(backgroundBucket)) {
-          try {
-            signedUrl = await this.ctx.minio.presignedGetObject(uploadBucket, url);
-          } catch (err) {
-            // --
-          }
-        }
-      }
-    }
-
-    return signedUrl;
-  }
-
-  public generatePublicUrl(url: string, type: "avatar" | "background") {
-    let signedUrl = url;
-    const avatarBucket = this.ctx.avatarBucket;
-    const backgroundBucket = this.ctx.backgroundBucket;
-    const uploadBucket = this.ctx.uploadBucket;
-    if (type === "avatar") {
-      if (!url.startsWith("https://") && !url.startsWith("http://")) {
-        if (url.startsWith(avatarBucket)) {
-          // TODO: Protocol and port should be configurable for different environments
-          signedUrl = `http://${this.ctx.minioEndpoint}:${this.ctx.minioPort}/${url}`;
-        } else {
-          signedUrl = `http://${this.ctx.minioEndpoint}:${this.ctx.minioPort}/${uploadBucket}/${url}`;
-        }
-      }
-    }
-
-    if (type === "background") {
-      if (!url.startsWith("https://") && !url.startsWith("http://")) {
-        if (url.startsWith(backgroundBucket)) {
-          // TODO: Protocol and port should be configurable for different environments
-          signedUrl = `http://${this.ctx.minioEndpoint}:${this.ctx.minioPort}/${url}`;
-        } else {
-          signedUrl = `http://${this.ctx.minioEndpoint}:${this.ctx.minioPort}/${uploadBucket}/${url}`;
-        }
-      }
-    }
-
-    return signedUrl;
+  /**
+   * @deprecated
+   */
+  public generatePublicUrl(url: string, _type: "avatar" | "background") {
+    return url;
   }
 }

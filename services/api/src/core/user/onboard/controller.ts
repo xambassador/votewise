@@ -61,34 +61,7 @@ export class Controller {
       }
 
       case 3: {
-        const avatarBucket = this.ctx.config.avatarsBucket;
         const url = body.avatar;
-        let shouldSchedule = false;
-        if (!url.includes(avatarBucket)) {
-          shouldSchedule = true;
-        }
-
-        if (shouldSchedule) {
-          const searchParams = new URLSearchParams(url.split("?")[1]);
-          const fileName = searchParams.get("file_name")!;
-          const fileToken = searchParams.get("file_token")!;
-          this.ctx.assert.unprocessableEntity(!fileName && !fileToken, "Invalid avatar url");
-          await this.ctx.repositories.user.update(userId, { avatar_url: url });
-          await this.ctx.services.onboard.updateUserOnboardCache(userId, { avatar_url: url });
-          this.ctx.queues.uploadQueue.add({
-            name: "uploadToS3",
-            payload: {
-              userId,
-              assetType: "avatar",
-              fileName,
-              path: userId + "/" + fileName,
-              fileToken
-            }
-          });
-          const result = { is_onboarded: user.is_onboarded };
-          return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
-        }
-
         await this.ctx.repositories.user.update(userId, { avatar_url: url });
         await this.ctx.services.onboard.updateUserOnboardCache(userId, { avatar_url: url });
         const result = { is_onboarded: user.is_onboarded };
@@ -96,34 +69,7 @@ export class Controller {
       }
 
       case 4: {
-        const backgroundBucket = this.ctx.config.backgroundsBucket;
         const url = body.cover;
-        let shouldSchedule = false;
-        if (!url.includes(backgroundBucket)) {
-          shouldSchedule = true;
-        }
-
-        if (shouldSchedule) {
-          const searchParams = new URLSearchParams(url.split("?")[1]);
-          const fileName = searchParams.get("file_name")!;
-          const fileToken = searchParams.get("file_token")!;
-          this.ctx.assert.unprocessableEntity(!fileName && !fileToken, "Invalid cover url");
-          await this.ctx.repositories.user.update(userId, { cover_image_url: url });
-          await this.ctx.services.onboard.updateUserOnboardCache(userId, { cover_image_url: url });
-          const result = { is_onboarded: user.is_onboarded };
-          this.ctx.queues.uploadQueue.add({
-            name: "uploadToS3",
-            payload: {
-              userId,
-              fileName,
-              path: userId + "/" + fileName,
-              fileToken,
-              assetType: "cover_image"
-            }
-          });
-          return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
-        }
-
         await this.ctx.repositories.user.update(userId, { cover_image_url: url });
         await this.ctx.services.onboard.updateUserOnboardCache(userId, { cover_image_url: url });
         const result = { is_onboarded: user.is_onboarded };

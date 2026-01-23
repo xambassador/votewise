@@ -41,7 +41,7 @@ export function GroupMolecule(props: Props) {
         >
           <Avatar className="size-20 rounded-xl">
             <AvatarFallback name={group.name} className="rounded-none" />
-            <AvatarImage src={group.logo_url ?? ""} alt={group.name} />
+            <AvatarImage src={group.logo_url ?? ""} alt={group.name} sizes="80px" />
           </Avatar>
         </Link>
         <GroupContent>

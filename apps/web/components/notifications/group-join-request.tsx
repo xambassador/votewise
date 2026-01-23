@@ -25,7 +25,11 @@ export const GroupJoinRequestNotification = memo(
       <NotificationPremitives.Notification>
         <Link href={routes.user.profile(notification.user_name)} className="focus-presets focus-primary rounded-full">
           <Avatar>
-            <AvatarImage src={notification.avatar_url} alt={notification.first_name + " " + notification.last_name} />
+            <AvatarImage
+              src={notification.avatar_url}
+              alt={notification.first_name + " " + notification.last_name}
+              sizes="48px"
+            />
             <AvatarFallback name={notification.first_name + " " + notification.last_name} />
           </Avatar>
         </Link>

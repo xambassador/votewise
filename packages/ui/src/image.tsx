@@ -2,6 +2,7 @@
 
 import { cn } from "./cn";
 import { Image as ImageIcon } from "./icons/image";
+import { getSrcSet } from "./image-utils";
 import { Spinner } from "./ring-spinner";
 import { useImageLoadingStatus } from "./use-image-status";
 
@@ -12,8 +13,8 @@ export type ImageProps = React.ImgHTMLAttributes<HTMLImageElement> & {
 };
 
 export function Image(props: ImageProps) {
-  const { src, children, alt, containerProps, errorElement, loadingElement, ...rest } = props;
-  const imageLoadingStatus = useImageLoadingStatus(src);
+  const { src, children, alt, containerProps, errorElement, loadingElement, width, sizes, ...rest } = props;
+  const imageLoadingStatus = useImageLoadingStatus(src, Number(width), sizes);
   const error = imageLoadingStatus === "error";
   const isLoading = imageLoadingStatus === "loading";
   const isLoaded = imageLoadingStatus === "loaded";
@@ -30,13 +31,15 @@ export function Image(props: ImageProps) {
     </div>
   );
 
+  const srcSets = getSrcSet(src || "", { width: Number(width), sizes });
+
   return (
     <div {...containerProps} className={cn("size-full bg-nobelBlack-200", containerProps?.className)}>
       {error && (errorElement ? errorElement : defaultErrorElement)}
       {isLoading && (loadingElement ? loadingElement : defaultLoadingElement)}
       {isLoaded && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt={alt || "Avatar"} {...rest} />
+        <img {...rest} sizes={srcSets.sizes} srcSet={srcSets.srcSet} src={srcSets.url} alt={alt || "Avatar"} />
       )}
     </div>
   );

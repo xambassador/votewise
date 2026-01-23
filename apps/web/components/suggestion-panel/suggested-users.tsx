@@ -50,7 +50,7 @@ async function SuggestedUsersList() {
           <Link href={routes.user.profile(user.user_name)} className="focus-visible rounded-full">
             <Avatar>
               <AvatarFallback name={user.first_name + " " + user.last_name} />
-              <AvatarImage src={user.avatar_url} alt={user.first_name} />
+              <AvatarImage src={user.avatar_url} alt={user.first_name} sizes="48px" />
             </Avatar>
           </Link>
           <div className="flex flex-col gap-1 flex-1">

@@ -19,8 +19,26 @@ export const ZGroupCreate = z.object({
     required_error: "Type is required",
     invalid_type_error: "Type must be either PUBLIC or PRIVATE"
   }),
-  cover_image_url: z.string().url().optional(),
-  logo_url: z.string().url().optional()
+  cover_image_url: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val) return true;
+        return val.startsWith("/votewise-bucket/uploads");
+      },
+      { message: "Invalid cover image url" }
+    ),
+  logo_url: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val) return true;
+        return val.startsWith("/votewise-bucket/uploads");
+      },
+      { message: "Invalid logo url" }
+    )
 });
 
 export const ZGroupUpdate = ZGroupCreate.extend({

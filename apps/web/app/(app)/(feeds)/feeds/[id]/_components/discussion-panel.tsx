@@ -207,7 +207,7 @@ const MemoizedComment = memo(function _Comment(props: MemoizedCommentProps) {
       >
         <Avatar className="size-8">
           <AvatarFallback name={name} />
-          <AvatarImage src={avatarUrl || ""} alt={name} />
+          <AvatarImage src={avatarUrl || ""} alt={name} sizes="32px" />
         </Avatar>
       </Link>
       <CommentContent>

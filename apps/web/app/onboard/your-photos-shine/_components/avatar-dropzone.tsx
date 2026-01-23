@@ -43,7 +43,7 @@ function ImageDropZonePlaceholder() {
     return (
       <div className="flex flex-col items-center gap-2">
         <Avatar className="size-28">
-          <AvatarImage src={selectedAvatar} alt="Selected Avatar" />
+          <AvatarImage src={selectedAvatar} alt="Selected Avatar" sizes="112px" />
           <AvatarFallback name="U" />
         </Avatar>
         <button onClick={reset}>
