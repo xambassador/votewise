@@ -29,7 +29,8 @@ export class Controller {
       first_name: body.first_name,
       last_name: body.last_name,
       avatar_url: body.avatar,
-      cover_image_url: body.cover
+      cover_image_url: body.cover,
+      about: body.about
     });
 
     const result = { ...body };

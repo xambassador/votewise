@@ -39,22 +39,31 @@ import { getFullName } from "@/lib/string";
 
 extend(relativeTime);
 
-type Props = { data: TFeed };
+type Props = { data: TFeed; isOptimistic?: boolean };
 
 export const FeedMolecule = memo(function FeedMolecule(props: Props) {
-  const { data: feed } = props;
+  const { data: feed, isOptimistic } = props;
   const router = useRouter();
+
+  function handleClick() {
+    if (isOptimistic) return;
+    router.push(routes.feed.view(feed.id));
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (isOptimistic) return;
+    if (e.key === "Enter" || e.key === " ") {
+      router.push(routes.feed.view(feed.id));
+    }
+  }
+
   return (
     <Feed
       role="link"
-      tabIndex={0}
-      onClick={() => router.push(routes.feed.view(feed.id))}
-      className="cursor-pointer focus-presets"
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          router.push(routes.feed.view(feed.id));
-        }
-      }}
+      tabIndex={isOptimistic ? -1 : 0}
+      onClick={handleClick}
+      className={cn("cursor-pointer focus-presets", isOptimistic && "opacity-70 cursor-default")}
+      onKeyDown={handleKeyDown}
     >
       <VoteContainer className="hidden md:flex">
         <VoteCount>{humanizeNumber(feed.votes)}</VoteCount>

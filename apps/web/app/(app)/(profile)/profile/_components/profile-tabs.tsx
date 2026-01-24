@@ -97,16 +97,15 @@ function PostsPanel(props: TabPanelProps) {
   return (
     <div className={panelStyle}>
       {data.posts.map((post) => (
-        <Link key={post.id} href={routes.feed.view(post.id)} className="focus-presets rounded-xl">
-          <FeedMolecule
-            data={{
-              ...post,
-              author: { ...post.author, avatar_url: post.author.avatar_url ?? "" },
-              hash_tags: [],
-              voters: post.voters.map((v) => ({ ...v, avatar_url: v.avatar_url ?? "" }))
-            }}
-          />
-        </Link>
+        <FeedMolecule
+          key={post.id}
+          data={{
+            ...post,
+            author: { ...post.author, avatar_url: post.author.avatar_url ?? "" },
+            hash_tags: [],
+            voters: post.voters.map((v) => ({ ...v, avatar_url: v.avatar_url ?? "" }))
+          }}
+        />
       ))}
     </div>
   );

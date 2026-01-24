@@ -10,17 +10,16 @@ import type { Input } from "@votewise/ui/input-basic";
 import type { Textarea } from "@votewise/ui/textarea-autosize";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useCreateFeedMutation } from "@/hooks/use-create-feed-mutation";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useMediaQuery } from "react-responsive";
 
 import { useComboBoxTrigger } from "@votewise/ui/combobox";
 
 import { chain } from "@/lib/chain";
-import { feedClient, onboardClient, uploadClient } from "@/lib/client";
+import { onboardClient, uploadClient } from "@/lib/client";
 import { cn } from "@/lib/cn";
-import { getGroupFeedsKey } from "@/lib/constants";
-import { renderErrorToast } from "@/lib/error";
+import { kindOfError } from "@/lib/error";
 import { useActiveGroup } from "@/lib/global-store";
 
 /* ----------------------------------------------------------------------------------------------- */
@@ -199,22 +198,32 @@ export function useAssets() {
 }
 
 export function useSubmit() {
-  const [status, setStatus] = useState<AsyncState>("idle");
+  const [uploadStatus, setUploadStatus] = useState<AsyncState>("idle");
   const [postContent, setPostContent] = useAtom(postContentAtom);
   const [title, setTitle] = useAtom(titleAtom);
   const [topics, setTopics] = useAtom(selectedTopicsAtom);
-  const setCreatePostDialogOpen = useSetAtom(isCreatePostDialogOpenAtom);
   const [files, setFiles] = useAtom(filesAtom);
+  const setCreatePostDialogOpen = useSetAtom(isCreatePostDialogOpenAtom);
   const group = useActiveGroup();
-  const queryClient = useQueryClient();
+
+  const reset = () => {
+    setPostContent("");
+    setTitle("");
+    setTopics([]);
+    setFiles([]);
+    setCreatePostDialogOpen(false);
+  };
+
+  const mutation = useCreateFeedMutation({ onMutate: reset });
+
   const isDisabled = !(title && postContent && topics.length > 0);
+  const status = mutation.status;
 
   async function handleSubmit() {
     if (isDisabled) return;
 
-    setStatus("loading");
+    setUploadStatus("loading");
     const urls: string[] = [];
-
     if (files.length > 0) {
       const filesWithoutError = files.filter((file) => !file.hasError);
       const promises = filesWithoutError.map((file) => uploadClient.upload(file.file));
@@ -224,40 +233,26 @@ export function useSubmit() {
           urls.push(r.data.url);
         }
       });
+      setUploadStatus("success");
     }
 
-    const res = await feedClient.create({
-      title,
-      topics,
-      content: postContent,
-      status: "OPEN",
-      type: "PUBLIC",
-      assets: urls.map((url) => ({ url, type: "image" })),
-      group_id: group?.id
-    });
-
-    const reset = () => {
-      setPostContent("");
-      setTitle("");
-      setTopics([]);
-      setFiles([]);
-      setStatus("idle");
-      setCreatePostDialogOpen(false);
-    };
-
-    if (!res.success) {
-      renderErrorToast(res, { onSandboxError: reset });
-      setStatus("error");
-      return;
-    }
-
-    if (group) {
-      queryClient.invalidateQueries({ queryKey: getGroupFeedsKey(group.id) });
-    }
-
-    setStatus("success");
-    reset();
-    setCreatePostDialogOpen(false);
+    mutation.mutate(
+      {
+        title,
+        topics,
+        content: postContent,
+        status: "OPEN",
+        type: "PUBLIC",
+        assets: urls.map((url) => ({ url, type: "image" })),
+        group_id: group?.id
+      },
+      {
+        onError: (err) => {
+          const { isSandbox } = kindOfError(err);
+          if (isSandbox) reset();
+        }
+      }
+    );
   }
 
   function getButtonProps(props?: ButtonProps): ButtonProps {
@@ -266,7 +261,7 @@ export function useSubmit() {
       ...props,
       disabled: isDisabled,
       onClick: chain(handleSubmit, props?.onClick),
-      loading: status === "loading"
+      loading: status === "pending" || uploadStatus === "loading"
     };
   }
 
