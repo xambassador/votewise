@@ -26,7 +26,11 @@ export async function Authorized(props: AuthorizedProps) {
   const userClient = getUserClient();
   const res = await userClient.getMe();
   if (!res.success) {
-    return <Error error={res.error} />;
+    return (
+      <div className="center min-h-screen">
+        <Error error={res.error} className="max-w-fit" />
+      </div>
+    );
   }
   const me = res.data;
 

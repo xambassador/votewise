@@ -38,11 +38,12 @@ export function Error(props: Props) {
             <AlertCircleSolid {...iconProps} className={cn("size-8", iconProps?.className)} />
           </div>
 
-          <h2 className="mb-2 text-lg font-bold text-center text-gray-200">Well, This Is Embarrassing...</h2>
+          <h2 className="mb-2 text-lg font-bold text-center text-gray-200">Something Went Wrong</h2>
 
           <div className="mb-6 text-center text-gray-300">
-            <p className="mb-4 text-base">
-              The hamsters powering this section have gone on strike. Union negotiations in progress.
+            <p className="mb-4 text-base text-center max-w-md mx-auto">
+              We&apos;re sorry, but we encountered an unexpected error. Please try refreshing the page or contact
+              support if the problem persists.
             </p>
             {isDevMode && (
               <div className="mt-4 p-3 bg-black-800 rounded-md text-left overflow-auto">
@@ -59,8 +60,9 @@ export function Error(props: Props) {
             )}
             {!isDevMode && (
               <div className="mt-4 p-3 bg-black-800 rounded-md text-left">
-                <p className="text-sm font-mono text-gray-300 mb-2">
-                  Something went wrong. Try again or come back later.
+                <p className="text-sm text-gray-300 mb-2">
+                  An error occurred while loading this content. Our team has been notified and we&apos;re working to fix
+                  it.
                 </p>
               </div>
             )}
