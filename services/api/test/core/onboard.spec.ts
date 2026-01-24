@@ -7,7 +7,7 @@ import { Assertions } from "@votewise/errors";
 import { Controller } from "@/core/user/onboard/controller";
 import { requestParserPluginFactory } from "@/plugins";
 
-import { mockTaskQueue, mockUploadQueue } from "../__mock__/queue";
+import { mockTaskQueue } from "../__mock__/queue";
 import {
   mockPostTopicRepository,
   mockRefreshTokenRepository,
@@ -34,8 +34,7 @@ const controller = new Controller({
     session: mockSessionManagerWithoutCtx
   },
   queues: {
-    tasksQueue: mockTaskQueue,
-    uploadQueue: mockUploadQueue
+    tasksQueue: mockTaskQueue
   }
 } as unknown as AppContext);
 

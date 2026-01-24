@@ -5,17 +5,6 @@ export abstract class ITaskWorker {
 }
 
 export type AssetType = "avatar" | "cover_image";
-export type UploadToS3Job = {
-  fileName: string;
-  fileToken: string;
-  userId: string;
-  path: string;
-  assetType: AssetType;
-};
-export type UploadCompletedEventJob = { userId: string; path: string; assetType: AssetType };
-export type UploadToS3Task = { name: "uploadToS3"; payload: UploadToS3Job };
-export type UploadCompletedEventTask = { name: "uploadCompletedEvent"; payload: UploadCompletedEventJob };
-
 export type JobType = "email";
 
 type BaseData = {

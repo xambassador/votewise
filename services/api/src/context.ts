@@ -110,7 +110,7 @@ export class AppContext {
     const cache = new Cache();
     const mailer = new Mailer({ env: environment });
     const repositories = createRepositories(dataLayer);
-    const { tasksQueue, uploadCompletedEventQueue, uploadQueue } = createQueues({ env: environment });
+    const { tasksQueue } = createQueues({ env: environment });
     const jwtService = new Services.JWTService({ accessTokenSecret: secrets.jwtSecret });
     const cryptoService = new Services.CryptoService();
     const requestParser = Plugins.requestParserPluginFactory();
@@ -160,7 +160,7 @@ export class AppContext {
       rateLimiteManager,
       repositories,
       eventBus,
-      queues: { tasksQueue, uploadQueue },
+      queues: { tasksQueue },
       plugins: { requestParser, jwt: jwtPlugin },
       services: {
         bucket: bucketService,
@@ -177,10 +177,7 @@ export class AppContext {
     this._instance = ctx;
     cache.onConnect(() => {
       tasksQueue.init();
-      uploadQueue.init();
-      uploadCompletedEventQueue.init();
       tasksQueue.initWorker(ctx);
-      uploadCompletedEventQueue.initWorker(ctx);
     });
     return ctx;
   }
