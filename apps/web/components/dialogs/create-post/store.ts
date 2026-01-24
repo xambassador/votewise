@@ -33,13 +33,14 @@ type ZigZagListProps = React.ComponentProps<typeof ZigZagList>;
 
 const maxLength = 300;
 const topicsPromise = onboardClient.getTopics();
+const totalAllowedFiles = 5;
 
 /* -----------------------------------------------------------------------------------------------
  * Atoms
  * -----------------------------------------------------------------------------------------------*/
 const postContentAtom = atom("");
 const titleAtom = atom("");
-const filesAtom = atom<{ file: File; preview: string; id: string }[]>([]);
+const filesAtom = atom<{ file: File; preview: string; id: string; hasError?: string }[]>([]);
 const isTopicModalOpenAtom = atom(false);
 const topicsAtom = atom<Topics>([]);
 const selectedTopicsAtom = atom<string[]>([]);
@@ -75,6 +76,7 @@ export function useTitleInput() {
       placeholder: "Headline of your post",
       ...props,
       value: title,
+      name: "title",
       onChange: chain((e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.value.length > 100) {
           e.target.value = e.target.value.slice(0, 100);
@@ -96,6 +98,7 @@ export function useContentInput() {
       maxRows: 25,
       cacheMeasurements: true,
       ...props,
+      name: "content",
       value: postContent,
       onChange: chain((e: React.ChangeEvent<HTMLTextAreaElement>) => {
         if (e.target.value.length > 300) {
@@ -153,10 +156,12 @@ export function useAssetPicker() {
       onChange: chain((e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFiles = e.target.files;
         if (!selectedFiles || !selectedFiles.length) return;
-        const fileArray = Array.from(selectedFiles).map((file, index) => ({
+        const slice = Array.from(selectedFiles).slice(0, totalAllowedFiles);
+        const fileArray = slice.map((file, index) => ({
           file,
           preview: URL.createObjectURL(file),
-          id: `${file.name}-${index}-${Date.now()}`
+          id: `${file.name}-${index}-${Date.now()}`,
+          hasError: file.size > 1 * 1024 * 1024 ? "File size exceeds 1MB" : undefined
         }));
         setFilesToAtom([...files, ...fileArray]);
         e.target.value = "";
@@ -172,8 +177,9 @@ export function useAssets() {
   const setFilesToAtom = useSetAtom(filesAtom);
   const isFilesEmpty = files.length === 0;
   const isMobile = useMediaQuery({ query: "(max-width: 640px)" });
-  const maxFilesToShow = isMobile ? 4 : 8;
+  const maxFilesToShow = isMobile ? 4 : totalAllowedFiles;
   const remainingFiles = files.length - maxFilesToShow;
+  const hasError = files.some((file) => file.hasError);
 
   function removeFile(fileId: string | number) {
     const newFiles = files.filter((f) => f.id !== fileId);
@@ -181,10 +187,15 @@ export function useAssets() {
   }
 
   function getZigZagListProps(props?: Partial<ZigZagListProps>): ZigZagListProps {
-    return { ...props, images: files.slice(0, maxFilesToShow).map((file) => ({ url: file.preview, id: file.id })) };
+    return {
+      ...props,
+      images: files
+        .slice(0, maxFilesToShow)
+        .map((file) => ({ url: file.preview, id: file.id, hasError: file.hasError }))
+    };
   }
 
-  return { getZigZagListProps, removeFile, remainingFiles, isFilesEmpty };
+  return { getZigZagListProps, removeFile, remainingFiles, isFilesEmpty, hasError };
 }
 
 export function useSubmit() {
@@ -205,7 +216,8 @@ export function useSubmit() {
     const urls: string[] = [];
 
     if (files.length > 0) {
-      const promises = files.map((file) => uploadClient.upload(file.file));
+      const filesWithoutError = files.filter((file) => !file.hasError);
+      const promises = filesWithoutError.map((file) => uploadClient.upload(file.file));
       const res = await Promise.all(promises);
       res.map((r) => {
         if (r.success) {

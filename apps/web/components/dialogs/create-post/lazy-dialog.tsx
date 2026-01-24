@@ -6,7 +6,15 @@ import { Dash } from "@votewise/ui/icons/dash";
 import { useActiveGroup } from "@/lib/global-store";
 
 import { CurrentUserAvatar } from "../../current-user-avatar";
-import { AssetPicker, Assets, ContentInput, ProgressTracker, SubmitButton, TitleInput } from "./form-elements";
+import {
+  AssetPicker,
+  Assets,
+  AssetsError,
+  ContentInput,
+  ProgressTracker,
+  SubmitButton,
+  TitleInput
+} from "./form-elements";
 import { PickTopics } from "./pick-topics";
 
 export function LazyCreatePostDialog(props: React.ComponentProps<typeof Dialog>) {
@@ -36,6 +44,7 @@ export function LazyCreatePostDialog(props: React.ComponentProps<typeof Dialog>)
             <AssetPicker />
             <ProgressTracker />
           </div>
+          <AssetsError />
           <Dash className="text-nobelBlack-200" />
         </div>
         <SubmitButton />

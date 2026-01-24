@@ -30,7 +30,8 @@ export function Assets() {
       {...getZigZagListProps({
         className: "relative w-fit",
         imageCardProps: (props) => ({
-          children: <ClearButton variant="topLeft" size="lg" onClick={() => removeFile(props.image.id)} />
+          children: <ClearButton variant="topLeft" size="lg" onClick={() => removeFile(props.image.id)} />,
+          figureProps: { className: props.image.hasError ? "border-2 border-red-500" : "" }
         })
       })}
     >
@@ -40,6 +41,16 @@ export function Assets() {
         </FloatingCounter>
       )}
     </ZigZagList>
+  );
+}
+
+export function AssetsError() {
+  const { hasError } = useAssets();
+  if (!hasError) return null;
+  return (
+    <div className="w-full bg-nobelBlack-200 rounded p-2">
+      <p className="text-xs text-red-500">One or more selected files has an error and could not be uploaded.</p>
+    </div>
   );
 }
 

@@ -138,7 +138,7 @@ export function ClearButton(props: ClearButtonProps) {
   );
 }
 
-type Img = { url: string; alt?: string; id: string | number };
+type Img = { url: string; alt?: string; id: string | number; hasError?: string };
 type ZigZagListProps = React.HTMLProps<HTMLDivElement> & {
   imageCardProps?: (props: { image: Img }) => Omit<React.ComponentProps<typeof ImageCard>, "url">;
   images: Img[];
