@@ -1,8 +1,8 @@
 import type { Cursor } from "@/lib/cursor";
-import type { PostStatus, PostType } from "@votewise/prisma/client";
+import type { PostStatus, PostType } from "@votewise/db/enums";
 import type { Tx } from "./transaction";
 
-import { sql } from "@votewise/prisma";
+import { sql } from "@votewise/db";
 
 import { BaseRepository } from "./base.repository";
 
@@ -146,8 +146,7 @@ export class FeedRepository extends BaseRepository {
         .values({
           post_id: feedId,
           user_id: userId,
-          created_at: new Date(),
-          updated_at: new Date()
+          created_at: new Date()
         })
         .returningAll()
         .executeTakeFirstOrThrow();

@@ -19,13 +19,9 @@
     "upload:start": "lerna exec --scope @votewise/upload -- yarn start",
     "upload:dev": "lerna exec --scope @votewise/upload -- yarn dev",
     "upload:build": "lerna exec --scope @votewise/upload -- yarn build",
-    "db:generate": "lerna exec --scope @votewise/prisma -- yarn run db:generate",
-    "db:migrate": "lerna exec --scope @votewise/prisma -- yarn run db:migrate",
-    "db:studio": "lerna exec --scope @votewise/prisma -- yarn run db:studio",
-    "db:seed": "lerna exec --scope @votewise/prisma -- yarn run db:seed",
-    "db:seed:sync": "lerna exec --scope @votewise/prisma -- yarn run seed:sync",
-    "db:clean": "lerna exec --scope @votewise/prisma -- yarn run db:clean",
-    "db:deploy": "lerna exec --scope @votewise/prisma -- yarn run db:deploy",
+    "db:migrate": "lerna exec --scope @votewise/db -- yarn run db:migrate",
+    "db:seed": "lerna exec --scope @votewise/db -- yarn run db:seed",
+    "db:clean": "lerna exec --scope @votewise/db -- yarn run db:clean",
     "clean": "lerna run clean --parallel",
     "clean:build": "lerna run clean:build --parallel",
     "dev": "lerna run dev --stream",
@@ -85,7 +81,7 @@
   },
   "packageManager": "yarn@4.0.2",
   "lint-staged": {
-    "*": "prettier --write --ignore-unknown",
+    "*": "prettier --write --ignore-unknown --no-error-on-unmatched-pattern",
     "*.{json,md,yml}": "prettier --write",
     "*.{js,jsx,ts,tsx}": "eslint"
   }

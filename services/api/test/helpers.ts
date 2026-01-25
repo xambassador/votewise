@@ -1,4 +1,4 @@
-import type { Challenge, Factor, RefreshToken, User } from "@votewise/prisma/client";
+import type { Challenge, Factor, RefreshToken, User } from "@votewise/db/db";
 import type { AccessTokenPayload } from "@votewise/types";
 import type { Request, Response } from "express";
 

@@ -2,7 +2,7 @@ import type { AppContext } from "@/context";
 
 import chalk from "chalk";
 
-import { sql } from "@votewise/prisma";
+import { sql } from "@votewise/db";
 
 type Options = { ctx: AppContext };
 

@@ -1,7 +1,9 @@
+/* eslint-disable no-console */
 import "dotenv/config";
 
 import chalk from "chalk";
 
+import { migrateToLatest } from "@votewise/db/migrator";
 import { environment } from "@votewise/env";
 import { Day, Minute } from "@votewise/times";
 
@@ -34,6 +36,24 @@ const secrets = new ServerSecrets({
 });
 
 async function bootstrap() {
+  if (environment.NODE_ENV === "production") {
+    console.log(chalk.blue("Checking pending database migrations..."));
+    const { error, results } = await migrateToLatest(environment.DATABASE_URL);
+    if (error) {
+      console.error(chalk.red("Database migration failed:"), error);
+      throw error;
+    }
+    results?.forEach((result) => {
+      if (result.status === "Success") {
+        console.log(chalk.green(`- Migrated: ${result.migrationName}`));
+      }
+      if (result.status === "Error") {
+        console.error(chalk.red(`- Migration failed: ${result.migrationName}`));
+      }
+    });
+    console.log(chalk.blue("Database migrations checked.\n"));
+  }
+
   const server = await Server.create({ cfg, secrets });
   await server.start();
   server.ctx.logger.logSync(chalk.blue("Press Ctrl+C to shutdown Votewise API\n\n"));

@@ -5,7 +5,7 @@ import type {
   NewUserAggregates,
   PostAggregates,
   UserAggregates
-} from "@votewise/prisma/db";
+} from "@votewise/db/db";
 import type { Tx } from "./transaction";
 
 import { BaseRepository } from "./base.repository";

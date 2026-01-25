@@ -1,5 +1,5 @@
 import type { AppContext } from "@/context";
-import type { Group } from "@votewise/prisma/client";
+import type { Group } from "@votewise/db/db";
 
 import { EventBuilder } from "@votewise/event";
 

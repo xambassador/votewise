@@ -1,6 +1,6 @@
 import type { Cursor } from "@/lib/cursor";
 
-import { sql } from "@votewise/prisma";
+import { sql } from "@votewise/db";
 
 import { BaseRepository } from "./base.repository";
 
@@ -17,7 +17,7 @@ export class HotViewsRepository extends BaseRepository {
     const shouldUseCursor = !!cursor;
     return this.execute(async () => {
       const hotFeeds = await this.dataLayer
-        .selectFrom("algohotfeedview")
+        .selectFrom("AlgoHotFeedView")
         .selectAll()
         .$if(shouldUseCursor, (qb) => {
           const [score, postId] = (cursor?.secondary as string).split("_");
@@ -120,7 +120,7 @@ export class HotViewsRepository extends BaseRepository {
     const shouldUseCursor = !!cursor;
     return this.execute(async () => {
       const hotUsers = await this.dataLayer
-        .selectFrom("algohotuserview")
+        .selectFrom("AlgoHotUserView")
         .selectAll()
         .$if(shouldUseCursor, (qb) => {
           const [score, username] = (cursor?.secondary as string).split("_");

@@ -1,9 +1,9 @@
-import type { Prisma } from "@votewise/prisma";
+import type { NewFactor } from "@votewise/db/db";
 import type { Tx } from "./transaction";
 
 import { BaseRepository } from "./base.repository";
 
-type TFactorCreate = Prisma.FactorCreateInput;
+type TFactorCreate = NewFactor;
 type TCreate = {
   userId: string;
   factorType: TFactorCreate["factor_type"];

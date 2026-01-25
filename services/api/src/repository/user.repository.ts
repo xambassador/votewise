@@ -1,7 +1,7 @@
-import type { NewUser, UserUpdate } from "@votewise/prisma/db";
+import type { NewUser, UserUpdate } from "@votewise/db/db";
 import type { Tx } from "./transaction";
 
-import { sql } from "@votewise/prisma";
+import { sql } from "@votewise/db";
 
 import { BaseRepository } from "./base.repository";
 

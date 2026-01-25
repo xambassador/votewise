@@ -1,6 +1,6 @@
 import type { AppContext } from "@/context";
 import type { ExtractControllerResponse } from "@/types";
-import type { Group, GroupInvitation } from "@votewise/prisma/db";
+import type { Group, GroupInvitation } from "@votewise/db/db";
 import type { GroupJoinPayload, GroupJoinRequestPayload } from "@votewise/types";
 import type { Request, Response } from "express";
 

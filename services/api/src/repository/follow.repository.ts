@@ -19,8 +19,7 @@ export class FollowRepository extends BaseRepository {
           follower_id: followerId,
           following_id: followedId,
           id: this.dataLayer.createId(),
-          created_at: new Date(),
-          updated_at: new Date()
+          created_at: new Date()
         })
         .returningAll()
         .executeTakeFirstOrThrow();

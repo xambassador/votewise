@@ -1,6 +1,6 @@
 import type { AppContext } from "@/context";
-import type { Transaction } from "@votewise/prisma";
-import type { DB } from "@votewise/prisma/db";
+import type { Transaction } from "@votewise/db";
+import type { DB } from "@votewise/db/db";
 
 export type Tx = Transaction<DB>;
 

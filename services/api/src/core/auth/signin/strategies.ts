@@ -1,5 +1,5 @@
 import type { AppContext } from "@/context";
-import type { User } from "@votewise/prisma/db";
+import type { User } from "@votewise/db/db";
 
 export abstract class Strategy {
   public abstract handle(value: string): Promise<User | undefined>;

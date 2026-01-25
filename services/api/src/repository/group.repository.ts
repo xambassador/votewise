@@ -1,8 +1,8 @@
-import type { GroupMemberRole, GroupStatus } from "@votewise/prisma/client";
-import type { GroupInvitationUpdate, GroupUpdate, NewGroup, NewGroupInvitation } from "@votewise/prisma/db";
+import type { GroupInvitationUpdate, GroupUpdate, NewGroup, NewGroupInvitation } from "@votewise/db/db";
+import type { GroupMemberRole, GroupStatus } from "@votewise/db/enums";
 import type { Tx } from "./transaction";
 
-import { sql } from "@votewise/prisma";
+import { sql } from "@votewise/db";
 
 import { BaseRepository } from "./base.repository";
 
@@ -341,8 +341,7 @@ export class GroupMemberRepository extends BaseRepository {
           user_id: userId,
           role,
           joined_at: new Date(),
-          created_at: new Date(),
-          updated_at: new Date()
+          created_at: new Date()
         })
         .returningAll()
         .executeTakeFirstOrThrow();
@@ -395,8 +394,7 @@ export class GroupMemberRepository extends BaseRepository {
           "member.created_at",
           "member.is_removed",
           "member.joined_at",
-          "member.role",
-          "member.updated_at"
+          "member.role"
         ])
         .executeTakeFirst();
       if (!admin) {
@@ -417,8 +415,7 @@ export class GroupMemberRepository extends BaseRepository {
         group_id: admin.group_id,
         created_at: admin.created_at,
         is_removed: admin.is_removed,
-        joined_at: admin.joined_at,
-        updated_at: admin.updated_at
+        joined_at: admin.joined_at
       };
     });
   }
@@ -455,7 +452,7 @@ export class GroupMemberRepository extends BaseRepository {
     return this.execute(async () => {
       const member = await db
         .updateTable("GroupMember")
-        .set({ is_removed: true, updated_at: new Date() })
+        .set({ is_removed: true })
         .where("group_id", "=", groupId)
         .where("user_id", "=", userId)
         .returningAll()
@@ -548,8 +545,7 @@ export class GroupInvitationRepository extends BaseRepository {
         .values({
           ...data,
           id: this.dataLayer.createId(),
-          created_at: new Date(),
-          updated_at: new Date()
+          created_at: new Date()
         })
         .returningAll()
         .executeTakeFirstOrThrow();
@@ -579,7 +575,7 @@ export class GroupInvitationRepository extends BaseRepository {
     return this.execute(async () => {
       const invitation = await db
         .updateTable("GroupInvitation")
-        .set({ ...data, updated_at: new Date() })
+        .set(data)
         .where("id", "=", id)
         .returningAll()
         .executeTakeFirstOrThrow();
@@ -612,8 +608,7 @@ export class GroupInvitationRepository extends BaseRepository {
           "invitation.sent_at",
           "invitation.status",
           "invitation.type",
-          "invitation.created_at",
-          "invitation.updated_at"
+          "invitation.created_at"
         ])
         .execute();
 
@@ -633,8 +628,7 @@ export class GroupInvitationRepository extends BaseRepository {
         sent_at: invitation.sent_at,
         status: invitation.status,
         type: invitation.type,
-        created_at: invitation.created_at,
-        updated_at: invitation.updated_at
+        created_at: invitation.created_at
       }));
     });
   }

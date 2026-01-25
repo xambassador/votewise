@@ -1,4 +1,4 @@
-import { sql } from "@votewise/prisma";
+import { sql } from "@votewise/db";
 
 import { BaseRepository } from "./base.repository";
 

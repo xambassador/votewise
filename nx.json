@@ -20,22 +20,10 @@
     "lint:fix": {
       "dependsOn": []
     },
-    "db:generate": {
-      "dependsOn": []
-    },
     "db:migrate": {
       "dependsOn": []
     },
-    "db:studio": {
-      "dependsOn": []
-    },
     "db:seed": {
-      "dependsOn": []
-    },
-    "db:seed:sync": {
-      "dependsOn": []
-    },
-    "db:deploy": {
       "dependsOn": []
     },
     "db:clean": {

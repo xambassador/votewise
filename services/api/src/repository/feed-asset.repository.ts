@@ -25,9 +25,7 @@ export class FeedAssetRepository extends BaseRepository {
           id: this.dataLayer.createId(),
           type: data.type,
           url: data.url,
-          post_id: data.post_id,
-          created_at: new Date(),
-          updated_at: new Date()
+          post_id: data.post_id
         })
         .execute();
     });

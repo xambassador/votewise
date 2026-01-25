@@ -1,7 +1,7 @@
-import type { NewNotification } from "@votewise/prisma/db";
+import type { NewNotification } from "@votewise/db/db";
 import type { Tx } from "./transaction";
 
-import { sql } from "@votewise/prisma";
+import { sql } from "@votewise/db";
 
 import { BaseRepository } from "./base.repository";
 
@@ -18,7 +18,7 @@ export class NotificationRepository extends BaseRepository {
     return this.execute(async () => {
       const notification = await db
         .insertInto("Notification")
-        .values({ ...data, id: this.dataLayer.createId(), created_at: new Date(), updated_at: new Date() })
+        .values({ ...data, id: this.dataLayer.createId(), created_at: new Date() })
         .returningAll()
         .executeTakeFirstOrThrow();
       return notification;
@@ -66,7 +66,7 @@ export class NotificationRepository extends BaseRepository {
     return this.execute(async () => {
       const notification = await db
         .updateTable("Notification")
-        .set({ read_at: new Date(), updated_at: new Date() })
+        .set({ read_at: new Date() })
         .where("id", "=", id)
         .returningAll()
         .executeTakeFirstOrThrow();

@@ -1,0 +1,68 @@
+{
+  "name": "@votewise/db",
+  "private": true,
+  "version": "0.0.0",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "db",
+    "migrator"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./db": {
+      "types": "./db/schema.ts"
+    },
+    "./enums": {
+      "types": "./db/enums.ts"
+    },
+    "./migrator": {
+      "import": "./dist/migrator.mjs",
+      "require": "./dist/migrator.js"
+    }
+  },
+  "scripts": {
+    "db:migrate": "npx tsx run-migration.ts",
+    "db:seed": "npx tsx seed.ts",
+    "db:clean": "npx tsx seed.ts --clean",
+    "db:migrate:create": "npx tsx create-migration.ts",
+    "clean": "rimraf --glob ./dist ./zod ./node_modules",
+    "clean:build": "rm -rf dist",
+    "dev": "tsup",
+    "build": "rm -rf ./dist && tsup"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.1",
+    "@types/pg": "^8",
+    "@votewise/config": "*",
+    "@votewise/tsconfig": "*",
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "@paralleldrive/cuid2": "^2.2.2",
+    "dotenv": "^17.2.3",
+    "kysely": "^0.28.8",
+    "pg": "^8.16.3"
+  },
+  "tsup": {
+    "entry": [
+      "./index.ts",
+      "./migrator.ts",
+      "./db/migrations/*.ts"
+    ],
+    "format": [
+      "cjs",
+      "esm"
+    ],
+    "sourcemap": true,
+    "dts": true,
+    "clean": true
+  }
+}

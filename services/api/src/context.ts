@@ -1,11 +1,11 @@
-import type { DataLayer } from "@votewise/prisma";
+import type { DataLayer } from "@votewise/db";
 
 import { yellow } from "chalk";
 import * as Minio from "minio";
 
+import { dataLayer } from "@votewise/db";
 import { Assertions } from "@votewise/errors";
 import logger from "@votewise/log";
-import { dataLayer } from "@votewise/prisma";
 
 import { Mailer } from "@/emails/mailer";
 import { EventBus } from "@/lib/event-bus";
