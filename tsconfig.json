@@ -61,7 +61,7 @@
       "path": "./packages/client"
     },
     {
-      "path": "./packages/prisma"
+      "path": "./packages/db"
     },
     {
       "path": "./packages/schemas"

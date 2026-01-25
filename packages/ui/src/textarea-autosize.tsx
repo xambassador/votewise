@@ -20,7 +20,7 @@ export const Textarea = forwardRef<TextareaRef, TextareaProps>((props, ref) => {
       {...rest}
       ref={ref}
       className={cn(
-        "bg-nobelBlack-100 text-gray-300 placeholder:text-gray-500 resize-none text-base focus-within:border-0 focus-within:outline-none rounded",
+        "bg-nobelBlack-100 text-gray-300 placeholder:text-gray-500 resize-none text-base focus-within:border-0 focus-within:outline-none rounded scroller",
         !disableFocusIndicator && inputWrapper.focus,
         isError && inputWrapper.error,
         className

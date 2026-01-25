@@ -40,9 +40,7 @@ export class FeedAssetRepository extends BaseRepository {
             id: this.dataLayer.createId(),
             type: item.type,
             url: item.url,
-            post_id: item.post_id,
-            created_at: new Date(),
-            updated_at: new Date()
+            post_id: item.post_id
           }))
         )
         .execute();

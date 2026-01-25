@@ -20,7 +20,7 @@ type Props = React.HTMLProps<HTMLDivElement> & {
 
 export function ImageCard(props: Props) {
   const { url, children, figureProps, isLoading: _isLoading, alt, width, ...rest } = props;
-  const imageLoadingStatus = useImageLoadingStatus(url, Number(width) || 100);
+  const imageLoadingStatus = useImageLoadingStatus(url, Number(width) || 256);
   const error = imageLoadingStatus === "error";
   const isLoading = imageLoadingStatus === "loading";
   const isLoaded = imageLoadingStatus === "loaded";
@@ -47,7 +47,7 @@ export function ImageCard(props: Props) {
     );
   }
 
-  const srcSets = getSrcSet(url, { width: Number(width) || 100 });
+  const srcSets = getSrcSet(url, { width: Number(width) || 256 });
 
   return (
     <div
