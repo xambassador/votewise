@@ -1,7 +1,6 @@
 import type { DataLayer } from "@votewise/db";
 
 import { yellow } from "chalk";
-import * as Minio from "minio";
 
 import { dataLayer } from "@votewise/db";
 import { Assertions } from "@votewise/errors";
@@ -34,7 +33,6 @@ export type AppContextOptions = {
   assert: Assertions;
   plugins: Plugins;
   rateLimiteManager: RateLimiterManager;
-  minio: Minio.Client;
   eventBus: EventBus;
 };
 
@@ -58,7 +56,6 @@ export class AppContext {
   public assert: Assertions;
   public plugins: Plugins;
   public rateLimiteManager: RateLimiterManager;
-  public minio: Minio.Client;
   public eventBus: EventBus;
 
   /**
@@ -81,7 +78,6 @@ export class AppContext {
     this.assert = opts.assert;
     this.plugins = opts.plugins;
     this.rateLimiteManager = opts.rateLimiteManager;
-    this.minio = opts.minio;
     this.services = opts.services;
     this.eventBus = opts.eventBus;
     this.dataLayer = opts.dataLayer;
@@ -116,13 +112,6 @@ export class AppContext {
     const requestParser = Plugins.requestParserPluginFactory();
     const jwtPlugin = Plugins.jwtPluginFactory({ jwtService });
     const rateLimiteManager = RateLimiterManager.create();
-    const minio = new Minio.Client({
-      endPoint: environment.MINIO_ENDPOINT,
-      port: environment.MINIO_PORT,
-      useSSL: environment.USE_SSL,
-      accessKey: environment.MINIO_ACCESS_KEY,
-      secretKey: environment.MINIO_SECRET_KEY
-    });
     const eventBus = EventBus.create();
     const sessionManager = new Services.SessionManager({
       jwtService,
@@ -132,14 +121,7 @@ export class AppContext {
       sessionRepository: repositories.session,
       accessTokenExpiration: cfg.jwt.accessTokenExpiration
     });
-    const bucketService = new Services.BucketService({
-      minio,
-      uploadBucket: cfg.uploadBucket,
-      backgroundBucket: cfg.backgroundsBucket,
-      avatarBucket: cfg.avatarsBucket,
-      minioPort: environment.MINIO_PORT,
-      minioEndpoint: environment.MINIO_ENDPOINT
-    });
+    const bucketService = new Services.BucketService();
     const onboardService = new Services.OnboardService({
       userRepository: repositories.user,
       cache,
@@ -171,7 +153,6 @@ export class AppContext {
         session: sessionManager,
         onboard: onboardService
       },
-      minio,
       ...(overrides ?? {})
     });
     this._instance = ctx;

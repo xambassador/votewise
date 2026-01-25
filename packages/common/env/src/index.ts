@@ -84,16 +84,6 @@ const REQUEST_TIMEOUT = z.string().default("30000");
 const CONCURRENCY = z.string().default("1");
 const SSL_KEY = z.string().optional();
 const SSL_CERT = z.string().optional();
-const MINIO_ACCESS_KEY = z
-  .string({ required_error: "MINIO_ACCESS_KEY is required" })
-  .min(1, { message: "MINIO_ACCESS is required" });
-const MINIO_SECRET_KEY = z
-  .string({ required_error: "MINIO_SECRET_KEY is required" })
-  .min(1, { message: "MINIO_SECRET is required" });
-const MINIO_ENDPOINT = z
-  .string({ required_error: "MINIO_ENDPOINT is required" })
-  .min(1, { message: "MINIO_ENDPOINT is required" });
-const MINIO_PORT = z.string({ required_error: "MINIO_PORT is required" }).min(1, { message: "MINIO_PORT is required" });
 const APP_COOKIE_SECRET = z
   .string({ required_error: "APP_COOKIE_SECRET is required" })
   .min(1, { message: "APP_COOKIE_SECRET is required" });
@@ -119,6 +109,8 @@ const VOTEWISE_ML_API_URL = z
     message: "VOTEWISE_ML_API_URL should be a valid URL"
   });
 const IS_SANDBOX = z.string().default("false").transform(parseBooleanValue);
+const NEXT_PUBLIC_IS_SANDBOX = z.string().default("false").transform(parseBooleanValue);
+const NEXT_PUBLIC_VOTEWISE_BUCKET_NAME = z.string().optional().default("votewise-bucket");
 const IMAGE_CACHE_TTL = z
   .string()
   .default(DEFAULT_IMAGE_CACHE_TTL.toString())
@@ -150,10 +142,6 @@ export const envBaseSchema = z.object({
   CONCURRENCY,
   SSL_KEY,
   SSL_CERT,
-  MINIO_ACCESS_KEY,
-  MINIO_SECRET_KEY,
-  MINIO_ENDPOINT,
-  MINIO_PORT,
   APP_COOKIE_SECRET,
   API_COOKIE_SECRET,
   VOTEWISE_BUCKET_NAME,
@@ -166,7 +154,9 @@ export const envBaseSchema = z.object({
   USE_SSL,
   VOTEWISE_ML_API_URL,
   IS_SANDBOX,
-  IMAGE_CACHE_TTL
+  IMAGE_CACHE_TTL,
+  NEXT_PUBLIC_IS_SANDBOX,
+  NEXT_PUBLIC_VOTEWISE_BUCKET_NAME
 });
 
 export const envSchema = z.object({
@@ -198,10 +188,6 @@ export const envSchema = z.object({
   CONCURRENCY: CONCURRENCY.transform((val) => parseInt(val, 10)),
   SSL_KEY,
   SSL_CERT,
-  MINIO_ACCESS_KEY,
-  MINIO_SECRET_KEY,
-  MINIO_ENDPOINT,
-  MINIO_PORT: MINIO_PORT.transform((val) => parseInt(val, 10)),
   APP_COOKIE_SECRET,
   API_COOKIE_SECRET,
   VOTEWISE_BUCKET_NAME,
@@ -214,7 +200,9 @@ export const envSchema = z.object({
   USE_SSL,
   VOTEWISE_ML_API_URL,
   IS_SANDBOX,
-  IMAGE_CACHE_TTL
+  IMAGE_CACHE_TTL,
+  NEXT_PUBLIC_IS_SANDBOX,
+  NEXT_PUBLIC_VOTEWISE_BUCKET_NAME
 });
 
 envSchema.superRefine((data) => {

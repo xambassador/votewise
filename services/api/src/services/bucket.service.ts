@@ -1,17 +1,4 @@
-import type { AppContext } from "@/context";
-
-type ServiceOptions = {
-  minio: AppContext["minio"];
-  avatarBucket: AppContext["config"]["avatarsBucket"];
-  backgroundBucket: AppContext["config"]["backgroundsBucket"];
-  uploadBucket: AppContext["config"]["uploadBucket"];
-  minioEndpoint: AppContext["environment"]["MINIO_ENDPOINT"];
-  minioPort: AppContext["environment"]["MINIO_PORT"];
-};
-
 export class BucketService {
-  constructor(_opts: ServiceOptions) {}
-
   /**
    * @deprecated
    */

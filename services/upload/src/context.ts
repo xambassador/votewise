@@ -6,7 +6,6 @@ import _fs from "node:fs/promises";
 import path from "node:path";
 import { yellow } from "chalk";
 import { ensureDirSync } from "fs-extra";
-import * as Minio from "minio";
 
 import { Assertions } from "@votewise/errors";
 import { JWT } from "@votewise/jwt";
@@ -27,7 +26,6 @@ export type AppContextOptions = {
   environment: Environment;
   assert: Assertions;
   plugins: Plugins;
-  minio: Minio.Client;
   jwtService: JWT;
   cache: RedisAdapter;
   imageConfig: ImageConfigComplete;
@@ -63,7 +61,6 @@ export class AppContext {
   public getFileInfo = getFileInfo;
   public getFileName = getFileName;
   public plugins: Plugins;
-  public minio: Minio.Client;
   public jwtService: JWT;
   public cache: RedisAdapter;
   public imageConfig: ImageConfigComplete;
@@ -75,7 +72,6 @@ export class AppContext {
     this.logger = opts.logger;
     this.assert = opts.assert;
     this.plugins = opts.plugins;
-    this.minio = opts.minio;
     this.jwtService = opts.jwtService;
     this.cache = opts.cache;
     this.imageConfig = opts.imageConfig;
@@ -92,13 +88,6 @@ export class AppContext {
     const cache = new RedisAdapter({ environment, maxRetriesPerRequest: null });
     cache.init();
     const requestParser = requestParserPluginFactory();
-    const minio = new Minio.Client({
-      endPoint: environment.MINIO_ENDPOINT,
-      port: environment.MINIO_PORT,
-      useSSL: false, // TODO: Get this from env
-      accessKey: environment.MINIO_ACCESS_KEY,
-      secretKey: environment.MINIO_SECRET_KEY
-    });
     const jwtService = new JWT({ accessTokenSecret: environment.ACCESS_TOKEN_SECRET });
     const imageConfig = createImageConfigDefault(cfg.imageCacheTTL);
     const imageOptimizerCache = new ImageOptimizerCache({
@@ -113,7 +102,6 @@ export class AppContext {
       imageConfig,
       imageOptimizerCache,
       plugins: { requestParser },
-      minio,
       jwtService,
       cache,
       ...overrides

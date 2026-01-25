@@ -2,7 +2,6 @@ import { Router } from "express";
 
 import { upload } from "@votewise/constant/routes";
 
-import { getAvatarsControllerFactory, getBgControllerFactory } from "./assets";
 import { serveImageControllerFactory } from "./serve/get";
 import {
   deleteControllerFactory,
@@ -24,8 +23,6 @@ export function moduleRouterFactory(basePath: string): Router {
   router.post(upload.paths.upload(basePath), ...uploadControllerFactory());
   router.get(upload.paths.status(basePath), ...statusControllerFactory());
   router.delete(upload.paths.delete(basePath), ...deleteControllerFactory());
-  router.get(upload.paths.getAvatars(basePath), ...getAvatarsControllerFactory());
-  router.get(upload.paths.getBackgrounds(basePath), ...getBgControllerFactory());
   router.get(upload.paths.optimize(basePath), ...serveImageControllerFactory());
   return router;
 }

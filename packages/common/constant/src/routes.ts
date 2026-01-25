@@ -210,10 +210,6 @@ export const upload = {
     status: (base: string) => base + "/upload/:token/status",
     /** Delete an upload */
     delete: (base: string) => base + "/upload/:token",
-    /** Get avatars */
-    getAvatars: (base: string) => base + "/upload/assets/avatars",
-    /** Get backgrounds */
-    getBackgrounds: (base: string) => base + "/upload/assets/backgrounds",
     /** Optimize and serve image */
     optimize: (base: string) => base + "/optimize"
   },
@@ -226,10 +222,6 @@ export const upload = {
     status: (base: string, token: string) => base + `/upload/${token}/status`,
     /** Delete an upload */
     delete: (base: string, token: string) => base + `/upload/${token}`,
-    /** Get avatars */
-    getAvatars: (base: string) => base + "/upload/assets/avatars",
-    /** Get backgrounds */
-    getBackgrounds: (base: string) => base + "/upload/assets/backgrounds",
     /** Optimize and serve image */
     optimize: (base: string, params: { url: string; w: number; q: number }) =>
       base + `/optimize?url=${encodeURIComponent(params.url)}&w=${params.w}&q=${params.q}`
