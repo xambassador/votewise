@@ -12,7 +12,6 @@ import { JWT } from "@votewise/jwt";
 import logger from "@votewise/log";
 
 import { checkEnv } from "@/env";
-import { RedisAdapter } from "@/storage/redis";
 
 import { createImageConfigDefault, ImageOptimizerCache } from "./core/image-optimizer";
 import { requestParserPluginFactory } from "./plugins/request-parser";
@@ -27,7 +26,6 @@ export type AppContextOptions = {
   assert: Assertions;
   plugins: Plugins;
   jwtService: JWT;
-  cache: RedisAdapter;
   imageConfig: ImageConfigComplete;
   imageOptimizerCache: ImageOptimizerCache;
 };
@@ -62,7 +60,6 @@ export class AppContext {
   public getFileName = getFileName;
   public plugins: Plugins;
   public jwtService: JWT;
-  public cache: RedisAdapter;
   public imageConfig: ImageConfigComplete;
   public imageOptimizerCache: ImageOptimizerCache;
 
@@ -73,7 +70,6 @@ export class AppContext {
     this.assert = opts.assert;
     this.plugins = opts.plugins;
     this.jwtService = opts.jwtService;
-    this.cache = opts.cache;
     this.imageConfig = opts.imageConfig;
     this.imageOptimizerCache = opts.imageOptimizerCache;
     createUploadPath();
@@ -85,8 +81,6 @@ export class AppContext {
     if (this._instance) return this._instance;
     const environment = checkEnv(process.env);
     const assert = new Assertions();
-    const cache = new RedisAdapter({ environment, maxRetriesPerRequest: null });
-    cache.init();
     const requestParser = requestParserPluginFactory();
     const jwtService = new JWT({ accessTokenSecret: environment.ACCESS_TOKEN_SECRET });
     const imageConfig = createImageConfigDefault(cfg.imageCacheTTL);
@@ -103,7 +97,6 @@ export class AppContext {
       imageOptimizerCache,
       plugins: { requestParser },
       jwtService,
-      cache,
       ...overrides
     });
     this._instance = context;
@@ -113,10 +106,6 @@ export class AppContext {
   static get instance(): AppContext {
     if (!this._instance) throw new Error("AppContext is not initialized");
     return this._instance;
-  }
-
-  static getInjectionToken<T extends keyof AppContext>(key: T): AppContext[T] {
-    return this.instance[key];
   }
 
   static getInjectionTokens<T extends keyof AppContext>(keys: T[]): Pick<AppContext, T> {

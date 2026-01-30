@@ -38,13 +38,7 @@ class RequestParser<Body, Query> {
 }
 
 export class RequestParserPlugin {
-  private readonly _pool: Map<string, RequestParserPluginOptions<unknown, unknown>> = new Map();
-
   public getParser<Body, Query>(bodySchema: ZodSchema<Body>, querySchema?: ZodSchema<Query>) {
-    const key = `${bodySchema.toString()}${querySchema?.toString()}`;
-    if (this._pool.has(key)) {
-      return this._pool.get(key) as unknown as RequestParser<Body, Query>;
-    }
     const parser = new RequestParser({ bodySchema, querySchema });
     return parser;
   }
