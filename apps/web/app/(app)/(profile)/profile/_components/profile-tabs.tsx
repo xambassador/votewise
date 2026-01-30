@@ -9,6 +9,7 @@ import dayjs, { extend } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
+import { LoadMore } from "@votewise/ui/button";
 import { Error } from "@votewise/ui/error";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@votewise/ui/tab";
 
@@ -75,16 +76,20 @@ export function ProfileTabs(props: TabPanelProps) {
 const panelStyle = "flex flex-col gap-5 pb-5";
 
 function PostsPanel(props: TabPanelProps) {
-  const { status, data, error } = useFetchUserPosts({ username: props.username });
+  const { status, posts, error, hasNextPage, fetchNextPage, isFetchingNextPage } = useFetchUserPosts({
+    username: props.username
+  });
 
   switch (status) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     case "pending":
       return <FeedListSkeleton />;
     case "error":
       return <Error error={error.message} />;
   }
 
-  if (data.posts.length === 0) {
+  if (posts.length === 0) {
     return (
       <div className="py-10">
         <p className="text-center text-gray-400">
@@ -96,7 +101,7 @@ function PostsPanel(props: TabPanelProps) {
 
   return (
     <div className={panelStyle}>
-      {data.posts.map((post) => (
+      {posts.map((post) => (
         <FeedMolecule
           key={post.id}
           data={{
@@ -107,21 +112,34 @@ function PostsPanel(props: TabPanelProps) {
           }}
         />
       ))}
+      {hasNextPage && (
+        <LoadMore
+          onClick={() => fetchNextPage()}
+          disabled={isFetchingNextPage}
+          className="load-more-button"
+          loading={isFetchingNextPage}
+        />
+      )}
     </div>
   );
 }
 
 function VotedPostsPanel(props: TabPanelProps) {
-  const { status, data, error } = useFetchUserPosts({ username: props.username, type: "voted" });
+  const { status, posts, error, hasNextPage, fetchNextPage, isFetchingNextPage } = useFetchUserPosts({
+    username: props.username,
+    type: "voted"
+  });
 
   switch (status) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     case "pending":
       return <FeedListSkeleton />;
     case "error":
       return <Error error={error.message} />;
   }
 
-  if (data.posts.length === 0) {
+  if (posts.length === 0) {
     return (
       <div className="py-10">
         <p className="text-center text-gray-400">This user has not voted on any posts yet.</p>
@@ -131,33 +149,44 @@ function VotedPostsPanel(props: TabPanelProps) {
 
   return (
     <div className={panelStyle}>
-      {data.posts.map((post) => (
-        <Link key={post.id} href={routes.feed.view(post.id)} className="focus-presets rounded-xl">
-          <FeedMolecule
-            data={{
-              ...post,
-              author: { ...post.author, avatar_url: post.author.avatar_url ?? "" },
-              hash_tags: [],
-              voters: post.voters.map((v) => ({ ...v, avatar_url: v.avatar_url ?? "" }))
-            }}
-          />
-        </Link>
+      {posts.map((post) => (
+        <FeedMolecule
+          key={post.id}
+          data={{
+            ...post,
+            author: { ...post.author, avatar_url: post.author.avatar_url ?? "" },
+            hash_tags: [],
+            voters: post.voters.map((v) => ({ ...v, avatar_url: v.avatar_url ?? "" }))
+          }}
+        />
       ))}
+      {hasNextPage && (
+        <LoadMore
+          onClick={() => fetchNextPage()}
+          disabled={isFetchingNextPage}
+          className="load-more-button"
+          loading={isFetchingNextPage}
+        />
+      )}
     </div>
   );
 }
 
 function CommentsPanel(props: TabPanelProps) {
-  const { status, data, error } = useFetchUserComments({ username: props.username });
+  const { status, comments, error, hasNextPage, fetchNextPage, isFetchingNextPage } = useFetchUserComments({
+    username: props.username
+  });
 
   switch (status) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error React query thinks status can never be "pending" without initialData
     case "pending":
       return <div>Loading comments...</div>;
     case "error":
       return <Error error={error.message} />;
   }
 
-  if (data.comments.length === 0) {
+  if (comments.length === 0) {
     return (
       <div className="py-10">
         <p className="text-center text-gray-400">
@@ -169,7 +198,7 @@ function CommentsPanel(props: TabPanelProps) {
 
   return (
     <div className={panelStyle}>
-      {data.comments.map((comment) => (
+      {comments.map((comment) => (
         <div
           key={comment.id}
           className="p-4 rounded-xl bg-nobelBlack-100 border border-nobelBlack-200 hover:border-nobelBlack-300 transition-colors"
@@ -209,6 +238,7 @@ function CommentsPanel(props: TabPanelProps) {
           </div>
         </div>
       ))}
+      {hasNextPage && <LoadMore onClick={() => fetchNextPage()} loading={isFetchingNextPage} />}
     </div>
   );
 }

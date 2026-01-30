@@ -1,3 +1,4 @@
+import type { Cursor } from "@/lib/cursor";
 import type { NewUser, UserUpdate } from "@votewise/db/db";
 import type { Tx } from "./transaction";
 
@@ -246,9 +247,10 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  public getUserPosts(username: string, opts: { page: number; limit: number }) {
-    const { page, limit } = opts;
+  public getUserPosts(username: string, opts: { page: number; limit: number; cursor?: Cursor | null }) {
+    const { page, limit, cursor } = opts;
     const offset = (page - 1) * limit;
+    const shouldUseCursor = !!cursor;
     return this.execute(async () => {
       const user = await this.dataLayer
         .selectFrom("User")
@@ -277,9 +279,21 @@ export class UserRepository extends BaseRepository {
           "pa.votes"
         ])
         .where("p.author_id", "=", user.id)
+        .$if(shouldUseCursor, (qb) =>
+          qb.where((eb) =>
+            eb.or([
+              eb("p.created_at", "<", new Date(cursor?.primary as string)),
+              eb.and([
+                eb("p.created_at", "=", new Date(cursor?.primary as string)),
+                eb("p.id", "<", cursor?.secondary as string)
+              ])
+            ])
+          )
+        )
         .orderBy("p.created_at", "desc")
+        .orderBy("p.id", "desc")
         .limit(limit)
-        .offset(offset)
+        .$if(!shouldUseCursor, (qb) => qb.offset(offset))
         .execute();
 
       if (posts.length === 0) return [];
@@ -349,9 +363,10 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  public getUserVotedPosts(username: string, opts: { page: number; limit: number }) {
-    const { page, limit } = opts;
+  public getUserVotedPosts(username: string, opts: { page: number; limit: number; cursor?: Cursor | null }) {
+    const { page, limit, cursor } = opts;
     const offset = (page - 1) * limit;
+    const shouldUseCursor = !!cursor;
     return this.execute(async () => {
       const user = await this.dataLayer
         .selectFrom("User")
@@ -364,10 +379,22 @@ export class UserRepository extends BaseRepository {
       const votedPostIds = await this.dataLayer
         .selectFrom("Upvote")
         .where("user_id", "=", user.id)
-        .select("post_id")
+        .$if(shouldUseCursor, (qb) =>
+          qb.where((eb) =>
+            eb.or([
+              eb("created_at", "<", new Date(cursor?.primary as string)),
+              eb.and([
+                eb("created_at", "=", new Date(cursor?.primary as string)),
+                eb("post_id", "<", cursor?.secondary as string)
+              ])
+            ])
+          )
+        )
+        .select(["post_id", "created_at"])
         .orderBy("created_at", "desc")
+        .orderBy("post_id", "desc")
         .limit(limit)
-        .offset(offset)
+        .$if(!shouldUseCursor, (qb) => qb.offset(offset))
         .execute();
 
       if (votedPostIds.length === 0) return [];
@@ -463,9 +490,10 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  public getUserComments(username: string, opts: { page: number; limit: number }) {
-    const { page, limit } = opts;
+  public getUserComments(username: string, opts: { page: number; limit: number; cursor?: Cursor | null }) {
+    const { page, limit, cursor } = opts;
     const offset = (page - 1) * limit;
+    const shouldUseCursor = !!cursor;
     return this.execute(async () => {
       const user = await this.dataLayer
         .selectFrom("User")
@@ -495,9 +523,21 @@ export class UserRepository extends BaseRepository {
         ])
         .where("c.user_id", "=", user.id)
         .where("c.parent_id", "is", null)
+        .$if(shouldUseCursor, (qb) =>
+          qb.where((eb) =>
+            eb.or([
+              eb("c.created_at", "<", new Date(cursor?.primary as string)),
+              eb.and([
+                eb("c.created_at", "=", new Date(cursor?.primary as string)),
+                eb("c.id", "<", cursor?.secondary as string)
+              ])
+            ])
+          )
+        )
         .orderBy("c.created_at", "desc")
+        .orderBy("c.id", "desc")
         .limit(limit)
-        .offset(offset)
+        .$if(!shouldUseCursor, (qb) => qb.offset(offset))
         .execute();
 
       return comments.map((comment) => ({

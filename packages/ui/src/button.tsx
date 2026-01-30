@@ -67,3 +67,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) =>
 });
 
 Button.displayName = "Button";
+
+export function LoadMore(props: React.ButtonHTMLAttributes<HTMLButtonElement> & { loading?: boolean }) {
+  const { className, children, loading, disabled, ...rest } = props;
+  const child = loading ? <Spinner className="size-4" /> : children || "More";
+  const isDisabled = disabled || loading;
+  return (
+    <button {...rest} disabled={isDisabled} className={cn("load-more-button", className)}>
+      {child}
+    </button>
+  );
+}

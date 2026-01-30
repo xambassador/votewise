@@ -11,6 +11,7 @@ import dayjs, { extend } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@votewise/ui/avatar";
+import { LoadMore } from "@votewise/ui/button";
 import {
   Comment,
   CommentActions,
@@ -20,7 +21,6 @@ import {
   CommentDate,
   CommentHeader,
   CommentList,
-  CommentMoreButton,
   CommentReplyButton,
   Comments,
   CommentText,
@@ -103,7 +103,7 @@ export function DiscussionPanel(props: Props) {
         ))}
       </CommentList>
       {data.pagination.has_next_page ? (
-        <CommentMoreButton {...getTriggerProps({ className: "w-full", children: "More" })} />
+        <LoadMore {...getTriggerProps({ className: "w-full", children: "More" })} />
       ) : null}
     </Comments>
   );
@@ -152,7 +152,7 @@ const Replies = memo(function Replies(props: RepliesProps) {
         />
       ))}
       {data.pagination.has_next_page ? (
-        <CommentMoreButton {...getTriggerProps({ className: "w-fit", children: "More replies" })} />
+        <LoadMore {...getTriggerProps({ className: "w-fit", children: "More replies" })} />
       ) : null}
     </ReplyContainer>
   );

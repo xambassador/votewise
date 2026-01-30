@@ -8,6 +8,7 @@ import { z } from "zod";
 import { PAGINATION } from "@votewise/constant";
 import { ZPagination } from "@votewise/schemas";
 
+import { unpack } from "@/lib/cursor";
 import { PaginationBuilder } from "@/lib/pagination";
 
 const QuerySchema = z.object({ type: z.enum(["posts", "voted"]).default("posts") });
@@ -33,21 +34,28 @@ export class Controller {
     const query = schema.data!;
     const { page } = query;
     const limit = query.limit < 1 ? PAGINATION.feeds.limit : query.limit;
+    const cursor = unpack(query.cursor, () => this.ctx.assert.unprocessableEntity(true, "Invalid cursor"));
 
     let total: number;
     let posts: Awaited<ReturnType<Controller["getPosts"]>>["posts"];
 
     if (type === "posts") {
-      const result = await this.getPosts(username!, page, limit);
+      const result = await this.getPosts(username!, page, limit, cursor);
       total = result.total;
       posts = result.posts;
     } else {
-      const result = await this.getVotedPosts(username!, page, limit);
+      const result = await this.getVotedPosts(username!, page, limit, cursor);
       total = result.total;
       posts = result.posts;
     }
 
-    const pagination = new PaginationBuilder({ limit, page, total }).build();
+    const nextCursor = posts.length < limit ? undefined : posts.at(-1);
+    const pagination = new PaginationBuilder({
+      limit,
+      page,
+      total,
+      cursor: nextCursor ? { primary: nextCursor.created_at, secondary: nextCursor.id } : undefined
+    }).build();
     posts.forEach((post) => {
       post.author.avatar_url = this.ctx.services.bucket.generatePublicUrl(post.author.avatar_url ?? "", "avatar");
       post.voters.forEach((voter) => {
@@ -59,16 +67,16 @@ export class Controller {
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 
-  private async getPosts(username: string, page: number, limit: number) {
+  private async getPosts(username: string, page: number, limit: number, cursor: ReturnType<typeof unpack>) {
     const total = await this.ctx.repositories.user.countUserPosts(username);
-    const posts = await this.ctx.repositories.user.getUserPosts(username, { page, limit });
-    return { total, posts };
+    const result = await this.ctx.repositories.user.getUserPosts(username, { page, limit, cursor });
+    return { total, posts: result };
   }
 
-  private async getVotedPosts(username: string, page: number, limit: number) {
+  private async getVotedPosts(username: string, page: number, limit: number, cursor: ReturnType<typeof unpack>) {
     const total = await this.ctx.repositories.user.countUserVotedPosts(username!);
-    const posts = await this.ctx.repositories.user.getUserVotedPosts(username!, { page, limit });
-    return { total, posts };
+    const result = await this.ctx.repositories.user.getUserVotedPosts(username!, { page, limit, cursor });
+    return { total, posts: result };
   }
 }
 

@@ -1,45 +1,40 @@
 "use client";
 
 import type { GetUserCommentsResponse } from "@votewise/client/user";
-import type { AsyncState } from "@votewise/types";
 
-import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { userClient } from "@/lib/client";
 import { getUserCommentsKey } from "@/lib/constants";
 import { assertResponse } from "@/lib/error";
 
-export function useFetchUserComments(props: { username: string }) {
-  const [nextPageStatus, setNextPageStatus] = useState<AsyncState>("idle");
-  const queryClient = useQueryClient();
-  const queryKey = getUserCommentsKey(props.username);
-  const query = useQuery({
+type Params = {
+  username: string;
+  initialData?: GetUserCommentsResponse;
+};
+
+export function useFetchUserComments(params: Params) {
+  const queryKey = getUserCommentsKey(params.username);
+
+  const query = useInfiniteQuery({
     queryKey,
-    queryFn: async () => assertResponse(await userClient.getUserComments(props.username)),
+    queryFn: async ({ pageParam }) =>
+      assertResponse(await userClient.getUserComments(params.username, { cursor: pageParam })),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.pagination.cursor ?? undefined,
+    initialData: params.initialData
+      ? {
+          pages: [params.initialData],
+          pageParams: [undefined]
+        }
+      : undefined,
     refetchOnWindowFocus: false
   });
 
-  async function fetchNextPage() {
-    setNextPageStatus("loading");
-    const res = await userClient.getUserComments(props.username);
-    if (!res.success) {
-      setNextPageStatus("error");
-      return;
-    }
-    queryClient.setQueryData<GetUserCommentsResponse>(queryKey, (oldData) => {
-      if (!oldData) return res.data;
-      return {
-        ...oldData,
-        pagination: {
-          ...oldData.pagination,
-          ...res.data.pagination
-        },
-        comments: [...oldData.comments, ...res.data.comments]
-      } as GetUserCommentsResponse;
-    });
-    setNextPageStatus("success");
-  }
+  const comments = query.data?.pages.flatMap((page) => page.comments) ?? [];
 
-  return { ...query, fetchNextPage, nextPageStatus };
+  return {
+    ...query,
+    comments
+  };
 }

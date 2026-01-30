@@ -13,7 +13,6 @@ import { Pencil } from "../icons/pencil";
 import { Plus } from "../icons/plus";
 import { Trash } from "../icons/trash";
 import { InputField } from "../input-field";
-import { Spinner } from "../ring-spinner";
 import { Textarea } from "../textarea-autosize";
 
 type CommentState = {
@@ -266,24 +265,6 @@ export function ReplyConnector(props: ReplyConnectorProps) {
     >
       <path d="M21 50.853S1 53.205 1 39.095V1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
-  );
-}
-
-export function CommentMoreButton(props: React.ButtonHTMLAttributes<HTMLButtonElement> & { loading?: boolean }) {
-  const { className, children, loading, disabled, ...rest } = props;
-  const child = loading ? <Spinner className="size-4" /> : children || "More";
-  const isDisabled = disabled || loading;
-  return (
-    <button
-      {...rest}
-      disabled={isDisabled}
-      className={cn(
-        "text-gray-400 hover:text-gray-300 focus-primary focus-presets rounded p-1 underline flex items-center justify-center",
-        className
-      )}
-    >
-      {child}
-    </button>
   );
 }
 
