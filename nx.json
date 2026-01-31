@@ -1,14 +1,10 @@
 {
   "targetDefaults": {
-    "dev": {},
+    "dev": { "dependsOn": ["^build"] },
     "build": {
       "cache": true,
       "dependsOn": ["^build"],
-      "outputs": [
-        "{projectRoot}/./apps/web/.next",
-        "{projectRoot}/./services/api/dist",
-        "{projectRoot}/./services/upload/dist"
-      ]
+      "outputs": ["{projectRoot}/dist", "{projectRoot}/.next", "{projectRoot}/storybook-static"]
     },
     "start": {
       "dependsOn": []
