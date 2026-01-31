@@ -8,6 +8,7 @@ import { z } from "zod";
 import { PAGINATION } from "@votewise/constant";
 import { ZPagination } from "@votewise/schemas";
 
+import { unpack } from "@/lib/cursor";
 import { PaginationBuilder } from "@/lib/pagination";
 
 const ZQuery = ZPagination.extend({
@@ -34,7 +35,8 @@ export class Controller {
     const total = await this.ctx.repositories.group.count({ status: query.status });
     const { page } = query;
     const limit = query.limit < 1 ? PAGINATION.groups.limit : query.limit;
-    const _groups = await this.ctx.repositories.group.getAll({ page, limit, status: query.status });
+    const cursor = unpack(query.cursor, () => this.ctx.assert.unprocessableEntity(true, "Invalid cursor"));
+    const _groups = await this.ctx.repositories.group.getAll({ page, limit, status: query.status, cursor });
     const groups = _groups.map((group) => ({
       id: group.id,
       name: group.name,
@@ -47,7 +49,13 @@ export class Controller {
       created_at: group.created_at,
       updated_at: group.updated_at
     }));
-    const pagination = new PaginationBuilder({ limit, page, total }).build();
+    const nextCursor = _groups.length < limit ? undefined : _groups.at(-1);
+    const pagination = new PaginationBuilder({
+      limit,
+      page,
+      total,
+      cursor: nextCursor ? { primary: nextCursor.created_at, secondary: nextCursor.id } : undefined
+    }).build();
     const result = { groups, ...pagination };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }

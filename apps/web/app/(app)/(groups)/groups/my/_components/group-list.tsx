@@ -19,28 +19,25 @@ type Props = { groups: GetMyGroupsResponse };
 
 export function MyGroupsList(props: Props) {
   const { groups: initialData } = props;
-  const { data, status, error, fetchNextPage, nextPageStatus } = useFetchMyGroups({ initialData });
+  const { groups, status, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useFetchMyGroups({
+    initialData
+  });
 
   function handleLoadMore(inView: boolean) {
     if (!inView) return;
-    if (!data) return;
-    if (!data.pagination.next_page) return;
-    if (nextPageStatus === "loading") return;
-    fetchNextPage(data.pagination.next_page);
+    if (!hasNextPage) return;
+    if (isFetchingNextPage) return;
+    fetchNextPage();
   }
 
   switch (status) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     case "pending":
       return <Loading />;
     case "error":
       return <Error error={error.message} errorInfo={{ componentStack: error.stack }} />;
   }
-
-  if (!data) {
-    return <Error error="No data received!" />;
-  }
-
-  const groups = data.groups;
 
   if (groups.length === 0) {
     return <NoGroups />;
@@ -51,7 +48,7 @@ export function MyGroupsList(props: Props) {
       {groups.map((group) => (
         <GroupMolecule key={group.id} group={group} />
       ))}
-      {nextPageStatus === "loading" && <LoadMoreSpinner />}
+      {isFetchingNextPage && <LoadMoreSpinner />}
       <InView onInView={handleLoadMore} />
     </div>
   );

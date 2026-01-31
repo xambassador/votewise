@@ -1,45 +1,30 @@
 "use client";
 
 import type { GetGroupFeedsResponse } from "@votewise/client/group";
-import type { AsyncState } from "@votewise/types";
 
-import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { groupClient } from "@/lib/client";
 import { getGroupFeedsKey } from "@/lib/constants";
 import { assertResponse } from "@/lib/error";
 
 export function useFetchGroupFeeds(id: string, options?: { initialData?: GetGroupFeedsResponse }) {
-  const [nextPageStatus, setNextPageStatus] = useState<AsyncState>("idle");
   const queryKey = getGroupFeedsKey(id);
-  const queryClient = useQueryClient();
-  const query = useQuery({
+  const query = useInfiniteQuery({
     queryKey,
-    queryFn: async () => assertResponse(await groupClient.getFeeds(id)),
+    queryFn: async ({ pageParam }) => assertResponse(await groupClient.getFeeds(id, { cursor: pageParam })),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.pagination.cursor ?? undefined,
     initialData: options?.initialData
+      ? {
+          pages: [options.initialData],
+          pageParams: [undefined]
+        }
+      : undefined
   });
 
-  async function fetchNextPage(cursor: string) {
-    setNextPageStatus("loading");
-    const res = await groupClient.getFeeds(id, { cursor });
-    if (!res.success) {
-      setNextPageStatus("error");
-      return;
-    }
-    queryClient.setQueryData<GetGroupFeedsResponse>(queryKey, (oldData) => {
-      if (!oldData) return res.data;
-      return {
-        ...oldData,
-        pagination: {
-          ...oldData.pagination,
-          ...res.data.pagination
-        },
-        feeds: [...oldData.feeds, ...res.data.feeds]
-      } as GetGroupFeedsResponse;
-    });
-    setNextPageStatus("success");
-  }
+  const feeds = query.data?.pages.flatMap((page) => page.feeds) ?? [];
+  const status = query.status as "pending" | "error" | "success";
 
-  return { ...query, fetchNextPage, nextPageStatus };
+  return { ...query, status, feeds };
 }

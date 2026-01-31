@@ -1,3 +1,4 @@
+import type { Cursor } from "@/lib/cursor";
 import type { GroupInvitationUpdate, GroupUpdate, NewGroup, NewGroupInvitation } from "@votewise/db/db";
 import type { GroupMemberRole, GroupStatus } from "@votewise/db/enums";
 import type { Tx } from "./transaction";
@@ -135,8 +136,9 @@ export class GroupRepository extends BaseRepository {
     });
   }
 
-  public getAll(props: { page: number; limit: number; status?: GroupStatus }) {
-    const { page, limit, status = "OPEN" } = props;
+  public getAll(props: { page: number; limit: number; status?: GroupStatus; cursor?: Cursor | null }) {
+    const { page, limit, status = "OPEN", cursor } = props;
+    const shouldUseCursor = !!cursor;
     const offset = (page - 1) * limit;
     return this.execute(async () => {
       const groups = await this.dataLayer
@@ -154,8 +156,18 @@ export class GroupRepository extends BaseRepository {
           sql<number>`count(gm.id)`.as("member_count")
         ])
         .where("g.status", "=", status)
+        .$if(shouldUseCursor, (qb) =>
+          qb.where((eb) =>
+            eb.and([
+              eb("g.created_at", "<", cursor?.primary as Date).or(
+                eb.and([eb("g.created_at", "=", cursor?.primary as Date), eb("g.id", "<", cursor?.secondary as string)])
+              )
+            ])
+          )
+        )
         .groupBy("g.id")
         .orderBy("g.created_at", "desc")
+        .orderBy("g.id", "desc")
         .limit(limit)
         .offset(offset)
         .execute();
@@ -207,8 +219,9 @@ export class GroupRepository extends BaseRepository {
     });
   }
 
-  public getByUserId(userId: string, props: { page: number; limit: number }) {
-    const { page, limit } = props;
+  public getByUserId(userId: string, props: { page: number; limit: number; cursor?: Cursor | null }) {
+    const { page, limit, cursor } = props;
+    const shouldUseCursor = !!cursor;
     const offset = (page - 1) * limit;
     return this.execute(async () => {
       const skeleton = await this.dataLayer
@@ -238,8 +251,18 @@ export class GroupRepository extends BaseRepository {
           "g.type",
           sql<number>`count(gm.id)`.as("member_count")
         ])
+        .$if(shouldUseCursor, (qb) =>
+          qb.where((eb) =>
+            eb.and([
+              eb("g.created_at", "<", cursor?.primary as Date).or(
+                eb.and([eb("g.created_at", "=", cursor?.primary as Date), eb("g.id", "<", cursor?.secondary as string)])
+              )
+            ])
+          )
+        )
         .groupBy("g.id")
         .orderBy("g.created_at", "desc")
+        .orderBy("g.id", "desc")
         .limit(limit)
         .offset(offset)
         .execute();

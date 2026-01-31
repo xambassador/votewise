@@ -1,10 +1,8 @@
 "use client";
 
 import type { GetMyGroupsResponse } from "@votewise/client/group";
-import type { AsyncState } from "@votewise/types";
 
-import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { PAGINATION } from "@votewise/constant";
 
@@ -15,36 +13,26 @@ import { assertResponse } from "@/lib/error";
 type Params = { initialData?: GetMyGroupsResponse };
 
 export function useFetchMyGroups(params: Params) {
-  const [nextPageStatus, setNextPageStatus] = useState<AsyncState>("idle");
-  const queryClient = useQueryClient();
   const queryKey = getMyGroupsKey();
-  const query = useQuery({
-    initialData: params.initialData,
+  const query = useInfiniteQuery({
     queryKey,
-    queryFn: async () => assertResponse(await groupClient.getMyGroups()),
+    queryFn: async ({ pageParam }) =>
+      assertResponse(await groupClient.getMyGroups({ page: pageParam, limit: PAGINATION.groups.limit })),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => lastPage.pagination.next_page ?? undefined,
+    initialData: params.initialData
+      ? {
+          pages: [params.initialData],
+          pageParams: [undefined]
+        }
+      : undefined,
     refetchOnWindowFocus: false
   });
 
-  async function fetchNextPage(page: number) {
-    setNextPageStatus("loading");
-    const res = await groupClient.getAll({ page, limit: PAGINATION.groups.limit });
-    if (!res.success) {
-      setNextPageStatus("error");
-      return;
-    }
-    queryClient.setQueryData<GetMyGroupsResponse>(queryKey, (oldData) => {
-      if (!oldData) return res.data;
-      return {
-        ...oldData,
-        pagination: {
-          ...oldData.pagination,
-          ...res.data.pagination
-        },
-        groups: [...oldData.groups, ...res.data.groups]
-      } as GetMyGroupsResponse;
-    });
-    setNextPageStatus("success");
-  }
+  const groups = query.data?.pages.flatMap((page) => page.groups) ?? [];
 
-  return { ...query, fetchNextPage, nextPageStatus };
+  return {
+    ...query,
+    groups
+  };
 }
