@@ -7,6 +7,7 @@ import { StatusCodes } from "http-status-codes";
 import { PAGINATION } from "@votewise/constant";
 import { ZPagination } from "@votewise/schemas";
 
+import { unpack } from "@/lib/cursor";
 import { PaginationBuilder } from "@/lib/pagination";
 
 export class Controller {
@@ -26,10 +27,19 @@ export class Controller {
     const query = schema.data!;
     const { page } = query;
     const limit = query.limit < 1 ? PAGINATION.trending.limit : query.limit;
+    const cursor = unpack(query.cursor, () => this.ctx.assert.unprocessableEntity(true, "Invalid cursor"));
 
     const total = await this.ctx.repositories.user.countUserFollowing(username!);
-    const following = await this.ctx.repositories.user.getUserFollowing(username!, { page, limit });
-    const pagination = new PaginationBuilder({ limit, page, total }).build();
+    const following = await this.ctx.repositories.user.getUserFollowing(username!, { page, limit, cursor });
+
+    const nextCursor = following.length < limit ? undefined : following.at(-1);
+    const pagination = new PaginationBuilder({
+      limit,
+      page,
+      total,
+      cursor: nextCursor ? { primary: nextCursor.follow_created_at, secondary: nextCursor.id } : undefined
+    }).build();
+
     following.forEach((following) => {
       following.avatar_url = this.ctx.services.bucket.generatePublicUrl(following.avatar_url ?? "", "avatar");
     });

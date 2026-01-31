@@ -244,7 +244,10 @@ function CommentsPanel(props: TabPanelProps) {
 }
 
 function FollowersPanel(props: TabPanelProps) {
-  const { data, status, error } = useFetchUserFollowers({ username: props.username });
+  const { followers, status, error, hasNextPage, fetchNextPage, isFetchingNextPage } = useFetchUserFollowers({
+    username: props.username
+  });
+
   switch (status) {
     case "pending":
       return <div>Loading followers...</div>;
@@ -252,7 +255,7 @@ function FollowersPanel(props: TabPanelProps) {
       return <Error error={error.message} />;
   }
 
-  if (data.followers.length === 0) {
+  if (followers.length === 0) {
     return (
       <div className="py-10">
         <p className="text-center text-gray-400">{props.isItMe ? "You have" : "This user has"} no followers yet.</p>
@@ -262,23 +265,27 @@ function FollowersPanel(props: TabPanelProps) {
 
   return (
     <div className={panelStyle}>
-      {data.followers.map((user) => (
+      {followers.map((user) => (
         <UserCard key={user.user_name} user={user} />
       ))}
+      {hasNextPage && <LoadMore onClick={() => fetchNextPage()} loading={isFetchingNextPage} />}
     </div>
   );
 }
 
 function FollowingsPanel(props: TabPanelProps) {
-  const { data, status, error } = useFetchUserFollowings({ username: props.username });
+  const { following, status, error, hasNextPage, fetchNextPage, isFetchingNextPage } = useFetchUserFollowings({
+    username: props.username
+  });
+
   switch (status) {
     case "pending":
-      return <div>Loading followers...</div>;
+      return <div>Loading following...</div>;
     case "error":
       return <Error error={error.message} />;
   }
 
-  if (data.following.length === 0) {
+  if (following.length === 0) {
     return (
       <div className="py-10">
         <p className="text-center text-gray-400">
@@ -290,9 +297,10 @@ function FollowingsPanel(props: TabPanelProps) {
 
   return (
     <div className={panelStyle}>
-      {data.following.map((user) => (
+      {following.map((user) => (
         <UserCard key={user.user_name} user={user} />
       ))}
+      {hasNextPage && <LoadMore onClick={() => fetchNextPage()} loading={isFetchingNextPage} />}
     </div>
   );
 }
@@ -348,16 +356,20 @@ function UserCard({ user }: UserCardProps) {
 }
 
 function GroupsPanel(props: TabPanelProps) {
-  const { data, status, error } = useFetchUserGroups({ username: props.username });
+  const { groups, status, error, hasNextPage, fetchNextPage, isFetchingNextPage } = useFetchUserGroups({
+    username: props.username
+  });
 
   switch (status) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     case "pending":
       return <GroupListSkeleton className="gap-5" />;
     case "error":
       return <Error error={error.message} />;
   }
 
-  if (data.groups.length === 0) {
+  if (groups.length === 0) {
     return (
       <div className="py-10">
         <p className="text-center text-gray-400">
@@ -369,9 +381,10 @@ function GroupsPanel(props: TabPanelProps) {
 
   return (
     <div className={panelStyle}>
-      {data.groups.map((group) => (
+      {groups.map((group) => (
         <GroupMolecule key={group.id} group={group} />
       ))}
+      {hasNextPage && <LoadMore onClick={() => fetchNextPage()} loading={isFetchingNextPage} />}
     </div>
   );
 }

@@ -581,8 +581,8 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  public getUserFollowers(username: string, opts: { page: number; limit: number }) {
-    const { page, limit } = opts;
+  public getUserFollowers(username: string, opts: { page: number; limit: number; cursor?: Cursor | null }) {
+    const { page, limit, cursor } = opts;
     const offset = (page - 1) * limit;
     return this.execute(async () => {
       const user = await this.dataLayer
@@ -593,7 +593,7 @@ export class UserRepository extends BaseRepository {
 
       if (!user) return [];
 
-      const followers = await this.dataLayer
+      let query = this.dataLayer
         .selectFrom("Follow as f")
         .innerJoin("User as u", "u.id", "f.follower_id")
         .leftJoin("UserAggregates as ua", "ua.user_id", "u.id")
@@ -605,13 +605,26 @@ export class UserRepository extends BaseRepository {
           "u.avatar_url",
           "u.about",
           "ua.total_followers",
-          "ua.total_posts"
+          "ua.total_posts",
+          "f.created_at as follow_created_at"
         ])
         .where("f.following_id", "=", user.id)
         .orderBy("f.created_at", "desc")
-        .limit(limit)
-        .offset(offset)
-        .execute();
+        .orderBy("u.id", "desc")
+        .limit(limit);
+
+      if (cursor) {
+        query = query.where((eb) =>
+          eb.or([
+            eb("f.created_at", "<", new Date(cursor.primary)),
+            eb.and([eb("f.created_at", "=", new Date(cursor.primary)), eb("u.id", "<", cursor.secondary)])
+          ])
+        );
+      } else {
+        query = query.offset(offset);
+      }
+
+      const followers = await query.execute();
 
       return followers.map((follower) => ({
         id: follower.id,
@@ -620,6 +633,7 @@ export class UserRepository extends BaseRepository {
         last_name: follower.last_name,
         avatar_url: follower.avatar_url,
         about: follower.about,
+        follow_created_at: follower.follow_created_at,
         aggregates: {
           total_followers: follower.total_followers ?? 0,
           total_posts: follower.total_posts ?? 0
@@ -648,8 +662,8 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  public getUserFollowing(username: string, opts: { page: number; limit: number }) {
-    const { page, limit } = opts;
+  public getUserFollowing(username: string, opts: { page: number; limit: number; cursor?: Cursor | null }) {
+    const { page, limit, cursor } = opts;
     const offset = (page - 1) * limit;
     return this.execute(async () => {
       const user = await this.dataLayer
@@ -660,7 +674,7 @@ export class UserRepository extends BaseRepository {
 
       if (!user) return [];
 
-      const following = await this.dataLayer
+      let query = this.dataLayer
         .selectFrom("Follow as f")
         .innerJoin("User as u", "u.id", "f.following_id")
         .leftJoin("UserAggregates as ua", "ua.user_id", "u.id")
@@ -672,13 +686,26 @@ export class UserRepository extends BaseRepository {
           "u.avatar_url",
           "u.about",
           "ua.total_followers",
-          "ua.total_posts"
+          "ua.total_posts",
+          "f.created_at as follow_created_at"
         ])
         .where("f.follower_id", "=", user.id)
         .orderBy("f.created_at", "desc")
-        .limit(limit)
-        .offset(offset)
-        .execute();
+        .orderBy("u.id", "desc")
+        .limit(limit);
+
+      if (cursor) {
+        query = query.where((eb) =>
+          eb.or([
+            eb("f.created_at", "<", new Date(cursor.primary)),
+            eb.and([eb("f.created_at", "=", new Date(cursor.primary)), eb("u.id", "<", cursor.secondary)])
+          ])
+        );
+      } else {
+        query = query.offset(offset);
+      }
+
+      const following = await query.execute();
 
       return following.map((user) => ({
         id: user.id,
@@ -687,6 +714,7 @@ export class UserRepository extends BaseRepository {
         last_name: user.last_name,
         avatar_url: user.avatar_url,
         about: user.about,
+        follow_created_at: user.follow_created_at,
         aggregates: {
           total_followers: user.total_followers ?? 0,
           total_posts: user.total_posts ?? 0
@@ -715,8 +743,8 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  public getUserGroups(username: string, opts: { page: number; limit: number }) {
-    const { page, limit } = opts;
+  public getUserGroups(username: string, opts: { page: number; limit: number; cursor?: Cursor | null }) {
+    const { page, limit, cursor } = opts;
     const offset = (page - 1) * limit;
     return this.execute(async () => {
       const user = await this.dataLayer
@@ -739,7 +767,7 @@ export class UserRepository extends BaseRepository {
       const groupIds = memberGroups.map((m) => m.group_id);
       const roleByGroup = new Map(memberGroups.map((m) => [m.group_id, m.role]));
 
-      const groups = await this.dataLayer
+      let query = this.dataLayer
         .selectFrom("Group as g")
         .leftJoin("GroupAggregates as ga", "ga.group_id", "g.id")
         .select([
@@ -755,9 +783,21 @@ export class UserRepository extends BaseRepository {
         ])
         .where("g.id", "in", groupIds)
         .orderBy("g.created_at", "desc")
-        .limit(limit)
-        .offset(offset)
-        .execute();
+        .orderBy("g.id", "desc")
+        .limit(limit);
+
+      if (cursor) {
+        query = query.where((eb) =>
+          eb.or([
+            eb("g.created_at", "<", new Date(cursor.primary)),
+            eb.and([eb("g.created_at", "=", new Date(cursor.primary)), eb("g.id", "<", cursor.secondary)])
+          ])
+        );
+      } else {
+        query = query.offset(offset);
+      }
+
+      const groups = await query.execute();
 
       if (groups.length === 0) return [];
 

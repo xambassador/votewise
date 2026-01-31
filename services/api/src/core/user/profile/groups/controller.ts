@@ -7,6 +7,7 @@ import { StatusCodes } from "http-status-codes";
 import { PAGINATION } from "@votewise/constant";
 import { ZPagination } from "@votewise/schemas";
 
+import { unpack } from "@/lib/cursor";
 import { PaginationBuilder } from "@/lib/pagination";
 
 export class Controller {
@@ -26,10 +27,18 @@ export class Controller {
     const query = schema.data!;
     const { page } = query;
     const limit = query.limit < 1 ? PAGINATION.groups.limit : query.limit;
+    const cursor = unpack(query.cursor, () => this.ctx.assert.unprocessableEntity(true, "Invalid cursor"));
 
     const total = await this.ctx.repositories.user.countUserGroups(username!);
-    const groups = await this.ctx.repositories.user.getUserGroups(username!, { page, limit });
-    const pagination = new PaginationBuilder({ limit, page, total }).build();
+    const groups = await this.ctx.repositories.user.getUserGroups(username!, { page, limit, cursor });
+
+    const nextCursor = groups.length < limit ? undefined : groups.at(-1);
+    const pagination = new PaginationBuilder({
+      limit,
+      page,
+      total,
+      cursor: nextCursor ? { primary: nextCursor.created_at, secondary: nextCursor.id } : undefined
+    }).build();
 
     const result = { groups, ...pagination };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;

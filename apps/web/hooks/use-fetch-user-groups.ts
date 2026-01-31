@@ -1,45 +1,40 @@
 "use client";
 
 import type { GetUserGroupsResponse } from "@votewise/client/user";
-import type { AsyncState } from "@votewise/types";
 
-import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { userClient } from "@/lib/client";
 import { getUserGroupsKey } from "@/lib/constants";
 import { assertResponse } from "@/lib/error";
 
-export function useFetchUserGroups(props: { username: string }) {
-  const [nextPageStatus, setNextPageStatus] = useState<AsyncState>("idle");
-  const queryClient = useQueryClient();
-  const queryKey = getUserGroupsKey(props.username);
-  const query = useQuery({
+type Params = {
+  username: string;
+  initialData?: GetUserGroupsResponse;
+};
+
+export function useFetchUserGroups(params: Params) {
+  const queryKey = getUserGroupsKey(params.username);
+
+  const query = useInfiniteQuery({
     queryKey,
-    queryFn: async () => assertResponse(await userClient.getUserGroups(props.username)),
+    queryFn: async ({ pageParam }) =>
+      assertResponse(await userClient.getUserGroups(params.username, { cursor: pageParam })),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.pagination.cursor ?? undefined,
+    initialData: params.initialData
+      ? {
+          pages: [params.initialData],
+          pageParams: [undefined]
+        }
+      : undefined,
     refetchOnWindowFocus: false
   });
 
-  async function fetchNextPage() {
-    setNextPageStatus("loading");
-    const res = await userClient.getUserGroups(props.username);
-    if (!res.success) {
-      setNextPageStatus("error");
-      return;
-    }
-    queryClient.setQueryData<GetUserGroupsResponse>(queryKey, (oldData) => {
-      if (!oldData) return res.data;
-      return {
-        ...oldData,
-        pagination: {
-          ...oldData.pagination,
-          ...res.data.pagination
-        },
-        groups: [...oldData.groups, ...res.data.groups]
-      } as GetUserGroupsResponse;
-    });
-    setNextPageStatus("success");
-  }
+  const groups = query.data?.pages.flatMap((page) => page.groups) ?? [];
 
-  return { ...query, fetchNextPage, nextPageStatus };
+  return {
+    ...query,
+    groups
+  };
 }
