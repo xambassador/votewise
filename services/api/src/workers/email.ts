@@ -32,7 +32,9 @@ export class EmailWorker implements ITaskWorker {
         subject
       });
       this.opts.logger.info(`Email sent to ${to}`);
-      await this.opts.userRepository.updateByEmail(to, { email_confirmation_sent_at: new Date() });
+      if (emailData.templateName === "signup") {
+        await this.opts.userRepository.updateByEmail(to, { email_confirmation_sent_at: new Date() });
+      }
     } catch (err) {
       this.opts.logger.error(`Failed to send email to ${to}`);
       throw err;
