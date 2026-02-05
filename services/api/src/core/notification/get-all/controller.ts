@@ -36,7 +36,7 @@ export class Controller {
           user_name: s.user_name,
           first_name: s.first_name,
           last_name: s.last_name,
-          avatar_url: this.ctx.services.bucket.generatePublicUrl(s.avatar_url || "", "avatar"),
+          avatar_url: s.avatar_url,
           notification_id: s.id
         } as GroupJoinPayload;
       }
@@ -58,7 +58,7 @@ export class Controller {
           admin_id: groupInvitation.user_id, // @todo
           group_id: group.id,
           group_name: group.name,
-          avatar_url: this.ctx.services.bucket.generatePublicUrl(s.avatar_url || "", "avatar"),
+          avatar_url: s.avatar_url,
           first_name: s.first_name,
           last_name: s.last_name,
           user_name: s.user_name,

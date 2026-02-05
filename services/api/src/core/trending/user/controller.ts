@@ -29,7 +29,7 @@ export class Controller {
       user_name: user.user_name,
       first_name: user.first_name,
       last_name: user.last_name,
-      avatar_url: this.ctx.services.bucket.generatePublicUrl(user.avatar_url ?? "", "avatar"),
+      avatar_url: user.avatar_url,
       about: user.about,
       created_at: user.created_at,
       updated_at: user.updated_at,

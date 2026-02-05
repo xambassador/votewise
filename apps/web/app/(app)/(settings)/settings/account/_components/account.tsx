@@ -40,7 +40,7 @@ export function AccountSettings(props: Props) {
         <div className="flex items-center gap-4">
           <Avatar className="size-20">
             <AvatarFallback name={name} />
-            <AvatarImage src={data.avatar_url} alt={name} sizes="80px" />
+            <AvatarImage src={data.avatar_url ?? ""} alt={name} sizes="80px" />
           </Avatar>
           <div className="flex flex-col">
             <span className="text-gray-300 font-medium">{name}</span>

@@ -67,7 +67,7 @@ function SearchResults() {
               <Link href={routes.user.profile(user.user_name)} className="focus-presets focus-primary rounded-full">
                 <Avatar className="size-12">
                   <AvatarFallback name={user.first_name + " " + user.last_name} />
-                  <AvatarImage src={user.avatar} alt={user.first_name + " " + user.last_name} sizes="48px" />
+                  <AvatarImage src={user.avatar ?? ""} alt={user.first_name + " " + user.last_name} sizes="48px" />
                 </Avatar>
               </Link>
               <div className="flex flex-col">

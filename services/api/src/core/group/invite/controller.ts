@@ -46,7 +46,7 @@ export class Controller {
       invitation_id: invitation.id,
       group_name: group.name,
       event_type: "group_invite",
-      avatar_url: this.ctx.services.bucket.generatePublicUrl(currentUserDetails.avatar_url || "", "avatar"),
+      avatar_url: currentUserDetails.avatar_url ?? "",
       created_at: new Date(),
       first_name: currentUserDetails.first_name,
       last_name: currentUserDetails.last_name,

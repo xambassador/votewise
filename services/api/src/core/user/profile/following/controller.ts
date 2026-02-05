@@ -40,10 +40,6 @@ export class Controller {
       cursor: nextCursor ? { primary: nextCursor.follow_created_at, secondary: nextCursor.id } : undefined
     }).build();
 
-    following.forEach((following) => {
-      following.avatar_url = this.ctx.services.bucket.generatePublicUrl(following.avatar_url ?? "", "avatar");
-    });
-
     const result = { following, ...pagination };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }

@@ -26,7 +26,7 @@ export class Controller {
       joined_at: member.joined_at,
       user: {
         id: member.user.id,
-        avatar_url: this.ctx.services.bucket.generatePublicUrl(member.user.avatar_url ?? "", "avatar"),
+        avatar_url: member.user.avatar_url,
         first_name: member.user.first_name,
         last_name: member.user.last_name,
         user_name: member.user.user_name

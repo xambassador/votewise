@@ -38,9 +38,6 @@ export class Controller {
       total,
       cursor: nextCursor ? { primary: nextCursor.created_at, secondary: nextCursor.id } : undefined
     }).build();
-    comments.forEach((comment) => {
-      comment.user.avatar_url = this.ctx.services.bucket.generatePublicUrl(comment.user.avatar_url ?? "", "avatar");
-    });
 
     const result = { comments, ...pagination };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;

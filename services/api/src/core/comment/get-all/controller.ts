@@ -42,10 +42,6 @@ export class Controller {
         replies: c.replies,
         is_edited: isEdited
       };
-      comment.user.avatar_url = this.ctx.services.bucket.generatePublicUrl(comment.user.avatar_url ?? "", "avatar");
-      comment.replies.forEach((reply) => {
-        reply.user.avatar_url = this.ctx.services.bucket.generatePublicUrl(reply.user.avatar_url ?? "", "avatar");
-      });
       const totalReplies = c._count.replies;
       const pagination = new PaginationBuilder({
         limit: repliesLimit,

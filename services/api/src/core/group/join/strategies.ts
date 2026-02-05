@@ -66,7 +66,7 @@ export class PublicGroupStrategy extends Strategy {
     );
     const event = new EventBuilder("groupJoinNotification").setData({
       admin_id: admin.user_id,
-      avatar_url: this.ctx.services.bucket.generatePublicUrl(user.avatar_url ?? "", "avatar"),
+      avatar_url: user.avatar_url ?? "",
       first_name: user.first_name,
       last_name: user.last_name,
       group_name: data.group.name,
@@ -121,7 +121,7 @@ export class PrivateGroupStrategy extends Strategy {
     );
     const event = new EventBuilder("groupJoinRequestNotification").setData({
       admin_id: admin.user_id,
-      avatar_url: this.ctx.services.bucket.generatePublicUrl(user.avatar_url ?? "", "avatar"),
+      avatar_url: user.avatar_url ?? "",
       created_at: sentAt,
       first_name: user.first_name,
       last_name: user.last_name,

@@ -31,14 +31,10 @@ export class Controller {
     const query = schema.data!;
     const { page } = query;
     const limit = query.limit < 1 ? PAGINATION.comments.reply.limit : query.limit;
-    const [totalReplies, repliesResult] = await Promise.all([
+    const [totalReplies, replies] = await Promise.all([
       this.ctx.repositories.comment.reply.count(feedId, commentId),
       this.ctx.repositories.comment.reply.findByParentId(feedId, commentId, page, limit)
     ]);
-    const replies = repliesResult.map((reply) => {
-      reply.user.avatar_url = this.ctx.services.bucket.generatePublicUrl(reply.user.avatar_url ?? "", "avatar");
-      return reply;
-    });
     const pagination = new PaginationBuilder({ limit, page, total: totalReplies }).build();
     const result = { replies, ...pagination };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;

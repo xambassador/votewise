@@ -8,7 +8,6 @@ type ServiceOptions = {
   assert: AppContext["assert"];
   userRepository: AppContext["repositories"]["user"];
   cache: AppContext["cache"];
-  bucketService: AppContext["services"]["bucket"];
 };
 
 const schema = z.object({

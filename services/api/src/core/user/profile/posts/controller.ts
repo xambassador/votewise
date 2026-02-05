@@ -56,12 +56,6 @@ export class Controller {
       total,
       cursor: nextCursor ? { primary: nextCursor.created_at, secondary: nextCursor.id } : undefined
     }).build();
-    posts.forEach((post) => {
-      post.author.avatar_url = this.ctx.services.bucket.generatePublicUrl(post.author.avatar_url ?? "", "avatar");
-      post.voters.forEach((voter) => {
-        voter.avatar_url = this.ctx.services.bucket.generatePublicUrl(voter.avatar_url ?? "", "avatar");
-      });
-    });
 
     const result = { posts, ...pagination };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;

@@ -40,12 +40,12 @@ export class Controller {
         user_name: timeline.post.author.user_name,
         first_name: timeline.post.author.first_name,
         last_name: timeline.post.author.last_name,
-        avatar_url: this.ctx.services.bucket.generatePublicUrl(timeline.post.author.avatar_url ?? "", "avatar")
+        avatar_url: timeline.post.author.avatar_url
       },
       votes: timeline.post.postAggregates?.votes ?? 0,
       voters: timeline.post.upvotes.map((vote) => ({
         id: vote.user.id,
-        avatar_url: this.ctx.services.bucket.generatePublicUrl(vote.user.avatar_url ?? "", "avatar")
+        avatar_url: vote.user.avatar_url
       })),
       comments: timeline.post.postAggregates?.comments ?? 0
     }));

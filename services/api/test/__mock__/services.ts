@@ -1,4 +1,3 @@
-import type { BucketService } from "@/services/bucket.service";
 import type { CryptoService } from "@/services/crypto.service";
 import type { JWTService } from "@/services/jwt.service";
 import type { OnboardService } from "@/services/onboard.service";
@@ -10,15 +9,6 @@ import { SessionManager } from "@/services/session.service";
 
 import { mockCache } from "./redis";
 import { mockSessionRepository } from "./repository";
-
-export const mockBucketService = {
-  getUrlForType: jest.fn().mockImplementation((url: string, type: "avatar" | "background") => {
-    if (type === "avatar") {
-      return `https://example.com/avatar/${url}`;
-    }
-    return `https://example.com/background/${url}`;
-  })
-} as unknown as jest.Mocked<BucketService>;
 
 export const mockCryptoService = {
   symmetricEncrypt: jest.fn().mockName("cryptoService.symmetricEncrypt"),

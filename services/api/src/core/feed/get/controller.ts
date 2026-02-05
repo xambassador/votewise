@@ -48,33 +48,6 @@ export class Controller {
         avatar_url: v.user.avatar_url
       }))
     };
-    const authorAvatarPromise = new Promise<typeof result>((resolve) => {
-      this.ctx.services.bucket
-        .getUrlForType(result.author.avatar_url ?? "", "avatar")
-        .then((url) => {
-          result.author.avatar_url = url;
-          resolve(result);
-        })
-        .catch(() => {
-          result.author.avatar_url = "";
-          resolve(result);
-        });
-    });
-    const votersAvatarPromises = result.voters
-      .filter((v) => v.avatar_url)
-      .map(
-        (upvote) =>
-          new Promise<typeof result>((resolve) => {
-            this.ctx.services.bucket
-              .getUrlForType(upvote.avatar_url || "", "avatar")
-              .then((url) => {
-                upvote.avatar_url = url;
-                resolve(result);
-              })
-              .catch(() => resolve(result));
-          })
-      );
-    await Promise.all([authorAvatarPromise, ...votersAvatarPromises]);
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }
 }

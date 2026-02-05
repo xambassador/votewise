@@ -27,32 +27,14 @@ export class Controller {
     }
 
     const groupsResult = await this.ctx.repositories.group.getGroupsById(recommendationResult.data.recommended_groups);
-    const groupsPromises = groupsResult.map((g) => {
-      const group = {
-        id: g.id,
-        name: g.name,
-        about: g.about,
-        author: g.admins[0],
-        logo_url: g.logo_url
-      };
-      return new Promise<typeof group>((resolve) => {
-        this.ctx.services.bucket
-          .getUrlForType(group.author?.avatar_url || "", "avatar")
-          .then((url) => {
-            if (group.author) {
-              group.author.avatar_url = url;
-              resolve(group);
-            } else {
-              resolve(group);
-            }
-          })
-          .catch(() => {
-            resolve(group);
-          });
-      });
-    });
+    const groups = groupsResult.map((g) => ({
+      id: g.id,
+      name: g.name,
+      about: g.about,
+      author: g.admins[0],
+      logo_url: g.logo_url
+    }));
 
-    const groups = await Promise.all(groupsPromises);
     const result = { groups };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }

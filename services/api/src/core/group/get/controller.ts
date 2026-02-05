@@ -49,8 +49,8 @@ export class Controller {
       about: group.about,
       type: group.type,
       status: group.status,
-      logo_url: this.ctx.services.bucket.generatePublicUrl(group.logo_url ?? "", "avatar"),
-      cover_url: this.ctx.services.bucket.generatePublicUrl(group.cover_image_url ?? "", "background"),
+      logo_url: group.logo_url,
+      cover_url: group.cover_image_url,
       created_at: group.created_at,
       updated_at: group.updated_at,
       self_is_member: isMember,
@@ -60,7 +60,7 @@ export class Controller {
         username: admin.user.user_name,
         first_name: admin.user.first_name,
         last_name: admin.user.last_name,
-        avatar: this.ctx.services.bucket.generatePublicUrl(admin.user.avatar_url || "", "avatar")
+        avatar: admin.user.avatar_url
       },
       aggregate: {
         total_members: group.groupAggregates?.total_members || 0,
@@ -70,7 +70,7 @@ export class Controller {
       },
       members: group.members.map((member) => ({
         id: member.user_id,
-        avatar_url: this.ctx.services.bucket.generatePublicUrl(member.user.avatar_url || "", "avatar")
+        avatar_url: member.user.avatar_url
       }))
     };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;

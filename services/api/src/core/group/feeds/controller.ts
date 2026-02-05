@@ -77,12 +77,12 @@ export class Controller {
           user_name: feed.post.author.user_name,
           first_name: feed.post.author.first_name,
           last_name: feed.post.author.last_name,
-          avatar_url: this.ctx.services.bucket.generatePublicUrl(feed.post.author.avatar_url ?? "", "avatar")
+          avatar_url: feed.post.author.avatar_url
         },
         votes: feed.post.postAggregates?.votes ?? 0,
         voters: feed.post.upvotes.map((vote) => ({
           id: vote.user.id,
-          avatar_url: this.ctx.services.bucket.generatePublicUrl(vote.user.avatar_url ?? "", "avatar")
+          avatar_url: vote.user.avatar_url
         })),
         comments: feed.post.postAggregates?.comments ?? 0
       })),

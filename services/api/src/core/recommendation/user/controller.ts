@@ -39,29 +39,14 @@ export class Controller {
     }
 
     const usersResults = await this.ctx.repositories.user.findManyByIds(recommendations);
-    const usersPromises = usersResults.map((u) => {
-      const user = {
-        id: u.id,
-        first_name: u.first_name,
-        last_name: u.last_name,
-        about: u.about,
-        avatar_url: "",
-        user_name: u.user_name
-      };
-      return new Promise<typeof user>((resolve) => {
-        this.ctx.services.bucket
-          .getUrlForType(u.avatar_url || "", "avatar")
-          .then((url) => {
-            user.avatar_url = url;
-            resolve(user);
-          })
-          .catch(() => {
-            user.avatar_url = "";
-            resolve(user);
-          });
-      });
-    });
-    const users = await Promise.all(usersPromises);
+    const users = usersResults.map((u) => ({
+      id: u.id,
+      first_name: u.first_name,
+      last_name: u.last_name,
+      about: u.about,
+      avatar_url: "",
+      user_name: u.user_name
+    }));
     const result = { users };
     return res.status(StatusCodes.OK).json(result) as Response<typeof result>;
   }

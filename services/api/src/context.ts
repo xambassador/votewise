@@ -121,12 +121,10 @@ export class AppContext {
       sessionRepository: repositories.session,
       accessTokenExpiration: cfg.jwt.accessTokenExpiration
     });
-    const bucketService = new Services.BucketService();
     const onboardService = new Services.OnboardService({
       userRepository: repositories.user,
       cache,
-      assert,
-      bucketService
+      assert
     });
     const mlService = new Services.MLService(environment.VOTEWISE_ML_API_URL);
     const realtime = new Services.Realtime({ cryptoService, env: environment, jwtService, logger });
@@ -145,7 +143,6 @@ export class AppContext {
       queues: { tasksQueue },
       plugins: { requestParser, jwt: jwtPlugin },
       services: {
-        bucket: bucketService,
         crypto: cryptoService,
         jwt: jwtService,
         ml: mlService,

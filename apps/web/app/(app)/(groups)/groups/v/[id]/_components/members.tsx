@@ -75,7 +75,7 @@ function Admins(props: { groupId: string }) {
         <li key={admin.id} className="flex items-center w-full justify-between pr-2">
           <User
             name={admin.user.first_name + " " + admin.user.last_name}
-            avatar={admin.user.avatar_url}
+            avatar={admin.user.avatar_url ?? ""}
             username={admin.user.user_name}
           />
         </li>
@@ -115,7 +115,7 @@ function Moderators(props: { groupId: string }) {
         <li key={moderator.id} className="flex items-center w-full justify-between pr-2">
           <User
             name={moderator.user.first_name + " " + moderator.user.last_name}
-            avatar={moderator.user.avatar_url}
+            avatar={moderator.user.avatar_url ?? ""}
             username={moderator.user.user_name}
             isMe={me.id === moderator.user.id}
           />
@@ -156,7 +156,7 @@ function Users(props: { groupId: string }) {
         <li key={member.id} className="flex items-center w-full justify-between pr-2">
           <User
             name={member.user.first_name + " " + member.user.last_name}
-            avatar={member.user.avatar_url}
+            avatar={member.user.avatar_url ?? ""}
             username={member.user.user_name}
             isMe={me.id === member.user.id}
           />
