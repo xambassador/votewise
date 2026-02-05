@@ -4,6 +4,8 @@ import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
+import { Day } from "@votewise/times";
+
 import { getAuthenticateLocals } from "@/utils/locals";
 
 export class Controller {
@@ -18,6 +20,17 @@ export class Controller {
     const _user = await this.ctx.repositories.user.getMyProfile(locals.payload.sub);
     this.ctx.assert.resourceNotFound(!_user, "User not found");
     const user = _user!;
+    let voteBucket = user.vote_bucket;
+    const lastBucketResetAt = user.last_bucket_reset_at;
+    const now = new Date();
+    if (voteBucket <= 0) {
+      const is24HrPassed = lastBucketResetAt ? now.getTime() - lastBucketResetAt.getTime() >= Day : true;
+      if (is24HrPassed) {
+        await this.ctx.repositories.user.update(user.id, { vote_bucket: 10, last_bucket_reset_at: now });
+        voteBucket = 10;
+      }
+    }
+
     const result = {
       id: user!.id,
       first_name: user!.first_name,
@@ -28,7 +41,7 @@ export class Controller {
       about: user!.about,
       gender: user!.gender,
       location: user!.location,
-      votes_left: user.vote_bucket,
+      votes_left: voteBucket,
       aggregation: {
         total_comments: user!.userAggregates?.total_comments ?? 0,
         total_posts: user!.userAggregates?.total_posts ?? 0,
