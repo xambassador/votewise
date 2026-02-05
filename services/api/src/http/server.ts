@@ -68,7 +68,6 @@ export class Server {
     this.server.timeout = this.serverConfig.serverTimeout ?? 60 * 1000;
     this.healthCheck();
     this.registerShutdownHandlers();
-    await events.once(server, "listening");
     server.on("error", (err) => {
       const error = err as NodeJS.ErrnoException;
       if (error.syscall !== "listen") {
@@ -89,6 +88,7 @@ export class Server {
           throw err;
       }
     });
+    await events.once(server, "listening");
     return server;
   }
 

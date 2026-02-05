@@ -43,7 +43,6 @@ export class Server {
     this.terminator = createHttpTerminator({ server });
     this.server = server;
     this.server.keepAliveTimeout = 61 * 1000;
-    events.once(server, "listening");
     server.on("error", (err) => {
       const error = err as NodeJS.ErrnoException;
       if (error.syscall !== "listen") {
@@ -62,6 +61,7 @@ export class Server {
           throw err;
       }
     });
+    await events.once(server, "listening");
     return server;
   }
 
