@@ -119,6 +119,7 @@ export class Server {
       this.isAlreadyShuttingDown = true;
       await Promise.all([
         this.shutdownServer(),
+        this.ctx.queues.tasksQueue.getWorker()?.close(),
         this.healthChecker.disconnectDB(),
         this.healthChecker.disconnectCache()
       ]);

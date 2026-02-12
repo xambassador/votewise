@@ -67,10 +67,17 @@ export class TasksQueue {
     this.worker.on("ready", () => {
       ctx.logger.info("[Tasks Worker] ready");
     });
+    this.worker.on("closed", () => {
+      ctx.logger.info("[Tasks Worker] closed");
+    });
   }
 
   public async add(task: Tasks) {
     if (!this.queue) throw new Error("Task Queue not initialized");
     return this.queue.add(task.name, task);
+  }
+
+  public getWorker() {
+    return this.worker;
   }
 }
