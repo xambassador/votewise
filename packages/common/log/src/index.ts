@@ -10,7 +10,7 @@ type Extra = Record<string, unknown>;
 class Logger {
   output: pino.Logger;
 
-  public constructor(options: pino.LoggerOptions = {}) {
+  constructor(options: pino.LoggerOptions = {}) {
     this.output = pino({
       level: process.env.LOG_LEVEL || "info",
       transport: {

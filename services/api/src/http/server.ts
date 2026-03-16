@@ -3,12 +3,9 @@ import "@/types";
 import type http from "http";
 import type { HttpTerminator } from "http-terminator";
 
-import events from "events";
 import chalk from "chalk";
 import express from "express";
 import { createHttpTerminator } from "http-terminator";
-
-import { banner } from "@/utils/banner";
 
 import { AppContext } from "../context";
 import { DevelopmentRouter } from "./dev-router";
@@ -56,7 +53,6 @@ export class Server {
   }
 
   public async start(): Promise<http.Server> {
-    banner();
     const { port } = this.ctx.config;
     const server = this.app.listen(port);
     this.ctx.services.realtime.init(server);
@@ -68,27 +64,23 @@ export class Server {
     this.server.timeout = this.serverConfig.serverTimeout ?? 60 * 1000;
     this.healthCheck();
     this.registerShutdownHandlers();
-    server.on("error", (err) => {
-      const error = err as NodeJS.ErrnoException;
-      if (error.syscall !== "listen") {
-        throw err;
-      }
+    await new Promise<void>((resolve, reject) => {
+      server.once("listening", resolve);
+      server.once("error", (err: NodeJS.ErrnoException) => {
+        if (err.syscall !== "listen") return reject(err);
 
-      const bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
-      switch (error.code) {
-        case "EACCES":
-          this.ctx.logger.errorSync(`${bind} requires elevated privileges`);
-          process.exit(1);
-          break;
-        case "EADDRINUSE":
-          this.ctx.logger.errorSync(`${bind} is already in use`);
-          process.exit(1);
-          break;
-        default:
-          throw err;
-      }
+        const bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
+        if (err.code === "EACCES") {
+          return reject(new Error(`${bind} requires elevated privileges`));
+        } else if (err.code === "EADDRINUSE") {
+          return reject(new Error(`${bind} is already in use`));
+        }
+        return reject(err);
+      });
     });
-    await events.once(server, "listening");
+    server.on("error", (err) => {
+      this.ctx.logger.errorSync("Unexpected server error", err);
+    });
     return server;
   }
 

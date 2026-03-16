@@ -56,12 +56,12 @@ async function bootstrap() {
 
   const server = await Server.create({ cfg, secrets });
   await server.start();
-  server.ctx.logger.logSync(chalk.blue("Press Ctrl+C to shutdown Votewise API\n\n"));
-  server.ctx.logger.logSync(`Votewise API is running on port ${cfg.port}`);
+  server.ctx.logger.logSync(`Votewise API is running on port ${chalk.green(server.ctx.config.port)}`);
+  server.ctx.logger.logSync(chalk.blue("Press Ctrl+C to shutdown Votewise API"));
 }
 
 bootstrap().catch((err) => {
   // eslint-disable-next-line no-console
-  console.error(err);
+  console.error("Failed to start the server: ", err);
   process.exit(1);
 });
