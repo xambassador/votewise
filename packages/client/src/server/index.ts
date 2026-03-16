@@ -25,10 +25,7 @@ type ClientOptions = {
   timeout?: number;
 };
 
-const VOTEWISE_API = environment.VOTEWISE_API_URL;
-
 const DEFAULT_OPTIONS: ClientOptions = {
-  url: VOTEWISE_API,
   timeout: 30_000, // 30 seconds
   headersFactory: () => ({}),
   headers: {
@@ -61,7 +58,8 @@ export class Client {
   private readonly isSandbox: boolean;
 
   constructor(opts?: ClientOptions) {
-    const settings = { ...DEFAULT_OPTIONS, ...opts };
+    const VOTEWISE_API = environment.VOTEWISE_API_URL;
+    const settings = { url: VOTEWISE_API, ...DEFAULT_OPTIONS, ...opts };
 
     this.url = settings.url;
     this.headers = settings.headers;
