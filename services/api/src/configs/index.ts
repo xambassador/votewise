@@ -1,4 +1,4 @@
-import { Millisecond } from "@votewise/times";
+import { Second } from "@votewise/times";
 
 export class ServerSecrets {
   public jwtSecret: string;
@@ -69,10 +69,10 @@ export class ServerConfig {
   public uploadBucket: string;
   public avatarsBucket: string;
   public backgroundsBucket: string;
-  public keepAliveTimeout?: number = 61 * Millisecond;
-  public headersTimeout?: number = 61 * Millisecond;
-  public requestTimeout?: number = 30 * Millisecond;
-  public serverTimeout?: number = 30 * Millisecond;
+  public keepAliveTimeout?: number = 61 * Second;
+  public headersTimeout?: number = 61 * Second;
+  public requestTimeout?: number = 30 * Second;
+  public serverTimeout?: number = 30 * Second;
   public isSandboxMode: boolean = false;
 
   constructor(cfg: ServerConfig) {

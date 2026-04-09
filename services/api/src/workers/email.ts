@@ -23,7 +23,11 @@ export class EmailWorker implements ITaskWorker {
     const { templateName, to, locals, subject } = emailData;
     this.opts.logger.info(`Sending email to ${emailData.to}`);
     const templatePath = path.resolve(__dirname, `../emails/templates/${templateName}.pug`);
-    const template = this.compiledTemplates[emailData.templateName] || pug.compileFile(templatePath);
+    let template = this.compiledTemplates[emailData.templateName];
+    if (!template) {
+      template = pug.compileFile(templatePath);
+      this.compiledTemplates[emailData.templateName] = template;
+    }
     const html = template(locals);
     try {
       await this.opts.mailer.send({

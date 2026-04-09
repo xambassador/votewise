@@ -5,14 +5,14 @@ import chalk from "chalk";
 
 import { migrateToLatest } from "@votewise/db/migrator";
 import { environment } from "@votewise/env";
-import { Day, Minute } from "@votewise/times";
+import { Day } from "@votewise/times";
 
 import { Server } from "@/http/server";
 
 import { Cors, JWT, ServerConfig, ServerSecrets } from "./configs";
 
 const cors = new Cors({ origin: "*" });
-const jwt = new JWT({ accessTokenExpiration: Day * 7, refreshTokenExpiration: Minute * 60 * 24 * 7 });
+const jwt = new JWT({ accessTokenExpiration: Day * 7, refreshTokenExpiration: Day * 30 });
 const cfg = new ServerConfig({
   hostname: "",
   jwt,
