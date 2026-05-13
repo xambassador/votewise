@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, memo, useState } from "react";
+import { forwardRef, memo, useCallback, useState } from "react";
 import { Slot } from "@radix-ui/react-slot";
 
 import { cn } from "../cn";
@@ -79,14 +79,14 @@ export const Comment = memo(
     const [isReplyOpen, setIsReplyOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
 
-    const toggle = (editMode = false) => {
+    const toggle = useCallback((editMode = false) => {
       if (!editMode) {
         setIsReplyOpen((prev) => !prev);
         return;
       }
       setIsEditMode((prev) => !prev);
       setIsReplyOpen(false);
-    };
+    }, []);
 
     return (
       <CommentProvider isReplyOpen={isReplyOpen} toggle={toggle} isEditMode={isEditMode}>
