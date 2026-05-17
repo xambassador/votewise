@@ -10,65 +10,93 @@
   ],
   "exports": {
     "./client": {
+      "@votewise/source": "./src/client/index.ts",
+      "types": "./dist/client/index.d.ts",
       "import": "./dist/client/index.mjs",
       "require": "./dist/client/index.js"
     },
     "./upload": {
+      "@votewise/source": "./src/client/upload.ts",
+      "types": "./dist/client/upload.d.ts",
       "import": "./dist/client/upload.mjs",
       "require": "./dist/client/upload.js"
     },
     "./server": {
+      "@votewise/source": "./src/server/index.ts",
+      "types": "./dist/server/index.d.ts",
       "import": "./dist/server/index.mjs",
       "require": "./dist/server/index.js"
     },
     "./auth": {
+      "@votewise/source": "./src/services/auth.ts",
+      "types": "./dist/services/auth.d.ts",
       "import": "./dist/services/auth.mjs",
       "require": "./dist/services/auth.js"
     },
     "./onboard": {
+      "@votewise/source": "./src/services/onboard.ts",
+      "types": "./dist/services/onboard.d.ts",
       "import": "./dist/services/onboard.mjs",
       "require": "./dist/services/onboard.js"
     },
     "./user": {
+      "@votewise/source": "./src/services/user.ts",
+      "types": "./dist/services/user.d.ts",
       "import": "./dist/services/user.mjs",
       "require": "./dist/services/user.js"
     },
     "./mfa": {
+      "@votewise/source": "./src/services/mfa.ts",
+      "types": "./dist/services/mfa.d.ts",
       "import": "./dist/services/mfa.mjs",
       "require": "./dist/services/mfa.js"
     },
     "./feed": {
+      "@votewise/source": "./src/services/feed.ts",
+      "types": "./dist/services/feed.d.ts",
       "import": "./dist/services/feed.mjs",
       "require": "./dist/services/feed.js"
     },
     "./comment": {
+      "@votewise/source": "./src/services/comment.ts",
+      "types": "./dist/services/comment.d.ts",
       "import": "./dist/services/comment.mjs",
       "require": "./dist/services/comment.js"
     },
     "./follow": {
+      "@votewise/source": "./src/services/follow.ts",
+      "types": "./dist/services/follow.d.ts",
       "import": "./dist/services/follow.mjs",
       "require": "./dist/services/follow.js"
     },
     "./group": {
+      "@votewise/source": "./src/services/group.ts",
+      "types": "./dist/services/group.d.ts",
       "import": "./dist/services/group.mjs",
       "require": "./dist/services/group.js"
     },
     "./notification": {
+      "@votewise/source": "./src/services/notification.ts",
+      "types": "./dist/services/notification.d.ts",
       "import": "./dist/services/notification.mjs",
       "require": "./dist/services/notification.js"
     },
     "./search": {
+      "@votewise/source": "./src/services/search.ts",
+      "types": "./dist/services/search.d.ts",
       "import": "./dist/services/search.mjs",
       "require": "./dist/services/search.js"
     },
     "./trending": {
+      "@votewise/source": "./src/services/trending.ts",
+      "types": "./dist/services/trending.d.ts",
       "import": "./dist/services/trending.mjs",
       "require": "./dist/services/trending.js"
     }
   },
   "scripts": {
-    "dev": "tsup --watch",
-    "build": "tsup",
+    "dev": "tsup --watch --tsconfig tsconfig.build.json",
+    "build": "tsup --tsconfig tsconfig.build.json",
     "clean:build": "rm -rf dist",
     "clean": "rm -rf dist node_modules"
   },

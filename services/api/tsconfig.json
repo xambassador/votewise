@@ -1,14 +1,5 @@
 {
   "extends": "../../tsconfig.json",
-  "ts-node": {
-    "files": true,
-    "require": ["tsconfig-paths/register"],
-    "experimentalResolverFeatures": true,
-    "compilerOptions": {
-      "module": "NodeNext",
-      "types": ["node"]
-    }
-  },
   "compilerOptions": {
     "verbatimModuleSyntax": false,
     "module": "NodeNext",

@@ -8,9 +8,10 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "verbatimModuleSyntax": false,
-    "incremental": false,
-    "composite": false
+    "incremental": true,
+    "composite": true
   },
-  "include": ["./src"],
+  "references": [{ "path": "../../services/api" }],
+  "include": ["./src/**/*"],
   "exclude": ["dist", "build", "node_modules"]
 }

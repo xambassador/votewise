@@ -12,6 +12,7 @@
   ],
   "exports": {
     ".": {
+      "@votewise/source": "./index.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
@@ -22,6 +23,7 @@
       "types": "./db/enums.ts"
     },
     "./migrator": {
+      "@votewise/source": "./migrator.ts",
       "import": "./dist/migrator.mjs",
       "require": "./dist/migrator.js"
     }

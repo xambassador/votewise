@@ -37,7 +37,6 @@
     "@votewise/config": "*",
     "@votewise/tsconfig": "*",
     "@votewise/types": "*",
-    "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.10",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.5.4"

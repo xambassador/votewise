@@ -9,14 +9,17 @@
   "main": "./dist/index.js",
   "exports": {
     ".": {
+      "@votewise/source": "./src/index.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
     "./routes": {
+      "@votewise/source": "./src/routes.ts",
       "import": "./dist/routes.mjs",
       "require": "./dist/routes.js"
     },
     "./queue": {
+      "@votewise/source": "./src/queue.ts",
       "import": "./dist/queue.mjs",
       "require": "./dist/queue.js"
     }

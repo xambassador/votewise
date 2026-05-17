@@ -7,6 +7,8 @@ import { Toaster } from "@votewise/ui/toast";
 
 import "@/styles/globals.css";
 
+import Script from "next/script";
+
 import { environment } from "@votewise/env";
 
 import Providers from "@/components/providers";
@@ -30,6 +32,9 @@ export const metadata: Metadata = {
 export default function RootLayout(props: Props) {
   return (
     <html lang="en">
+      <head>
+        <Script src="//unpkg.com/react-scan/dist/auto.global.js" crossOrigin="anonymous" strategy="beforeInteractive" />
+      </head>
       <body className={inter.className + " bg-nobelBlack-50 text-gray-200"}>
         <Toaster />
         <Providers>{props.children}</Providers>

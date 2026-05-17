@@ -20,6 +20,7 @@
     "@votewise/env": "*",
     "@votewise/event": "*",
     "@votewise/schemas": "*",
+    "@votewise/text": "*",
     "@votewise/ui": "*",
     "cookie": "^1.0.2",
     "cookie-parser": "^1.4.7",
@@ -59,6 +60,7 @@
     "autoprefixer": "^10.4.20",
     "file-loader": "^6.2.0",
     "postcss": "8.4.41",
+    "react-scan": "^0.5.3",
     "tailwindcss": "3.4.10",
     "typescript": "^5.5.4"
   },

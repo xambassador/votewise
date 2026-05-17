@@ -41,65 +41,10 @@
 
     // Projects
     "composite": true,
-    "incremental": true
+    "incremental": true,
+
+    "customConditions": ["@votewise/source"],
+    "outDir": "${configDir}/dist"
   },
-  "include": [],
-  "references": [
-    // Backend
-    {
-      "path": "./services/api"
-    },
-    {
-      "path": "./services/upload"
-    },
-    // frontend
-    {
-      "path": "./apps/web"
-    },
-    // shared
-    {
-      "path": "./packages/client"
-    },
-    {
-      "path": "./packages/db"
-    },
-    {
-      "path": "./packages/schemas"
-    },
-    {
-      "path": "./packages/ui"
-    },
-    {
-      "path": "./packages/common/constant"
-    },
-    {
-      "path": "./packages/common/crypto"
-    },
-    {
-      "path": "./packages/common/debug"
-    },
-    {
-      "path": "./packages/common/env"
-    },
-    {
-      "path": "./packages/common/errors"
-    },
-    {
-      "path": "./packages/common/event"
-    },
-    {
-      "path": "./packages/common/jwt"
-    },
-    {
-      "path": "./packages/common/log"
-    },
-    {
-      "path": "./packages/common/text"
-    },
-    {
-      "path": "./packages/common/times"
-    }
-  ],
-  "files": [],
   "exclude": ["node_modules", "dist"]
 }

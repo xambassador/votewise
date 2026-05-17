@@ -9,10 +9,12 @@
   "main": "./dist/index.js",
   "exports": {
     ".": {
+      "@votewise/source": "./src/index.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
     "./edge": {
+      "@votewise/source": "./src/edge.ts",
       "import": "./dist/edge.mjs",
       "require": "./dist/edge.js"
     }

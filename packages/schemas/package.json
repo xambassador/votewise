@@ -10,38 +10,56 @@
   ],
   "exports": {
     ".": {
+      "@votewise/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
     "./auth": {
+      "@votewise/source": "./src/auth.ts",
+      "types": "./dist/auth.d.ts",
       "import": "./dist/auth.mjs",
       "require": "./dist/auth.js"
     },
     "./upload": {
+      "@votewise/source": "./src/upload.ts",
+      "types": "./dist/upload.d.ts",
       "import": "./dist/upload.mjs",
       "require": "./dist/upload.js"
     },
     "./onboard": {
+      "@votewise/source": "./src/onboard.ts",
+      "types": "./dist/onboard.d.ts",
       "import": "./dist/onboard.mjs",
       "require": "./dist/onboard.js"
     },
     "./user": {
+      "@votewise/source": "./src/user.ts",
+      "types": "./dist/user.d.ts",
       "import": "./dist/user.mjs",
       "require": "./dist/user.js"
     },
     "./feed": {
+      "@votewise/source": "./src/feed.ts",
+      "types": "./dist/feed.d.ts",
       "import": "./dist/feed.mjs",
       "require": "./dist/feed.js"
     },
     "./pagination": {
+      "@votewise/source": "./src/pagination.ts",
+      "types": "./dist/pagination.d.ts",
       "import": "./dist/pagination.mjs",
       "require": "./dist/pagination.js"
     },
     "./comment": {
+      "@votewise/source": "./src/comment.ts",
+      "types": "./dist/comment.d.ts",
       "import": "./dist/comment.mjs",
       "require": "./dist/comment.js"
     },
     "./group": {
+      "@votewise/source": "./src/group.ts",
+      "types": "./dist/group.d.ts",
       "import": "./dist/group.mjs",
       "require": "./dist/group.js"
     }

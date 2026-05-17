@@ -460,8 +460,6 @@ export class GroupMemberRepository extends BaseRepository {
     return this.execute(async () => {
       const member = await db
         .deleteFrom("GroupMember")
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         .where("group_id", "=", groupId)
         .where("user_id", "=", userId)
         .returningAll()

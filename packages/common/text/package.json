@@ -9,14 +9,17 @@
   "main": "./dist/index.js",
   "exports": {
     ".": {
+      "@votewise/source": "./src/index.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
     "./truncate": {
+      "@votewise/source": "./src/truncate.ts",
       "import": "./dist/truncate.mjs",
       "require": "./dist/truncate.js"
     },
     "./truncate-on-word": {
+      "@votewise/source": "./src/truncate-on-word.ts",
       "import": "./dist/truncate-on-word.mjs",
       "require": "./dist/truncate-on-word.js"
     }

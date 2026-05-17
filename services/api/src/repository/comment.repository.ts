@@ -167,8 +167,6 @@ export class CommentRepository extends BaseRepository {
   public delete(id: string, tx?: Tx) {
     const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error - I don't know why, but it has some issue with Tx
       db.deleteFrom("Comment").where("id", "=", id).executeTakeFirstOrThrow();
     });
   }

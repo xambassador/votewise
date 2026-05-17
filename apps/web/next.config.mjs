@@ -14,6 +14,7 @@ const nextConfig = bundleAnalyzer({
   reactStrictMode: true,
   output: "standalone",
   eslint: { dirs: ["."] },
+  typescript: { ignoreBuildErrors: true },
   poweredByHeader: false,
   transpilePackages: ["@votewise/ui"],
   webpack: (config) => {

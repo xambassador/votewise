@@ -76,8 +76,6 @@ export class FollowRepository extends BaseRepository {
   public delete(id: string, tx?: Tx) {
     const db = tx ?? this.dataLayer;
     return this.execute(async () => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
       db.deleteFrom("Follow").where("id", "=", id).execute();
     });
   }
