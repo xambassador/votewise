@@ -2,7 +2,7 @@
 
 import type { GetUserCommentsResponse } from "@votewise/client/user";
 
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 
 import { userClient } from "@/lib/client";
 import { getUserCommentsKey } from "@/lib/constants";
@@ -36,5 +36,18 @@ export function useFetchUserComments(params: Params) {
   return {
     ...query,
     comments
+  };
+}
+
+export function usePrefetchUserComments(params: Omit<Params, "initialData">) {
+  const queryKey = getUserCommentsKey(params.username);
+  const qc = useQueryClient();
+
+  return () => {
+    // @ts-expect-error @fixme
+    qc.prefetchInfiniteQuery({
+      queryKey,
+      queryFn: async () => assertResponse(await userClient.getUserComments(params.username))
+    });
   };
 }

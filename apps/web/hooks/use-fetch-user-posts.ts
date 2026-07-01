@@ -2,7 +2,7 @@
 
 import type { GetUserPostsResponse } from "@votewise/client/user";
 
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 
 import { userClient } from "@/lib/client";
 import { getUserPostsKey } from "@/lib/constants";
@@ -37,5 +37,18 @@ export function useFetchUserPosts(params: Params) {
   return {
     ...query,
     posts
+  };
+}
+
+export function usePrefetchUserPosts(params: Omit<Params, "initialData">) {
+  const queryKey = getUserPostsKey(params.username, params.type || "posts");
+  const qc = useQueryClient();
+
+  return () => {
+    // @ts-expect-error @fixme
+    qc.prefetchInfiniteQuery({
+      queryKey,
+      queryFn: async () => assertResponse(await userClient.getUserPosts(params.username, { type: params.type }))
+    });
   };
 }

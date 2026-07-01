@@ -1,6 +1,6 @@
 "use client";
 
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 
 import { userClient } from "@/lib/client";
 import { getUserFollowersKey, getUserFollowingKey } from "@/lib/constants";
@@ -26,6 +26,19 @@ export function useFetchUserFollowers(props: { username: string }) {
   };
 }
 
+export function usePrefetchUserFollowers(props: { username: string }) {
+  const queryKey = getUserFollowersKey(props.username);
+  const qc = useQueryClient();
+
+  return () => {
+    // @ts-expect-error @fixme
+    qc.prefetchInfiniteQuery({
+      queryKey,
+      queryFn: async () => assertResponse(await userClient.getUserFollowers(props.username))
+    });
+  };
+}
+
 export function useFetchUserFollowings(props: { username: string }) {
   const queryKey = getUserFollowingKey(props.username);
 
@@ -43,5 +56,17 @@ export function useFetchUserFollowings(props: { username: string }) {
   return {
     ...query,
     following
+  };
+}
+
+export function usePrefetchUserFollowings(props: { username: string }) {
+  const queryKey = getUserFollowingKey(props.username);
+  const qc = useQueryClient();
+  return () => {
+    // @ts-expect-error @fixme
+    qc.prefetchInfiniteQuery({
+      queryKey,
+      queryFn: async () => assertResponse(await userClient.getUserFollowings(props.username))
+    });
   };
 }

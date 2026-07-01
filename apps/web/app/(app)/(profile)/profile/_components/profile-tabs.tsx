@@ -1,10 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useFetchUserComments } from "@/hooks/use-fetch-user-comments";
-import { useFetchUserGroups } from "@/hooks/use-fetch-user-groups";
-import { useFetchUserPosts } from "@/hooks/use-fetch-user-posts";
-import { useFetchUserFollowers, useFetchUserFollowings } from "@/hooks/use-fetch-user-socials";
+import { useFetchUserComments, usePrefetchUserComments } from "@/hooks/use-fetch-user-comments";
+import { useFetchUserGroups, usePrefetchUserGroups } from "@/hooks/use-fetch-user-groups";
+import { useFetchUserPosts, usePrefetchUserPosts } from "@/hooks/use-fetch-user-posts";
+import {
+  useFetchUserFollowers,
+  useFetchUserFollowings,
+  usePrefetchUserFollowers,
+  usePrefetchUserFollowings
+} from "@/hooks/use-fetch-user-socials";
 import dayjs, { extend } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
@@ -40,9 +45,7 @@ export function ProfileTabs(props: TabPanelProps) {
     <Tabs defaultValue="posts" className="w-full">
       <TabsList className="overflow-x-auto">
         {tabs.map((tab) => (
-          <TabsTrigger value={tab.value} key={tab.value} className="pb-4 h-fit">
-            {tab.label}
-          </TabsTrigger>
+          <TabsTriggerWithPrefetch value={tab.value} label={tab.label} key={tab.value} username={props.username} />
         ))}
       </TabsList>
 
@@ -386,5 +389,44 @@ function GroupsPanel(props: TabPanelProps) {
       ))}
       {hasNextPage && <LoadMore onClick={() => fetchNextPage()} loading={isFetchingNextPage} />}
     </div>
+  );
+}
+
+function TabsTriggerWithPrefetch(props: { username: string; value: string; label: string }) {
+  const { value, label, username } = props;
+  const prefetchPosts = usePrefetchUserPosts({ username });
+  const prefetchComments = usePrefetchUserComments({ username });
+  const prefetchVotedPosts = usePrefetchUserPosts({ username, type: "voted" });
+  const prefetchGroups = usePrefetchUserGroups({ username });
+  const prefetchFollowers = usePrefetchUserFollowers({ username });
+  const prefetchFollowings = usePrefetchUserFollowings({ username });
+
+  function onPrefetch() {
+    switch (value) {
+      case "posts":
+        prefetchPosts();
+        break;
+      case "comments":
+        prefetchComments();
+        break;
+      case "voted":
+        prefetchVotedPosts();
+        break;
+      case "groups":
+        prefetchGroups();
+        break;
+      case "followers":
+        prefetchFollowers();
+        break;
+      case "following":
+        prefetchFollowings();
+        break;
+    }
+  }
+
+  return (
+    <TabsTrigger value={value} className="pb-4 h-fit" onMouseEnter={onPrefetch} onFocus={onPrefetch}>
+      {label}
+    </TabsTrigger>
   );
 }

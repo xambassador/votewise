@@ -2,7 +2,7 @@
 
 import type { GetUserGroupsResponse } from "@votewise/client/user";
 
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 
 import { userClient } from "@/lib/client";
 import { getUserGroupsKey } from "@/lib/constants";
@@ -36,5 +36,17 @@ export function useFetchUserGroups(params: Params) {
   return {
     ...query,
     groups
+  };
+}
+
+export function usePrefetchUserGroups(params: Omit<Params, "initialData">) {
+  const queryKey = getUserGroupsKey(params.username);
+  const qc = useQueryClient();
+  return () => {
+    // @ts-expect-error @fixme
+    qc.prefetchInfiniteQuery({
+      queryKey,
+      queryFn: async () => assertResponse(await userClient.getUserGroups(params.username))
+    });
   };
 }
