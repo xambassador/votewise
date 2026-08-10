@@ -74,16 +74,15 @@ Votewise is a social platform that enables users to share their thoughts, and vo
 
 ### Infrastructure & Tooling
 
-| Technology            | Purpose                     |
-| --------------------- | --------------------------- |
-| **Nx**                | Monorepo build system       |
-| **Lerna**             | Monorepo package management |
-| **Nginx**             | Reverse proxy               |
-| **Storybook**         | Component documentation     |
-| **Jest**              | Testing framework           |
-| **ESLint / Prettier** | Code quality                |
-| **Husky**             | Git hooks                   |
-| **Commitlint**        | Conventional commits        |
+| Technology            | Purpose                 |
+| --------------------- | ----------------------- |
+| **Turborepo**         | Monorepo build system   |
+| **Nginx**             | Reverse proxy           |
+| **Storybook**         | Component documentation |
+| **Jest**              | Testing framework       |
+| **ESLint / Prettier** | Code quality            |
+| **Husky**             | Git hooks               |
+| **Commitlint**        | Conventional commits    |
 
 ## Architecture
 
