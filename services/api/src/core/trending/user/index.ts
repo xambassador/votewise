@@ -1,6 +1,7 @@
 import { yellow } from "chalk";
 
 import { AppContext } from "@/context";
+import { twoFactorAuthMiddlewareFactory } from "@/http/middlewares/2fa";
 import { authMiddlewareFactory } from "@/http/middlewares/auth";
 import { ExceptionLayer } from "@/lib/exception-layer";
 
@@ -10,7 +11,8 @@ export function getHotUsersControllerFactory() {
   const ctx = AppContext.instance;
   const controller = new Controller(ctx);
   const auth = authMiddlewareFactory();
+  const mfa = twoFactorAuthMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "get-hot-users" });
   ctx.logger.info(`[${yellow("GetHotUsersController")}] dependencies initialized`);
-  return [auth, exceptionLayer.catch(controller.handle.bind(controller))];
+  return [auth, mfa, exceptionLayer.catch(controller.handle.bind(controller))];
 }

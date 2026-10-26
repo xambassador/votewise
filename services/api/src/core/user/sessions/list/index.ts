@@ -1,6 +1,7 @@
 import { yellow } from "chalk";
 
 import { AppContext } from "@/context";
+import { twoFactorAuthMiddlewareFactory } from "@/http/middlewares/2fa";
 import { authMiddlewareFactory } from "@/http/middlewares/auth";
 import { ExceptionLayer } from "@/lib/exception-layer";
 
@@ -10,7 +11,8 @@ export function listSessionsControllerFactory() {
   const { services, logger } = AppContext.getInjectionTokens(["services", "logger"]);
   const controller = new Controller({ sessionManager: services.session });
   const auth = authMiddlewareFactory();
+  const mfa = twoFactorAuthMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "list-sessions" });
   logger.info(`[${yellow("ListSessionsController")}] dependencies initialized`);
-  return [auth, exceptionLayer.catch(controller.handle.bind(controller))];
+  return [auth, mfa, exceptionLayer.catch(controller.handle.bind(controller))];
 }

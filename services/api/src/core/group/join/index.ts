@@ -1,6 +1,7 @@
 import { yellow } from "chalk";
 
 import { AppContext } from "@/context";
+import { twoFactorAuthMiddlewareFactory } from "@/http/middlewares/2fa";
 import { authMiddlewareFactory } from "@/http/middlewares/auth";
 import { ExceptionLayer } from "@/lib/exception-layer";
 
@@ -19,7 +20,8 @@ export function joinGroupControllerFactory() {
     }
   });
   const auth = authMiddlewareFactory();
+  const mfa = twoFactorAuthMiddlewareFactory();
   const exceptionLayer = new ExceptionLayer({ name: "join-group" });
   ctx.logger.info(`[${yellow("JoinGroupController")}] dependencies initialized`);
-  return [auth, exceptionLayer.catch(controller.handle.bind(controller))];
+  return [auth, mfa, exceptionLayer.catch(controller.handle.bind(controller))];
 }

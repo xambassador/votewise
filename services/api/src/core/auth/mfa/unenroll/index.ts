@@ -1,6 +1,7 @@
 import { yellow } from "chalk";
 
 import { AppContext } from "@/context";
+import { twoFactorAuthMiddlewareFactory } from "@/http/middlewares/2fa";
 import { authMiddlewareFactory } from "@/http/middlewares/auth";
 import { rateLimitMiddlewareFactory } from "@/http/middlewares/rate-limit";
 import { ExceptionLayer } from "@/lib/exception-layer";
@@ -14,11 +15,12 @@ export function unEnrollMFAControllerFactory(path: string) {
   const verifyFactorService = new VerifyFactorSevice(ctx);
   const controller = new Controller({ ...ctx, verifyFactorService });
   const auth = authMiddlewareFactory();
+  const mfa = twoFactorAuthMiddlewareFactory();
   const limiter = rateLimitMiddlewareFactory(path, {
     ...rateLimitStrategies.FIVE_PER_HOUR,
     keyPrefix: "rtUnEnrollMFA"
   });
   const exceptionLayer = new ExceptionLayer({ name: "unenroll-mfa" });
   ctx.logger.info(`[${yellow("UnEnrollMFAController")}] dependencies initialized`);
-  return [limiter, auth, exceptionLayer.catch(controller.handle.bind(controller))];
+  return [limiter, auth, mfa, exceptionLayer.catch(controller.handle.bind(controller))];
 }
