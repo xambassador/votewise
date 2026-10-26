@@ -24,6 +24,10 @@ export class JWTService {
     return this.jwt.verifyAccessToken(token);
   }
 
+  public verifyAccessTokenIgnoreExpiry(token: string) {
+    return this.jwt.verifyAccessTokenIgnoreExpiry(token);
+  }
+
   public decodeAccessToken(token: string) {
     return this.jwt.decode<AccessTokenPayload>(token);
   }

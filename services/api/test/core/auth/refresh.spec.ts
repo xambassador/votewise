@@ -56,7 +56,7 @@ function clearAllMocks() {
 const assert = new Assertions();
 
 const controller = new Controller({
-  repositories: { user: mockUserRepository, refreshToken: mockRefreshTokenRepository },
+  repositories: { user: mockUserRepository, refreshToken: mockRefreshTokenRepository, session: mockSessionRepository },
   services: { session: mockSessionManager, jwt: jwtService },
   assert,
   plugins: { requestParser: requestParserPluginFactory() }
@@ -84,6 +84,63 @@ describe("Refresh Controller", () => {
     const error = await controller.handle(req, res).catch((e) => e);
     expect(mockUserRepository.findById).not.toHaveBeenCalledWith();
     expect(error.message).toBe("Invalid access token");
+  });
+
+  it("should throw error if access token is signed with a different secret", async () => {
+    const forged = new JWTService({ accessTokenSecret: faker.string.alphanumeric(32) }).signAccessToken({
+      aal: "aal2",
+      amr,
+      email: user.email,
+      role: "admin",
+      session_id: sessionId,
+      sub: user.id,
+      user_metadata: {},
+      app_metadata: appMetaData,
+      user_aal_level: "aal2",
+      is_onboarded: false
+    });
+    const req = buildReq({ body: { access_token: forged, refresh_token: refreshToken } });
+    const res = buildRes({ locals });
+    setupHappyPath();
+    const error = await controller.handle(req, res).catch((e) => e);
+    expect(error.message).toBe("Invalid access token");
+    expect(mockRefreshTokenRepository.find).not.toHaveBeenCalled();
+    expect(mockSessionRepository.delete).not.toHaveBeenCalled();
+    expect(mockJWTService.signAccessToken).not.toHaveBeenCalled();
+  });
+
+  it("should accept an expired access token with a valid signature", async () => {
+    const expired = jwtService.signAccessToken(
+      {
+        aal: "aal1",
+        amr,
+        email: user.email,
+        role: "user",
+        session_id: sessionId,
+        sub: user.id,
+        user_metadata: {},
+        app_metadata: appMetaData,
+        user_aal_level: "aal1",
+        is_onboarded: false
+      },
+      { expiresIn: -60 }
+    );
+    const req = buildReq({ body: { access_token: expired, refresh_token: refreshToken } });
+    const res = buildRes({ locals });
+    setupHappyPath();
+    await controller.handle(req, res);
+    expect(res.status).toHaveBeenCalledWith(StatusCodes.OK);
+  });
+
+  it("should throw error if the session belongs to another user", async () => {
+    const req = buildReq({ body: { access_token: accessToken, refresh_token: refreshToken } });
+    const res = buildRes({ locals });
+    setupHappyPath();
+    mockSessionRepository.find.mockResolvedValueOnce({ id: sessionId, user_id: faker.string.uuid() } as never);
+    const error = await controller.handle(req, res).catch((e) => e);
+    expect(error.message).toBe("Invalid access token");
+    expect(mockSessionRepository.delete).not.toHaveBeenCalled();
+    expect(mockRefreshTokenRepository.revoke).not.toHaveBeenCalled();
   });
 
   it("should throw error if refresh token is invalid", async () => {

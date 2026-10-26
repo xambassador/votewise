@@ -23,10 +23,10 @@ export class Controller {
     const ip = locals.meta.ip;
     const userAgent = req.headers["user-agent"] || "";
 
-    const _accessTokenPayload = this.ctx.services.jwt.decodeAccessToken(body.access_token);
-    this.ctx.assert.unprocessableEntity(!_accessTokenPayload, invalidTokenMsg, INVALID_ACCESS_TOKEN);
+    const verified = this.ctx.services.jwt.verifyAccessTokenIgnoreExpiry(body.access_token);
+    this.ctx.assert.unprocessableEntity(!verified.success, invalidTokenMsg, INVALID_ACCESS_TOKEN);
 
-    const accessTokenPayload = _accessTokenPayload!;
+    const accessTokenPayload = (verified as Extract<typeof verified, { success: true }>).data;
     this.ctx.assert.unprocessableEntity(!accessTokenPayload.session_id, invalidTokenMsg, INVALID_ACCESS_TOKEN);
     this.ctx.assert.unprocessableEntity(!accessTokenPayload.sub, invalidTokenMsg, INVALID_ACCESS_TOKEN);
 
@@ -39,6 +39,13 @@ export class Controller {
     this.ctx.assert.resourceNotFound(!_user, "User not found", USER_NOT_FOUND);
 
     const user = _user!;
+
+    const oldSession = await this.ctx.repositories.session.find(accessTokenPayload.session_id);
+    this.ctx.assert.unprocessableEntity(
+      !!oldSession && oldSession.user_id !== user.id,
+      invalidTokenMsg,
+      INVALID_ACCESS_TOKEN
+    );
 
     await this.ctx.services.session.delete(accessTokenPayload.session_id);
     await this.ctx.repositories.refreshToken.revoke(token.id);

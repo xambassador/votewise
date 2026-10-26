@@ -31,6 +31,21 @@ export class JWT {
   }
 
   /**
+   * Verify the signature of the access token but allow an expired token.
+   *
+   * @param {string} token JSON Web Token string
+   * @returns {VerifyResult<AccessTokenPayload>} Result of the verification
+   */
+  public verifyAccessTokenIgnoreExpiry(token: string): VerifyResult<AccessTokenPayload> {
+    try {
+      const data = verify(token, this.accessTokenSecret, { ignoreExpiration: true }) as AccessTokenPayload;
+      return { success: true, data };
+    } catch (err) {
+      return { success: false, error: this.handleError(err) };
+    }
+  }
+
+  /**
    * Create new JWT access token from the payload
    *
    * @param {AccessTokenPayload} payload Payload or data that need to convert into a JSON Web Token string payload
