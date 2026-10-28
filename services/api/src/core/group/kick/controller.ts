@@ -10,6 +10,7 @@ import { getAuthenticateLocals } from "@/utils/locals";
 const ZQuery = z.object({ groupId: z.string(), username: z.string() });
 const memberNotInGroupMessage = `Invalid request, you are not a member of this group`;
 const userNotMemberMessage = "User is not a member of this group";
+const canNotKickAdminMessage = "You cannot kick an admin. Please remove their admin role first.";
 const permissionError = "You are not allowed to kick members from this group";
 
 export class Controller {
@@ -43,14 +44,17 @@ export class Controller {
     this.ctx.assert.unprocessableEntity(!_role, memberNotInGroupMessage);
     this.ctx.assert.forbidden(role.role !== "ADMIN", permissionError);
 
+    const targetRole = await this.ctx.repositories.group.groupMember.whatIsMyRole(groupId, user.id);
+    this.ctx.assert.unprocessableEntity(targetRole?.role === "ADMIN", canNotKickAdminMessage);
+
     await this.ctx.repositories.transactionManager.withDataLayerTransaction(async (tx) => {
       await Promise.all([
-        this.ctx.repositories.group.groupMember.kick(groupId, locals.payload.sub, tx),
+        this.ctx.repositories.group.groupMember.kick(groupId, user.id, tx),
         this.ctx.repositories.aggregator.groupAggregator.aggregate(
           groupId,
           (data) => ({
             ...data,
-            total_members: (data?.total_members ?? 0) + 1
+            total_members: (data?.total_members ?? 1) - 1
           }),
           tx
         )
