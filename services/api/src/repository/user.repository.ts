@@ -5,6 +5,7 @@ import type { Tx } from "./transaction";
 import { sql } from "@votewise/db";
 
 import { BaseRepository } from "./base.repository";
+import { isPostVisibleTo } from "./post-visibility";
 
 export class UserRepository extends BaseRepository {
   private readonly dataLayer: RepositoryConfig["dataLayer"];
@@ -249,8 +250,11 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  public getUserPosts(username: string, opts: { page: number; limit: number; cursor?: Cursor | null }) {
-    const { page, limit, cursor } = opts;
+  public getUserPosts(
+    username: string,
+    opts: { page: number; limit: number; cursor?: Cursor | null; viewerId: string }
+  ) {
+    const { page, limit, cursor, viewerId } = opts;
     const offset = (page - 1) * limit;
     const shouldUseCursor = !!cursor;
     return this.execute(async () => {
@@ -281,6 +285,7 @@ export class UserRepository extends BaseRepository {
           "pa.votes"
         ])
         .where("p.author_id", "=", user.id)
+        .where(isPostVisibleTo(viewerId))
         .$if(shouldUseCursor, (qb) =>
           qb.where((eb) =>
             eb.or([
@@ -345,7 +350,7 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  public countUserPosts(username: string) {
+  public countUserPosts(username: string, viewerId: string) {
     return this.execute(async () => {
       const user = await this.dataLayer
         .selectFrom("User")
@@ -356,17 +361,21 @@ export class UserRepository extends BaseRepository {
       if (!user) return 0;
 
       const res = await this.dataLayer
-        .selectFrom("UserAggregates")
-        .where("user_id", "=", user.id)
-        .select("total_posts")
+        .selectFrom("Post as p")
+        .where("p.author_id", "=", user.id)
+        .where(isPostVisibleTo(viewerId))
+        .select(sql<string>`count(*)`.as("count"))
         .executeTakeFirst();
 
-      return res?.total_posts ?? 0;
+      return Number(res?.count ?? 0);
     });
   }
 
-  public getUserVotedPosts(username: string, opts: { page: number; limit: number; cursor?: Cursor | null }) {
-    const { page, limit, cursor } = opts;
+  public getUserVotedPosts(
+    username: string,
+    opts: { page: number; limit: number; cursor?: Cursor | null; viewerId: string }
+  ) {
+    const { page, limit, cursor, viewerId } = opts;
     const offset = (page - 1) * limit;
     const shouldUseCursor = !!cursor;
     return this.execute(async () => {
@@ -379,22 +388,24 @@ export class UserRepository extends BaseRepository {
       if (!user) return [];
 
       const votedPostIds = await this.dataLayer
-        .selectFrom("Upvote")
-        .where("user_id", "=", user.id)
+        .selectFrom("Upvote as uv")
+        .innerJoin("Post as p", "p.id", "uv.post_id")
+        .where("uv.user_id", "=", user.id)
+        .where(isPostVisibleTo(viewerId))
         .$if(shouldUseCursor, (qb) =>
           qb.where((eb) =>
             eb.or([
-              eb("created_at", "<", new Date(cursor?.primary as string)),
+              eb("uv.created_at", "<", new Date(cursor?.primary as string)),
               eb.and([
-                eb("created_at", "=", new Date(cursor?.primary as string)),
-                eb("post_id", "<", cursor?.secondary as string)
+                eb("uv.created_at", "=", new Date(cursor?.primary as string)),
+                eb("uv.post_id", "<", cursor?.secondary as string)
               ])
             ])
           )
         )
-        .select(["post_id", "created_at"])
-        .orderBy("created_at", "desc")
-        .orderBy("post_id", "desc")
+        .select(["uv.post_id", "uv.created_at"])
+        .orderBy("uv.created_at", "desc")
+        .orderBy("uv.post_id", "desc")
         .limit(limit)
         .$if(!shouldUseCursor, (qb) => qb.offset(offset))
         .execute();
@@ -472,7 +483,7 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  public countUserVotedPosts(username: string) {
+  public countUserVotedPosts(username: string, viewerId: string) {
     return this.execute(async () => {
       const user = await this.dataLayer
         .selectFrom("User")
@@ -483,17 +494,22 @@ export class UserRepository extends BaseRepository {
       if (!user) return 0;
 
       const res = await this.dataLayer
-        .selectFrom("UserAggregates")
-        .where("user_id", "=", user.id)
-        .select("total_votes")
+        .selectFrom("Upvote as uv")
+        .innerJoin("Post as p", "p.id", "uv.post_id")
+        .where("uv.user_id", "=", user.id)
+        .where(isPostVisibleTo(viewerId))
+        .select(sql<string>`count(*)`.as("count"))
         .executeTakeFirst();
 
-      return res?.total_votes ?? 0;
+      return Number(res?.count ?? 0);
     });
   }
 
-  public getUserComments(username: string, opts: { page: number; limit: number; cursor?: Cursor | null }) {
-    const { page, limit, cursor } = opts;
+  public getUserComments(
+    username: string,
+    opts: { page: number; limit: number; cursor?: Cursor | null; viewerId: string }
+  ) {
+    const { page, limit, cursor, viewerId } = opts;
     const offset = (page - 1) * limit;
     const shouldUseCursor = !!cursor;
     return this.execute(async () => {
@@ -525,6 +541,7 @@ export class UserRepository extends BaseRepository {
         ])
         .where("c.user_id", "=", user.id)
         .where("c.parent_id", "is", null)
+        .where(isPostVisibleTo(viewerId))
         .$if(shouldUseCursor, (qb) =>
           qb.where((eb) =>
             eb.or([
@@ -563,7 +580,7 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  public countUserComments(username: string) {
+  public countUserComments(username: string, viewerId: string) {
     return this.execute(async () => {
       const user = await this.dataLayer
         .selectFrom("User")
@@ -574,12 +591,15 @@ export class UserRepository extends BaseRepository {
       if (!user) return 0;
 
       const res = await this.dataLayer
-        .selectFrom("UserAggregates")
-        .where("user_id", "=", user.id)
-        .select("total_comments")
+        .selectFrom("Comment as c")
+        .innerJoin("Post as p", "p.id", "c.post_id")
+        .where("c.user_id", "=", user.id)
+        .where("c.parent_id", "is", null)
+        .where(isPostVisibleTo(viewerId))
+        .select(sql<string>`count(*)`.as("count"))
         .executeTakeFirst();
 
-      return res?.total_comments ?? 0;
+      return Number(res?.count ?? 0);
     });
   }
 

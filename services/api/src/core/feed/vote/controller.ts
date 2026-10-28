@@ -6,6 +6,7 @@ import { StatusCodes } from "http-status-codes";
 
 import { ERROR_CODES } from "@votewise/constant";
 
+import { assertCanAccessGroupPost } from "@/utils/group-access";
 import { getAuthenticateLocals } from "@/utils/locals";
 
 export class Controller {
@@ -25,6 +26,13 @@ export class Controller {
     const _feed = await this.ctx.repositories.feed.findById(id);
     this.ctx.assert.resourceNotFound(!_feed, `Feed with id ${id} not found`, ERROR_CODES.FEED.FEED_NOT_FOUND);
     const feed = _feed!;
+
+    await assertCanAccessGroupPost(this.ctx, {
+      groupId: feed.group_id,
+      userId: currentUserId,
+      notFoundMessage: `Feed with id ${id} not found`,
+      errorCode: ERROR_CODES.FEED.FEED_NOT_FOUND
+    });
 
     const isVotedByMe = await this.ctx.repositories.feed.isVoted(currentUserId, feed.id);
     this.ctx.assert.unprocessableEntity(!!isVotedByMe, "You have already voted on this feed");

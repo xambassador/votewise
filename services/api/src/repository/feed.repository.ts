@@ -60,6 +60,7 @@ export class FeedRepository extends BaseRepository {
           "p.status",
           "p.title",
           "p.type",
+          "p.group_id",
           "p.created_at",
           "p.updated_at",
           "author.id as author_id",
@@ -106,6 +107,7 @@ export class FeedRepository extends BaseRepository {
         status: post.status,
         title: post.title,
         type: post.type,
+        group_id: post.group_id,
         created_at: post.created_at,
         updated_at: post.updated_at,
         author: {

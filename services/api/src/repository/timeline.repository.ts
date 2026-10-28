@@ -5,6 +5,7 @@ import type { Tx } from "./transaction";
 import { sql } from "@votewise/db";
 
 import { BaseRepository } from "./base.repository";
+import { isPostVisibleTo } from "./post-visibility";
 
 export class TimelineRepository extends BaseRepository {
   private readonly dataLayer: RepositoryConfig["dataLayer"];
@@ -46,6 +47,7 @@ export class TimelineRepository extends BaseRepository {
           "pa.votes"
         ])
         .where("t.user_id", "=", userId)
+        .where(isPostVisibleTo(userId))
         .$if(shouldUseCursor, (qb) =>
           qb.where((eb) =>
             eb.or([
@@ -116,8 +118,10 @@ export class TimelineRepository extends BaseRepository {
   public async countByUserId(userId: string) {
     return this.execute(async () => {
       const res = await this.dataLayer
-        .selectFrom("Timeline")
-        .where("user_id", "=", userId)
+        .selectFrom("Timeline as t")
+        .innerJoin("Post as p", "p.id", "t.post_id")
+        .where("t.user_id", "=", userId)
+        .where(isPostVisibleTo(userId))
         .select(sql<string>`count(*)`.as("count"))
         .executeTakeFirst();
       return Number(res?.count ?? 0);

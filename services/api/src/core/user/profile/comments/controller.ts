@@ -9,6 +9,7 @@ import { ZPagination } from "@votewise/schemas";
 
 import { unpack } from "@/lib/cursor";
 import { PaginationBuilder } from "@/lib/pagination";
+import { getAuthenticateLocals } from "@/utils/locals";
 
 export class Controller {
   private readonly ctx: AppContext;
@@ -18,6 +19,8 @@ export class Controller {
   }
 
   async handle(req: Request, res: Response) {
+    const locals = getAuthenticateLocals(res);
+    const viewerId = locals.payload.sub;
     const { username } = req.params;
     this.ctx.assert.unprocessableEntity(!username, "Username is required");
 
@@ -29,8 +32,8 @@ export class Controller {
     const limit = query.limit < 1 ? PAGINATION.comments.limit : query.limit;
     const cursor = unpack(query.cursor, () => this.ctx.assert.unprocessableEntity(true, "Invalid cursor"));
 
-    const total = await this.ctx.repositories.user.countUserComments(username!);
-    const comments = await this.ctx.repositories.user.getUserComments(username!, { page, limit, cursor });
+    const total = await this.ctx.repositories.user.countUserComments(username!, viewerId);
+    const comments = await this.ctx.repositories.user.getUserComments(username!, { page, limit, cursor, viewerId });
     const nextCursor = comments.length < limit ? undefined : comments.at(-1);
     const pagination = new PaginationBuilder({
       limit,

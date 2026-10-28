@@ -5,10 +5,12 @@ import type { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 
-import { PAGINATION } from "@votewise/constant";
+import { ERROR_CODES, PAGINATION } from "@votewise/constant";
 import { ZPagination } from "@votewise/schemas";
 
 import { PaginationBuilder } from "@/lib/pagination";
+import { assertCanAccessGroupPost } from "@/utils/group-access";
+import { getAuthenticateLocals } from "@/utils/locals";
 
 const ZQuery = z.object({
   feedId: z.string(),
@@ -23,6 +25,7 @@ export class Controller {
   }
 
   public async handle(req: Request, res: Response) {
+    const locals = getAuthenticateLocals(res);
     const validate = ZQuery.safeParse(req.params);
     this.ctx.assert.unprocessableEntity(!validate.success, "Invalid request");
     const schema = ZPagination.safeParse(req.query);
@@ -31,6 +34,15 @@ export class Controller {
     const query = schema.data!;
     const { page } = query;
     const limit = query.limit < 1 ? PAGINATION.comments.reply.limit : query.limit;
+
+    const _feed = await this.ctx.repositories.feed.findById(feedId);
+    this.ctx.assert.resourceNotFound(!_feed, `Feed with ID ${feedId} not found`, ERROR_CODES.FEED.FEED_NOT_FOUND);
+    await assertCanAccessGroupPost(this.ctx, {
+      groupId: _feed!.group_id,
+      userId: locals.payload.sub,
+      notFoundMessage: `Feed with ID ${feedId} not found`,
+      errorCode: ERROR_CODES.FEED.FEED_NOT_FOUND
+    });
     const [totalReplies, replies] = await Promise.all([
       this.ctx.repositories.comment.reply.count(feedId, commentId),
       this.ctx.repositories.comment.reply.findByParentId(feedId, commentId, page, limit)

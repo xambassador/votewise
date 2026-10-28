@@ -4,10 +4,12 @@ import type { Request, Response } from "express";
 
 import { StatusCodes } from "http-status-codes";
 
-import { PAGINATION } from "@votewise/constant";
+import { ERROR_CODES, PAGINATION } from "@votewise/constant";
 import { ZPagination } from "@votewise/schemas";
 
 import { PaginationBuilder } from "@/lib/pagination";
+import { assertCanAccessGroupPost } from "@/utils/group-access";
+import { getAuthenticateLocals } from "@/utils/locals";
 
 const defaultReplyPage = 1;
 const repliesLimit = PAGINATION.comments.reply.limit;
@@ -20,6 +22,7 @@ export class Controller {
   }
 
   public async handle(req: Request, res: Response) {
+    const locals = getAuthenticateLocals(res);
     const feedId = req.params.feedId as string;
     this.ctx.assert.badRequest(typeof feedId !== "string", "Invalid feed ID provided");
     const schema = ZPagination.safeParse(req.query);
@@ -27,6 +30,15 @@ export class Controller {
     const query = schema.data!;
     const { page } = query;
     const limit = query.limit < 1 ? PAGINATION.comments.limit : query.limit;
+
+    const _feed = await this.ctx.repositories.feed.findById(feedId);
+    this.ctx.assert.resourceNotFound(!_feed, `Feed with ID ${feedId} not found`, ERROR_CODES.FEED.FEED_NOT_FOUND);
+    await assertCanAccessGroupPost(this.ctx, {
+      groupId: _feed!.group_id,
+      userId: locals.payload.sub,
+      notFoundMessage: `Feed with ID ${feedId} not found`,
+      errorCode: ERROR_CODES.FEED.FEED_NOT_FOUND
+    });
     const [totalComments, comments] = await Promise.all([
       this.ctx.repositories.comment.count(feedId),
       this.ctx.repositories.comment.findByFeedId(feedId, page, limit)

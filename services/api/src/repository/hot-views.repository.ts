@@ -3,6 +3,7 @@ import type { Cursor } from "@/lib/cursor";
 import { sql } from "@votewise/db";
 
 import { BaseRepository } from "./base.repository";
+import { isPostVisibleTo } from "./post-visibility";
 
 export class HotViewsRepository extends BaseRepository {
   private readonly dataLayer: RepositoryConfig["dataLayer"];
@@ -12,24 +13,29 @@ export class HotViewsRepository extends BaseRepository {
     this.dataLayer = cfg.dataLayer;
   }
 
-  public getHotFeeds(opts: { cursor?: Cursor | null; limit: number }) {
-    const { cursor, limit } = opts;
+  public getHotFeeds(opts: { cursor?: Cursor | null; limit: number; viewerId: string }) {
+    const { cursor, limit, viewerId } = opts;
     const shouldUseCursor = !!cursor;
     return this.execute(async () => {
       const hotFeeds = await this.dataLayer
         .selectFrom("AlgoHotFeedView")
-        .selectAll()
+        .innerJoin("Post as p", "p.id", "AlgoHotFeedView.post_id")
+        .selectAll("AlgoHotFeedView")
+        .where(isPostVisibleTo(viewerId))
         .$if(shouldUseCursor, (qb) => {
           const [score, postId] = (cursor?.secondary as string).split("_");
           return qb.where((eb) =>
             eb.or([
-              eb("score", "<", Number(score)),
-              eb.and([eb("score", "=", Number(score)), eb("post_id", "<", postId as string)])
+              eb("AlgoHotFeedView.score", "<", Number(score)),
+              eb.and([
+                eb("AlgoHotFeedView.score", "=", Number(score)),
+                eb("AlgoHotFeedView.post_id", "<", postId as string)
+              ])
             ])
           );
         })
-        .orderBy("score", "desc")
-        .orderBy("post_id", "desc")
+        .orderBy("AlgoHotFeedView.score", "desc")
+        .orderBy("AlgoHotFeedView.post_id", "desc")
         .limit(limit)
         .execute();
 

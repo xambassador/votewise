@@ -8,6 +8,7 @@ import { z } from "zod";
 import { ERROR_CODES } from "@votewise/constant";
 import { ZCommentCreate } from "@votewise/schemas/comment";
 
+import { assertCanAccessGroupPost } from "@/utils/group-access";
 import { getAuthenticateLocals } from "@/utils/locals";
 
 const ZQuery = z.object({ feedId: z.string() });
@@ -31,6 +32,13 @@ export class Controller {
 
     const _feed = await this.ctx.repositories.feed.findById(feedId);
     this.ctx.assert.resourceNotFound(!_feed, `Feed with ID ${feedId} not found`, ERROR_CODES.FEED.FEED_NOT_FOUND);
+
+    await assertCanAccessGroupPost(this.ctx, {
+      groupId: _feed!.group_id,
+      userId: currentUserId,
+      notFoundMessage: `Feed with ID ${feedId} not found`,
+      errorCode: ERROR_CODES.FEED.FEED_NOT_FOUND
+    });
 
     if (body.parent_id) {
       const parent = await this.ctx.repositories.comment.findById(body.parent_id);

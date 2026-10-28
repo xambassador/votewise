@@ -9,6 +9,7 @@ import { ZPagination } from "@votewise/schemas";
 
 import { unpack } from "@/lib/cursor";
 import { PaginationBuilder } from "@/lib/pagination";
+import { getAuthenticateLocals } from "@/utils/locals";
 
 export class Controller {
   private readonly ctx: AppContext;
@@ -18,12 +19,13 @@ export class Controller {
   }
 
   async handle(req: Request, res: Response) {
+    const locals = getAuthenticateLocals(res);
     const validation = ZPagination.safeParse(req.query);
     this.ctx.assert.unprocessableEntity(!validation.success, "Invalid query");
     const query = validation.data!;
     const limit = query.limit < 1 ? PAGINATION.trending.limit : query.limit;
     const cursor = unpack(query.cursor, () => this.ctx.assert.unprocessableEntity(true, "Invalid cursor"));
-    const hotFeeds = await this.ctx.repositories.hotViews.getHotFeeds({ cursor, limit });
+    const hotFeeds = await this.ctx.repositories.hotViews.getHotFeeds({ cursor, limit, viewerId: locals.payload.sub });
     const feeds = hotFeeds.map((feed) => ({
       id: feed.id,
       title: feed.title,
