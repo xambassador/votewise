@@ -20,6 +20,17 @@ export class Controller {
     const locals = getAuthenticateLocals(res);
     const { body } = this.ctx.plugins.requestParser.getParser(ZFeedCreate).parseRequest(req, res);
 
+    if (body.group_id) {
+      const _group = await this.ctx.repositories.group.findById(body.group_id);
+      this.ctx.assert.resourceNotFound(!_group, `Group with id ${body.group_id} not found`);
+      const group = _group!;
+
+      if (group.type !== "PUBLIC") {
+        const isMember = await this.ctx.repositories.group.groupMember.isMember(group.id, locals.payload.sub);
+        this.ctx.assert.forbidden(!isMember, "You are not a member of this group");
+      }
+    }
+
     const today = Date.now();
     const slug = slugify(body.title + " " + today);
     const validTopicsPromises = body.topics.map((topic) => this.ctx.repositories.topic.findById(topic));
